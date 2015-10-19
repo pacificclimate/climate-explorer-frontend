@@ -1,0 +1,23 @@
+{
+  "name": "Climate-explorer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Basil Veerman <bveerman@uvic.ca>",
+  "license": "GPLv3",
+  "dependencies": {
+    "bootstrap-slider": "^5.1.0",
+    "jquery": "^2.1.4",
+    "leaflet": "0.7.3",
+    "proj4": "^2.3.10",
+    "proj4leaflet": "^0.7.1",
+    "react": "^0.13.3"
+  },
+  "devDependencies": {
+    "jest-cli": "^0.5.1",
+    "jsx-loader": "^0.12.2"
+  }
+}
