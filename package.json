@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "author": "Basil Veerman <bveerman@uvic.ca>",
-  "license": "GPLv3",
+  "license": "GPL-3.0",
   "dependencies": {
     "bootstrap": "^3.3.5",
     "bootstrap-slider": "^5.1.0",
