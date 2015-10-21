@@ -32,6 +32,29 @@ var CanadaMap = React.createClass({
             ]
         });
 
+        var defaults = {
+            dataset: "pr-tasmax-tasmin_day_BCSD-ANUSPLIN300-CanESM2_historical-rcp26_r1i1p1_19500101-21001231",
+            variable: "tasmax"
+        };
+
+        var params = {
+            crs: crs,
+            layers: defaults.dataset + "/" + defaults.variable,
+            format: "image/png",
+            transparent: "true",
+            opacity: 0.7,
+            styles: "boxfill/ferret",
+            time: "2000-01-01",
+            numcolorbands: 254,
+            version: "1.1.1",
+            srs: "EPSG:4326",
+            colorscalerange: "-50,11.0",
+            logscale: false
+        };
+
+        var datalayerName = "Climate raster";
+        var ncwmsLayer =  new L.tileLayer.wms("http://tools.pacificclimate.org/ncWMS/wms", params).addTo(map);
+
         map.on('click', this.onMapClick);
         map.setView(L.latLng(60, -100), 1);
 
