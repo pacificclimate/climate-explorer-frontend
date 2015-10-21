@@ -25,7 +25,7 @@ module.exports = {
                 loader: 'babel'
             }, {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader!postcss-loader'
+                loader: ExtractTextPlugin.extract('style-loader', 'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader')
             }, {
                 test: /\.(png|jpg)$/,
                 loader: 'file?name=images/[hash].[ext]'
@@ -39,6 +39,7 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
+        new ExtractTextPlugin('style.css', { allChunks: true }),
     ],
 
     postcss: function () {

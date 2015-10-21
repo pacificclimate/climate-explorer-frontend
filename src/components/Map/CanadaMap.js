@@ -2,7 +2,7 @@ var React = require("react");
 
 var utils = require("./utils");
 
-import './map.css';
+import styles from './map.css';
 
 var CanadaMap = React.createClass({
     componentDidMount: function() {
@@ -45,7 +45,7 @@ var CanadaMap = React.createClass({
     },
     render: function() {
         return (
-            <div className="map"></div>
+            <div className={styles.map}></div>
         );
     }
 });
