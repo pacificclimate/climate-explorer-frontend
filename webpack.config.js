@@ -2,6 +2,9 @@
 
 var path = require('path');
 var webpack = require('webpack');
+var autoprefixer = require('autoprefixer');
+
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
     entry: [
@@ -16,15 +19,31 @@ module.exports = {
 
     module: {
         loaders: [
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
-            { test: /\.css$/, loader: "style!css" }
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel'
+            }, {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader!postcss-loader'
+            }, {
+                test: /\.(png|jpg)$/,
+                loader: 'file?name=images/[hash].[ext]'
+            }, {
+                test: /\.woff$/,
+                loader: 'file-loader?name=fonts/[name].[ext]'
+            }
         ]
     },
 
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
+        new webpack.NoErrorsPlugin(),
     ],
+
+    postcss: function () {
+        return [autoprefixer];
+    },
 
     devServer: {
         historyApiFallback: true,
