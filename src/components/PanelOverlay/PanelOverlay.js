@@ -1,29 +1,8 @@
 var React = require("react/addons");
 var m = require("../util.js").merge;
+var classNames = require('classnames');
 
-var styles = {
-    root: {
-        position: 'relative',
-        paddingLeft: 15,
-        paddingRight: 15,
-        paddingBottom: 5,
-        marginTop: 10,
-        marginBottom: 10,
-        borderRadius: '0px 10px 10px 0px',
-        float: 'left',
-        clear: 'left',
-        backgroundColor: '#333',
-        color: '#DDD',
-    },
-
-    hidden: {
-        display: 'none',
-    },
-
-    content: {
-        overflowY: 'auto',
-    }
-};
+import styles from './PanelOverlay.css';
 
 var PanelOverlay = React.createClass({
     propTypes: {
@@ -53,18 +32,15 @@ var PanelOverlay = React.createClass({
     },
 
     render: function() {
-        var containerStyle = m(styles.root,
-        {
+        var containerStyle = {
             maxWidth: this.props.maxWidth,
             maxHeight: this.props.maxHeight
-        }
-        );
+        };
 
         return (
-            <div className='' style={containerStyle}>
-            <h3 onClick={ this.handleClick }>{this.props.title}</h3>
-            <div style={m(styles.content,
-                !this.state.open && styles.hidden)}>{this.props.children}</div>
+            <div className={ styles.container } style={ containerStyle }>
+            <h3 onClick={ this.handleClick }>{ this.props.title }</h3>
+            <div className= { classNames(styles.content, !this.state.open && styles.hidden) }>{this.props.children}</div>
             </div>
         )
     }

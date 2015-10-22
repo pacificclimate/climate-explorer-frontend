@@ -1,0 +1,22 @@
+.container {
+    position: relative;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 0px 10px 10px 0px;
+    float: left;
+    clear: left;
+    background-color: #333;
+    color: #DDD;
+}
+
+.content {
+    border: 5px solid red;
+    overflow-y: auto;
+}
+
+.hidden {
+    display: none;
+}
