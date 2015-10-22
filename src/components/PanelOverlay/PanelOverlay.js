@@ -39,10 +39,16 @@ var PanelOverlay = React.createClass({
             maxHeight: this.props.maxHeight
         };
 
+        var contentStyle = {
+            maxHeight: this.props.maxHeight - 66 // Bootstrap margin-top 20px, margin-bottom 10px + (h3 height 24px) * 1.1 line height + 10px spacing
+        };
+
         return (
             <div className={ classNames(styles.container, styles[this.props.align]) } style={ containerStyle }>
             <h3 onClick={ this.handleClick }>{ this.props.title }</h3>
-            <div className= { classNames(styles.content, !this.state.open && styles.hidden) }>{this.props.children}</div>
+            <div className={ classNames(styles.content, !this.state.open && styles.hidden) }
+                style={ contentStyle }>{this.props.children}
+            </div>
             </div>
         )
     }
