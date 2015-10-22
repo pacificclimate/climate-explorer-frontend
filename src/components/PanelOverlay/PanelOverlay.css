@@ -5,15 +5,23 @@
     padding-bottom: 5px;
     margin-top: 10px;
     margin-bottom: 10px;
-    border-radius: 0px 10px 10px 0px;
-    float: left;
-    clear: left;
     background-color: #333;
     color: #DDD;
 }
 
+.left {
+    border-radius: 0px 10px 10px 0px;
+    float: left;
+    clear: left;
+}
+
+.right {
+    border-radius: 10px 0px 0px 10px;
+    float: right;
+    clear: right;
+}
+
 .content {
-    border: 5px solid red;
     overflow-y: auto;
 }
 

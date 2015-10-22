@@ -8,12 +8,14 @@ var PanelOverlay = React.createClass({
     propTypes: {
         maxWidth: React.PropTypes.number,
         maxHeight: React.PropTypes.number,
+        align: React.PropTypes.string,
     },
 
     getDefaultProps: function() {
         return {
             maxHeight: 200,
             maxWidth: 300,
+            align: 'left',
         };
     },
 
@@ -38,7 +40,7 @@ var PanelOverlay = React.createClass({
         };
 
         return (
-            <div className={ styles.container } style={ containerStyle }>
+            <div className={ classNames(styles.container, styles[this.props.align]) } style={ containerStyle }>
             <h3 onClick={ this.handleClick }>{ this.props.title }</h3>
             <div className= { classNames(styles.content, !this.state.open && styles.hidden) }>{this.props.children}</div>
             </div>
