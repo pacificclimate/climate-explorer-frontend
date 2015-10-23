@@ -16,17 +16,17 @@ var PanelOverlay = React.createClass({
             maxHeight: 200,
             maxWidth: 300,
             align: 'left',
-        };
-    },
-
-    getOpenStyle: function() {
-        return {
-            maxHeight: this.props.maxHeight,
+            initialOpen: false,
+            keepOpen: false,
         };
     },
 
     getInitialState: function() {
-        return { open: false };
+        if (this.props.keepOpen) {
+            return { open: true };
+        } else {
+            return { open: this.props.initialOpen };
+        }
     },
 
     handleClick: function(event) {
@@ -45,7 +45,7 @@ var PanelOverlay = React.createClass({
 
         return (
             <div className={ classNames(styles.container, styles[this.props.align]) } style={ containerStyle }>
-            <h3 onClick={ this.handleClick }>{ this.props.title }</h3>
+            <h3 onClick={ this.props.keepOpen ? null : this.handleClick }>{ this.props.title }</h3>
             <div className={ classNames(styles.content, !this.state.open && styles.hidden) }
                 style={ contentStyle }>{this.props.children}
             </div>
