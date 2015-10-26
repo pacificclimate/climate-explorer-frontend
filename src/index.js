@@ -5,7 +5,7 @@ var CanadaMap = require("./components/Map/CanadaMap").CanadaMap;
 var PanelOverlay = require("./components/PanelOverlay/PanelOverlay");
 var DatasetList = require("./components/CheckboxList/DatasetList");
 var TimeSlider = require("./components/Slider/TimeSlider");
-
+var GraphOverlay = require("./components/DataGraph/GraphOverlay");
 
 var App = React.createClass({
 
@@ -20,6 +20,7 @@ var App = React.createClass({
                 <PanelOverlay title={'Ensemble Selection'} maxHeight={200}>
                     <DatasetList />
                 </PanelOverlay>
+                <GraphOverlay />
                 <TimeSlider />
             </div>
         )
