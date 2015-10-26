@@ -20,7 +20,9 @@
     "jquery": "^2.1.4",
     "leaflet": "0.7.3",
     "proj4": "^2.3.10",
-    "proj4leaflet": "^0.7.1"
+    "proj4leaflet": "^0.7.1",
+    "contextify": "^0.1.14",
+    "rickshaw": "^1.5.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.3",
