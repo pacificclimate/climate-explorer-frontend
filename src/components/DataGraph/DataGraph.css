@@ -1,0 +1,11 @@
+.container {
+    width: 350px;
+    height: 400px;
+    float: right;
+}
+
+.y_axis {
+    width: 40px;
+    height: 400px;
+    float: left;
+}
