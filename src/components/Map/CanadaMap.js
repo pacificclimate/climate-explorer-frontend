@@ -40,6 +40,7 @@ var CanadaMap = React.createClass({
         var params = {
             crs: crs,
             layers: defaults.dataset + "/" + defaults.variable,
+            noWrap: true,
             format: "image/png",
             transparent: "true",
             opacity: 0.7,
