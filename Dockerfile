@@ -3,7 +3,7 @@ FROM node:latest
 ADD . /app
 WORKDIR /app
 
-RUN npm install
+RUN npm install --quiet
 
 EXPOSE 8080
 
