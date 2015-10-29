@@ -1,69 +1,33 @@
 import React, { PropTypes, Component } from 'react';
-//import Rickshaw from 'rickshaw';
-var Rickshaw = require("rickshaw/rickshaw");
-
+var C3 = require("c3/c3");
+import parseC3Data from './util';
 import styles from './DataGraph.css';
 
 var DataGraph = React.createClass({
 
-    parseData: function(data) {
-        var allModelsData = [];
-        for (let model in data) {
-
-            var modelData = []
-            for (let key in data[model]) {
-                if (parseInt(key)) {
-                    var val = data[model][key];
-                    modelData.push({x: parseInt(key), y: val});
-                }
-            }
-
-            // sort model data along x axis
-            allModelsData.push({
-                color: 'steelblue', // generate dynamically
-                data:modelData
-            });
-        }
-        return allModelsData;
-    },
-
-
     componentDidMount: function() {
 
-        var seriesData = this.parseData(this.props.data);
+        var seriesData = parseC3Data(this.props.data);
+        console.log(seriesData);
 
-        var graph = new Rickshaw.Graph( {
-            element: document.getElementById('graph'),
-            renderer: 'lineplot',
-            interpolation: 'linear',
-            min: 'auto',
+        var graph = new C3.generate({
+            bindto: document.getElementById('graph'),
+            size: {width: 300},
             padding: {
-                top: 0.1,
-                bottom: 0.1,
-                right: 0.1,
-                left: 0.1
-            },
-            series: seriesData
+                right: 30},
+            data: seriesData[0],
+            axis: seriesData[1],
+            color: {
+                pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+            }
         });
 
-        var y_ticks = new Rickshaw.Graph.Axis.Y( {
-            graph: graph,
-            orientation: 'left',
-            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-            element: document.getElementById('y_axis')
-        } );
-
-        var graphHover = new Rickshaw.Graph.HoverDetail({
-            graph:graph
-        });
-
-        graph.render();
     },
 
     render: function () {
+        // <div id={'y_axis'} className={styles.y_axis}></div>
         return (
             <div>
-            <div id={'y_axis'} className={styles.y_axis}></div>
             <div id={'graph'} className={styles.container}></div>
             </div>
         )

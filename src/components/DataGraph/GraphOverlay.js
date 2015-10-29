@@ -15,7 +15,7 @@ const testData = {
     "model_id2": {
         "units": "degC",
         "2050": 22.0,
-        "2080": 36.0,
+        // "2080": 36.0,
         "2020": 12.0  
     },
     "model_id3": {
@@ -25,22 +25,14 @@ const testData = {
         "2020": 13.0  
     },
     "model_id4": {
-        "units": "degC",
-        "2050": 24.0,
+        "units": "degK",
+        // "2050": 24.0,
         "2080": 39.0,
         "2020": 14.0  
     }
 };
 
 class GraphOverlay extends Component {
-
-    // getDefaultProps () {
-    //     return {
-    //         maxHeight: 600,
-    //         maxWidth: 1000,
-    //         align: 'right',
-    //     };
-    // }
 
     render () {
         return (        
