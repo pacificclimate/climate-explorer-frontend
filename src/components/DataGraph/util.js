@@ -8,6 +8,7 @@ var parseC3Data = function(data) {
         var xLabel = modelName.concat("_xs");
         var xSeries = [xLabel];
         var yUnits;
+        var yAxisCount; // to accommodate plotting multiple climate variables
         allModelsData['xs'][dataLabel] = xLabel;
         for (let key in data[model]) {
             var val = data[model][key];
@@ -15,16 +16,24 @@ var parseC3Data = function(data) {
                 xSeries.push(key);
                 dataSeries.push(val);
             }
-            else { // this is the units of the series
+            else { // this is the units of the series, which also defines the y axes
                 if (String(key) === 'units' && String(data[model][key]) !== yUnits) { // don't create redundant axes
                     yUnits = String(data[model][key]);
-                    var modelYaxisLabel = modelName.concat("_axis");
+                    // var modelYaxisLabel = modelName.concat("_axis");
+                    var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
+
                     allModelsData['axes'][dataLabel] = modelYaxisLabel;
                     axisInfo[modelYaxisLabel] = {
                         'show': true,
-                        'label': yUnits,
-                        'position':'outer-center',
+                        'label': {
+                            'text': yUnits,
+                            'position':'inner-center',
+                        }
                     };
+                    if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
+                        yAxisCount = 1;
+                    }
+                    yAxisCount++;
                 }
             }              
         }
