@@ -10,7 +10,7 @@ var DataGraph = React.createClass({
             height: 380,
             width: 380,
             padding: {
-                right: 30
+                right: 50
             }
         };
     },
@@ -36,7 +36,7 @@ var DataGraph = React.createClass({
             tooltip: {
                 grouped: false,
                 format: {
-                    name: function (id) { return id + ': '},
+                    name: function (id) { return id },
                     title: function(d) { return d },
                     value: function (value) { return value }
                     } 
