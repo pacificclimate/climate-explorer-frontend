@@ -40,7 +40,10 @@
     "jquery": "^2.1.4",
     "leaflet": "0.7.3",
     "proj4": "^2.3.10",
-    "proj4leaflet": "^0.7.1"
+    "proj4leaflet": "^0.7.1",
+    "contextify": "^0.1.14",
+    "c3": "~0.4.11-rc4",
+    "react-bootstrap-table: "~1.2.5"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.3",
@@ -62,6 +65,6 @@
     "react-router": "^1.0.0-rc3",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.2",
-    "webpack-dev-server": "^1.12.1"
+    "webpack-dev-server": "^1.12.1",
   }
 }
