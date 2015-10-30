@@ -27,7 +27,7 @@ var parseC3Data = function(data) {
                         'show': true,
                         'label': {
                             'text': yUnits,
-                            'position':'inner-center',
+                            'position':'outer-center',
                         }
                     };
                     if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
