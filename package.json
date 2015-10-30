@@ -30,9 +30,13 @@
       "react"
     ]
   },
+  "//": ["brianmcd/contextify not actually needed, but",
+    "included as a hack for other dependencies which require it",
+    "Should remove when node v4.x compatible version released to npm"],
   "dependencies": {
     "bootstrap": "^3.3.5",
     "bootstrap-slider": "^5.1.0",
+    "contextify": "brianmcd/contextify",
     "jquery": "^2.1.4",
     "leaflet": "0.7.3",
     "proj4": "^2.3.10",
