@@ -48,6 +48,7 @@
     "extract-text-webpack-plugin": "^0.8.2",
     "jest-cli": "^0.5.1",
     "jsx-loader": "^0.12.2",
+    "normalize.css": "^3.0.3",
     "perfect-scrollbar": "^0.6.7",
     "postcss-cssnext": "^2.2.0",
     "postcss-import": "^7.1.0",

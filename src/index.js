@@ -6,6 +6,7 @@ var PanelOverlay = require("./components/PanelOverlay/PanelOverlay");
 var DatasetList = require("./components/CheckboxList/DatasetList");
 var TimeSlider = require("./components/Slider/TimeSlider");
 
+var css = require("./styles/base.css")
 
 var App = React.createClass({
 
