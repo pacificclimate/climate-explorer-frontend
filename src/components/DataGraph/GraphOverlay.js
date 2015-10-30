@@ -37,7 +37,7 @@ class GraphOverlay extends Component {
     render () {
         return (        
         <PanelOverlay title={'Data Plot'} maxHeight={500} maxWidth={500} align={'right'}>
-        <DataGraph data={testData} />
+            <DataGraph data={testData} />
         </PanelOverlay>
         )
     }

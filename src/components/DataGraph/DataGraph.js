@@ -18,8 +18,6 @@ var DataGraph = React.createClass({
     componentDidMount: function() {
 
         var seriesData = parseC3Data(this.props.data);
-        console.log(seriesData[0]);
-        console.log(seriesData[1]);
 
         var graph = new C3.generate({
             bindto: document.getElementById('graph'),
@@ -48,7 +46,6 @@ var DataGraph = React.createClass({
     },
 
     render: function () {
-        // <div id={'y_axis'} className={styles.y_axis}></div>
         return (
             <div>
             <div id={'graph'} className={styles.container}></div>

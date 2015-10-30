@@ -6,6 +6,7 @@ var PanelOverlay = require("./components/PanelOverlay/PanelOverlay");
 var DatasetList = require("./components/CheckboxList/DatasetList");
 var TimeSlider = require("./components/Slider/TimeSlider");
 var GraphOverlay = require("./components/DataGraph/GraphOverlay");
+var TableOverlay = require("./components/DataTable/TableOverlay");
 
 var App = React.createClass({
 
@@ -21,6 +22,7 @@ var App = React.createClass({
                     <DatasetList />
                 </PanelOverlay>
                 <GraphOverlay />
+                <TableOverlay />
                 <TimeSlider />
             </div>
         )
