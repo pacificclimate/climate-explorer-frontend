@@ -22,7 +22,7 @@
     "proj4": "^2.3.10",
     "proj4leaflet": "^0.7.1",
     "contextify": "^0.1.14",
-    "rickshaw": "^1.5.1"
+    "c3": "~0.4.11-rc4"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.3",
@@ -43,6 +43,5 @@
     "style-loader": "^0.13.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1",
-    "c3": "~0.4.11-rc4"
   }
 }
