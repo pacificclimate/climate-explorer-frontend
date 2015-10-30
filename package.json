@@ -14,10 +14,17 @@
     "type": "git",
     "url": "https://github.com/pacificclimate/climate-explorer"
   },
-  "jest" : {
+  "jest": {
     "scriptPreprocessor": "./node_modules/babel-jest",
-    "testFileExtensions": ["es6", "js"],
-    "moduleFileExtensions": ["js", "json", "es6"],
+    "testFileExtensions": [
+      "es6",
+      "js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "es6"
+    ],
     "unmockedModulePathPatterns": [
       "fbjs",
       "react"
