@@ -30,9 +30,11 @@
       "react"
     ]
   },
-  "//": ["brianmcd/contextify not actually needed, but",
+  "//": [
+    "brianmcd/contextify not actually needed, but",
     "included as a hack for other dependencies which require it",
-    "Should remove when node v4.x compatible version released to npm"],
+    "Should remove when node v4.x compatible version released to npm"
+  ],
   "dependencies": {
     "bootstrap": "^3.3.5",
     "bootstrap-slider": "^5.1.0",
@@ -53,6 +55,7 @@
     "css-loader": "^0.20.2",
     "extract-text-webpack-plugin": "^0.8.2",
     "jest-cli": "^0.5.1",
+    "json-stable-stringify": "^1.0.0",
     "jsx-loader": "^0.12.2",
     "normalize.css": "^3.0.3",
     "perfect-scrollbar": "^0.6.7",
@@ -63,6 +66,7 @@
     "react-hot-loader": "^1.3.0",
     "react-router": "^1.0.0-rc3",
     "style-loader": "^0.13.0",
+    "underscore": "^1.8.3",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   }

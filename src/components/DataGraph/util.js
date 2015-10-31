@@ -1,3 +1,5 @@
+var stringify = require('json-stable-stringify');
+
 var parseC3Data = function(data) {
     var allModelsData = {xs:{}, columns:[], axes:{}};
     var axisInfo = {};
@@ -41,7 +43,11 @@ var parseC3Data = function(data) {
         allModelsData['columns'].push(dataSeries);          
     }
     // console.log(allModelsData);
+    // console.log(stringify(allModelsData));
     // console.log(axisInfo);
+    // console.log(stringify(axisInfo));
+    
+
     return [allModelsData, axisInfo];
 }
 
