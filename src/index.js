@@ -1,35 +1,15 @@
-var React = require("react");
+import React, { Component } from 'react';
 var ReactDOM = require("react-dom");
-var CanadaMap = require("./components/Map/CanadaMap").CanadaMap;
 
+import IndexPage from './components/IndexPage'
 
-var PanelOverlay = require("./components/PanelOverlay/PanelOverlay");
-var DatasetList = require("./components/CheckboxList/DatasetList");
-var TimeSlider = require("./components/Slider/TimeSlider");
-var css = require("./styles/base.css")
-var GraphOverlay = require("./components/DataGraph/GraphOverlay");
-var TableOverlay = require("./components/DataTable/TableOverlay");
+class App extends Component {
 
-var App = React.createClass({
-
-
-    render: function() {
+    render() {
         return (
-            <div>
-                <CanadaMap></CanadaMap>
-                <PanelOverlay title={'Dataset Selection'} maxHeight={200}>
-                    <DatasetList />
-                </PanelOverlay>
-                <PanelOverlay title={'Ensemble Selection'} maxHeight={200}>
-                    <DatasetList />
-                </PanelOverlay>
-                <GraphOverlay />
-                <TableOverlay />
-                <TimeSlider />
-            </div>
-        )
+            <IndexPage />
+        );
     }
-
-});
+}
 
 ReactDOM.render(<App />, document.getElementById('wrapper'));

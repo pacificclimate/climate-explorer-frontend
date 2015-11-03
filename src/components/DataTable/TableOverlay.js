@@ -44,9 +44,7 @@ class TableOverlay extends Component {
 
     render () {
         return (        
-        <PanelOverlay title={'Data Summary'} maxHeight={500} maxWidth={600} align={'right'}>
             <DataTable data={testData} />
-        </PanelOverlay>
         )
     }
 };

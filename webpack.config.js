@@ -43,7 +43,7 @@ module.exports = {
                 loader: ExtractTextPlugin.extract('style-loader', 'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader')
             }, {
                 test: /\.(png|jpg)$/,
-                loader: 'file-loader?name=images/[hash].[ext]'
+                loader: 'url-loader?limit=10000'
             }, {
                 test: /\.woff$/,
                 loader: 'file-loader?name=fonts/[name].[ext]'

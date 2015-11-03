@@ -1,0 +1,6 @@
+{
+  "name": "Experiment Selector",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ExperimentSelector.js"
+}
