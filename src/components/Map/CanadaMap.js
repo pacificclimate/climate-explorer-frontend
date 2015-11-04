@@ -1,4 +1,5 @@
 var React = require("react");
+var ReactDOM = require("react-dom");
 
 var utils = require("./utils");
 
@@ -15,7 +16,7 @@ var CanadaMap = React.createClass({
             }
         );
 
-        var map = this.map = L.map(this.getDOMNode(), {
+        var map = this.map = L.map(ReactDOM.findDOMNode(this), {
             crs: crs,
             minZoom: 0,
             maxZoom: 10,

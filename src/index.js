@@ -1,4 +1,5 @@
 var React = require("react");
+var ReactDOM = require("react-dom");
 var CanadaMap = require("./components/Map/CanadaMap").CanadaMap;
 
 
@@ -31,4 +32,4 @@ var App = React.createClass({
 
 });
 
-React.render(<App />, document.getElementById('wrapper'));
+ReactDOM.render(<App />, document.getElementById('wrapper'));

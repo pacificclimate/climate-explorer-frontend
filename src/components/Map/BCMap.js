@@ -1,4 +1,5 @@
 var React = require("react");
+var ReactDOM = require("react-dom");
 
 var utils = require("./utils");
 
@@ -20,7 +21,7 @@ var BCMap = React.createClass({
             }
         );
 
-        var map = L.map(this.getDOMNode(), {
+        var map = L.map(ReactDOM.findDOMNode(this), {
             crs: crs,
             minZoom: 0,
             maxZoom: 12,

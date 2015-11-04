@@ -1,4 +1,4 @@
-var React = require("react/addons");
+var React = require("react");
 var m = require("../util.js").merge;
 var classNames = require('classnames');
 
