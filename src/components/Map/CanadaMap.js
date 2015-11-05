@@ -22,8 +22,7 @@ var CanadaMap = React.createClass({
             maxZoom: 10,
             maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
             layers: [
-                L.tileLayer(
-                'http://{s}.tiles.pacificclimate.org/tilecache/tilecache.py/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
+                L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
                 {
                     subdomains: 'abc',
                     noWrap: true,
@@ -55,7 +54,7 @@ var CanadaMap = React.createClass({
         };
 
         var datalayerName = "Climate raster";
-        var ncwmsLayer =  new L.tileLayer.wms("http://tools.pacificclimate.org/ncWMS/wms", params).addTo(map);
+        var ncwmsLayer =  new L.tileLayer.wms(NCWMS_URL, params).addTo(map);
 
         map.on('click', this.onMapClick);
         map.setView(L.latLng(60, -100), 1);

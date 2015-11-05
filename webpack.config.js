@@ -5,6 +5,12 @@ var webpack = require('webpack');
 
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+const GLOBALS = {
+    'process.env.NODE_ENV': (process.env.NODE_ENV !== 'production') ? '"development"' : '"production"',
+    'TILECACHE_URL': JSON.stringify(process.env.TILECACHE_URL || 'http://tiles.pacificclimate.org/tilecache/tilecache.py'),
+    'NCWMS_URL': JSON.stringify(process.env.NCWMS_URL || 'http://tools.pacificclimate.org/ncWMS/wms')
+};
+
 const AUTOPREFIXER_BROWSERS = [
   'Chrome >= 35',
   'Firefox >= 31',
@@ -44,6 +50,8 @@ module.exports = {
     },
 
     plugins: [
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.DefinePlugin(GLOBALS),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
         new ExtractTextPlugin('style.css', { allChunks: true }),

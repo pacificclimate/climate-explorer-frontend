@@ -27,8 +27,7 @@ var BCMap = React.createClass({
             maxZoom: 12,
             maxBounds: L.latLngBounds([[45, -148], [62, -108]]),
             layers: [
-                L.tileLayer(
-                'http://{s}.tiles.pacificclimate.org/tilecache/tilecache.py/1.0.0/bc_osm/{z}/{x}/{y}.png',
+                L.tileLayer(TILECACHE_URL + '1.0.0/bc_osm/{z}/{x}/{y}.png',
                 {
                     subdomains: 'abc',
                     noWrap: true,
