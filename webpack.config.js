@@ -51,6 +51,7 @@ module.exports = {
 
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.ProvidePlugin({$: "jquery", jQuery: "jquery"}),
         new webpack.DefinePlugin(GLOBALS),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
