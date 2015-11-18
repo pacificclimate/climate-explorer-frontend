@@ -1,7 +1,7 @@
 :root {
     --lwidth: 300px;
     --rwidth: 600px;
-    --barwidth: 25px;
+    --barwidth: 30px;
 };
 
 .content {
@@ -45,24 +45,36 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color:black;
     width: var(--barwidth);
-    cursor: col-resize;
     transition: left 0.5s, right 0.5s;
 }
 
 .dragbar.left {
     left: calc(var(--lwidth));
+    cursor: w-resize;
 }
 
 .dragbar.right {
     right: calc(var(--rwidth));
+    cursor: e-resize;
 }
 
 .dragbar.left.closed {
     left: 0;
+    cursor: e-resize;
 }
 
 .dragbar.right.closed {
     right: 0;
+    cursor: w-resize;
+}
+
+.verticalAlign {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.glyph {
+    margin-left: 25%;
 }

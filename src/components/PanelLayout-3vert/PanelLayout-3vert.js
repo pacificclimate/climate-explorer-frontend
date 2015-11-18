@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-
+import { Glyphicon } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import styles from './PanelLayout-3vert.css';
@@ -47,18 +47,35 @@ class App extends Component {
       !this.state.lOpen && styles.lclosed
     )
 
+    const glyphLeft = (
+      <div className={classNames(styles.verticalAlign, styles.glyph)}>
+        <Glyphicon glyph="chevron-left" /><br /><br /><Glyphicon glyph="chevron-left" />
+      </div>
+    )
+
+    const glyphRight = (
+      <div className={classNames(styles.verticalAlign, styles.glyph)}>
+        <Glyphicon glyph="chevron-right" /><br /><br /><Glyphicon glyph="chevron-right" />
+      </div>
+    )
+
     return (
       <div>
         <div className={lClass}>
           {this.props.left}
         </div>
-        <div className={classNames(styles.dragbar, styles.left, !this.state.lOpen && styles.closed)} onClick={this.toggleLeft.bind(this)}></div>
+        <div className={classNames(styles.dragbar, styles.left, !this.state.lOpen && styles.closed)}
+            onClick={this.toggleLeft.bind(this)}>
+          { (this.state.lOpen ? glyphLeft : glyphRight) }
+        </div>
 
         <div className={rClass}>
           {this.props.right}
         </div>
-        <div className={classNames(styles.dragbar, styles.right, !this.state.rOpen && styles.closed)} onClick={this.toggleRight.bind(this)}></div>
-
+        <div className={classNames(styles.dragbar, styles.right, !this.state.rOpen && styles.closed)}
+            onClick={this.toggleRight.bind(this)}>
+          { (this.state.rOpen ? glyphRight : glyphLeft) }
+        </div>
         <div className={contentClass}>
           {this.props.content}
         </div>
