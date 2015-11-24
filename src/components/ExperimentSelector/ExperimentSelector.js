@@ -24,8 +24,6 @@ var ExperimentSelector = React.createClass({
 
   onChange: function(event) {
     this.setState({value: event.target.value});
-    window.alert("Change detected");
-    console.log("Change detected");
     this.props.onChange(event.target.value);
   },
 

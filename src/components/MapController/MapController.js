@@ -27,12 +27,31 @@ var MapController = React.createClass({
       colorscalerange: "0.1,100.0"
     });
   },
-    
+  setWMSParam: function(param, event) {
+    var update = {}; update[param] = event.target.value;
+    this.setState(update);
+  },
   render: function () {
     return (
       <div>
         <div className={styles.selector}>
           <ExperimentSelector onChange={this.handleChange} />
+          <select onChange={this.setWMSParam.bind(this, 'styles')} >
+            <option value="boxfill/ferret">boxfill/ferret</option>
+            <option value="boxfill/rainbow">boxfill/rainbow</option>
+            <option value="boxfill/occam">boxfill/occam</option>
+            <option value="boxfill/occam_inv">boxfill/occam_inv</option>
+          </select>
+          // FIXME: These need to be dynamically populated
+          <select onChange={this.setWMSParam.bind(this, 'variable')} >
+            <option value="tasmax">Maximumm temperature</option>
+            <option value="tasmin">Minimum temperature</option>
+            <option value="pr">Pricipitation</option>
+          </select>
+          <select onChange={this.setWMSParam.bind(this, 'logscale')} >
+            <option value="false">Linear scale</option>
+            <option value="true">Log scale</option>
+          </select>
         </div>
         <div className={styles.map}>
         <CanadaMap {...this.state} />
