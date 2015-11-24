@@ -22,9 +22,9 @@ var MapController = React.createClass({
   },
   handleChange: function(i) {
     this.setState({
-      'variable': 'pr',
-      'logscale': true,
-      'colorscalerange': "0.1,100.0"
+      variable: 'pr',
+      logscale: true,
+      colorscalerange: "0.1,100.0"
     });
   },
     
