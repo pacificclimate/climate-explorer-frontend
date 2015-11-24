@@ -4,16 +4,15 @@ import _ from 'underscore';
 
 import styles from './ExperimentSelector.css';
 
-class ExperimentSelector extends Component {
+var ExperimentSelector = React.createClass({
 
-  constructor(props) {
-    super(props);
-    this.state = {
+  getInitialState: function() {
+    return {
       items: []
     }
-  }
+  },
 
-  componentDidMount() {
+  componentDidMount: function() {
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'models'),
       crossDomain: true
@@ -21,17 +20,24 @@ class ExperimentSelector extends Component {
       data = _.uniq(data);
       this.setState({ items: data });
     }.bind(this));
-  };
+  },
 
-  render() {
+  onChange: function(event) {
+    this.setState({value: event.target.value});
+    window.alert("Change detected");
+    console.log("Change detected");
+    this.props.onChange(event.target.value);
+  },
+
+  render: function() {
     return (
       <div className={styles.selector}>
-        <select>
+        <select onChange={this.onChange.bind(this)} value={this.state.value}>
           { this.state.items.map(function(item){ return <option key={item}>{item} </option> }) }
         </select>
       </div>
     );
   }
-}
+});
 
 export default ExperimentSelector;

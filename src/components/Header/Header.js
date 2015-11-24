@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import ExperimentSelector from '../ExperimentSelector'
-
 import styles from './Header.css';
 
 class Header extends Component {
@@ -19,7 +17,6 @@ class Header extends Component {
               </a>
             </Col>
             <Col lg={4}>
-              <ExperimentSelector />
             </Col>
             <Col lg={4}>
             </Col>

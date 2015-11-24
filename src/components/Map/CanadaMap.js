@@ -6,6 +6,7 @@ var utils = require("./utils");
 import styles from './map.css';
 
 var CanadaMap = React.createClass({
+
     componentDidMount: function() {
         var crs = new L.Proj.CRS.TMS(
             'EPSG:4326',
@@ -32,29 +33,24 @@ var CanadaMap = React.createClass({
             ]
         });
 
-        var defaults = {
-            dataset: "pr-tasmax-tasmin_day_BCSD-ANUSPLIN300-CanESM2_historical-rcp26_r1i1p1_19500101-21001231",
-            variable: "tasmax"
-        };
-
         var params = {
             crs: crs,
-            layers: defaults.dataset + "/" + defaults.variable,
+            layers: this.props.dataset + "/" + this.props.variable,
             noWrap: true,
             format: "image/png",
             transparent: "true",
             opacity: 0.7,
-            styles: "boxfill/ferret",
-            time: "2000-01-01",
+            styles: this.props.styles,
+            time: this.props.time,
             numcolorbands: 254,
             version: "1.1.1",
             srs: "EPSG:4326",
-            colorscalerange: "-50,11.0",
-            logscale: false
+            colorscalerange: this.props.colorscalerange,
+            logscale: this.props.logscale
         };
 
         var datalayerName = "Climate raster";
-        var ncwmsLayer =  new L.tileLayer.wms(NCWMS_URL, params).addTo(map);
+        var ncwmsLayer =  this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, params).addTo(map);
 
         map.on('click', this.onMapClick);
         map.setView(L.latLng(60, -100), 1);
@@ -66,6 +62,11 @@ var CanadaMap = React.createClass({
     },
     onMapClick: function() {
         console.log('clicked on map');
+    },
+    componentDidUpdate: function() {
+        var params = {layers: this.props.dataset + "/" + this.props.variable};
+        $.extend(params, this.props);
+        this.ncwmsLayer.setParams(params);
     },
     render: function() {
         return (
