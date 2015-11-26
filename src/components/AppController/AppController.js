@@ -6,6 +6,8 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import MapController from '../MapController/MapController';
+import GraphOverlay from '../DataGraph/GraphOverlay';
+import TableOverlay from '../DataTable/TableOverlay';
 
 import styles from './AppController.css';
 
@@ -98,15 +100,24 @@ var App = React.createClass({
         <Row>
           <Col lg={4}>
             <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getModels()}/>
+          </Col>
+          <Col lg={4}>
             <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getVariables()}/>
+          </Col>
+          <Col lg={4}>
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getScenarios()}/>
           </Col>
-          <Col lg={8}>
+        </Row>
+        <Row>
+          <Col lg={6}>
             <div className={styles.map}>
               <MapController {...this.state} />
             </div>
           </Col>
-
+          <Col lg={6}>
+            <GraphOverlay />
+            <TableOverlay />
+          </Col>
         </Row>
       </Grid>
 

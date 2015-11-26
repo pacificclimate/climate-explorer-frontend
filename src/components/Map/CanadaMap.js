@@ -56,7 +56,7 @@ var CanadaMap = React.createClass({
         var ncwmsLayer =  this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
         map.on('click', this.onMapClick);
-        map.setView(L.latLng(60, -100), 1);
+        map.setView(L.latLng(60, -100), 0);
 
     },
     componentWillUnmount: function() {
