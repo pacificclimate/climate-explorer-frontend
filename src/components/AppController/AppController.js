@@ -49,13 +49,25 @@ var App = React.createClass({
     }).done(function(data) {
       var models = [];
       for (var key in data) {
-        models.push(_.extend({'unique_id': key}, data[key]))
+        var vars = Object.keys(data[key]['variables'])
+
+        for (var v in vars) {
+          models.push(_.extend(
+            {
+              'unique_id': key,
+              'variable_id': vars[v],
+              'variable_name': data[key]['variables'][vars[v]]
+            }, _.omit(data[key], 'variables')
+          ))
+        }
       }
+
       if (this.isMounted()) {
         this.setState({
           meta: models
         })
       }
+
     }.bind(this));
     
   },
