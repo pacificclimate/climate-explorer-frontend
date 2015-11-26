@@ -30,7 +30,7 @@ var ExperimentSelector = React.createClass({
   render: function() {
     return (
       <div className={styles.selector}>
-        <select onChange={this.onChange.bind(this)} value={this.state.value}>
+        <select onChange={this.onChange} value={this.state.value}>
           { this.state.items.map(function(item){ return <option key={item}>{item} </option> }) }
         </select>
       </div>
