@@ -6,6 +6,7 @@ import Header from '../Header';
 import Layout from '../PanelLayout-3vert';
 import Footer from '../Footer';
 
+import AppController from '../AppController';
 import MapController from '../MapController/MapController';
 import DatasetList from '../CheckboxList/DatasetList';
 import GraphOverlay from '../DataGraph/GraphOverlay';
@@ -22,7 +23,7 @@ class App extends Component {
           <Header />
         </div>
         <div className={styles.content}>
-          <Layout left=<DatasetList /> right={<div><GraphOverlay /><TableOverlay /></div>} content=<MapController /> />
+          <AppController />
         </div>
         <div className={styles.footer}>
           <Footer />
