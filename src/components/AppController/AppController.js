@@ -72,19 +72,29 @@ var App = React.createClass({
     
   },
 
-  setModel: function(model) {
-    this.setState({
-      model:model
-    });
+  updateSelection: function(param, selection) {
+    var update = {}; update[param] = selection;
+    this.setState(update);
   },
   
   render: function() {
     var getModels = function() {
       return _.unique(this.state.meta.map(function(el){return el['model_id']}))
     }.bind(this);
+
+    var getVariables = function() {
+      return _.unique(this.state.meta.map(function(el){return el['variable_id']}))
+    }.bind(this)
+
+    var getScenarios = function() {
+      return _.unique(this.state.meta.map(function(el){return el['experiment']}))
+    }.bind(this)
+
     return (
       <div>
-        <Selector label={"Model Selection"} onChange={this.setModel} items={getModels()}/>
+        <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getModels()}/>
+        <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getVariables()}/>
+        <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getScenarios()}/>
       </div>
     );
   }
