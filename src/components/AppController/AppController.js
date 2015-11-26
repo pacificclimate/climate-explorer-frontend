@@ -2,9 +2,12 @@ import React, { PropTypes, Component } from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
 import { Input } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { CanadaMap } from '../Map/CanadaMap';
+import MapController from '../MapController/MapController';
+
+import styles from './AppController.css';
 
 
 var Selector = React.createClass({
@@ -91,11 +94,22 @@ var App = React.createClass({
     }.bind(this)
 
     return (
-      <div>
-        <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getModels()}/>
-        <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getVariables()}/>
-        <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getScenarios()}/>
-      </div>
+      <Grid fluid={true}>
+        <Row>
+          <Col lg={4}>
+            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getModels()}/>
+            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getVariables()}/>
+            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getScenarios()}/>
+          </Col>
+          <Col lg={8}>
+            <div className={styles.map}>
+              <MapController {...this.state} />
+            </div>
+          </Col>
+
+        </Row>
+      </Grid>
+
     );
   }
 })
