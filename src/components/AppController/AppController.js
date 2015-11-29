@@ -8,34 +8,9 @@ import classNames from 'classnames';
 import MapController from '../MapController/MapController';
 import GraphOverlay from '../DataGraph/GraphOverlay';
 import TableOverlay from '../DataTable/TableOverlay';
+import Selector from '../Selector/Selector';
 
 import styles from './AppController.css';
-
-
-var Selector = React.createClass({
-  getDefaultProps: function() {
-    return {
-      label: "Selection",
-      items: []
-    };
-  },
-
-  handleChange: function(event) {
-    this.props.onChange(event.target.value);
-  },
-
-  render: function() {
-    return (
-      <Input type="select" label={this.props.label} onChange={this.handleChange}>
-      { this.props.items.map(function(item){
-        return <option key={item}>{item} </option>
-      })}
-      </Input>
-      );
-  }
-});
-
-
 
 var App = React.createClass({
 
