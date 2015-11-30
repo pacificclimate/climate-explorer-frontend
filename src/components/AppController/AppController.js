@@ -76,7 +76,7 @@ var App = React.createClass({
         <Row>
           <Col lg={6}>
             <div className={styles.map}>
-              <MapController {...this.state} />
+              <MapController variable={this.state.variable_id}/>
             </div>
           </Col>
           <Col lg={6}>
