@@ -26,6 +26,7 @@ describe('DataGraph', function() {
     var graph = TestUtils.renderIntoDocument(
       <DataGraph />
     );
+    expect(TestUtils.isCompositeComponent(graph)).toBeTruthy();
   });
 
   it('accepts data', function() {
@@ -36,6 +37,7 @@ describe('DataGraph', function() {
     var graph = TestUtils.renderIntoDocument(
       <DataGraph data={data[0]} axis={data[1]} />
     );
+    expect(TestUtils.isCompositeComponent(graph)).toBeTruthy();
   });
 
 });
