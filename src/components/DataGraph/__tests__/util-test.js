@@ -2,7 +2,6 @@ jest.dontMock('../util');
 jest.dontMock('underscore');
 
 var _ = require('underscore');
-var util = require('util');
 
 
 const testData = {

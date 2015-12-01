@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 
 import PanelOverlay from '../PanelOverlay/PanelOverlay';
 import DataGraph from './DataGraph';
+import parseC3Data from './util';
 
 import styles from './GraphOverlay.css';
 
@@ -35,8 +36,11 @@ const testData = {
 class GraphOverlay extends Component {
 
     render () {
-        return (        
-            <DataGraph data={testData} />
+
+        var data = parseC3Data(testData);
+
+        return (
+            <DataGraph data={data[0]} axis={data[1]} />
         )
     }
 };
