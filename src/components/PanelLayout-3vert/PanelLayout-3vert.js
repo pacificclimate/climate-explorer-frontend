@@ -20,12 +20,10 @@ class App extends Component {
 
   toggleLeft() {
     this.setState({lOpen: !this.state.lOpen});
-    console.log('toggleLeft');
   }
 
   toggleRight() {
     this.setState({rOpen: !this.state.rOpen});
-    console.log('toggleRight');
   }
 
   render() {
@@ -64,7 +62,7 @@ class App extends Component {
         <div className={lClass}>
           {this.props.left}
         </div>
-        <div className={classNames(styles.dragbar, styles.left, !this.state.lOpen && styles.closed)}
+        <div className={classNames('control-toggle-left', styles.dragbar, styles.left, !this.state.lOpen && styles.closed)}
             onClick={this.toggleLeft.bind(this)}>
           { (this.state.lOpen ? glyphLeft : glyphRight) }
         </div>
@@ -72,7 +70,7 @@ class App extends Component {
         <div className={rClass}>
           {this.props.right}
         </div>
-        <div className={classNames(styles.dragbar, styles.right, !this.state.rOpen && styles.closed)}
+        <div className={classNames('control-toggle-right', styles.dragbar, styles.right, !this.state.rOpen && styles.closed)}
             onClick={this.toggleRight.bind(this)}>
           { (this.state.rOpen ? glyphRight : glyphLeft) }
         </div>
