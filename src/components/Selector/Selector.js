@@ -17,7 +17,7 @@ var Selector = React.createClass({
     return (
       <Input type="select" label={this.props.label} onChange={this.handleChange}>
       { this.props.items.map(function(item){
-        return <option key={item}>{item} </option>
+        return <option key={item}>{item}</option>
       })}
       </Input>
       );
