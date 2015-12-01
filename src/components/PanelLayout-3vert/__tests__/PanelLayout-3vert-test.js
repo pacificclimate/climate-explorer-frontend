@@ -5,22 +5,23 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 
 const Layout = require('../PanelLayout-3vert');
-import styles from '../PanelLayout-3vert.css';
 
 
 describe('PanelLayout-3vert', function() {
   const left = <div id={'left'}></div>;
   const right = <div id={'right'}></div>;
   const content = <div id={'content'}></div>;
+  var element;
+
+  beforeEach(function() {
+    element = TestUtils.renderIntoDocument(<Layout left={left} content={content} right={right} />);
+  });
 
   it('renders', function(){
-    var element = TestUtils.renderIntoDocument(<Layout left={left} content={content} right={right} />);
     expect(TestUtils.isCompositeComponent(element)).toBeTruthy();
   });
 
   it('toggles open state on click (left)', function(){
-    var element = TestUtils.renderIntoDocument(<Layout left={left} content={content} right={right} />);
-
     TestUtils.Simulate.click(
       TestUtils.findRenderedDOMComponentWithClass(
         element, 'control-toggle-left'
@@ -30,8 +31,6 @@ describe('PanelLayout-3vert', function() {
   });
 
   it('toggles open state on click (right)', function(){
-    var element = TestUtils.renderIntoDocument(<Layout left={left} content={content} right={right} />);
-
     TestUtils.Simulate.click(
       TestUtils.findRenderedDOMComponentWithClass(
         element, 'control-toggle-right'
