@@ -55,6 +55,30 @@ var CanadaMap = React.createClass({
         var datalayerName = "Climate raster";
         var ncwmsLayer =  this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawOptions = {
+            edit: {
+                featureGroup: drawnItems
+            },
+            draw: {
+                marker: false,
+                polyline: false
+            },
+        }
+        var drawControl = new L.Control.Draw(drawOptions);
+        map.addControl(drawControl);
+
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+
+            drawnItems.removeLayer(drawnItems.getLayers()[0]);
+            drawnItems.addLayer(layer);
+            console.log(drawnItems);
+        });
+
         map.on('click', this.onMapClick);
         map.setView(L.latLng(60, -100), 0);
 
