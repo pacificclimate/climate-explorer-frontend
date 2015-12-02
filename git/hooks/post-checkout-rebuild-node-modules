@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Check package.json and npm install after git checkout.
+# Put this to .git/hooks/post-checkout
+#
+
+PREVIOUS_HEAD=$1
+NEW_HEAD=$2
+BRANCH_SWITCH=$3
+
+DIFF=$(git diff --name-only "$PREVIOUS_HEAD".."$NEW_HEAD" -- client/package.json | wc -l)
+
+if [ ${DIFF}  == "1" ]; then
+    echo "[post-checkout] package.json changed"
+    # This is relative to the GIT_WORK_TREE
+    cd client
+    echo "[post-checkout] Removing node_modules/ (if they exist)"
+    rm -rf node_modules/
+    echo "[post-checkout] Reinstalling nodejs modules"
+    npm install
+fi
