@@ -20,7 +20,8 @@ var App = React.createClass({
       filter: {},
       model_id: 'BCCAQ+ANUSPLINE300+MPI-ESM-LR',
       variable_id: 'tasmax',
-      experiment: 'historical+rcp85'
+      experiment: 'historical+rcp85',
+      area: undefined
     };
   },
 
@@ -58,6 +59,10 @@ var App = React.createClass({
     this.setState(update);
   },
 
+  handleSetArea: function(wkt) {
+    this.setState({area: wkt});
+  },
+
   findUniqueId: function() {
       var l = this.state.meta.filter(
 	  function(x) {
@@ -89,7 +94,7 @@ var App = React.createClass({
         <Row>
           <Col lg={6}>
             <div className={styles.map}>
-              <MapController variable={this.state.variable_id} dataset={this.findUniqueId()} />
+              <MapController variable={this.state.variable_id} dataset={this.findUniqueId()} onSetArea={this.handleSetArea} />
             </div>
           </Col>
           <Col lg={6}>

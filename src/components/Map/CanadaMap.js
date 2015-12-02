@@ -1,11 +1,18 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
+var GeoJSONToWKT = require('wellknown').stringify;
 
 var utils = require("./utils");
 
 import styles from './map.css';
 
 var CanadaMap = React.createClass({
+
+    getInitialState: function () {
+        return {
+            area: undefined
+        }
+    },
 
     getDefaultProps: function() {
         return {
@@ -34,6 +41,10 @@ var CanadaMap = React.createClass({
         var params = {layers: this.props.dataset + "/" + this.props.variable};
         $.extend(params, this.props);
         return params;
+    },
+    handleSetArea: function(wkt) {
+        this.setState({area: wkt})
+        this.props.onSetArea(wkt);
     },
     componentDidMount: function() {
         var map = this.map = L.map(ReactDOM.findDOMNode(this), {
@@ -64,20 +75,44 @@ var CanadaMap = React.createClass({
             },
             draw: {
                 marker: false,
+                circle: false,
                 polyline: false
             },
         }
         var drawControl = new L.Control.Draw(drawOptions);
         map.addControl(drawControl);
 
-        map.on('draw:created', function (e) {
-            var type = e.layerType,
-                layer = e.layer;
+        var onDraw = function(e) {
+            var layer = e.layer;
 
-            drawnItems.removeLayer(drawnItems.getLayers()[0]);
+            drawnItems.getLayers().map((layer) => drawnItems.removeLayer(layer));
             drawnItems.addLayer(layer);
-            console.log(drawnItems);
-        });
+            this.handleSetArea(GeoJSONToWKT(layer.toGeoJSON()));
+        }.bind(this);
+
+        var onEdit = function(e) {
+            var layers = e.layers.getLayers();
+            if (layers.length != 1) { //Should never happen
+                // TODO: use a better popup (bind handleAlert at top level?)
+                alert("Something went wrong editing the feature");
+                return;
+            }
+            this.handleSetArea(GeoJSONToWKT(layers[0].toGeoJSON()));
+        }.bind(this);
+
+        var onDelete = function(e) {
+            var layers = e.layers.getLayers();
+            if (layers.length != 1) { //Should never happen
+                // TODO: use a better popup (bind handleAlert at top level?)
+                alert("Something went wrong deleting this feature");
+                return;
+            }
+            this.handleSetArea(undefined);
+        }.bind(this);
+
+        map.on('draw:created', onDraw);
+        map.on('draw:edited', onEdit);
+        map.on('draw:deleted', onDelete);
 
         map.on('click', this.onMapClick);
         map.setView(L.latLng(60, -100), 0);
