@@ -30,6 +30,13 @@ var MapController = React.createClass({
     var update = {}; update[param] = selection;
     this.setState(update);
   },
+
+  handleSetArea: function(wkt) {
+    // TODO: Do something more here?
+    // Really just here so it's not invisibly transferred from parent props, not directly needed
+    this.props.onSetArea(wkt);
+  },
+
   render: function () {
     return (
       <div>
@@ -38,7 +45,7 @@ var MapController = React.createClass({
           <Selector label={"Log scale?"} onChange={this.updateSelection.bind(this, 'logscale')} items={['false', 'true']} />
         </div>
         <div className={styles.map}>
-        <CanadaMap {...this.state} {...this.props} />
+        <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
         </div>
       </div>
     )
