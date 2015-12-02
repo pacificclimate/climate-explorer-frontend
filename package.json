@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/pacificclimate/climate-explorer"
   },
-  "//" : [
+  "//": [
     "fbjs mocked due to https://github.com/facebook/jest/issues/554"
   ],
   "jest": {
@@ -33,6 +33,7 @@
     "c3": "~0.4.11-rc4",
     "jquery": "^2.1.4",
     "leaflet": "0.7.3",
+    "leaflet-draw": "^0.2.3",
     "proj4": "^2.3.10",
     "proj4leaflet": "^0.7.1",
     "react-bootstrap-table": "^1.2.5"
