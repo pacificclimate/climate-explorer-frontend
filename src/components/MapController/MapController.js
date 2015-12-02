@@ -11,6 +11,10 @@ import styles from './MapController.css';
 
 var MapController = React.createClass({
 
+    propTypes: {
+        onSetArea: React.PropTypes.string.isRequired,
+    },
+
   getInitialState: function () {
     return {
       styles: "boxfill/ferret",

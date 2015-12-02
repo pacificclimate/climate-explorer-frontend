@@ -8,6 +8,12 @@ import styles from './map.css';
 
 var CanadaMap = React.createClass({
 
+    propTypes: {
+        dataset: React.PropTypes.string.isRequired,
+        variable: React.PropTypes.string.isRequired,
+        onSetArea: React.PropTypes.string.isRequired,
+    },
+
     getInitialState: function () {
         return {
             area: undefined
