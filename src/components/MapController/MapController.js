@@ -12,7 +12,7 @@ import styles from './MapController.css';
 var MapController = React.createClass({
 
     propTypes: {
-        onSetArea: React.PropTypes.string.isRequired,
+        onSetArea: React.PropTypes.func.isRequired,
     },
 
   getInitialState: function () {
