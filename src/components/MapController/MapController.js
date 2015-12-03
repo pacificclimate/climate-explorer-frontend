@@ -59,9 +59,11 @@ var MapController = React.createClass({
           </Row>
         </Input>
         <Row>
-          <div className={styles.map}>
-            <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
-          </div>
+          <Col lg={12}>
+            <div className={styles.map}>
+              <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
+            </div>
+          </Col>
         </Row>
       </div>
     )
