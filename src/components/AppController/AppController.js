@@ -5,10 +5,10 @@ import { Input } from 'react-bootstrap';
 import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import MapController from '../MapController/MapController';
+import MapController from '../MapController';
 import GraphOverlay from '../DataGraph/GraphOverlay';
 import TableOverlay from '../DataTable/TableOverlay';
-import Selector from '../Selector/Selector';
+import Selector from '../Selector';
 
 import styles from './AppController.css';
 
