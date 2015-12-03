@@ -10,7 +10,8 @@ const GLOBALS = {
     'process.env.NODE_ENV': (process.env.NODE_ENV !== 'production') ? '"development"' : '"production"',
     'CE_BACKEND_URL': JSON.stringify(process.env.CE_BACKEND_URL || ((process.env.NODE_ENV !== 'production') ? 'http://localhost:8000/api' : 'http://tools.pacificclimate.org/climate-data')),
     'TILECACHE_URL': JSON.stringify(process.env.TILECACHE_URL || 'http://tiles.pacificclimate.org/tilecache/tilecache.py'),
-    'NCWMS_URL': JSON.stringify(process.env.NCWMS_URL || 'http://tools.pacificclimate.org/ncWMS/wms')
+    'NCWMS_URL': JSON.stringify(process.env.NCWMS_URL || 'http://tools.pacificclimate.org/ncWMS/wms'),
+    'CE_ENSEMBLE_NAME': JSON.stringify(process.env.CE_ENSEMBLE_NAME || 'ce')
 };
 
 const AUTOPREFIXER_BROWSERS = [

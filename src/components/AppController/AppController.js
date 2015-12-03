@@ -28,7 +28,7 @@ var App = React.createClass({
   componentDidMount: function() {
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'multimeta'),
-      ensemble_name: 'ce',
+      ensemble_name: CE_ENSEMBLE_NAME,
       crossDomain: true
     }).done(function(data) {
       var models = [];
