@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { CanadaMap } from '../Map/CanadaMap';
 import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
+import TimeSlider from '../TimeSlider';
 
 import styles from './MapController.css';
 
@@ -44,7 +45,7 @@ var MapController = React.createClass({
   render: function () {
     return (
       <div>
-        <div className={styles.selector}>
+        <Input>
           <Row>
             <Col lg={6}>
               <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={['boxfill/ferret', 'boxfill/rainbow', 'boxfill/occam', 'boxfill/occam_inv']} />
@@ -53,10 +54,17 @@ var MapController = React.createClass({
               <Selector label={"Log scale?"} onChange={this.updateSelection.bind(this, 'logscale')} items={['false', 'true']} />
             </Col>
           </Row>
-        </div>
-        <div className={styles.map}>
-        <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
-        </div>
+          <Row>
+            <Col lg={12}>
+              <TimeSlider />
+            </Col>
+          </Row>
+        </Input>
+        <Row>
+          <div className={styles.map}>
+            <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
+          </div>
+        </Row>
       </div>
     )
   }

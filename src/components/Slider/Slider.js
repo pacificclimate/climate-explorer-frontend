@@ -37,12 +37,12 @@ var Slider = React.createClass({
     },
 
     componentWillUpdate: function(nextProps, nextState) {
-        nextState.slider.setValue(nextProps.value);
+        this.slider.setValue(nextProps.value);
     },
 
     componentDidMount: function() {
         var toolTip = this.props.toolTip ? 'show' : 'hide';
-        var slider = new BootstrapSlider(ReactDOM.findDOMNode(this), {
+        var slider = this.slider = new BootstrapSlider(ReactDOM.findDOMNode(this), {
             id: this.props.id,
             min: this.props.min,
             max: this.props.max,
@@ -57,12 +57,8 @@ var Slider = React.createClass({
 
         slider.on('slideStop', function(event) {
             this.props.onSlideStop(event);
-            this.state.slider.setValue(event);
+            this.slider.setValue(event);
         }.bind(this));
-
-        this.setState({
-            slider: slider
-        });
     },
 
     render: function() {

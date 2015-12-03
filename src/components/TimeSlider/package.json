@@ -1,0 +1,6 @@
+{
+  "name": "TimeSlider",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./TimeSlider.js"
+}
