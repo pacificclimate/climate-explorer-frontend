@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Input } from 'react-bootstrap';
+import { Input, Row, Col } from 'react-bootstrap';
 
 import classNames from 'classnames';
 
@@ -45,8 +45,14 @@ var MapController = React.createClass({
     return (
       <div>
         <div className={styles.selector}>
-          <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={['boxfill/ferret', 'boxfill/rainbow', 'boxfill/occam', 'boxfill/occam_inv']} />
-          <Selector label={"Log scale?"} onChange={this.updateSelection.bind(this, 'logscale')} items={['false', 'true']} />
+          <Row>
+            <Col lg={6}>
+              <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={['boxfill/ferret', 'boxfill/rainbow', 'boxfill/occam', 'boxfill/occam_inv']} />
+            </Col>
+            <Col lg={6}>
+              <Selector label={"Log scale?"} onChange={this.updateSelection.bind(this, 'logscale')} items={['false', 'true']} />
+            </Col>
+          </Row>
         </div>
         <div className={styles.map}>
         <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
