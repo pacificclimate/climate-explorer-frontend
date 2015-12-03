@@ -24,9 +24,6 @@ class App extends Component {
         <div className={styles.content}>
           <AppController />
         </div>
-        <div className={styles.footer}>
-          <Footer />
-        </div>
       </div>
     )
   }
