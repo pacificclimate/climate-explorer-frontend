@@ -1,17 +1,8 @@
 .header {
-    height: 70px;
 }
 
 .content {
-    position: fixed;
-    top: 70px;
-    bottom: 50px;
-    left: 0;
-    right: 0;
 }
 
 .footer {
-    position: fixed;
-    bottom: 0;
-    height: 50px;
 }
