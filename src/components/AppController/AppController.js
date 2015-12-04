@@ -81,13 +81,13 @@ var App = React.createClass({
     return (
       <Grid fluid={true}>
         <Row>
-          <Col lg={4}>
+          <Col lg={4} md={4}>
             <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getThings('model_id')}/>
           </Col>
-          <Col lg={4}>
+          <Col lg={4} md={4}>
             <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getThings('variable_id')}/>
           </Col>
-          <Col lg={4}>
+          <Col lg={4} md={4}>
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getThings('experiment')}/>
           </Col>
         </Row>
