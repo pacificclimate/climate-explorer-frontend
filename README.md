@@ -1,3 +1,59 @@
 # PCIC Climate Explorer
 
+[![Build Status](https://travis-ci.org/pacificclimate/climate-explorer-frontend.svg?branch=master)](https://travis-ci.org/pacificclimate/climate-explorer-frontend)
+[![Code Climate](https://codeclimate.com/github/pacificclimate/climate-explorer-frontend/badges/gpa.svg)](https://codeclimate.com/github/pacificclimate/climate-explorer-frontend)
+
 Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babel, ES6+.
+
+## Requirements
+
+Node.js >= 4.0
+
+We reccomend using [nvm](https://github.com/creationix/nvm) to manage your node/npm install.
+
+## Deployment
+
+In progress
+
+## Development
+
+Uses webpack-dev-server with hot module replacement.
+
+### Config
+
+Front end configuration uses environment variables.
+
+* NODE_ENV
+  * set to "production" to enable production build optimization
+  * default: "development"
+* CE_BACKEND_URL
+  * Publicly accessible URL for backend climate data
+  * Development default: http://localhost:8000/api
+  * Production default: http://tools.pacificclimate.org/climate-data
+* TILECACHE_URL
+  * Tilecache URL for basemap layers
+  * default: http://tiles.pacificclimate.org/tilecache/tilecache.py
+* NCWMS_URL
+  * ncWMS URL for climate layers
+  * default: http://tools.pacificclimate.org/ncWMS-PCIC/wms
+* CE_ENSEMBLE_NAME
+  * ensemble name to use for backend requests
+  * default: ce
+
+```bash
+npm install
+npm start
+```
+
+### Testing
+
+```bash
+npm test
+```
+
+### Setup using Docker
+
+```bash
+docker build -t climate-explorer-frontend .
+docker run --rm -it -e "CE_BACKEND_URL=http://localhost:8000/api" -v $(pwd)/client:/app -p 8080:8080 --name frontend climate-explorer-frontend
+```
