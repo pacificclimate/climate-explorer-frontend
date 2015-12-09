@@ -6,10 +6,8 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import MapController from '../MapController';
-import GraphOverlay from '../DataGraph/GraphOverlay';
-import TableOverlay from '../DataTable/TableOverlay';
+import DataController from '../DataController/DataController';
 import Selector from '../Selector';
-
 import styles from './AppController.css';
 
 var App = React.createClass({
@@ -98,8 +96,8 @@ var App = React.createClass({
             </div>
           </Col>
           <Col lg={6}>
-            <GraphOverlay />
-            <TableOverlay />
+            <DataController model_id={this.state.model_id} variable={this.state.variable_id} 
+              experiment={this.state.experiment} area={this.state.area} unique_id={this.findUniqueId()}/>
           </Col>
         </Row>
       </Grid>
