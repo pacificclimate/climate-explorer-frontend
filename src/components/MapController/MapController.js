@@ -43,15 +43,23 @@ var MapController = React.createClass({
   },
 
   render: function () {
+
+    var pallettes = [['boxfill/ferret', 'ferret'],
+                     ['boxfill/rainbow', 'rainbow'],
+                     ['boxfill/occam', 'occam'],
+                     ['boxfill/occam_inv', 'inverted occam']
+                    ]
+    var color_scales = [['false', 'Linear'], ['true', 'Logarithmic']]
+
     return (
       <div>
         <Input>
           <Row>
             <Col lg={4} md={4}>
-              <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={['boxfill/ferret', 'boxfill/rainbow', 'boxfill/occam', 'boxfill/occam_inv']} />
+              <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
             </Col>
             <Col lg={4} md={4}>
-              <Selector label={"Log scale?"} onChange={this.updateSelection.bind(this, 'logscale')} items={['false', 'true']} />
+              <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
             </Col>
             <Col lg={4} md={4}>
               <Selector label={"Time of year"} onChange={this.updateSelection.bind(this, 'timeofyear')} items={['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Winter - DJF', 'Spring - MAM', 'Summer - JJA', 'Fall - SON', 'Annual']} />
