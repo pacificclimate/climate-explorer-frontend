@@ -16,9 +16,11 @@ var Selector = React.createClass({
   render: function() {
     return (
       <Input type="select" label={this.props.label} onChange={this.handleChange}>
-      { this.props.items.map(function(item){
-        return <option key={item}>{item}</option>
-      })}
+      {
+        this.props.items.map(function(item) {
+          return Array.isArray(item) ? <option key={item[0]}>{item[1]}</option> : <option key={item}>{item}</option>;
+        })
+      }
       </Input>
       );
   }

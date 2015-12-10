@@ -30,6 +30,12 @@ describe('Selector', function() {
     expect(content).toEqual(['apple', 'banana', 'carrot']);
   });
 
+  it('can handle "tuples"', function() {
+    var selector = TestUtils.renderIntoDocument(
+      <Selector items={[['Apple label', 'Apple value'], ['Banana label', 'banana_value']]} />
+    );
+  });
+
   it('calls the callback', function() {
     var dummyCallback = jest.genMockFunction();
     var selector = TestUtils.renderIntoDocument(
