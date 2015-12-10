@@ -32,8 +32,19 @@ describe('Selector', function() {
 
   it('can handle "tuples"', function() {
     var selector = TestUtils.renderIntoDocument(
-      <Selector items={[['Apple label', 'Apple value'], ['Banana label', 'banana_value']]} />
+      <Selector items={[['apple_value', 'Apple label'], ['banana_value', 'Banana label']]} />
     );
+    var optionNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
+
+    var content = optionNodes.map(function(obj) {
+      return obj.textContent;
+    });
+    expect(content).toEqual(['Apple label', 'Banana label']);
+
+    var keys = optionNodes.map(function(obj) {
+       return obj.value;
+      });
+    expect(keys).toEqual(['apple_value', 'banana_value']);
   });
 
   it('calls the callback', function() {
