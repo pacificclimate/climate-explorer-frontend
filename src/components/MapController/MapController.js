@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { CanadaMap } from '../Map/CanadaMap';
 import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
+import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 
 import styles from './MapController.css';
 
@@ -62,7 +63,7 @@ var MapController = React.createClass({
               <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
             </Col>
             <Col lg={4} md={4}>
-              <Selector label={"Time of year"} onChange={this.updateSelection.bind(this, 'timeofyear')} items={['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Winter - DJF', 'Spring - MAM', 'Summer - JJA', 'Fall - SON', 'Annual']} />
+              <TimeOfYearSelector onChange={this.updateSelection.bind(this, 'timeofyear')} />
             </Col>
           </Row>
         </Input>
