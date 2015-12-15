@@ -16,9 +16,9 @@ var App = React.createClass({
     return {
       meta: [],
       filter: {},
-      model_id: 'BCCAQ+ANUSPLINE300+MPI-ESM-LR',
+      model_id: 'CanESM2',
       variable_id: 'tasmax',
-      experiment: 'historical+rcp85',
+      experiment: 'rcp85',
       area: undefined
     };
   },
@@ -96,8 +96,12 @@ var App = React.createClass({
             </div>
           </Col>
           <Col lg={6}>
-            <DataController model_id={this.state.model_id} variable={this.state.variable_id} 
-              experiment={this.state.experiment} area={this.state.area} unique_id={this.findUniqueId()}/>
+            <DataController
+              model_id={this.state.model_id}
+              variable_id={this.state.variable_id}
+              experiment={this.state.experiment}
+              area={this.state.area}
+              unique_id={this.findUniqueId()}/>
           </Col>
         </Row>
       </Grid>

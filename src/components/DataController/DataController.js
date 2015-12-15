@@ -5,8 +5,6 @@ import _ from 'underscore';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 
-
-
 var DataController = React.createClass({
 
   propTypes: {
@@ -18,7 +16,15 @@ var DataController = React.createClass({
     time: React.PropTypes.number
   },
 
+  getInitialState: function() {
+    return {
+      timeseriesData: undefined,
+      statsData: undefined
+    };
+  },
+
   getData: function(){
+    console.log(this.state);
     var my_data_promise = $.ajax({
       url: urljoin(CE_BACKEND_URL, 'data'),
       crossDomain: true,
@@ -26,10 +32,10 @@ var DataController = React.createClass({
         model: this.props.model_id,
         variable: this.props.variable_id,
         emission: this.props.experiment,
-        area: this.props.area,
-        time: 17
+        area: this.props.area || null,
+        time: 16
       }
-    });//.bind(this));
+    });
   
     var my_stats_promise = $.ajax({
       url: urljoin(CE_BACKEND_URL, 'stats'),
@@ -37,16 +43,20 @@ var DataController = React.createClass({
       data: {
         id_: this.props.model_id,
         variable: this.props.variable_id,
-        area: this.props.area,
-        time: 17
+        area: this.props.area || null,
+        time: 16
       }
-    });//).bind(this);
+    });
 
     $.when(my_data_promise, my_stats_promise).done(function(data_response, stats_response) {
+      this.setState({
+        timeseriesData: data_response,
+        statsData: stats_response
+      });
       console.log(data_response);
-      console.log(stats_response);      
+      console.log(stats_response);
       console.log("done!");
-    })
+    }.bind(this));
   },
 
   verifyParams: function(){
@@ -62,14 +72,16 @@ var DataController = React.createClass({
 
   componentDidUpdate: function() {
     if (this.verifyParams()){
-      this.getData();
+      // this.getData(); // FIXME: create loop since getData sets state
     }
   },
 
   render: function() {
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData: {columns:[]}
+
     return(
       <div>
-        { if (_.isEmpty(data)) {<DataGraph data={}/>} }
+        <DataGraph data={timeseriesData} />
         <DataTable />
       </div>
   )}
