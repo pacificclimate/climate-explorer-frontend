@@ -50,12 +50,9 @@ var DataController = React.createClass({
 
     $.when(my_data_promise, my_stats_promise).done(function(data_response, stats_response) {
       this.setState({
-        timeseriesData: data_response,
-        statsData: stats_response
+        timeseriesData: data_response[0],
+        statsData: stats_response[0]
       });
-      console.log(data_response);
-      console.log(stats_response);
-      console.log("done!");
     }.bind(this));
   },
 
@@ -70,9 +67,13 @@ var DataController = React.createClass({
     }
   },
 
-  componentDidUpdate: function() {
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return nextProps !== this.props
+  },
+
+  componentWillUpdate: function() {
     if (this.verifyParams()){
-      // this.getData(); // FIXME: create loop since getData sets state
+      this.getData();
     }
   },
 
