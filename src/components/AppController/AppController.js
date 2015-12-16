@@ -16,9 +16,9 @@ var App = React.createClass({
     return {
       meta: [],
       filter: {},
-      model_id: 'CanESM2',
+      model_id: 'cgcm3',
       variable_id: 'tasmax',
-      experiment: 'rcp85',
+      experiment: 'rcp45',
       area: undefined
     };
   },
