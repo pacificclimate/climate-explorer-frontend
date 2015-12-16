@@ -23,16 +23,16 @@ var DataController = React.createClass({
     };
   },
 
-  getData: function(){
-    console.log(this.state);
+  getData: function(props){
+
     var my_data_promise = $.ajax({
       url: urljoin(CE_BACKEND_URL, 'data'),
       crossDomain: true,
       data: {
-        model: this.props.model_id,
-        variable: this.props.variable_id,
-        emission: this.props.experiment,
-        area: this.props.area || null,
+        model: props.model_id,
+        variable: props.variable_id,
+        emission: props.experiment,
+        area: props.area || null,
         time: 0
       }
     });
@@ -41,9 +41,9 @@ var DataController = React.createClass({
       url: urljoin(CE_BACKEND_URL, 'stats'),
       crossDomain: true,
       data: {
-        id_: this.props.model_id,
-        variable: this.props.variable_id,
-        area: this.props.area || null,
+        id_ : props.unique_id || null,
+        variable: props.variable_id,
+        area: props.area || null,
         time: 0
       }
     });
@@ -56,14 +56,14 @@ var DataController = React.createClass({
     }.bind(this));
   },
 
-  verifyParams: function(){
-    var stringPropList = _.values(_.pick(this.props, 'unique_id', 'model_id', 'variable_id', 'experiment'));
+  verifyParams: function(props){
+    var stringPropList = _.values(_.pick(props, 'unique_id', 'model_id', 'variable_id', 'experiment'));
     return (stringPropList.length > 0) && stringPropList.every(Boolean) 
   },
 
   componentDidMount: function() {
-    if (this.verifyParams()){
-      this.getData();
+    if (this.verifyParams(this.props)){
+      this.getData(this.props);
     }
   },
 
@@ -71,9 +71,9 @@ var DataController = React.createClass({
     return JSON.stringify(nextProps) !== JSON.stringify(this.props)
   },
 
-  componentWillUpdate: function() {
-    if (this.verifyParams()){
-      this.getData();
+  componentWillReceiveProps: function(nextProps) {
+    if (this.verifyParams(nextProps)){
+      this.getData(nextProps);
     }
   },
 
