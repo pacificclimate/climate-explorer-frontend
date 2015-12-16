@@ -68,7 +68,7 @@ var DataController = React.createClass({
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
-    return nextProps !== this.props
+    return JSON.stringify(nextProps) !== JSON.stringify(this.props)
   },
 
   componentWillUpdate: function() {
