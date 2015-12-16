@@ -61,15 +61,18 @@ var App = React.createClass({
     this.setState({area: wkt});
   },
 
+  filteredMeta: function() {
+    var l = this.state.meta.filter( function(x) {
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
+    }, this );
+  },
+
   findUniqueId: function() {
-      var l = this.state.meta.filter(
-	  function(x) {
-	      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
-	  }, this
-      );
-      if (l.length > 0) {
-	  return l[0].unique_id
-      }
+    var l = this.filteredMeta();
+    if (l.length > 0) {
+      console.log(l);
+      return l[0].unique_id;
+    }
   },
 
   render: function() {
@@ -92,7 +95,11 @@ var App = React.createClass({
         <Row>
           <Col lg={6}>
             <div className={styles.map}>
-              <MapController variable={this.state.variable_id} dataset={this.findUniqueId()} onSetArea={this.handleSetArea} />
+              <MapController
+                variable={this.state.variable_id}
+                dataset={this.findUniqueId()}
+                meta = {this.filteredMeta()}
+                onSetArea={this.handleSetArea} />
             </div>
           </Col>
           <Col lg={6}>

@@ -13,22 +13,24 @@ import styles from './MapController.css';
 var MapController = React.createClass({
 
     propTypes: {
+        dataset: React.PropTypes.string,
+        variable: React.PropTypes.string,
+        meta: React.PropTypes.array,
         onSetArea: React.PropTypes.func.isRequired,
     },
 
   getInitialState: function () {
     return {
       styles: "boxfill/ferret",
-      timeofyear: "Annual",
-      time: "2000-01-01",
-      colorscalerange: "-50,11.0",
+      time: "2055-01-16T00:00:00.000Z",
+      colorscalerange: "220,320",
       logscale: false
     }
   },
   getDefaultProps: function() {
     return {
       variable: "tasmax",
-      dataset: "pr-tasmax-tasmin_day_BCSD-ANUSPLIN300-CanESM2_historical-rcp26_r1i1p1_19500101-21001231",
+      dataset: "tasmax_Amon_CanESM2_rcp85_r1i1p1_20400101-20691231",
     }
   },
 
@@ -63,14 +65,17 @@ var MapController = React.createClass({
               <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
             </Col>
             <Col lg={4} md={4}>
-              <TimeOfYearSelector onChange={this.updateSelection.bind(this, 'timeofyear')} />
+              <TimeOfYearSelector onChange={this.updateSelection.bind(this, 'time')} />
             </Col>
           </Row>
         </Input>
         <Row>
           <Col lg={12}>
             <div className={styles.map}>
-              <CanadaMap {...this.state} {...this.props} onSetArea={this.handleSetArea} />
+              <CanadaMap {...this.state}
+                dataset={this.props.dataset}
+                variable={this.props.variable}
+                onSetArea={this.handleSetArea} />
             </div>
           </Col>
         </Row>
