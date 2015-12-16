@@ -1,6 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var GeoJSONToWKT = require('wellknown').stringify;
+var _ = require('underscore');
 
 var utils = require("./utils");
 
@@ -45,7 +46,7 @@ var CanadaMap = React.createClass({
     },
     getWMSParams: function() {
         var params = {layers: this.props.dataset + "/" + this.props.variable};
-        $.extend(params, this.props);
+        _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
         return params;
     },
     handleSetArea: function(wkt) {
