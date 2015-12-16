@@ -23,7 +23,6 @@ var MapController = React.createClass({
     return {
       styles: "boxfill/ferret",
       time: "2055-01-16T00:00:00.000Z",
-      colorscalerange: "220,320",
       logscale: false
     }
   },
@@ -72,7 +71,10 @@ var MapController = React.createClass({
         <Row>
           <Col lg={12}>
             <div className={styles.map}>
-              <CanadaMap {...this.state}
+              <CanadaMap
+                logscale={this.state.logscale}
+                styles={this.state.styles}
+                time={this.state.time}
                 dataset={this.props.dataset}
                 variable={this.props.variable}
                 onSetArea={this.handleSetArea} />

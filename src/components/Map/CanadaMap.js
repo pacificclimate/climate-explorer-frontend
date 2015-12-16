@@ -40,7 +40,7 @@ var CanadaMap = React.createClass({
             numcolorbands: 254,
             version: "1.1.1",
             srs: "EPSG:4326",
-            colorscalerange: "-50,11.0",
+            colorscalerange: "220,320",
             logscale: false
         };
     },
