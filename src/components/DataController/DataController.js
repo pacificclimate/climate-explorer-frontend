@@ -78,12 +78,13 @@ var DataController = React.createClass({
   },
 
   render: function() {
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData: {columns:[]}
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData: {columns:[]};
+    var statsData = this.state.statsData ? this.state.statsData : {};
 
     return(
       <div>
         <DataGraph data={timeseriesData} />
-        <DataTable />
+        <DataTable data={statsData} />
       </div>
   )}
 })
