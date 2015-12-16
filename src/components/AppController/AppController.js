@@ -65,17 +65,18 @@ var App = React.createClass({
     var l = this.state.meta.filter( function(x) {
       return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
     }, this );
+    return l;
   },
 
   findUniqueId: function() {
     var l = this.filteredMeta();
     if (l.length > 0) {
-      console.log(l);
       return l[0].unique_id;
     }
   },
 
   render: function() {
+    var filteredMeta = this.filteredMeta()
     var getThings = function(thing) {
       return _.unique(this.state.meta.map(function(el){return el[thing]}))
     }.bind(this);
@@ -97,8 +98,7 @@ var App = React.createClass({
             <div className={styles.map}>
               <MapController
                 variable={this.state.variable_id}
-                dataset={this.findUniqueId()}
-                meta = {this.filteredMeta()}
+                meta = {filteredMeta}
                 onSetArea={this.handleSetArea} />
             </div>
           </Col>
