@@ -33,7 +33,7 @@ var DataController = React.createClass({
         variable: this.props.variable_id,
         emission: this.props.experiment,
         area: this.props.area || null,
-        time: 16
+        time: 0
       }
     });
   
@@ -44,7 +44,7 @@ var DataController = React.createClass({
         id_: this.props.model_id,
         variable: this.props.variable_id,
         area: this.props.area || null,
-        time: 16
+        time: 0
       }
     });
 
