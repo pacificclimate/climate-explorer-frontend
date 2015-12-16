@@ -6,10 +6,8 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import MapController from '../MapController';
-import GraphOverlay from '../DataGraph/GraphOverlay';
-import TableOverlay from '../DataTable/TableOverlay';
+import DataController from '../DataController/DataController';
 import Selector from '../Selector';
-
 import styles from './AppController.css';
 
 var App = React.createClass({
@@ -18,9 +16,9 @@ var App = React.createClass({
     return {
       meta: [],
       filter: {},
-      model_id: 'BCCAQ+ANUSPLINE300+MPI-ESM-LR',
+      model_id: 'cgcm3',
       variable_id: 'tasmax',
-      experiment: 'historical+rcp85',
+      experiment: 'rcp45',
       area: undefined
     };
   },
@@ -66,11 +64,11 @@ var App = React.createClass({
   findUniqueId: function() {
       var l = this.state.meta.filter(
 	  function(x) {
-	      return x['model_id'] === this.state.model_id && x['experiment'] === this.state.experiment && x['variable_id'] === this.state.variable_id
+	      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
 	  }, this
       );
       if (l.length > 0) {
-	  return l[0].unique_id;
+	  return l[0].unique_id
       }
   },
 
@@ -98,8 +96,12 @@ var App = React.createClass({
             </div>
           </Col>
           <Col lg={6}>
-            <GraphOverlay />
-            <TableOverlay />
+            <DataController
+              model_id={this.state.model_id}
+              variable_id={this.state.variable_id}
+              experiment={this.state.experiment}
+              area={this.state.area}
+              unique_id={this.findUniqueId()} />
           </Col>
         </Row>
       </Grid>

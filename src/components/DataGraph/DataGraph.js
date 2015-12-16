@@ -4,6 +4,11 @@ import styles from './DataGraph.css';
 
 var DataGraph = React.createClass({
 
+    propTypes: {
+        data: React.PropTypes.object.isRequired,
+        axis: React.PropTypes.object,
+    },
+
     getDefaultProps: function() {
         return {
             data: {},
