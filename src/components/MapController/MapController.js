@@ -22,16 +22,8 @@ var MapController = React.createClass({
   getInitialState: function () {
     return {
       styles: "boxfill/ferret",
-      wmstime: "",
       timeidx: 0,
-      dataset: "",
       logscale: false
-    }
-  },
-  getDefaultProps: function() {
-    return {
-      variable: "tasmax",
-      meta: []
     }
   },
 
@@ -94,6 +86,18 @@ var MapController = React.createClass({
 
     var ids = this.props.meta.map(function(el){return el.unique_id})
 
+    // Only render map if required paramers exist in state/props
+    var map;
+    if (_.every(['wmstime', 'dataset', 'variable'], _.partial(_.has, _.extend({}, this.state, this.props)))) {
+      map = <CanadaMap
+              logscale={this.state.logscale}
+              styles={this.state.styles}
+              time={this.state.wmstime}
+              dataset={this.state.dataset}
+              variable={this.props.variable}
+              onSetArea={this.handleSetArea} />
+    }
+
     return (
       <div>
         <Input>
@@ -115,13 +119,7 @@ var MapController = React.createClass({
         <Row>
           <Col lg={12}>
             <div className={styles.map}>
-              <CanadaMap
-                logscale={this.state.logscale}
-                styles={this.state.styles}
-                time={this.state.wmstime}
-                dataset={this.state.dataset}
-                variable={this.props.variable}
-                onSetArea={this.handleSetArea} />
+              { map }
             </div>
           </Col>
         </Row>
