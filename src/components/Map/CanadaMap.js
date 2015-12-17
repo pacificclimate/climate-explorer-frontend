@@ -1,6 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var GeoJSONToWKT = require('wellknown').stringify;
+var _ = require('underscore');
 
 var utils = require("./utils");
 
@@ -9,8 +10,8 @@ import styles from './map.css';
 var CanadaMap = React.createClass({
 
     propTypes: {
-        dataset: React.PropTypes.string.isRequired,
-        variable: React.PropTypes.string.isRequired,
+        dataset: React.PropTypes.string,
+        variable: React.PropTypes.string,
         onSetArea: React.PropTypes.func.isRequired,
     },
 
@@ -39,13 +40,13 @@ var CanadaMap = React.createClass({
             numcolorbands: 254,
             version: "1.1.1",
             srs: "EPSG:4326",
-            colorscalerange: "-50,11.0",
+            colorscalerange: "220,320",
             logscale: false
         };
     },
     getWMSParams: function() {
         var params = {layers: this.props.dataset + "/" + this.props.variable};
-        $.extend(params, this.props);
+        _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
         return params;
     },
     handleSetArea: function(wkt) {
@@ -70,6 +71,7 @@ var CanadaMap = React.createClass({
         });
 
         var datalayerName = "Climate raster";
+        //FIXME - Problem: ncWMS layer 404s if we don't provide a dataset/variable. Solution: conditionally add layer to map
         var ncwmsLayer =  this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
         var drawnItems = new L.FeatureGroup();

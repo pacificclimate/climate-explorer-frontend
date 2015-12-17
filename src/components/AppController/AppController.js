@@ -12,14 +12,16 @@ import styles from './AppController.css';
 
 var App = React.createClass({
 
+  /**
+   * Initial state set upon metadata returning in {@link App#componentDidMount}.
+   * Includes:
+   *   - model_id
+   *   - variable_id
+   *   - experiment
+   */
   getInitialState: function() {
     return {
-      meta: [],
-      filter: {},
-      model_id: 'cgcm3',
-      variable_id: 'tasmax',
-      experiment: 'rcp45',
-      area: undefined
+      meta: []
     };
   },
 
@@ -46,7 +48,10 @@ var App = React.createClass({
 
       if (this.isMounted()) {
         this.setState({
-          meta: models
+          meta: models,
+          model_id: models[0].model_id,
+          variable_id: models[0].variable_id,
+          experiment: models[0].experiment
         })
       }
     }.bind(this));
@@ -61,21 +66,26 @@ var App = React.createClass({
     this.setState({area: wkt});
   },
 
+  getfilteredMeta: function() {
+    var l = this.state.meta.filter( function(x) {
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
+    }, this );
+    return l;
+  },
+
   findUniqueId: function() {
-      var l = this.state.meta.filter(
-	  function(x) {
-	      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
-	  }, this
-      );
-      if (l.length > 0) {
-	  return l[0].unique_id
-      }
+    var l = this.getfilteredMeta();
+    if (l.length > 0) {
+      return l[0].unique_id;
+    }
   },
 
   render: function() {
+
     var getThings = function(thing) {
       return _.unique(this.state.meta.map(function(el){return el[thing]}))
     }.bind(this);
+
     return (
       <Grid fluid={true}>
         <Row>
@@ -92,7 +102,10 @@ var App = React.createClass({
         <Row>
           <Col lg={6}>
             <div className={styles.map}>
-              <MapController variable={this.state.variable_id} dataset={this.findUniqueId()} onSetArea={this.handleSetArea} />
+              <MapController
+                variable={this.state.variable_id}
+                meta = {this.getfilteredMeta()}
+                onSetArea={this.handleSetArea} />
             </div>
           </Col>
           <Col lg={6}>
