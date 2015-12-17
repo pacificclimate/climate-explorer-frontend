@@ -1,35 +1,42 @@
 var moment = require("moment/moment");
 
-var allMonths = ['January', 'February', 'March', 'April', 'May',
-                'June', 'July', 'August', 'September', 'October',
-                'November', 'December'];
-
-var winter = ['December', 'January', 'February'];
-var spring = ['March', 'April', 'May'];
-var summer = ['June', 'July', 'August'];
-var fall = ['September', 'October', 'November'];
+// set the decimal precision of displayed values
+var PRECISION = 2;
 
 var parseC3Data = function(graph_data) {
 
     var modelName = String(graph_data['id']);
     var yUnits = String(graph_data['units']);
-    var dataLabel = modelName.concat(" ".concat(yUnits));
+    // var modelName = modelName.concat(" ".concat(yUnits));
     var C3Data = {
         columns:[], 
         types: {
-            dataLabel: 'line', 
+            modelName: 'line', 
             'Annual Average': 'step',
             'Seasonal Averages': 'step'
         }, 
-        axes: {dataLabel:'y'}
+        labels: {
+            format: {
+                'Seasonal Averages': function (v, id, i, j){
+                    if (i == 0 || i == 11){ return "Winter" }
+                    if (i == 3) { return "Spring" }
+                    if (i == 6) { return "Summer" }
+                    if (i == 9) { return "Fall" }
+                }
+            }
+        },
+        axes: {modelName:'y'},
+        // regions: {
+        //     'Seasonal Averages': [{'start':1, 'end':2, 'style': 'dashed'}]
+        // },
     };
-    var dataSeries = [dataLabel];
+    
+    var monthlySeries = [modelName];
 
     var axisInfo = { 
         x: { type:'category', categories:[] },
         y: { label: { 'text': yUnits, 'position':'outer-middle' }} 
     };
-
 
     var springSeries = [];
     var summerSeries = [];
@@ -40,12 +47,12 @@ var parseC3Data = function(graph_data) {
 
     var idx = 0;
     for (let key in graph_data['data']) {
-        var val = graph_data['data'][key];
+        var val = graph_data['data'][key].toFixed(PRECISION);
         var timestep = moment(key, moment.ISO_8601);
         var month = timestep.format('MMMM');
         if (idx < 12){
             axisInfo['x']['categories'].push(month);
-            dataSeries.push(val);
+            monthlySeries.push(val);
         }
         else if (idx === 12){
             winterSeries.push(val, val, val);
@@ -64,8 +71,7 @@ var parseC3Data = function(graph_data) {
         }
         idx++;
     }              
-    C3Data['columns'].push(dataSeries);   
-      
+    C3Data['columns'].push(monthlySeries);   
     // Form series for seasonal lines
     var seasonalSeries = seasonalLabel.concat(winterSeries.slice(-2),springSeries,summerSeries,fallSeries,winterSeries.slice(0,1));
     C3Data['columns'].push(seasonalSeries);
