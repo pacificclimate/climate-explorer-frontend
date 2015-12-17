@@ -61,8 +61,8 @@ class GraphOverlay extends Component {
 
     render () {
 
-        var data = parseDataForC3(testData);
-        // var data = parseTimeSeriesForC3(testData);
+        //var data = parseDataForC3(testData);
+        var data = parseTimeSeriesForC3(testTimeSeries);
 
         return (
             <DataGraph data={data[0]} axis={data[1]} tooltip={data[2]} />

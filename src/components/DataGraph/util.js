@@ -62,7 +62,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
         }, 
         labels: {
             format: {
-                'Seasonal Averages': function (v, id, i, j){
+                'Seasonal Average': function (v, id, i, j){
                     if (i == 0 || i == 11){ return "Winter" }
                     if (i == 3) { return "Spring" }
                     if (i == 6) { return "Summer" }
