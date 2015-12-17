@@ -14,12 +14,7 @@ var App = React.createClass({
 
   getInitialState: function() {
     return {
-      meta: [],
-      filter: {},
-      model_id: '',
-      variable_id: '',
-      experiment: '',
-      area: undefined
+      meta: []
     };
   },
 
@@ -79,11 +74,11 @@ var App = React.createClass({
   },
 
   render: function() {
-    var filteredMeta = this.getfilteredMeta()
 
     var getThings = function(thing) {
       return _.unique(this.state.meta.map(function(el){return el[thing]}))
     }.bind(this);
+
     return (
       <Grid fluid={true}>
         <Row>
@@ -102,7 +97,7 @@ var App = React.createClass({
             <div className={styles.map}>
               <MapController
                 variable={this.state.variable_id}
-                meta = {filteredMeta}
+                meta = {this.getfilteredMeta()}
                 onSetArea={this.handleSetArea} />
             </div>
           </Col>
