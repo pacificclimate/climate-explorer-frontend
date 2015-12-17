@@ -1,4 +1,5 @@
 var moment = require("moment/moment");
+var _ = require('underscore');
 
 // set the decimal precision of displayed values
 var PRECISION = 2;
@@ -8,13 +9,12 @@ var parseDataForC3 = function(data) {
     var axisInfo = {};
 
     for (let model in data) {
-        var modelName = String(model);
-        var dataSeries = [modelName];
-        var xLabel = modelName.concat("_xs");
+        var dataSeries = [model];
+        var xLabel = model.concat("_xs");
         var xSeries = [xLabel];
         var yUnits;
         var yAxisCount; // to accommodate plotting multiple climate variables
-        allModelsData['xs'][modelName] = xLabel;
+        allModelsData['xs'][model] = xLabel;
         for (let key in data[model]) {
             var val = data[model][key];
             if (parseInt(key)) { // this is a time series value
@@ -22,12 +22,11 @@ var parseDataForC3 = function(data) {
                 dataSeries.push(val);
             }
             else { // this is the units of the series, which also defines the y axes
-                if (String(key) === 'units' && String(data[model][key]) !== yUnits) { // don't create redundant axes
+                if (key === 'units' && data[model][key] !== yUnits) { // don't create redundant axes
                     yUnits = String(data[model][key]);
-                    // var modelYaxisLabel = modelName.concat("_axis");
                     var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
 
-                    allModelsData['axes'][modelName] = modelYaxisLabel;
+                    allModelsData['axes'][model] = modelYaxisLabel;
                     axisInfo[modelYaxisLabel] = {
                         'show': true,
                         'label': {
@@ -51,12 +50,12 @@ var parseDataForC3 = function(data) {
 
 var parseTimeSeriesForC3 = function(graph_data) {
 
-    var modelName = String(graph_data['id']);
-    var yUnits = String(graph_data['units']);
+    var model = graph_data['id'];
+    var yUnits = graph_data['units'];
     var C3Data = {
         columns:[], 
         types: {
-            modelName: 'line', 
+            model: 'line', 
             'Annual Average': 'step',
             'Seasonal Average': 'step'
         }, 
@@ -70,7 +69,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
                 }
             }
         },
-        axes: {modelName:'y'},
+        axes: {model:'y'},
     };
 
     var axisInfo = { 
@@ -85,7 +84,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
         } 
     };
 
-    var monthlySeries = [modelName];
+    var monthlySeries = [model];
     var springSeries = [];
     var summerSeries = [];
     var fallSeries = [];
@@ -115,7 +114,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
             fallSeries.push(val, val, val);
         }
         else if (idx === 16){
-            annualSeries.push(val, val, val, val, val, val, val, val, val, val, val, val);
+            annualSeries.push(_.times(12, function(){return this}, val));
         }
         idx++;
     }              
