@@ -83,20 +83,7 @@ var MapController = React.createClass({
                      ['boxfill/occam_inv', 'inverted occam']
                     ]
     var color_scales = [['false', 'Linear'], ['true', 'Logarithmic']]
-
     var ids = this.props.meta.map(function(el){return el.unique_id})
-
-    // Only render map if required paramers exist in state/props
-    var map;
-    if (_.every(['wmstime', 'dataset', 'variable'], _.partial(_.has, _.extend({}, this.state, this.props)))) {
-      map = <CanadaMap
-              logscale={this.state.logscale}
-              styles={this.state.styles}
-              time={this.state.wmstime}
-              dataset={this.state.dataset}
-              variable={this.props.variable}
-              onSetArea={this.handleSetArea} />
-    }
 
     return (
       <div>
@@ -119,7 +106,13 @@ var MapController = React.createClass({
         <Row>
           <Col lg={12}>
             <div className={styles.map}>
-              { map }
+              <CanadaMap
+              logscale={this.state.logscale}
+              styles={this.state.styles}
+              time={this.state.wmstime}
+              dataset={this.state.dataset}
+              variable={this.props.variable}
+              onSetArea={this.handleSetArea} />
             </div>
           </Col>
         </Row>
