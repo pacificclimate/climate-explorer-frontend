@@ -6,15 +6,15 @@ var PRECISION = 2;
 var parseDataForC3 = function(data) {
     var allModelsData = {xs:{}, columns:[], axes:{}};
     var axisInfo = {};
+
     for (let model in data) {
         var modelName = String(model);
-        var dataLabel = modelName.concat("_data");
-        var dataSeries = [dataLabel];
+        var dataSeries = [modelName];
         var xLabel = modelName.concat("_xs");
         var xSeries = [xLabel];
         var yUnits;
         var yAxisCount; // to accommodate plotting multiple climate variables
-        allModelsData['xs'][dataLabel] = xLabel;
+        allModelsData['xs'][modelName] = xLabel;
         for (let key in data[model]) {
             var val = data[model][key];
             if (parseInt(key)) { // this is a time series value
@@ -27,12 +27,12 @@ var parseDataForC3 = function(data) {
                     // var modelYaxisLabel = modelName.concat("_axis");
                     var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
 
-                    allModelsData['axes'][dataLabel] = modelYaxisLabel;
+                    allModelsData['axes'][modelName] = modelYaxisLabel;
                     axisInfo[modelYaxisLabel] = {
                         'show': true,
                         'label': {
                             'text': yUnits,
-                            'position':'outer-center',
+                            'position':'outer-middle',
                         }
                     };
                     if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
@@ -40,12 +40,11 @@ var parseDataForC3 = function(data) {
                     }
                     yAxisCount++;
                 }
-            }              
+            }          
         }
         allModelsData['columns'].push(xSeries);
         allModelsData['columns'].push(dataSeries);          
     }
-
     return [allModelsData, axisInfo];
 }
 
