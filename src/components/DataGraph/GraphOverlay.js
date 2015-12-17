@@ -2,30 +2,39 @@ import React, { PropTypes, Component } from 'react';
 
 import PanelOverlay from '../PanelOverlay/PanelOverlay';
 import DataGraph from './DataGraph';
-import parseC3Data from './util';
+import { parseDataForC3, parseTimeSeriesForC3 } from './util';
 
 import styles from './GraphOverlay.css';
 
-// const testData = {
-//     'id': 'tmax_monClim_PRISM_historical_run1_198101-201012',
-//     'units': 'degC',
-//     'data': {
-//           '1985-01-15T00:00:00Z': 1.5,
-//           '1985-02-15T00:00:00Z': 2.5,
-//           '1985-03-15T00:00:00Z': 5.5,
-//           '1985-04-15T00:00:00Z': 10.2,
-//           '1985-05-15T00:00:00Z': 13.5,
-//           '1985-06-15T00:00:00Z': 20.1,
-//           '1985-07-15T00:00:00Z': 24.4,
-//           '1985-08-15T00:00:00Z': 25.2,
-//           '1985-09-15T00:00:00Z': 21.7,
-//           '1985-10-15T00:00:00Z': 15.8,
-//           '1985-11-15T00:00:00Z': 9.2,
-//           '1985-12-15T00:00:00Z': 3.1,
-//     }
-// };
 
 const testData = {
+    "model_id1": {
+        "units": "degC",
+        "2050": 21.0,
+        "2080": 35.0,
+        "2020": 11.0
+    },
+    "model_id2": {
+        "units": "degC",
+        "2050": 22.0,
+        // "2080": 36.0,
+        "2020": 12.0  
+    },
+    "model_id3": {
+        "units": "degC",
+        "2050": 23.0,
+        "2080": 37.0,
+        "2020": 13.0  
+    },
+    "model_id4": {
+        "units": "mm",
+        // "2050": 24.0,
+        "2080": 200.0,
+        "2020": 300.0  
+    }
+};
+
+const testTimeSeries = {
   "id": "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231",
   "units": "K",
   "data": {"1986-01-16T00:00:00Z": 275.75720932904414, 
@@ -52,10 +61,11 @@ class GraphOverlay extends Component {
 
     render () {
 
-        var data = parseC3Data(testData);
+        var data = parseDataForC3(testData);
+        // var data = parseTimeSeriesForC3(testData);
 
         return (
-            <DataGraph data={data[0]} axis={data[1]} />
+            <DataGraph data={data[0]} axis={data[1]} tooltip={data[2]} />
         )
     }
 };

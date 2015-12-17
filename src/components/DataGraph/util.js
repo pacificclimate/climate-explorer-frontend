@@ -3,17 +3,63 @@ var moment = require("moment/moment");
 // set the decimal precision of displayed values
 var PRECISION = 2;
 
-var parseC3Data = function(graph_data) {
+var parseDataForC3 = function(data) {
+    var allModelsData = {xs:{}, columns:[], axes:{}};
+    var axisInfo = {};
+    for (let model in data) {
+        var modelName = String(model);
+        var dataLabel = modelName.concat("_data");
+        var dataSeries = [dataLabel];
+        var xLabel = modelName.concat("_xs");
+        var xSeries = [xLabel];
+        var yUnits;
+        var yAxisCount; // to accommodate plotting multiple climate variables
+        allModelsData['xs'][dataLabel] = xLabel;
+        for (let key in data[model]) {
+            var val = data[model][key];
+            if (parseInt(key)) { // this is a time series value
+                xSeries.push(key);
+                dataSeries.push(val);
+            }
+            else { // this is the units of the series, which also defines the y axes
+                if (String(key) === 'units' && String(data[model][key]) !== yUnits) { // don't create redundant axes
+                    yUnits = String(data[model][key]);
+                    // var modelYaxisLabel = modelName.concat("_axis");
+                    var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
+
+                    allModelsData['axes'][dataLabel] = modelYaxisLabel;
+                    axisInfo[modelYaxisLabel] = {
+                        'show': true,
+                        'label': {
+                            'text': yUnits,
+                            'position':'outer-center',
+                        }
+                    };
+                    if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
+                        yAxisCount = 1;
+                    }
+                    yAxisCount++;
+                }
+            }              
+        }
+        allModelsData['columns'].push(xSeries);
+        allModelsData['columns'].push(dataSeries);          
+    }
+
+    return [allModelsData, axisInfo];
+}
+
+
+var parseTimeSeriesForC3 = function(graph_data) {
 
     var modelName = String(graph_data['id']);
     var yUnits = String(graph_data['units']);
-    // var modelName = modelName.concat(" ".concat(yUnits));
     var C3Data = {
         columns:[], 
         types: {
             modelName: 'line', 
             'Annual Average': 'step',
-            'Seasonal Averages': 'step'
+            'Seasonal Average': 'step'
         }, 
         labels: {
             format: {
@@ -26,23 +72,26 @@ var parseC3Data = function(graph_data) {
             }
         },
         axes: {modelName:'y'},
-        // regions: {
-        //     'Seasonal Averages': [{'start':1, 'end':2, 'style': 'dashed'}]
-        // },
     };
-    
-    var monthlySeries = [modelName];
 
     var axisInfo = { 
         x: { type:'category', categories:[] },
         y: { label: { 'text': yUnits, 'position':'outer-middle' }} 
     };
 
+    var tooltipInfo = {
+        grouped: true,
+        format: {
+            value: function (value) { return value + ' ' + yUnits }
+        } 
+    };
+
+    var monthlySeries = [modelName];
     var springSeries = [];
     var summerSeries = [];
     var fallSeries = [];
     var winterSeries = [];
-    var seasonalLabel = ['Seasonal Averages'];
+    var seasonalLabel = ['Seasonal Average'];
     var annualSeries = ['Annual Average'];
 
     var idx = 0;
@@ -77,7 +126,7 @@ var parseC3Data = function(graph_data) {
     C3Data['columns'].push(seasonalSeries);
     C3Data['columns'].push(annualSeries);
 
-    return [C3Data, axisInfo];
+    return [C3Data, axisInfo, tooltipInfo];
 }
 
-export default parseC3Data
+module.exports = { parseDataForC3, parseTimeSeriesForC3 }

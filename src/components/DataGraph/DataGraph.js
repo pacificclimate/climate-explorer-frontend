@@ -37,14 +37,7 @@ var DataGraph = React.createClass({
             point: {
                 show: false
             },
-            tooltip: {
-                grouped: true,
-                format: {
-                    name: function (id) { return id },
-                    title: function(d) { return d },
-                    value: function (value) { return value }
-                    } 
-            },
+            tooltip: this.props.tooltip
         });
     },
 
