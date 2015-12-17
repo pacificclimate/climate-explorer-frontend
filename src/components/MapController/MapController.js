@@ -19,6 +19,12 @@ var MapController = React.createClass({
     onSetArea: React.PropTypes.func.isRequired,
   },
 
+  /**
+   * State items also set from meta object array
+   * Includes:
+   *   - dataset
+   *   - wmstime
+   */
   getInitialState: function () {
     return {
       styles: "boxfill/ferret",

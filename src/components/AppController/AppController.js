@@ -12,6 +12,13 @@ import styles from './AppController.css';
 
 var App = React.createClass({
 
+  /**
+   * Initial state set upon metadata returning in {@link App#componentDidMount}.
+   * Includes:
+   *   - model_id
+   *   - variable_id
+   *   - experiment
+   */
   getInitialState: function() {
     return {
       meta: []
