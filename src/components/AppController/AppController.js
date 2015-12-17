@@ -16,9 +16,9 @@ var App = React.createClass({
     return {
       meta: [],
       filter: {},
-      model_id: 'cgcm3',
-      variable_id: 'tasmax',
-      experiment: 'rcp45',
+      model_id: '',
+      variable_id: '',
+      experiment: '',
       area: undefined
     };
   },
@@ -46,7 +46,10 @@ var App = React.createClass({
 
       if (this.isMounted()) {
         this.setState({
-          meta: models
+          meta: models,
+          model_id: models[0].model_id,
+          variable_id: models[0].variable_id,
+          experiment: models[0].experiment
         })
       }
     }.bind(this));
@@ -61,7 +64,7 @@ var App = React.createClass({
     this.setState({area: wkt});
   },
 
-  filteredMeta: function() {
+  getfilteredMeta: function() {
     var l = this.state.meta.filter( function(x) {
       return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
     }, this );
@@ -69,14 +72,15 @@ var App = React.createClass({
   },
 
   findUniqueId: function() {
-    var l = this.filteredMeta();
+    var l = this.getfilteredMeta();
     if (l.length > 0) {
       return l[0].unique_id;
     }
   },
 
   render: function() {
-    var filteredMeta = this.filteredMeta()
+    var filteredMeta = this.getfilteredMeta()
+
     var getThings = function(thing) {
       return _.unique(this.state.meta.map(function(el){return el[thing]}))
     }.bind(this);

@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { Input, Row, Col } from 'react-bootstrap';
+import _ from 'underscore';
 
 import classNames from 'classnames';
 
@@ -21,8 +22,9 @@ var MapController = React.createClass({
   getInitialState: function () {
     return {
       styles: "boxfill/ferret",
-      time: "2055-01-16T00:00:00.000Z",
-      dataset: "tasmax_Amon_CanESM2_rcp85_r1i1p1_20400101-20691231",
+      wmstime: "",
+      timeidx: 0,
+      dataset: "",
       logscale: false
     }
   },
@@ -46,7 +48,22 @@ var MapController = React.createClass({
     }.bind(this))
 
     // Assumes filter returns a single element which /should/ be true. FIXME.
-    this.setState({time: selected[0].times[timeidx]})
+    this.setState({
+      timeidx: timeidx,
+      wmstime: selected[0].times[timeidx]})
+  },
+
+  updateDataset: function(dataset) {
+    // Updates dataset in state. Updates time value to match new dataset
+
+    var selected = this.props.meta.filter(function(el){
+      return el.unique_id == dataset
+    }.bind(this))[0]
+
+    this.setState({
+      dataset: dataset,
+      wmstime: selected.times[this.state.timeidx]
+    })
   },
 
   findUniqueId: function() {
@@ -59,8 +76,14 @@ var MapController = React.createClass({
     this.props.onSetArea(wkt);
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      dataset: nextProps.meta[0].unique_id,
+      wmstime: nextProps.meta[0].times[this.state.timeidx]
+    });
+  },
+
   render: function () {
-    console.log(this.state);
 
     var pallettes = [['boxfill/ferret', 'ferret'],
                      ['boxfill/rainbow', 'rainbow'],
@@ -85,7 +108,7 @@ var MapController = React.createClass({
               <TimeOfYearSelector onChange={this.updateTime} />
             </Col>
             <Col lg={3} md={6}>
-              <Selector label={"Dataset"} onChange={this.updateSelection.bind(this, 'dataset')} items={ids} />
+              <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
             </Col>
           </Row>
         </Input>
@@ -95,7 +118,7 @@ var MapController = React.createClass({
               <CanadaMap
                 logscale={this.state.logscale}
                 styles={this.state.styles}
-                time={this.state.time}
+                time={this.state.wmstime}
                 dataset={this.state.dataset}
                 variable={this.props.variable}
                 onSetArea={this.handleSetArea} />
