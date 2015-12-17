@@ -1,47 +1,29 @@
-var parseC3Data = function(data) {
-    var allModelsData = {xs:{}, columns:[], axes:{}};
-    var axisInfo = {};
-    for (let model in data) {
-        var modelName = String(model);
-        var dataLabel = modelName.concat("_data");
-        var dataSeries = [dataLabel];
-        var xLabel = modelName.concat("_xs");
-        var xSeries = [xLabel];
-        var yUnits;
-        var yAxisCount; // to accommodate plotting multiple climate variables
-        allModelsData['xs'][dataLabel] = xLabel;
-        for (let key in data[model]) {
-            var val = data[model][key];
-            if (parseInt(key)) { // this is a time series value
-                xSeries.push(key);
-                dataSeries.push(val);
-            }
-            else { // this is the units of the series, which also defines the y axes
-                if (String(key) === 'units' && String(data[model][key]) !== yUnits) { // don't create redundant axes
-                    yUnits = String(data[model][key]);
-                    // var modelYaxisLabel = modelName.concat("_axis");
-                    var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
+var moment = require("moment/moment");
 
-                    allModelsData['axes'][dataLabel] = modelYaxisLabel;
-                    axisInfo[modelYaxisLabel] = {
-                        'show': true,
-                        'label': {
-                            'text': yUnits,
-                            'position':'outer-center',
-                        }
-                    };
-                    if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
-                        yAxisCount = 1;
-                    }
-                    yAxisCount++;
-                }
-            }              
-        }
-        allModelsData['columns'].push(xSeries);
-        allModelsData['columns'].push(dataSeries);          
-    }
+var parseC3Data = function(graph_data) {
 
-    return [allModelsData, axisInfo];
+    var modelName = String(graph_data['id']);
+    var yUnits = String(graph_data['units']);
+    var dataLabel = modelName.concat("_".concat(yUnits));
+    var C3Data = {columns:[], axes: {dataLabel:'y'}};
+    var dataSeries = [dataLabel];
+
+    var axisInfo = { 
+        x: { type:'category', categories:[] },
+        y: { label: { 'text': yUnits, 'position':'outer-middle' }} 
+    };
+    for (let key in graph_data['data']) {
+        var val = graph_data['data'][key];
+        var timestep = moment(key, moment.ISO_8601);
+        axisInfo['x']['categories'].push(timestep.format('MMMM'));
+        dataSeries.push(val);
+    }              
+
+    C3Data['columns'].push(dataSeries);   
+       
+    console.log(C3Data);
+    console.log(axisInfo);
+    return [C3Data, axisInfo];
 }
 
 export default parseC3Data

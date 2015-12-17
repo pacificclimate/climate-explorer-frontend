@@ -42,9 +42,6 @@ var DataGraph = React.createClass({
                     value: function (value) { return value }
                     } 
             },
-            subchart: { // will add a subchart if we have multiple y-axes, to allow for zooming
-                show: Object.keys(this.props.axis).length > 1 ? true : false
-            }
         });
     },
 
