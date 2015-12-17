@@ -102,16 +102,16 @@ var MapController = React.createClass({
       <div>
         <Input>
           <Row>
-            <Col lg={3} md={6}>
+            <Col lg={4} md={6}>
               <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
             </Col>
-            <Col lg={3} md={6}>
+            <Col lg={4} md={6}>
               <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
             </Col>
-            <Col lg={3} md={6}>
+            <Col lg={4} md={6}>
               <TimeOfYearSelector onChange={this.updateTime} />
             </Col>
-            <Col lg={3} md={6}>
+            <Col lg={12} md={6}>
               <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
             </Col>
           </Row>
