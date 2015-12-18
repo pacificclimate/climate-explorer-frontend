@@ -188,7 +188,7 @@ describe('parseTimeSeriesForC3', function() {
 
     var result = parseTimeSeriesForC3(testTimeSeries);
 
-    expect(result[0].columns).toEqual(outputC3TimeSeries.columns);
+    expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
 
   });
 });
