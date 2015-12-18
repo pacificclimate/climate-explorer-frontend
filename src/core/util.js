@@ -78,7 +78,7 @@ var generateAxisInfo = function(units) {
  */
 var generateXAxis = function(data) {
   return ['x'].concat(_.map(_.keys(data), function(d) {
-    return moment(d, moment.ISO_8601).format("YYYY-MM-DD")
+    return moment(d, moment.ISO_8601).utc().format("YYYY-MM-DD")
   }))
 };
 
@@ -212,7 +212,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
   var idx = 0;
   for (let key in graph_data['data']) {
     var val = graph_data['data'][key].toFixed(PRECISION);
-    var timestep = moment(key, moment.ISO_8601);
+    var timestep = moment(key, moment.ISO_8601).utc();
     var month = timestep.format('MMMM');
     if (idx < 12){
       axisInfo['x']['categories'].push(month);
