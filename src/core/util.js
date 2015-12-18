@@ -241,7 +241,11 @@ var parseTimeSeriesForC3 = function(graph_data) {
   C3Data['columns'].push(seasonalSeries);
   C3Data['columns'].push(annualSeries);
 
-  return [C3Data, axisInfo, tooltipInfo];
+  return {
+    data: C3Data,
+    axis: axisInfo,
+    tooltip: tooltipInfo
+  };
 }
 
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3 }
