@@ -4,6 +4,104 @@ var _ = require('underscore');
 // set the decimal precision of displayed values
 var PRECISION = 2;
 
+/*
+ * Merges new data into an existing C3 formatted data object
+ */
+var mergeC3Data = function(old, toAdd) {
+    _.extend(old.xs, toAdd.xs);
+    old.columns = old.columns.concat(toAdd.columns);
+    _.extend(old.axes, toAdd.axes);
+    return old
+}
+
+
+/*
+ * Formats a single entry from a Climate Explorer `data` api call
+ * into C3 compatible input
+ *
+ * Input:
+ *   @param name: Run name
+ *       eg: r1i1p1
+ *   @param data: Js object of {timeval: result}
+ *       eg: { '2025-04-16': 281,
+ *             '2055-04-16': 284 }
+ * Output:
+ *    [ [ 'r1i1p1_xs', '2025-04-16', '2055-04-16' ],
+ *        'r1i1p1', 281, 284 ] ]
+ */
+var genC3DataFromModel = function(name, data, unit, axisMap) {
+    var xs = {},
+        axes = {};
+    xs[name] = name.concat('_xs');
+    axes[name] = axisMap[unit];
+    return {
+        xs: xs,
+        columns:[ [].concat(name.concat('_xs'), _.keys(data)),
+                  [].concat(name, _.values(data)) ],
+        axes: axes
+    }
+};
+
+/*
+ * Generates a C3 compatible 'axis' object
+ *
+ * Returns an object with keys containing the c3 axis data
+ * and a reverse unit to y axis label map
+ *
+ */
+var generateAxisInfo = function(units) {
+    var seen = [],
+        yCount = 1,
+        c3Axis = {},
+        reverseMap = {}
+
+    _.each(units, function(unit) {
+        if (_.contains(seen, unit)) {
+            return
+        }
+
+        var yLabel = 'y' + yCount
+        c3Axis[yLabel] = {
+            label: {
+                position: 'outer-middle',
+                text: unit
+            },
+            show: true
+        }
+        reverseMap[unit] = yLabel
+        yCount++;
+    });
+
+    return {
+        axisData: c3Axis,
+        unitsMap: reverseMap
+    }
+};
+
+/*
+ * Sample input:
+ * {"r1i1p1": {"units": "K", "data": {"2025-04-16T00:00:00Z": 281}}}
+ */
+var dataApiToC3 = function(data) {
+    var c3Data = {
+        xs: {},
+        columns: [],
+        axes: {}
+    }
+
+    var units = _.map(data, function(val, key) {
+        return val.units;
+    });
+    var c3AxisInfo = generateAxisInfo(units).axisData;
+    var unitsMap = generateAxisInfo(units).unitsMap;
+
+    _.each(data, function(value, key) {
+        c3Data = mergeC3Data(c3Data, genC3DataFromModel(key, value.data, value.units, unitsMap));
+    })
+    return [c3Data, c3AxisInfo]
+}
+
+
 var parseDataForC3 = function(data) {
     var allModelsData = {xs:{}, columns:[], axes:{}};
     var axisInfo = {};
@@ -127,4 +225,4 @@ var parseTimeSeriesForC3 = function(graph_data) {
     return [C3Data, axisInfo, tooltipInfo];
 }
 
-module.exports = { parseDataForC3, parseTimeSeriesForC3 }
+module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3 }
