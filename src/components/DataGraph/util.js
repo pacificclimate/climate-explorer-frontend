@@ -114,7 +114,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
             fallSeries.push(val, val, val);
         }
         else if (idx === 16){
-            annualSeries.push(_.times(12, function(){return this}, val));
+            annualSeries = annualSeries.concat(_.times(12, function(){return this}, val));
         }
         idx++;
     }              

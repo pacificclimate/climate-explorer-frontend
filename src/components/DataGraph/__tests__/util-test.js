@@ -89,14 +89,20 @@ const testTimeSeries = {
 };
 
 const outputC3TimeSeries = {
-        columns:[
-                ['tasmin_Amon_CanESM2_historical_r1i1p1_19710101', 
-                275.76, 273.43, 273.49, 274.86, 276.67, 278.16, 278.56,
-                278.06, 276.94, 275.78], 
-                [275.87, 275.87, 273.90, 273.90, 273.90, 275.01, 275.01, 
-                275.01, 278.26, 278.26, 278.26, 275.87],
-                [275.77, 275.77, 275.77, 275.77, 275.77, 275.77, 275.77,
-                275.77, 275.77, 275.77, 275.77, 275.77]
+    columns:[
+        [
+            'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',
+            '275.76', '273.43', '273.49', '274.86', '276.67', '278.16', '278.56',
+            '278.06', '276.94', '275.78', '274.90', '274.34'
+        ], [
+            'Seasonal Average',
+            '273.90', '273.90', '275.01', '275.01', '275.01', '278.26',
+            '278.26', '278.26', '275.87', '275.87', '275.87', '273.90'
+        ], [
+            'Annual Average',
+            '275.77', '275.77', '275.77', '275.77', '275.77', '275.77', '275.77',
+            '275.77', '275.77', '275.77', '275.77', '275.77'
+            ]
         ],
         // types: {
         //     model: 'line', 
@@ -138,9 +144,7 @@ describe('parseTimeSeriesForC3', function() {
         var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
 
         var result = parseTimeSeriesForC3(testTimeSeries);
-        console.log(result[0]);
-        // var outputC3TimeSeries_expected = outputC3TimeSeries //, outputC3TimeSeriesAxisInfo, outputC3TimeSeriesTooltipInfo];
-        // var res = _.isEqual(result, expected);
+
         expect(result[0].columns).toEqual(outputC3TimeSeries.columns);
 
     });
