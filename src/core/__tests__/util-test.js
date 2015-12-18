@@ -53,8 +53,8 @@ const outputC3DataAxisInfo = {
 };
 
 describe('parseDataForC3', function() {
+    var parseDataForC3 = require('../util').parseDataForC3;
     it('Correctly parses a JSON object with average data from multiple models for plotting with C3', function() {
-        var parseDataForC3 = require('../util').parseDataForC3;
 
         var result = parseDataForC3(testData);
         var expected = [outputC3Data, outputC3DataAxisInfo];
@@ -62,6 +62,27 @@ describe('parseDataForC3', function() {
         var res = _.isEqual(result, expected);
         expect(res).toEqual(true);
 
+    });
+
+    it('can handle a minimum data set', function() {
+        var input = {'r1i1p1': {'data': {'2025-01-16T00:00:00Z': 275}, 'units': 'K'}}
+        var expected = [{
+            axes: {r1i1p1: 'y'},
+            columns: [ ['r1i1p1_xs', '2025-01-16T00:00:00Z'],
+                       ['r1i1p1', 275] ],
+            xs: { r1i1p1: 'r1i1p1_xs' }
+        }, {
+            y: {
+                label: {
+                    position: 'outer-middle',
+                    text: 'K'
+                },
+            'show': true
+            }
+        }]
+        var result = parseDataForC3(input);
+
+        expect(result).toEqual(expected);
     });
 });
 
