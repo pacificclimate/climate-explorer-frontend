@@ -30,14 +30,10 @@ var mergeC3Data = function(old, toAdd) {
  *    'r1i1p1', 281, 284 ] ]
  */
 var genC3DataFromModel = function(name, data, unit, axisMap) {
-  var xs = {},
-    axes = {};
-  xs[name] = name.concat('_xs');
+  var axes = {};
   axes[name] = axisMap[unit];
   return {
-    xs: xs,
-    columns:[ [].concat(name.concat('_xs'), _.keys(data)),
-          [].concat(name, _.values(data)) ],
+    columns:[ [].concat(name, _.values(data)) ],
     axes: axes
   }
 };
@@ -51,7 +47,7 @@ var genC3DataFromModel = function(name, data, unit, axisMap) {
  */
 var generateAxisInfo = function(units) {
   var seen = [],
-      yCount = 1,
+      yCount = 0,
       c3Axis = {},
       reverseMap = {}
 
@@ -60,13 +56,12 @@ var generateAxisInfo = function(units) {
       return
     }
 
-    var yLabel = 'y' + yCount
+    var yLabel = Boolean(yCount) ? 'y' + yCount: 'y'
     c3Axis[yLabel] = {
       label: {
         position: 'outer-middle',
         text: unit
-      },
-      show: true
+      }
     }
     reverseMap[unit] = yLabel
     yCount++;
@@ -79,26 +74,50 @@ var generateAxisInfo = function(units) {
 };
 
 /*
+ * Generates base x-axis information
+ */
+var generateXAxis = function(data) {
+  return ['x'].concat(_.map(_.keys(data), function(d) {
+    return moment(d, moment.ISO_8601).format("YYYY-MM-DD")
+  }))
+};
+
+/*
  * Sample input:
  * {"r1i1p1": {"units": "K", "data": {"2025-04-16T00:00:00Z": 281}}}
  */
 var dataApiToC3 = function(data) {
+
+  // Initialize the x axis data to the first
   var c3Data = {
-    xs: {},
-    columns: [],
+    x: 'x',
+    columns: [generateXAxis(data[Object.keys(data)[0]].data)],
     axes: {}
+  }
+
+  var c3AxisInfo = {
+    x: {
+      type: 'timeseries',
+      tick: {
+        format: '%Y-%m-%d'
+      }
+    }
   }
 
   var units = _.map(data, function(val, key) {
     return val.units;
   });
-  var c3AxisInfo = generateAxisInfo(units).axisData;
+  _.extend(c3AxisInfo, generateAxisInfo(units).axisData);
   var unitsMap = generateAxisInfo(units).unitsMap;
 
   _.each(data, function(value, key) {
     c3Data = mergeC3Data(c3Data, genC3DataFromModel(key, value.data, value.units, unitsMap));
   })
-  return [c3Data, c3AxisInfo]
+
+  return {
+    data: c3Data,
+    axis: c3AxisInfo
+  }
 }
 
 
