@@ -2,7 +2,7 @@ import React, { PropTypes, Component } from 'react';
 
 import PanelOverlay from '../PanelOverlay/PanelOverlay';
 import DataGraph from './DataGraph';
-import { parseDataForC3, parseTimeSeriesForC3 } from './util';
+import { parseDataForC3, parseTimeSeriesForC3 } from '../../core/util';
 
 import styles from './GraphOverlay.css';
 
