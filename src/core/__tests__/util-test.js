@@ -79,7 +79,7 @@ describe('parseDataForC3', function() {
     }
     var expected = {
       data: {
-        columns: [ ['x', '2025-01-15', '2025-02-15'],
+        columns: [ ['x', '2025-01-16', '2025-02-16'],
                    ['r1i1p1', 275, 280] ],
         x: 'x',
         axes: {
@@ -188,7 +188,7 @@ describe('parseTimeSeriesForC3', function() {
 
     var result = parseTimeSeriesForC3(testTimeSeries);
 
-    expect(result[0].columns).toEqual(outputC3TimeSeries.columns);
+    expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
 
   });
 });
