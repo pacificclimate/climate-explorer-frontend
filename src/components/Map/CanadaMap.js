@@ -34,7 +34,7 @@ var CanadaMap = React.createClass({
             noWrap: true,
             format: "image/png",
             transparent: "true",
-            //opacity: 0.7,
+            opacity: 0.7,
             styles: "boxfill/ferret",
             time: "2000-01-01",
             numcolorbands: 254,
@@ -46,7 +46,7 @@ var CanadaMap = React.createClass({
     },
     getWMSParams: function() {
         var params = {layers: this.props.dataset + "/" + this.props.variable};
-        _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
+        _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'opacity', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
         return params;
     },
     handleSetArea: function(wkt) {
@@ -133,8 +133,10 @@ var CanadaMap = React.createClass({
     onMapClick: function() {
         console.log('clicked on map');
     },
-    componentDidUpdate: function() {
-        this.ncwmsLayer.setParams(this.getWMSParams());
+    componentWillReceiveProps: function(newProps) {
+        var params = {layers: newProps.dataset + "/" + newProps.variable};
+        _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
+        this.ncwmsLayer.setParams(params);
     },
     render: function() {
         return (
