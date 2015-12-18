@@ -1,47 +1,52 @@
 jest.dontMock('../util');
 
 const testData = {
-    "model_id1": {
-        "min": 10.0,
-        "max": 40.0,
-        "mean": 23.0,
-        "median": 25.0,
-        "stdev": 2.0,
-        "units": "degC change"
-    },
-    "model_id2": {
-        "min": 5.0,
-        "max": 30.0,
-        "mean": 15.0,
-        "median": 18.0,
-        "stdev": 1.5,
-        "units": "degC change"
-    }
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": {
+    "median": 278.34326171875,
+    "min": 225.05545043945312,
+    "units": "K",
+    "mean": 273.56732177734375,
+    "max": 303.601318359375,
+    "time": "1977-07-15T21:10:35Z",
+    "ncells": 8192,
+    "stdev": 22.509726901403784
+  },
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": {
+    "median": 278.4786682128906,
+    "min": 225.04750061035156,
+    "units": "K",
+    "mean": 273.87298583984375,
+    "max": 303.7774963378906,
+    "time": "1986-07-15T21:10:35Z",
+    "ncells": 8192,
+    "stdev": 22.323802147796965
+  }
 };
 
-const outputData = [
-    {"model_id": "model_id1",
-    "min": 10.0,
-    "max": 40.0,
-    "mean": 23.0,
-    "median": 25.0,
-    "stdev": 2.0,
-    "units": "degC change"
+const expected = [
+    {"model_id": "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231",
+    "min": 225.06,
+    "max": 303.60,
+    "mean": 273.57,
+    "median": 278.34,
+    "stdev": 22.51,
+    "units": "K"
     },
     {
-    "model_id": "model_id2",
-    "min": 5.0,
-    "max": 30.0,
-    "mean": 15.0,
-    "median": 18.0,
-    "stdev": 1.5,
-    "units": "degC change"
+    "model_id": "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231",
+    "min": 225.05,
+    "max": 303.78,
+    "mean": 273.87,
+    "median": 278.48,
+    "stdev": 22.32,
+    "units": "K"
     }
 ];
 
 describe('parseBootstrapTableData', function() {
     it('Correctly flattens a stats object', function() {
-        var parseBootstrapTableData = require('../util');
-        expect(parseBootstrapTableData(testData)).toEqual(outputData);
+        var parseBootstrapTableData = require('../util').parseBootstrapTableData;
+        var result = parseBootstrapTableData(testData);
+        expect(result).toEqual(expected);
     });
 });
