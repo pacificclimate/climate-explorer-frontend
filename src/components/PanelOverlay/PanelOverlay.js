@@ -1,5 +1,4 @@
 var React = require("react");
-var m = require("../util.js").merge;
 var classNames = require('classnames');
 
 import styles from './PanelOverlay.css';
