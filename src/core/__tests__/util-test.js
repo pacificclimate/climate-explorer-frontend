@@ -5,16 +5,20 @@ var _ = require('underscore');
 
 
 const testData = {
-    "model_id1": {
-        "units": "degC",
-        "2050": 21.0,
-        "2080": 35.0,
-        "2020": 11.0
+    model_id1: {
+        units: "degC",
+        data: {
+            2050: 21.0,
+            2080: 35.0,
+            2020: 11.0
+        }
     },
-    "model_id2": {
-        "units": "mm",
-        "2050": 240.0,
-        "2020": 300.0  
+    model_id2: {
+        units: "mm",
+        data: {
+            2050: 240.0,
+            2020: 300.0
+        }
     }
 };
 
@@ -30,13 +34,13 @@ const outputC3Data = {
         ["model_id2", 300, 240]
     ],
     'axes':{
-        "model_id1": "y",
+        "model_id1": "y1",
         "model_id2": "y2"
     }
 };
 
 const outputC3DataAxisInfo = {
-    'y': {
+    'y1': {
         'label': {
             'position': 'outer-middle',
             'text': 'degC'
@@ -53,26 +57,25 @@ const outputC3DataAxisInfo = {
 };
 
 describe('parseDataForC3', function() {
-    var parseDataForC3 = require('../util').parseDataForC3;
+    var parseDataForC3 = require('../util').dataApiToC3;
     it('Correctly parses a JSON object with average data from multiple models for plotting with C3', function() {
 
         var result = parseDataForC3(testData);
         var expected = [outputC3Data, outputC3DataAxisInfo];
 
-        var res = _.isEqual(result, expected);
-        expect(res).toEqual(true);
+        expect(result).toEqual(expected);
 
     });
 
     it('can handle a minimum data set', function() {
         var input = {'r1i1p1': {'data': {'2025-01-16T00:00:00Z': 275}, 'units': 'K'}}
         var expected = [{
-            axes: {r1i1p1: 'y'},
+            axes: {r1i1p1: 'y1'},
             columns: [ ['r1i1p1_xs', '2025-01-16T00:00:00Z'],
                        ['r1i1p1', 275] ],
             xs: { r1i1p1: 'r1i1p1_xs' }
         }, {
-            y: {
+            y1: {
                 label: {
                     position: 'outer-middle',
                     text: 'K'
