@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
 
+import { dataApiToC3 } from '../../core/util'
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 
@@ -50,7 +51,7 @@ var DataController = React.createClass({
 
     $.when(my_data_promise, my_stats_promise).done(function(data_response, stats_response) {
       this.setState({
-        timeseriesData: data_response[0],
+        timeseriesData: dataApiToC3(data_response[0]),
         statsData: stats_response[0]
       });
     }.bind(this));
@@ -78,12 +79,12 @@ var DataController = React.createClass({
   },
 
   render: function() {
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData: {columns:[]};
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData: {data:{columns:[]}, axis:{}};
     var statsData = this.state.statsData ? this.state.statsData : {};
 
     return(
       <div>
-        <DataGraph data={timeseriesData} />
+        <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} />
         <DataTable data={statsData} />
       </div>
   )}
