@@ -8,8 +8,6 @@ import Footer from '../Footer';
 
 import AppController from '../AppController';
 import DatasetList from '../CheckboxList/DatasetList';
-import GraphOverlay from '../DataGraph/GraphOverlay';
-import TableOverlay from '../DataTable/TableOverlay';
 
 import styles from './IndexPage.css';
 
