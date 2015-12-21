@@ -2,5 +2,12 @@
 }
 
 .map {
-    height: 600px;
+    height: 700px;
+}
+
+.controls {
+    position: absolute;
+    top: 0;
+    left: 75px;
+    right: 30px;
 }
