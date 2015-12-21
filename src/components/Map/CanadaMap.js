@@ -54,7 +54,7 @@ var CanadaMap = React.createClass({
         this.props.onSetArea(wkt);
     },
     componentDidMount: function() {
-        var map = this.map = L.map(ReactDOM.findDOMNode(this), {
+        var map = this.map = L.map(this._map, {
             crs: this.props.crs,
             minZoom: 0,
             maxZoom: 10,
@@ -140,7 +140,10 @@ var CanadaMap = React.createClass({
     },
     render: function() {
         return (
-            <div className={styles.map}></div>
+            <div className={styles.map}>
+		<div ref={ (c) => this._map = c } className={styles.map} />
+		{ this.props.children }
+	    </div>
         );
     }
 });
