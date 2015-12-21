@@ -39,7 +39,7 @@ describe('DataTable', function() {
   });
 
   it('accepts data', function() {
-    var parseBootstrapTableData = require('../util').parseBootstrapTableData;
+    var parseBootstrapTableData = require('../util');
 
     var data = parseBootstrapTableData(testData);
 

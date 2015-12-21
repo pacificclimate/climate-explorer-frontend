@@ -30,7 +30,8 @@ const expected = [
     "mean": 273.57,
     "median": 278.34,
     "stdev": 22.51,
-    "units": "K"
+    "units": "K",
+    "time": "1961 - 1990"
     },
     {
     "model_id": "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231",
@@ -39,13 +40,14 @@ const expected = [
     "mean": 273.87,
     "median": 278.48,
     "stdev": 22.32,
-    "units": "K"
+    "units": "K",
+    "time": "1971 - 2000"
     }
 ];
 
 describe('parseBootstrapTableData', function() {
     it('Correctly flattens a stats object', function() {
-        var parseBootstrapTableData = require('../util').parseBootstrapTableData;
+        var parseBootstrapTableData = require('../util');
         var result = parseBootstrapTableData(testData);
         expect(result).toEqual(expected);
     });

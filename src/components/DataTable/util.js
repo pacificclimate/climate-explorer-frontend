@@ -11,11 +11,11 @@ var parseBootstrapTableData = function(data) {
         var modelInfo = {
             "model_id": model,
             "time": period, 
-            "min": data[model]['min'].toFixed(PRECISION),
-            "max": data[model]['max'].toFixed(PRECISION),
-            "mean": data[model]['mean'].toFixed(PRECISION),
-            "median": data[model]['median'].toFixed(PRECISION),
-            "stdev": data[model]['stdev'].toFixed(PRECISION),
+            "min": +data[model]['min'].toFixed(PRECISION),
+            "max": +data[model]['max'].toFixed(PRECISION),
+            "mean": +data[model]['mean'].toFixed(PRECISION),
+            "median": +data[model]['median'].toFixed(PRECISION),
+            "stdev": +data[model]['stdev'].toFixed(PRECISION),
             "units": data[model]['units']
         };
         flatData.push(modelInfo); 
