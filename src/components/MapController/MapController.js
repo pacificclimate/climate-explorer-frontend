@@ -105,18 +105,18 @@ var MapController = React.createClass({
               onSetArea={this.handleSetArea}>
               <div className={styles.controls}>
                 <Row>
-                  <Col lg={6} md={6}>
+                  <Col lg={4} md={6}>
                     <TimeOfYearSelector onChange={this.updateTime} />
                   </Col>
-                  <Col lg={6} md={6}>
+                  <Col lg={4} md={6}>
                     <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg={6} md={6}>
+                  <Col lg={4} md={6}>
                     <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
                   </Col>
-                  <Col lg={6} md={6}>
+                  <Col lg={4} md={6}>
                     <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
                   </Col>
                 </Row>
