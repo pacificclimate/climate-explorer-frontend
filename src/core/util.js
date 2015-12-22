@@ -61,6 +61,11 @@ var generateAxisInfo = function(units) {
       label: {
         position: 'outer-middle',
         text: unit
+      },
+      tick: {
+        format: function(x) {
+          return +x.toFixed(1);
+        }
       }
     }
     reverseMap[unit] = yLabel
