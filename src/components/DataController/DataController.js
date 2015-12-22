@@ -107,10 +107,10 @@ var DataController = React.createClass({
             <Tab>Seasonal Range</Tab>
           </TabList>
           <TabPanel>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} />
+            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
           </TabPanel>
           <TabPanel>
-            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
+            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} />
           </TabPanel>
         </Tabs>
         <DataTable data={statsData} />
