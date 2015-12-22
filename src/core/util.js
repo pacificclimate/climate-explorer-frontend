@@ -176,15 +176,20 @@ var parseDataForC3 = function(data) {
 
 var parseTimeSeriesForC3 = function(graph_data) {
 
-  var model = graph_data['id'];
+  var model = 'Monthly Mean';
   var yUnits = graph_data['units'];
+
+  var types = {
+    'Annual Average': 'step',
+    'Seasonal Average': 'step'
+  };
+  types[model] = 'line';
+
+  var axes = {}; axes[model] = 'y';
+
   var C3Data = {
     columns:[],
-    types: {
-      model: 'line',
-      'Annual Average': 'step',
-      'Seasonal Average': 'step'
-    },
+    types: types,
     labels: {
       format: {
         'Seasonal Average': function (v, id, i, j){
@@ -195,7 +200,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
         }
       }
     },
-    axes: {model:'y'},
+    axes: axes,
   };
 
   var axisInfo = {
