@@ -146,9 +146,13 @@ var parseDataForC3 = function(data) {
           allModelsData['axes'][model] = modelYaxisLabel;
           axisInfo[modelYaxisLabel] = {
             'show': true,
-            'label': {
+            'label': 
+            {
               'text': yUnits,
               'position':'outer-middle',
+            },
+            tick: {
+              format: function (x) { return +x.toFixed(1); }
             }
           };
           if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
@@ -191,7 +195,12 @@ var parseTimeSeriesForC3 = function(graph_data) {
 
   var axisInfo = {
     x: { type:'category', categories:[] },
-    y: { label: { 'text': yUnits, 'position':'outer-middle' }}
+    y: { 
+        label: { 'text': yUnits, 'position':'outer-middle' },
+        tick: {
+          format: function (x) { return +x.toFixed(1); }
+        }  
+      }
   };
 
   var tooltipInfo = {
