@@ -3,11 +3,17 @@ var PRECISION = 2;
 
 var parseBootstrapTableData = function(data) {
     var flatData = [];
+    var model_count = 0;
     for (let model in data) {
-        // This is a hack to display the time range of the given model run
-        // We probably want to figure out a better way to form / handle the "time"
-        // member of the JSON object returned by multistats.py
-        var period = model.slice(-17, -13) + " - " + model.slice(-8, -4);
+        var year_range_re = new RegExp("[0-9]{8}","g");
+        var year_range = [];
+        var lastIndex = 0;
+        while (year_range_re.test(model)){
+            year_range_re.lastIndex = lastIndex;
+            year_range.push(year_range_re.exec(model)[0].slice(0,4));
+            lastIndex = year_range_re.lastIndex;
+        }
+        var period = year_range[0] + " - " + year_range[1];
         var modelInfo = {
             "model_id": model,
             "time": period, 
@@ -23,5 +29,4 @@ var parseBootstrapTableData = function(data) {
     return flatData;
 }
 
-// export default parseBootstrapTableData
-module.exports = parseBootstrapTableData
+export default parseBootstrapTableData

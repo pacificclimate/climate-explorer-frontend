@@ -7,7 +7,8 @@ import TestUtils from 'react-addons-test-utils';
 const DataTable = require('../DataTable');
 
 const testData = {
-  "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": {
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": 
+  {
     "median": 278.34326171875,
     "min": 225.05545043945312,
     "units": "K",
@@ -17,7 +18,8 @@ const testData = {
     "ncells": 8192,
     "stdev": 22.509726901403784
   },
-  "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": {
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": 
+  {
     "median": 278.4786682128906,
     "min": 225.04750061035156,
     "units": "K",
@@ -39,12 +41,8 @@ describe('DataTable', function() {
   });
 
   it('accepts data', function() {
-    var parseBootstrapTableData = require('../util');
-
-    var data = parseBootstrapTableData(testData);
-
     var table = TestUtils.renderIntoDocument(
-      <DataTable data={data} />
+      <DataTable data={testData} />
     );
     expect(TestUtils.isCompositeComponent(table)).toBeTruthy();
   });
