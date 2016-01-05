@@ -41,11 +41,11 @@ var DataController = React.createClass({
     });
   
     var my_stats_promise = $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'stats'),
+      url: urljoin(CE_BACKEND_URL, 'multistats'),
       crossDomain: true,
       data: {
-        id_ : props.unique_id || null,
         variable: props.variable_id,
+        emission: props.experiment,
         area: props.area || null,
         time: 0
       }
@@ -107,10 +107,10 @@ var DataController = React.createClass({
             <Tab>Seasonal Range</Tab>
           </TabList>
           <TabPanel>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} />
+            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
           </TabPanel>
           <TabPanel>
-            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
+            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} />
           </TabPanel>
         </Tabs>
         <DataTable data={statsData} />

@@ -134,7 +134,7 @@ const testTimeSeries = {
 const outputC3TimeSeries = {
   columns:[
     [
-      'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',
+      'Monthly Mean',
       '275.76', '273.43', '273.49', '274.86', '276.67', '278.16', '278.56',
       '278.06', '276.94', '275.78', '274.90', '274.34'
     ], [
