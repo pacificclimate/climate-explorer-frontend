@@ -85,7 +85,8 @@ var DataController = React.createClass({
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
-    return JSON.stringify(nextProps) !== JSON.stringify(this.props)
+    // This guards against re-rendering before Ajax calls alter the state
+    return JSON.stringify(nextState) !== JSON.stringify(this.state)
   },
 
   componentWillReceiveProps: function(nextProps) {
