@@ -114,6 +114,7 @@ var App = React.createClass({
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
               area={this.state.area}
+              meta = {this.getfilteredMeta()}
               unique_id={this.findUniqueId()} />
           </Col>
         </Row>

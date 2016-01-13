@@ -13,6 +13,7 @@ var DataTable = React.createClass({
             <div id={'table'}>
                 <BootstrapTable data={tableData} striped={true} hover={true} >
                     <TableHeaderColumn dataField="time" isKey={true} dataAlign="center" dataSort={true}>Model Period</TableHeaderColumn>
+                    <TableHeaderColumn dataField="run" dataAlign="center" dataSort={true}>Run</TableHeaderColumn>
                     <TableHeaderColumn dataField="min" dataAlign="center" dataSort={true}>Min</TableHeaderColumn>
                     <TableHeaderColumn dataField="max" dataAlign="center" dataSort={true}>Max</TableHeaderColumn>
                     <TableHeaderColumn dataField="mean" dataAlign="center" dataSort={true}>W.Mean</TableHeaderColumn>

@@ -10,7 +10,8 @@ const testData = {
     "max": 303.601318359375,
     "time": "1977-07-15T21:10:35Z",
     "ncells": 8192,
-    "stdev": 22.509726901403784
+    "stdev": 22.509726901403784,
+    "run": "r1i1p1"
   },
   "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": 
   {
@@ -21,12 +22,14 @@ const testData = {
     "max": 303.7774963378906,
     "time": "1986-07-15T21:10:35Z",
     "ncells": 8192,
-    "stdev": 22.323802147796965
+    "stdev": 22.323802147796965,
+    "run": "r1i1p1"
   }
 };
 
 const expected = [
-    {"model_id": "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231",
+    {
+    "run": "r1i1p1",
     "min": 225.06,
     "max": 303.60,
     "mean": 273.57,
@@ -36,7 +39,7 @@ const expected = [
     "time": "1961 - 1990"
     },
     {
-    "model_id": "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231",
+    "run": "r1i1p1",
     "min": 225.05,
     "max": 303.78,
     "mean": 273.87,

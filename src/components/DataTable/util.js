@@ -15,7 +15,7 @@ var parseBootstrapTableData = function(data) {
         }
         var period = year_range[0] + " - " + year_range[1];
         var modelInfo = {
-            "model_id": model,
+            "run": data[model]['run'],
             "time": period, 
             "min": +data[model]['min'].toFixed(PRECISION),
             "max": +data[model]['max'].toFixed(PRECISION),

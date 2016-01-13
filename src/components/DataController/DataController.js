@@ -15,6 +15,7 @@ var DataController = React.createClass({
     variable_id: React.PropTypes.string,
     experiment: React.PropTypes.string,
     area: React.PropTypes.string,
+    meta: React.PropTypes.array,
     time: React.PropTypes.number
   },
 
@@ -24,6 +25,17 @@ var DataController = React.createClass({
       timeSeriesData: undefined,
       statsData: undefined
     };
+  },
+
+  injectRunIntoStats: function(data) {
+    // Injects the ensemble member (run) into object returned by stats call
+    _.map(data, function(val, key) {
+      var selected = this.props.meta.filter(function(el){
+        return el.unique_id == key;
+      })
+      val['run'] = selected[0].ensemble_member;
+    }.bind(this))
+    return data;
   },
 
   getData: function(props){
@@ -44,6 +56,7 @@ var DataController = React.createClass({
       url: urljoin(CE_BACKEND_URL, 'multistats'),
       crossDomain: true,
       data: {
+        model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
@@ -68,7 +81,7 @@ var DataController = React.createClass({
     $.when(my_data_promise, my_stats_promise).done(function(data_response, stats_response) {
       this.setState({
         climoSeriesData: dataApiToC3(data_response[0]),
-        statsData: stats_response[0]
+        statsData: this.injectRunIntoStats(stats_response[0])
       });
     }.bind(this));
   },
