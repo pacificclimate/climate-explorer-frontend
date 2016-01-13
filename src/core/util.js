@@ -70,6 +70,7 @@ var generateAxisInfo = function(units) {
     }
     reverseMap[unit] = yLabel
     yCount++;
+    seen.push(unit);
   });
 
   return {
