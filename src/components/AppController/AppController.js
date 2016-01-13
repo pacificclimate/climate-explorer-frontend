@@ -74,13 +74,6 @@ var App = React.createClass({
     return l;
   },
 
-  findUniqueId: function() {
-    var l = this.getfilteredMeta();
-    if (l.length > 0) {
-      return l[0].unique_id;
-    }
-  },
-
   render: function() {
 
     var getThings = function(thing) {
@@ -115,8 +108,7 @@ var App = React.createClass({
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
               area={this.state.area}
-              meta = {this.getfilteredMeta()}
-              unique_id={this.findUniqueId()} />
+              meta = {this.getfilteredMeta()} />
           </Col>
         </Row>
       </Grid>
