@@ -89,7 +89,14 @@ var MapController = React.createClass({
                      ['boxfill/occam_inv', 'inverted occam']
                     ]
     var color_scales = [['false', 'Linear'], ['true', 'Logarithmic']]
-    var ids = this.props.meta.map(function(el){return el.unique_id})
+    var ids = this.props.meta.map(function(el) {
+      var period = el.unique_id.split('_').slice(5)[0]
+      var period = period.split('-').map(function(datestring){return datestring.slice(0,4)}).join('-');
+      var l = [el.unique_id, el.unique_id.split('_').slice(4,5) + ' ' + period ];
+      return l
+    }).sort(function(a,b){
+      return a[1] > b[1] ? 1 : -1;
+    });
 
     return (
       <div>
