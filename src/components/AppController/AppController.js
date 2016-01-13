@@ -70,6 +70,7 @@ var App = React.createClass({
     var l = this.state.meta.filter( function(x) {
       return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
     }, this );
+    l.sort(function(a,b){return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
   },
 
