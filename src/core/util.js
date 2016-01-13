@@ -165,7 +165,7 @@ var parseDataForC3 = function(data) {
               'position':'outer-middle',
             },
             tick: {
-              format: function (x) { return +x.toFixed(1); }
+              format: function (x) { return +x.toFixed(PRECISION); }
             }
           };
           if (!yAxisCount){ // C3 wants y-axes labeled 'y', 'y2', 'y3'...
