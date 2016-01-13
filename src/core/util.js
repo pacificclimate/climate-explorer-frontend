@@ -115,10 +115,14 @@ var dataApiToC3 = function(data) {
   _.extend(c3AxisInfo, generateAxisInfo(units).axisData);
   var unitsMap = generateAxisInfo(units).unitsMap;
 
+  // NOTE: we have not found a way yet to display units if we have multiple axes of different
+  // units/variable type (e.g. 'mm' and 'degrees_C'), as the tooltip option is applied globally across 
+  // all chart series.  So for now we assume the keys of unitsMap are all the same (i.e. just 
+  // one variable type is being displayed).
   var tooltipInfo = {
     grouped: true,
     format: {
-      value: function (value) { return value.toFixed(PRECISION) }
+      value: function (value) { return value.toFixed(PRECISION) + ' ' + _.keys(unitsMap)[0] }
     }
   };
 
