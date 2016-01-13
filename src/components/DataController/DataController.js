@@ -2,10 +2,13 @@ import React, { PropTypes, Component } from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
 import ReactTabs, { Tab, Tabs, TabList, TabPanel} from 'react-tabs';
+import { Input, Row, Col } from 'react-bootstrap'
 
 import { dataApiToC3, parseTimeSeriesForC3 } from '../../core/util'
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
+import Selector from '../Selector'
+import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 
 var DataController = React.createClass({
 
@@ -15,12 +18,13 @@ var DataController = React.createClass({
     variable_id: React.PropTypes.string,
     experiment: React.PropTypes.string,
     area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    time: React.PropTypes.number
+    meta: React.PropTypes.array
   },
 
   getInitialState: function() {
     return {
+      projChangeTimeOfYear: 0,
+      dataTableTimeOfYear: 0,
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined
@@ -38,9 +42,8 @@ var DataController = React.createClass({
     return data;
   },
 
-  getData: function(props){
-
-    var my_data_promise = $.ajax({
+  getDataPromise: function(props, timeidx) {
+    return $.ajax({
       url: urljoin(CE_BACKEND_URL, 'data'),
       crossDomain: true,
       data: {
@@ -48,11 +51,13 @@ var DataController = React.createClass({
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: 0
+        time: timeidx
       }
     });
-  
-    var my_stats_promise = $.ajax({
+  },
+
+  getStatsPromise: function(props, timeidx) {
+    return $.ajax({
       url: urljoin(CE_BACKEND_URL, 'multistats'),
       crossDomain: true,
       data: {
@@ -60,11 +65,13 @@ var DataController = React.createClass({
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: 0
+        time: timeidx
       }
     });
+  },
 
-    var my_timeseries_promise = $.ajax({
+  getTimeseriesPromise: function(props) {
+    return $.ajax({
       url: urljoin(CE_BACKEND_URL, 'timeseries'),
       crossDomain: true,
       data: {
@@ -72,16 +79,23 @@ var DataController = React.createClass({
         variable: props.variable_id,
         area: props.area || null
       }
-    }).done(function(data) {
-      this.setState({
-        timeSeriesData: parseTimeSeriesForC3(data)
-      });
-    }.bind(this));
+    })
+  },
 
-    $.when(my_data_promise, my_stats_promise).done(function(data_response, stats_response) {
+  getData: function(props){
+
+    var my_data_promise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
+
+    var my_stats_promise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
+
+    var my_timeseries_promise = this.getTimeseriesPromise(props);
+
+    $.when(my_data_promise, my_stats_promise, my_timeseries_promise)
+     .done(function(data_response, stats_response, timeseries_response) {
       this.setState({
         climoSeriesData: dataApiToC3(data_response[0]),
-        statsData: this.injectRunIntoStats(stats_response[0])
+        statsData: this.injectRunIntoStats(stats_response[0]),
+        timeSeriesData: parseTimeSeriesForC3(timeseries_response[0])
       });
     }.bind(this));
   },
@@ -99,13 +113,39 @@ var DataController = React.createClass({
 
   shouldComponentUpdate: function(nextProps, nextState) {
     // This guards against re-rendering before Ajax calls alter the state
-    return JSON.stringify(nextState) !== JSON.stringify(this.state)
+    return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
+           JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
+           JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData)
   },
 
   componentWillReceiveProps: function(nextProps) {
     if (this.verifyParams(nextProps)){
       this.getData(nextProps);
     }
+  },
+
+  updateProjChangeTimeOfYear: function(timeidx) {
+    this.setState({
+      projChangeTimeOfYear: timeidx
+    });
+    this.getDataPromise(this.props, timeidx).done(function(data) {
+      this.setState({
+        climoSeriesData: dataApiToC3(data),
+      })
+    }.bind(this))
+
+  },
+
+  updateDataTableTimeOfYear: function(timeidx) {
+    this.setState({
+      dataTableTimeOfYear: timeidx
+    });
+    this.getStatsPromise(this.props, timeidx).done(function(data) {
+      this.setState({
+        statsData: this.injectRunIntoStats(data),
+      })
+    }.bind(this))
+
   },
 
   render: function() {
@@ -124,9 +164,19 @@ var DataController = React.createClass({
             <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
           </TabPanel>
           <TabPanel>
+            <Row>
+              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+                <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
+              </Col>
+            </Row>
             <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
           </TabPanel>
         </Tabs>
+        <Row>
+          <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
+          </Col>
+        </Row>
         <DataTable data={statsData} />
       </div>
   )}
