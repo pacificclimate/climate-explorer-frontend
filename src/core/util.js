@@ -130,6 +130,10 @@ var dataApiToC3 = function(data) {
     c3Data = mergeC3Data(c3Data, genC3DataFromModel(key, value.data, value.units, unitsMap));
   })
 
+  c3Data.columns.sort(function(a,b){
+    return a[0] > b[0] ? 1 : -1;
+  })
+
   return {
     data: c3Data,
     axis: c3AxisInfo,
