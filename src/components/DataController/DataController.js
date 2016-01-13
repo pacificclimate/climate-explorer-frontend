@@ -124,7 +124,7 @@ var DataController = React.createClass({
             <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
           </TabPanel>
           <TabPanel>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} />
+            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
           </TabPanel>
         </Tabs>
         <DataTable data={statsData} />

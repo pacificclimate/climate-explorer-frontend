@@ -23,17 +23,17 @@ var mergeC3Data = function(old, toAdd) {
  *   @param name: Run name
  *     eg: r1i1p1
  *   @param data: Js object of {timeval: result}
- *     eg: { '2025-04-16': 281,
- *       '2055-04-16': 284 }
+ *     eg: { '2025-04-16': 281.1234,
+ *       '2055-04-16': 284.3456 }
  * Output:
  *  [ [ 'r1i1p1_xs', '2025-04-16', '2055-04-16' ],
- *    'r1i1p1', 281, 284 ] ]
+ *    'r1i1p1', 281.12, 284.35 ] ]
  */
 var genC3DataFromModel = function(name, data, unit, axisMap) {
   var axes = {};
   axes[name] = axisMap[unit];
   return {
-    columns:[ [].concat(name, _.values(data)) ],
+    columns:[ [].concat(name, _.map(_.values(data), function(num){return num.toFixed(PRECISION)})) ],
     axes: axes
   }
 };
@@ -93,7 +93,6 @@ var generateXAxis = function(data) {
  * {"r1i1p1": {"units": "K", "data": {"2025-04-16T00:00:00Z": 281}}}
  */
 var dataApiToC3 = function(data) {
-
   // Initialize the x axis data to the first
   var c3Data = {
     x: 'x',
@@ -116,13 +115,21 @@ var dataApiToC3 = function(data) {
   _.extend(c3AxisInfo, generateAxisInfo(units).axisData);
   var unitsMap = generateAxisInfo(units).unitsMap;
 
+  var tooltipInfo = {
+    grouped: true,
+    format: {
+      value: function (value) { return value }
+    }
+  };
+
   _.each(data, function(value, key) {
     c3Data = mergeC3Data(c3Data, genC3DataFromModel(key, value.data, value.units, unitsMap));
   })
 
   return {
     data: c3Data,
-    axis: c3AxisInfo
+    axis: c3AxisInfo,
+    tooltip: tooltipInfo
   }
 }
 
