@@ -33,7 +33,7 @@ var genC3DataFromModel = function(name, data, unit, axisMap) {
   var axes = {};
   axes[name] = axisMap[unit];
   return {
-    columns:[ [].concat(name, _.map(_.values(data), function(num){return num.toFixed(PRECISION)})) ],
+    columns:[ [].concat(name, _.values(data)) ],
     axes: axes
   }
 };
@@ -64,7 +64,7 @@ var generateAxisInfo = function(units) {
       },
       tick: {
         format: function(x) {
-          return +x.toFixed(1);
+          return +x.toFixed(PRECISION);
         }
       }
     }
@@ -118,7 +118,7 @@ var dataApiToC3 = function(data) {
   var tooltipInfo = {
     grouped: true,
     format: {
-      value: function (value) { return value }
+      value: function (value) { return value.toFixed(PRECISION) }
     }
   };
 
@@ -216,7 +216,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
     y: { 
         label: { 'text': yUnits, 'position':'outer-middle' },
         tick: {
-          format: function (x) { return +x.toFixed(1); }
+          format: function (x) { return +x.toFixed(PRECISION); }
         }  
       }
   };
@@ -224,7 +224,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
   var tooltipInfo = {
     grouped: true,
     format: {
-      value: function (value) { return value + ' ' + yUnits }
+      value: function (value) { return value.toFixed(PRECISION) + ' ' + yUnits }
     }
   };
 
@@ -238,7 +238,7 @@ var parseTimeSeriesForC3 = function(graph_data) {
 
   var idx = 0;
   for (let key in graph_data['data']) {
-    var val = graph_data['data'][key].toFixed(PRECISION);
+    var val = graph_data['data'][key];
     var timestep = moment(key, moment.ISO_8601).utc();
     var month = timestep.format('MMMM');
     if (idx < 12){
