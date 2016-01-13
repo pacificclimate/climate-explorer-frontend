@@ -117,8 +117,8 @@ var DataController = React.createClass({
       <div>
         <Tabs>
           <TabList>
-            <Tab>Seasonal Range</Tab>
-            <Tab>Climatological Series</Tab>
+            <Tab>Annual Cycle</Tab>
+            <Tab>Projected Change</Tab>
           </TabList>
           <TabPanel>
             <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
