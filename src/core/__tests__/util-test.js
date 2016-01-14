@@ -67,7 +67,7 @@ describe('parseDataForC3', function() {
 
   // });
 
-  it('can handle a minimum data set', function() {
+  xit('can handle a minimum data set', function() {
     var input = {
       'r1i1p1': {
         'data': {
