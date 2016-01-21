@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { Input, Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
+import urljoin from 'url-join';
 
 import classNames from 'classnames';
 
@@ -39,29 +40,27 @@ var MapController = React.createClass({
   },
 
   updateTime: function(timeidx) {
-
-    // Find selected dataset, then apply time transformation based on index
-    var selected = this.props.meta.filter(function(el){
-      return el.unique_id == this.state.dataset
-    }.bind(this))
-
-    // Assumes filter returns a single element which /should/ be true. FIXME.
     this.setState({
       timeidx: timeidx,
-      wmstime: selected[0].times[timeidx]})
+      wmstime: this.selectedDataset.times[timeidx]
+    })
   },
 
-  updateDataset: function(dataset) {
+  updateDataset: function(unique_id) {
     // Updates dataset in state. Updates time value to match new dataset
 
-    var selected = this.props.meta.filter(function(el){
-      return el.unique_id == dataset
-    }.bind(this))[0]
+    this.selectedDataset = this.props.meta.filter(function(el){
+      return el.unique_id == unique_id
+    })[0]
 
-    this.setState({
-      dataset: dataset,
-      wmstime: selected.times[this.state.timeidx]
-    })
+    this.getTimeMetadata(unique_id).done(function(data) {
+      this.selectedDataset.times = data[unique_id].times;
+
+      this.setState({
+        dataset: this.selectedDataset.unique_id,
+        wmstime: this.selectedDataset.times[this.state.timeidx]
+      });
+    }.bind(this))
   },
 
   findUniqueId: function() {
@@ -74,11 +73,28 @@ var MapController = React.createClass({
     this.props.onSetArea(wkt);
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      dataset: nextProps.meta[0].unique_id,
-      wmstime: nextProps.meta[0].times[this.state.timeidx]
+  getTimeMetadata: function(unique_id) {
+    return $.ajax({
+      url: urljoin(CE_BACKEND_URL, 'metadata'),
+      crossDomain: true,
+      data: {
+        model_id: unique_id
+      }
     });
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.selectedDataset = nextProps.meta[0]
+
+    this.getTimeMetadata(this.selectedDataset.unique_id).done(function(data) {
+      this.selectedDataset.times = data[this.selectedDataset.unique_id].times;
+
+      this.setState({
+        dataset: this.selectedDataset.unique_id,
+        wmstime: this.selectedDataset.times[this.state.timeidx]
+      });
+
+    }.bind(this))
   },
 
   render: function () {
