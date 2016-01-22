@@ -53,7 +53,7 @@ var MapController = React.createClass({
       return el.unique_id == unique_id
     })[0]
 
-    this.getTimeMetadata(unique_id).done(function(data) {
+    this.requestTimeMetadata(unique_id).done(function(data) {
       this.selectedDataset.times = data[unique_id].times;
 
       this.setState({
@@ -73,7 +73,7 @@ var MapController = React.createClass({
     this.props.onSetArea(wkt);
   },
 
-  getTimeMetadata: function(unique_id) {
+  requestTimeMetadata: function(unique_id) {
     return $.ajax({
       url: urljoin(CE_BACKEND_URL, 'metadata'),
       crossDomain: true,
@@ -86,7 +86,7 @@ var MapController = React.createClass({
   componentWillReceiveProps: function(nextProps) {
     this.selectedDataset = nextProps.meta[0]
 
-    this.getTimeMetadata(this.selectedDataset.unique_id).done(function(data) {
+    this.requestTimeMetadata(this.selectedDataset.unique_id).done(function(data) {
       this.selectedDataset.times = data[this.selectedDataset.unique_id].times;
 
       this.setState({
