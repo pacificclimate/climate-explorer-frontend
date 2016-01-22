@@ -25,6 +25,7 @@ var MapController = React.createClass({
    * Includes:
    *   - dataset
    *   - wmstime
+   *   - variable
    */
   getInitialState: function () {
     return {
@@ -58,7 +59,8 @@ var MapController = React.createClass({
 
       this.setState({
         dataset: this.selectedDataset.unique_id,
-        wmstime: this.selectedDataset.times[this.state.timeidx]
+        wmstime: this.selectedDataset.times[this.state.timeidx],
+        variable: this.selectedDataset.variable_id
       });
     }.bind(this))
   },
@@ -91,10 +93,16 @@ var MapController = React.createClass({
 
       this.setState({
         dataset: this.selectedDataset.unique_id,
-        wmstime: this.selectedDataset.times[this.state.timeidx]
+        wmstime: this.selectedDataset.times[this.state.timeidx],
+        variable: this.selectedDataset.variable_id
       });
 
     }.bind(this))
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // This guards against re-rendering before we have required data
+    return JSON.stringify(nextState) !== JSON.stringify(this.state)
   },
 
   render: function () {
@@ -124,7 +132,7 @@ var MapController = React.createClass({
               styles={this.state.styles}
               time={this.state.wmstime}
               dataset={this.state.dataset}
-              variable={this.props.variable}
+              variable={this.state.variable}
               onSetArea={this.handleSetArea}>
               <div className={styles.controls}>
                 <Row>
