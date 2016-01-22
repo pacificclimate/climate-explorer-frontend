@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { Input, Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
+import urljoin from 'url-join';
 
 import classNames from 'classnames';
 
@@ -24,6 +25,7 @@ var MapController = React.createClass({
    * Includes:
    *   - dataset
    *   - wmstime
+   *   - variable
    */
   getInitialState: function () {
     return {
@@ -39,29 +41,28 @@ var MapController = React.createClass({
   },
 
   updateTime: function(timeidx) {
-
-    // Find selected dataset, then apply time transformation based on index
-    var selected = this.props.meta.filter(function(el){
-      return el.unique_id == this.state.dataset
-    }.bind(this))
-
-    // Assumes filter returns a single element which /should/ be true. FIXME.
     this.setState({
       timeidx: timeidx,
-      wmstime: selected[0].times[timeidx]})
+      wmstime: this.selectedDataset.times[timeidx]
+    })
   },
 
-  updateDataset: function(dataset) {
+  updateDataset: function(unique_id) {
     // Updates dataset in state. Updates time value to match new dataset
 
-    var selected = this.props.meta.filter(function(el){
-      return el.unique_id == dataset
-    }.bind(this))[0]
+    this.selectedDataset = this.props.meta.filter(function(el){
+      return el.unique_id == unique_id
+    })[0]
 
-    this.setState({
-      dataset: dataset,
-      wmstime: selected.times[this.state.timeidx]
-    })
+    this.requestTimeMetadata(unique_id).done(function(data) {
+      this.selectedDataset.times = data[unique_id].times;
+
+      this.setState({
+        dataset: this.selectedDataset.unique_id,
+        wmstime: this.selectedDataset.times[this.state.timeidx],
+        variable: this.selectedDataset.variable_id
+      });
+    }.bind(this))
   },
 
   findUniqueId: function() {
@@ -74,11 +75,34 @@ var MapController = React.createClass({
     this.props.onSetArea(wkt);
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      dataset: nextProps.meta[0].unique_id,
-      wmstime: nextProps.meta[0].times[this.state.timeidx]
+  requestTimeMetadata: function(unique_id) {
+    return $.ajax({
+      url: urljoin(CE_BACKEND_URL, 'metadata'),
+      crossDomain: true,
+      data: {
+        model_id: unique_id
+      }
     });
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.selectedDataset = nextProps.meta[0]
+
+    this.requestTimeMetadata(this.selectedDataset.unique_id).done(function(data) {
+      this.selectedDataset.times = data[this.selectedDataset.unique_id].times;
+
+      this.setState({
+        dataset: this.selectedDataset.unique_id,
+        wmstime: this.selectedDataset.times[this.state.timeidx],
+        variable: this.selectedDataset.variable_id
+      });
+
+    }.bind(this))
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // This guards against re-rendering before we have required data
+    return JSON.stringify(nextState) !== JSON.stringify(this.state)
   },
 
   render: function () {
@@ -108,7 +132,7 @@ var MapController = React.createClass({
               styles={this.state.styles}
               time={this.state.wmstime}
               dataset={this.state.dataset}
-              variable={this.props.variable}
+              variable={this.state.variable}
               onSetArea={this.handleSetArea}>
               <div className={styles.controls}>
                 <Row>

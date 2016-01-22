@@ -97,7 +97,6 @@ var App = React.createClass({
           <Col lg={6}>
             <div className={styles.map}>
               <MapController
-                variable={this.state.variable_id}
                 meta = {this.getfilteredMeta()}
                 onSetArea={this.handleSetArea} />
             </div>
