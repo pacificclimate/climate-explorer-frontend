@@ -1,7 +1,9 @@
+XLSX = require('xlsx');
 // set the decimal precision of displayed values
 var PRECISION = 2; 
 
 var parseBootstrapTableData = function(data) {
+    console.log(data)
     var flatData = [];
     var model_count = 0;
     for (let model in data) {
@@ -26,7 +28,12 @@ var parseBootstrapTableData = function(data) {
         };
         flatData.push(modelInfo); 
     }
+    console.log(flatData)
     return flatData;
+}
+
+var exportTableDataToSpreadsheet = function(data){
+
 }
 
 export default parseBootstrapTableData
