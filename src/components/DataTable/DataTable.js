@@ -21,6 +21,7 @@ var DataTable = React.createClass({
                     <TableHeaderColumn dataField="stdev" dataAlign="center" dataSort={true}>W.Std.Dev</TableHeaderColumn>
                     <TableHeaderColumn dataField="units" dataAlign="center" dataSort={true}>Units</TableHeaderColumn>
                 </BootstrapTable>
+                    <input type="button" id="export" value="Export to CSV" onclick=""/>
             </div>
         )
     }
