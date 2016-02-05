@@ -38,7 +38,8 @@
     "moment": "^2.10.6",
     "proj4": "^2.3.10",
     "proj4leaflet": "^0.7.1",
-    "react-bootstrap-table": "^1.2.5"
+    "react-bootstrap-table": "^1.2.5",
+    "xlsx": "^0.8.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.3",
