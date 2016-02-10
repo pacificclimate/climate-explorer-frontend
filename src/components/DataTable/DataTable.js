@@ -8,6 +8,7 @@ var DataTable = React.createClass({
 
     handleClick: function(data) {
         var ss_data = exportTableDataToSpreadsheet(data);
+
         var xlsx_data = new Blob([ss_data],{type:""});
         // TODO: need to pull in info about selected ensemble, variable, time of year, etc. to make better filename
         filesaver.saveAs(xlsx_data, "ClimateExplorerDataTableExport.xlsx");

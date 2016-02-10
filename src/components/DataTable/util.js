@@ -39,7 +39,7 @@ var exportTableDataToSpreadsheet = function(data){
     var ws = {};
     // TODO: need to pull in info about selected ensemble to make better ws_name
     var ws_name = "CE_DataTable_export";
-    var num_rows = Object.keys(data).length;
+    var num_rows = Object.keys(data).length+1;
     var num_cols = Object.keys(data[0]).length
     var range = {s: {c:0, r:0}, e: {c:num_cols, r:num_rows }};
 
@@ -47,12 +47,12 @@ var exportTableDataToSpreadsheet = function(data){
     var short_labels = ["model_period", "run", "min", "max", "w_mean", "median", "w_stdev", "units" ]
 
     // populate worksheet
-    for(var R = -1; R != num_rows; ++R){
+    for(var R = 0; R != num_rows; ++R){
         for(var C = 0; C != num_cols; ++C){
             // create header row
-            if(R == -1) var cell = {v: column_labels[C]};
+            if(R == 0) var cell = {v: column_labels[C]};
             // create cell object: .v is the actual data
-            else var cell = {v: data[R][short_labels[C]]};
+            else var cell = {v: data[R-1][short_labels[C]]};
             if(cell.v == null) continue;
             // create the correct cell reference
             var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
@@ -72,7 +72,7 @@ var exportTableDataToSpreadsheet = function(data){
     function s2ab(s) {
         var buf = new ArrayBuffer(s.length);
         var view = new Uint8Array(buf);
-        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF; 
+        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
         return buf;
     }  
 
