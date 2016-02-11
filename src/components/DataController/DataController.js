@@ -2,9 +2,9 @@ import React, { PropTypes, Component } from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
 import ReactTabs, { Tab, Tabs, TabList, TabPanel} from 'react-tabs';
-import { Input, Row, Col } from 'react-bootstrap'
+import { Button, Input, Row, Col } from 'react-bootstrap'
 
-import { dataApiToC3, parseTimeSeriesForC3 } from '../../core/util'
+import { dataApiToC3, parseTimeSeriesForC3, parseBootstrapTableData, exportTableDataToSpreadsheet } from '../../core/util'
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector'
@@ -31,13 +31,17 @@ var DataController = React.createClass({
     };
   },
 
-  injectRunIntoStats: function(data) {
-    // Injects the ensemble member (run) into object returned by stats call
+  injectModelRunInfoIntoStats: function(data) {
+    // Injects model run information into object returned by stats call
     _.map(data, function(val, key) {
       var selected = this.props.meta.filter(function(el){
         return el.unique_id == key;
       })
+      val['model_id'] = selected[0].model_id;
       val['run'] = selected[0].ensemble_member;
+      val['variable_id'] = selected[0].variable_id;
+      val['variable_name'] = selected[0].variable_name;
+      val['experiment'] = selected[0].experiment;
     }.bind(this))
     return data;
   },
@@ -82,8 +86,7 @@ var DataController = React.createClass({
     })
   },
 
-  getData: function(props){
-
+  getData: function(props) {
     var my_data_promise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
     var my_stats_promise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
@@ -94,7 +97,7 @@ var DataController = React.createClass({
      .done(function(data_response, stats_response, timeseries_response) {
       this.setState({
         climoSeriesData: dataApiToC3(data_response[0]),
-        statsData: this.injectRunIntoStats(stats_response[0]),
+        statsData: parseBootstrapTableData(this.injectModelRunInfoIntoStats(stats_response[0])),
         timeSeriesData: parseTimeSeriesForC3(timeseries_response[0])
       });
     }.bind(this));
@@ -166,7 +169,7 @@ var DataController = React.createClass({
   render: function() {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : {data:{columns:[]}, axis:{}};
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : {data:{columns:[]}, axis:{}};
-    var statsData = this.state.statsData ? this.state.statsData : {};
+    var statsData = this.state.statsData ? this.state.statsData : [];
     var ids = this.props.meta.map(function(el) {
       var period = el.unique_id.split('_').slice(5)[0]
       var period = period.split('-').map(function(datestring){return datestring.slice(0,4)}).join('-');
@@ -203,7 +206,8 @@ var DataController = React.createClass({
             <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
           </Col>
         </Row>
-        <DataTable data={statsData} />
+          <DataTable data={statsData} />
+          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData)}>Export Table Data</Button>
       </div>
   )}
 })

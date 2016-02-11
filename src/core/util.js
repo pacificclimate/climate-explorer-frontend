@@ -1,6 +1,8 @@
 var moment = require("moment/moment");
 var _ = require('underscore');
-
+import XLSX from 'xlsx';
+// import saveAs from 'filesaver.js';
+import * as filesaver from 'filesaver.js';
 // set the decimal precision of displayed values
 var PRECISION = 2;
 
@@ -283,4 +285,114 @@ var parseTimeSeriesForC3 = function(graph_data) {
   };
 }
 
-module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3 }
+var parseBootstrapTableData = function(data) {
+
+    var flatData = [];
+    var model_count = 0;
+    for (let model in data) {
+        var year_range_re = new RegExp("[0-9]{8}","g");
+        var year_range = [];
+        var lastIndex = 0;
+        while (year_range_re.test(model)){
+            year_range_re.lastIndex = lastIndex;
+            year_range.push(year_range_re.exec(model)[0].slice(0,4));
+            lastIndex = year_range_re.lastIndex;
+        }
+        var period = year_range[0] + " - " + year_range[1];
+        var modelInfo = {
+            "model_id": data[model]['model_id'],
+            "variable_id": data[model]['variable_id'],
+            "variable_name": data[model]['variable_name'],
+            "emissions_scenario": data[model]['experiment'],
+            "time_of_year": data[model]['time_of_year'],
+            "model_period": period,
+            "run": data[model]['run'],
+            "min": +data[model]['min'].toFixed(PRECISION),
+            "max": +data[model]['max'].toFixed(PRECISION),
+            "w_mean": +data[model]['mean'].toFixed(PRECISION),
+            "median": +data[model]['median'].toFixed(PRECISION),
+            "w_stdev": +data[model]['stdev'].toFixed(PRECISION),
+            "units": data[model]['units']
+        };
+        flatData.push(modelInfo); 
+    }
+    return flatData;
+  }
+
+var exportTableDataToSpreadsheet = function(data){
+
+    // Create workbook object containing one or more worksheets
+    var wb = {}
+    wb.Sheets = {};
+    wb.SheetNames = [];
+    var ws = {};
+
+    // write summary rows at top of worksheet
+    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
+    var summary_keys = ["model_id", "emissions_scenario", "time_of_year", "variable_id", "variable_name"]
+    var num_summary_rows = 3;
+    var num_summary_cols = summary_keys.length
+    for(var R = 0; R < num_summary_rows; ++R){
+      for(var C = 0; C < num_summary_cols; ++C){
+        if(R == 0) var cell = {v: summary_header[C]};
+        else if(R == 1) var cell = {v: data[0][summary_keys[C]]};
+        else var cell = {v: ""};
+        cell.t = 's';
+        var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
+        ws[cell_ref] = cell;
+      }
+    }
+
+    // populate worksheet with table data
+    var column_labels = ["Model Period", "Run", "Min", "Max", "W.Mean", "Median", "W.Std.Dev", "Units" ];
+    var data_keys = ["model_period", "run", "min", "max", "w_mean", "median", "w_stdev", "units" ];
+    var num_data_rows = Object.keys(data).length;
+    var num_data_cols = data_keys.length
+
+    var data_idx = 0
+    for(var R = 0; R <= num_data_rows; ++R){
+        for(var C = 0; C < num_data_cols; ++C){
+            // create header row
+            if(R == 0) var cell = {v: column_labels[C]};
+            // create cell object: .v is the actual data
+            else var cell = {v: data[R-1][data_keys[C]]};
+            if(cell.v == null) continue;
+            // create the correct cell reference
+            var cell_ref = XLSX.utils.encode_cell({c:C,r:R + num_summary_rows});
+            // determine the cell type 
+            if(typeof cell.v === 'number') cell.t = 'n';
+            else cell.t = 's';
+            // add to worksheet object
+            ws[cell_ref] = cell;
+        }
+    }
+    // set worksheet range bounds
+    var range = {
+      s: {c:0, r:0}, 
+      e: {
+          c: (num_summary_cols > num_data_cols ? num_summary_cols : num_data_cols), 
+          r: num_summary_rows + num_data_rows + 1}};
+    ws['!ref'] = XLSX.utils.encode_range(range);
+
+    // add worksheet to workbook -- TODO: add time_of_year to ws_name
+    var ws_name = data[0].model_id + "_" + data[0].emissions_scenario + "_" + data[0].variable_id;
+    wb.SheetNames.push(ws_name);
+    wb.Sheets[ws_name] = ws;
+
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }  
+
+    // convert workbook to XLSX and prepare for download
+    var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+    var xlsx_data = new Blob([s2ab(wbout)],{type:""});
+
+    // form output file name -- TODO: add time_of_year
+    var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + "_" + data[0].variable_id + ".xlsx"
+    filesaver.saveAs(xlsx_data, output_filename);
+}
+
+module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, exportTableDataToSpreadsheet }
