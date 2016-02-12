@@ -75,7 +75,7 @@ module.exports = {
         progress: true,
 	    colors: true
     },
-    devtool: 'source-map',
+    devtool: (process.env.NODE_ENV !== 'production') ? 'source-map' : '',
     // 'node' and 'externals' added as a fix to make xlsx.js work with Webpack. See: https://github.com/SheetJS/js-xlsx/issues/285
     node: {
             fs: 'empty'

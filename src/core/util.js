@@ -304,6 +304,7 @@ var parseBootstrapTableData = function(data) {
             "variable_name": data[model]['variable_name'],
             "emissions_scenario": data[model]['experiment'],
             "time_of_year": data[model]['time_of_year'],
+
             "model_period": period,
             "run": data[model]['run'],
             "min": +data[model]['min'].toFixed(PRECISION),
@@ -316,7 +317,7 @@ var parseBootstrapTableData = function(data) {
         flatData.push(modelInfo); 
     }
     return flatData;
-  }
+}
 
 var exportTableDataToSpreadsheet = function(data, format){
     // Create workbook object containing one or more worksheets
@@ -327,8 +328,8 @@ var exportTableDataToSpreadsheet = function(data, format){
     var time_of_year = "";
 
     // write summary rows at top of worksheet
-    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
-    var summary_keys = ["model_id", "emissions_scenario", "time_of_year", "variable_id", "variable_name"];
+    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name (TODO)"];
+    var summary_keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
     var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
                           "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
                           "Fall - SON", "Annual"];
@@ -339,11 +340,11 @@ var exportTableDataToSpreadsheet = function(data, format){
         if(R == 0) var cell = {v: summary_header[C]};
         else if(R == 1) {
           if(summary_keys[C] == 'time_of_year'){
-            var cell = {v: times_of_year[data[0]['time_of_year']]};
+            var cell = {v: times_of_year[this.state.dataTableTimeOfYear]};
             var short_season_label = cell.v.substr(0, cell.v.indexOf(' ')); // will return string before whitespace
             if(short_season_label) time_of_year = short_season_label; else time_of_year = cell.v;       
           }
-          else var cell = {v: data[0][summary_keys[C]]};
+          else var cell = {v: this.props[summary_keys[C]]};
         }
         else var cell = {v: ""};
         cell.t = 's';
@@ -358,14 +359,13 @@ var exportTableDataToSpreadsheet = function(data, format){
     var num_data_rows = Object.keys(data).length;
     var num_data_cols = data_keys.length
 
-    var data_idx = 0
     for(var R = 0; R <= num_data_rows; ++R){
         for(var C = 0; C < num_data_cols; ++C){
             // create header row
             if(R == 0) var cell = {v: column_labels[C]};
             // create cell object: .v is the actual data
             else var cell = {v: data[R-1][data_keys[C]]};
-            if(cell.v == null) continue;
+            if(cell.v === null) continue;
             // create the correct cell reference
             var cell_ref = XLSX.utils.encode_cell({c:C,r:R + num_summary_rows});
             // determine the cell type 
@@ -390,30 +390,31 @@ var exportTableDataToSpreadsheet = function(data, format){
 
     // Note: we will probably want to split the rest of this out into a separate function 
     // to combine multiple worksheets if/when we want to export additional data (e.g. DataGraph points)
+    function to_csv(workbook) {
+        var result = [];
+        workbook.SheetNames.forEach(function(sheetName) {
+            var csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+            if(csv.length > 0){
+                // Uncomment the following 2 lines of code to support multiple worksheets
+                // result.push("SHEET: " + sheetName);
+                // result.push("");
+                result.push(csv);
+            }
+        });
+        return result.join("\n");
+    }
+
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
 
     if(format == 'csv'){
-        function to_csv(workbook) {
-            var result = [];
-            workbook.SheetNames.forEach(function(sheetName) {
-                var csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-                if(csv.length > 0){
-                    // Uncomment the following 2 lines of code to support multiple worksheets
-                    // result.push("SHEET: " + sheetName);
-                    // result.push("");
-                    result.push(csv);
-                }
-            });
-            return result.join("\n");
-        }
-        var out_data = new Blob([to_csv(wb)],{type:""});;
+        var out_data = new Blob([to_csv(wb)],{type:""});
     }
-    else if(format == 'xlsx') {
-        function s2ab(s) {
-            var buf = new ArrayBuffer(s.length);
-            var view = new Uint8Array(buf);
-            for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-            return buf;
-        }  
+    else if(format == 'xlsx') { 
         // convert workbook to XLSX and prepare for download
         var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
         var out_data = new Blob([s2ab(wbout)],{type:""});
