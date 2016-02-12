@@ -4,7 +4,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 var DataTable = React.createClass({
 
     propTypes: {
-        data: React.PropTypes.array.isRequired
+        data: React.PropTypes.array
     },
 
     render: function () {
