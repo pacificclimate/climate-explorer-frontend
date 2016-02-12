@@ -1,8 +1,8 @@
 var moment = require("moment/moment");
 var _ = require('underscore');
 import XLSX from 'xlsx';
-// import saveAs from 'filesaver.js';
 import * as filesaver from 'filesaver.js';
+
 // set the decimal precision of displayed values
 var PRECISION = 2;
 
@@ -286,7 +286,6 @@ var parseTimeSeriesForC3 = function(graph_data) {
 }
 
 var parseBootstrapTableData = function(data) {
-
     var flatData = [];
     var model_count = 0;
     for (let model in data) {
@@ -320,22 +319,32 @@ var parseBootstrapTableData = function(data) {
   }
 
 var exportTableDataToSpreadsheet = function(data){
-
     // Create workbook object containing one or more worksheets
     var wb = {}
     wb.Sheets = {};
     wb.SheetNames = [];
     var ws = {};
+    var time_of_year = "";
 
     // write summary rows at top of worksheet
     var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
-    var summary_keys = ["model_id", "emissions_scenario", "time_of_year", "variable_id", "variable_name"]
+    var summary_keys = ["model_id", "emissions_scenario", "time_of_year", "variable_id", "variable_name"];
+    var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
+                          "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
+                          "Fall - SON", "Annual"];
     var num_summary_rows = 3;
     var num_summary_cols = summary_keys.length
     for(var R = 0; R < num_summary_rows; ++R){
       for(var C = 0; C < num_summary_cols; ++C){
         if(R == 0) var cell = {v: summary_header[C]};
-        else if(R == 1) var cell = {v: data[0][summary_keys[C]]};
+        else if(R == 1) {
+          if(summary_keys[C] == 'time_of_year'){
+            var cell = {v: times_of_year[data[0]['time_of_year']]};
+            var short_season_label = cell.v.substr(0, cell.v.indexOf(' ')); // will return string before whitespace
+            if(short_season_label) time_of_year = short_season_label; else time_of_year = cell.v;       
+          }
+          else var cell = {v: data[0][summary_keys[C]]};
+        }
         else var cell = {v: ""};
         cell.t = 's';
         var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
@@ -390,8 +399,9 @@ var exportTableDataToSpreadsheet = function(data){
     var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
     var xlsx_data = new Blob([s2ab(wbout)],{type:""});
 
-    // form output file name -- TODO: add time_of_year
-    var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + "_" + data[0].variable_id + ".xlsx"
+    // form output filename -- TODO: add time_of_year
+    var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
+                            "_" + data[0].variable_id + "_" + time_of_year + ".xlsx"
     filesaver.saveAs(xlsx_data, output_filename);
 }
 

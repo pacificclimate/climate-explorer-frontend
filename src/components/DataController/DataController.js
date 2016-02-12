@@ -42,6 +42,7 @@ var DataController = React.createClass({
       val['variable_id'] = selected[0].variable_id;
       val['variable_name'] = selected[0].variable_name;
       val['experiment'] = selected[0].experiment;
+      val['time_of_year'] = this.state.dataTableTimeOfYear;
     }.bind(this))
     return data;
   },
@@ -149,10 +150,10 @@ var DataController = React.createClass({
     });
     this.getStatsPromise(this.props, timeidx).done(function(data) {
       this.setState({
-        statsData: this.injectRunIntoStats(data),
+        // statsData: this.injectModelRunInfoIntoStats(data),
+        statsData: parseBootstrapTableData(this.injectModelRunInfoIntoStats(data)),
       })
     }.bind(this))
-
   },
 
   updateAnnCycleDataset: function(dataset) {
