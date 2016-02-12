@@ -208,7 +208,8 @@ var DataController = React.createClass({
           </Col>
         </Row>
           <DataTable data={statsData} />
-          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData)}>Export Table Data</Button>
+          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData, 'xlsx')}>Export To XLSX</Button>
+          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
       </div>
   )}
 })

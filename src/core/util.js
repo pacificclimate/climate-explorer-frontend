@@ -318,7 +318,7 @@ var parseBootstrapTableData = function(data) {
     return flatData;
   }
 
-var exportTableDataToSpreadsheet = function(data){
+var exportTableDataToSpreadsheet = function(data, format){
     // Create workbook object containing one or more worksheets
     var wb = {}
     wb.Sheets = {};
@@ -388,21 +388,42 @@ var exportTableDataToSpreadsheet = function(data){
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length);
-        var view = new Uint8Array(buf);
-        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
-    }  
+    if(format == 'csv'){
+        function to_csv(workbook) {
+            var result = [];
+            workbook.SheetNames.forEach(function(sheetName) {
+                var csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+                if(csv.length > 0){
+                    result.push("SHEET: " + sheetName);
+                    result.push("");
+                    result.push(csv);
+                }
+            });
+            return result.join("\n");
+        }
+        var csv_data = new Blob([to_csv(wb)],{type:""});;
+        // form output filename -- TODO: add time_of_year
+        var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
+                                "_" + data[0].variable_id + "_" + time_of_year + ".csv"
+        filesaver.saveAs(csv_data, output_filename);
+    }
+    else if(format == 'xlsx') {
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }  
 
-    // convert workbook to XLSX and prepare for download
-    var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
-    var xlsx_data = new Blob([s2ab(wbout)],{type:""});
+        // convert workbook to XLSX and prepare for download
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+        var xlsx_data = new Blob([s2ab(wbout)],{type:""});
 
-    // form output filename -- TODO: add time_of_year
-    var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
-                            "_" + data[0].variable_id + "_" + time_of_year + ".xlsx"
-    filesaver.saveAs(xlsx_data, output_filename);
+        // form output filename -- TODO: add time_of_year
+        var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
+                                "_" + data[0].variable_id + "_" + time_of_year + ".xlsx"
+        filesaver.saveAs(xlsx_data, output_filename);
+    }
 }
 
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, exportTableDataToSpreadsheet }
