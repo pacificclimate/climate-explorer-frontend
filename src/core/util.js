@@ -383,10 +383,13 @@ var exportTableDataToSpreadsheet = function(data, format){
           r: num_summary_rows + num_data_rows + 1}};
     ws['!ref'] = XLSX.utils.encode_range(range);
 
-    // add worksheet to workbook -- TODO: add time_of_year to ws_name
-    var ws_name = data[0].model_id + "_" + data[0].emissions_scenario + "_" + data[0].variable_id;
+    // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
+    var ws_name = "Stats_Table_" + data[0].variable_id + "_" + time_of_year;
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
+
+    // Note: we will probably want to split the rest of this out into a separate function 
+    // to combine multiple worksheets if/when we want to export additional data (e.g. DataGraph points)
 
     if(format == 'csv'){
         function to_csv(workbook) {
@@ -394,18 +397,15 @@ var exportTableDataToSpreadsheet = function(data, format){
             workbook.SheetNames.forEach(function(sheetName) {
                 var csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
                 if(csv.length > 0){
-                    result.push("SHEET: " + sheetName);
-                    result.push("");
+                    // Uncomment the following 2 lines of code to support multiple worksheets
+                    // result.push("SHEET: " + sheetName);
+                    // result.push("");
                     result.push(csv);
                 }
             });
             return result.join("\n");
         }
-        var csv_data = new Blob([to_csv(wb)],{type:""});;
-        // form output filename -- TODO: add time_of_year
-        var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
-                                "_" + data[0].variable_id + "_" + time_of_year + ".csv"
-        filesaver.saveAs(csv_data, output_filename);
+        var out_data = new Blob([to_csv(wb)],{type:""});;
     }
     else if(format == 'xlsx') {
         function s2ab(s) {
@@ -414,16 +414,15 @@ var exportTableDataToSpreadsheet = function(data, format){
             for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
             return buf;
         }  
-
         // convert workbook to XLSX and prepare for download
         var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
-        var xlsx_data = new Blob([s2ab(wbout)],{type:""});
-
-        // form output filename -- TODO: add time_of_year
-        var output_filename = "PCIC_CE_DataTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
-                                "_" + data[0].variable_id + "_" + time_of_year + ".xlsx"
-        filesaver.saveAs(xlsx_data, output_filename);
+        var out_data = new Blob([s2ab(wbout)],{type:""});
     }
+    // form output filename
+    var output_filename = "PCIC_CE_StatsTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
+                            "_" + data[0].variable_id + "_" + time_of_year + "." + format;
+    // serve up file for download
+    filesaver.saveAs(out_data, output_filename);
 }
 
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, exportTableDataToSpreadsheet }
