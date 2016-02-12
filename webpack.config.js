@@ -67,7 +67,7 @@ module.exports = {
             require('postcss-cssnext')({ autoprefixer: AUTOPREFIXER_BROWSERS })
         ];
     },
-
+    devtool: (process.env.NODE_ENV !== 'production') ? 'source-map' : '',
     devServer: {
         historyApiFallback: true,
         hot: true,
