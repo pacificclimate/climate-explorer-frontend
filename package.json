@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server --host 0.0.0.0",
     "build": "webpack --progress --colors",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "lint": "eslint src"
   },
   "author": "Basil Veerman <bveerman@uvic.ca>",
   "license": "GPL-3.0",
@@ -42,10 +43,14 @@
   "devDependencies": {
     "autoprefixer": "^6.0.3",
     "babel-core": "^5.8.25",
+    "babel-eslint": "^4.1.8",
     "babel-jest": "^5.3.0",
     "babel-loader": "^5.3.2",
     "classnames": "^2.2.0",
     "css-loader": "^0.20.2",
+    "eslint": "^2.0.0",
+    "eslint-config-airbnb": "^5.0.0",
+    "eslint-plugin-react": "^3.16.1",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
     "jest-cli": "^0.5.1",
