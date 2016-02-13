@@ -7,9 +7,9 @@ import TestUtils from 'react-addons-test-utils';
 
 const Selector = require('../Selector');
 
-describe('Selector', function() {
+describe('Selector', function () {
 
-  it('sets the label', function() {
+  it('sets the label', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector label={'New Label'} />
     );
@@ -18,43 +18,43 @@ describe('Selector', function() {
     expect(labelNode.textContent).toEqual('New Label');
   });
 
-  it('sets passed items', function() {
+  it('sets passed items', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector items={['apple', 'banana', 'carrot']} />
     );
 
     var optionNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
-    var content = optionNodes.map(function(obj) {
+    var content = optionNodes.map(function (obj) {
       return obj.textContent;
-    })
+    });
     expect(content).toEqual(['apple', 'banana', 'carrot']);
   });
 
-  it('can handle "tuples"', function() {
+  it('can handle "tuples"', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector items={[['apple_value', 'Apple label'], ['banana_value', 'Banana label']]} />
     );
     var optionNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
 
-    var content = optionNodes.map(function(obj) {
+    var content = optionNodes.map(function (obj) {
       return obj.textContent;
     });
     expect(content).toEqual(['Apple label', 'Banana label']);
 
-    var keys = optionNodes.map(function(obj) {
-       return obj.value;
-      });
+    var keys = optionNodes.map(function (obj) {
+      return obj.value;
+    });
     expect(keys).toEqual(['apple_value', 'banana_value']);
   });
 
-  it('calls the callback', function() {
+  it('calls the callback', function () {
     var dummyCallback = jest.genMockFunction();
     var selector = TestUtils.renderIntoDocument(
       <Selector onChange={dummyCallback} />
     );
 
     var selectorNode = TestUtils.findRenderedDOMComponentWithTag(selector, 'select');
-    TestUtils.Simulate.change(selectorNode, {target: {value: "new value"}});
+    TestUtils.Simulate.change(selectorNode, { target: { value: 'new value' } });
 
     expect(dummyCallback).toBeCalled();
   });

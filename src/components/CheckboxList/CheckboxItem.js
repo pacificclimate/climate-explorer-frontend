@@ -1,20 +1,20 @@
-var React = require("react");
+var React = require('react');
 
 var CheckboxItem = React.createClass({
-    propTypes: {
-        label: React.PropTypes.string.isRequired,
-        isChecked: React.PropTypes.bool,
-        onChange: React.PropTypes.func
-    },
+  propTypes: {
+    label: React.PropTypes.string.isRequired,
+    isChecked: React.PropTypes.bool,
+    onChange: React.PropTypes.func
+  },
 
-    getDefaultProps: function () {
-        return {
-            isChecked: false
-        };
-    },
+  getDefaultProps: function () {
+    return {
+      isChecked: false
+    };
+  },
 
-    render: function () {
-        return (
+  render: function () {
+    return (
             <div>
                 <label>
                     <input
@@ -26,7 +26,7 @@ var CheckboxItem = React.createClass({
                 </label>
             </div>
         );
-    }
+  }
 });
 
-module.exports = CheckboxItem
+module.exports = CheckboxItem;

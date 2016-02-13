@@ -29,32 +29,32 @@ var MapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      styles: "boxfill/ferret",
+      styles: 'boxfill/ferret',
       timeidx: 0,
       logscale: false
-    }
+    };
   },
 
-  updateSelection: function(param, selection) {
+  updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
   },
 
-  updateTime: function(timeidx) {
+  updateTime: function (timeidx) {
     this.setState({
       timeidx: timeidx,
       wmstime: this.selectedDataset.times[timeidx]
-    })
+    });
   },
 
-  updateDataset: function(unique_id) {
+  updateDataset: function (unique_id) {
     // Updates dataset in state. Updates time value to match new dataset
 
-    this.selectedDataset = this.props.meta.filter(function(el){
-      return el.unique_id == unique_id
-    })[0]
+    this.selectedDataset = this.props.meta.filter(function (el) {
+      return el.unique_id == unique_id;
+    })[0];
 
-    this.requestTimeMetadata(unique_id).done(function(data) {
+    this.requestTimeMetadata(unique_id).done(function (data) {
       this.selectedDataset.times = data[unique_id].times;
 
       this.setState({
@@ -62,20 +62,20 @@ var MapController = React.createClass({
         wmstime: this.selectedDataset.times[this.state.timeidx],
         variable: this.selectedDataset.variable_id
       });
-    }.bind(this))
+    }.bind(this));
   },
 
-  findUniqueId: function() {
+  findUniqueId: function () {
     if (this.props.meta.length > 0) {
       return this.props.meta[0].unique_id;
     }
   },
 
-  handleSetArea: function(wkt) {
+  handleSetArea: function (wkt) {
     this.props.onSetArea(wkt);
   },
 
-  requestTimeMetadata: function(unique_id) {
+  requestTimeMetadata: function (unique_id) {
     return $.ajax({
       url: urljoin(CE_BACKEND_URL, 'metadata'),
       crossDomain: true,
@@ -85,10 +85,10 @@ var MapController = React.createClass({
     });
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    this.selectedDataset = nextProps.meta[0]
+  componentWillReceiveProps: function (nextProps) {
+    this.selectedDataset = nextProps.meta[0];
 
-    this.requestTimeMetadata(this.selectedDataset.unique_id).done(function(data) {
+    this.requestTimeMetadata(this.selectedDataset.unique_id).done(function (data) {
       this.selectedDataset.times = data[this.selectedDataset.unique_id].times;
 
       this.setState({
@@ -97,12 +97,12 @@ var MapController = React.createClass({
         variable: this.selectedDataset.variable_id
       });
 
-    }.bind(this))
+    }.bind(this));
   },
 
-  shouldComponentUpdate: function(nextProps, nextState) {
+  shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before we have required data
-    return JSON.stringify(nextState) !== JSON.stringify(this.state)
+    return JSON.stringify(nextState) !== JSON.stringify(this.state);
   },
 
   render: function () {
@@ -111,14 +111,14 @@ var MapController = React.createClass({
                      ['boxfill/rainbow', 'rainbow'],
                      ['boxfill/occam', 'occam'],
                      ['boxfill/occam_inv', 'inverted occam']
-                    ]
-    var color_scales = [['false', 'Linear'], ['true', 'Logarithmic']]
-    var ids = this.props.meta.map(function(el) {
-      var period = el.unique_id.split('_').slice(5)[0]
-      var period = period.split('-').map(function(datestring){return datestring.slice(0,4)}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4,5) + ' ' + period ];
-      return l
-    }).sort(function(a,b){
+                    ];
+    var color_scales = [['false', 'Linear'], ['true', 'Logarithmic']];
+    var ids = this.props.meta.map(function (el) {
+      var period = el.unique_id.split('_').slice(5)[0];
+      var period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
+      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
+      return l;
+    }).sort(function (a, b) {
       return a[1] > b[1] ? 1 : -1;
     });
 
@@ -157,8 +157,8 @@ var MapController = React.createClass({
           </Col>
         </Row>
       </div>
-    )
+    );
   }
 });
 
-export default MapController
+export default MapController;

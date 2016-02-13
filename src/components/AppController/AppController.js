@@ -19,21 +19,21 @@ var App = React.createClass({
    *   - variable_id
    *   - experiment
    */
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       meta: []
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'multimeta'),
       ensemble_name: CE_ENSEMBLE_NAME,
       crossDomain: true
-    }).done(function(data) {
+    }).done(function (data) {
       var models = [];
       for (var key in data) {
-        var vars = Object.keys(data[key]['variables'])
+        var vars = Object.keys(data[key]['variables']);
 
         for (var v in vars) {
           models.push(_.extend(
@@ -42,7 +42,7 @@ var App = React.createClass({
               'variable_id': vars[v],
               'variable_name': data[key]['variables'][vars[v]]
             }, _.omit(data[key], 'variables')
-          ))
+          ));
         }
       }
 
@@ -52,36 +52,36 @@ var App = React.createClass({
           model_id: models[0].model_id,
           variable_id: models[0].variable_id,
           experiment: models[0].experiment
-        })
+        });
       }
     }.bind(this));
   },
 
-  updateSelection: function(param, selection) {
+  updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
   },
 
-  handleSetArea: function(wkt) {
-    this.setState({area: wkt});
+  handleSetArea: function (wkt) {
+    this.setState({ area: wkt });
   },
 
-  getfilteredMeta: function() {
-    var l = this.state.meta.filter( function(x) {
-      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id
-    }, this );
-    l.sort(function(a,b){return a.unique_id > b.unique_id ? 1 : -1;});
+  getfilteredMeta: function () {
+    var l = this.state.meta.filter(function (x) {
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id;
+    }, this);
+    l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
   },
 
-  render: function() {
+  render: function () {
 
-    var getThings = function(thing) {
-      return _.unique(this.state.meta.map(function(el){return el[thing]}))
+    var getThings = function (thing) {
+      return _.unique(this.state.meta.map(function (el) {return el[thing];}));
     }.bind(this);
 
     return (
-      <Grid fluid={true}>
+      <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
             <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getThings('model_id')}/>
@@ -114,6 +114,6 @@ var App = React.createClass({
 
     );
   }
-})
+});
 
-export default App
+export default App;

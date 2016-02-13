@@ -10,7 +10,7 @@ class App extends Component {
     this.state = {
       lOpen: true,
       rOpen: false
-    }
+    };
   }
   static propTypes = {
     content: PropTypes.node.isRequired,
@@ -19,11 +19,11 @@ class App extends Component {
   }
 
   toggleLeft() {
-    this.setState({lOpen: !this.state.lOpen});
+    this.setState({ lOpen: !this.state.lOpen });
   }
 
   toggleRight() {
-    this.setState({rOpen: !this.state.rOpen});
+    this.setState({ rOpen: !this.state.rOpen });
   }
 
   render() {
@@ -31,31 +31,31 @@ class App extends Component {
       styles.sidebar,
       styles.left,
       !this.state.lOpen && styles.closed
-    )
+    );
 
     var rClass = classNames(
       styles.sidebar,
       styles.right,
       !this.state.rOpen && styles.closed
-    )
+    );
 
     var contentClass = classNames(
       styles.content,
       !this.state.rOpen && styles.rclosed,
       !this.state.lOpen && styles.lclosed
-    )
+    );
 
     const glyphLeft = (
       <div className={classNames(styles.verticalAlign, styles.glyph)}>
         <Glyphicon glyph="chevron-left" /><br /><br /><Glyphicon glyph="chevron-left" />
       </div>
-    )
+    );
 
     const glyphRight = (
       <div className={classNames(styles.verticalAlign, styles.glyph)}>
         <Glyphicon glyph="chevron-right" /><br /><br /><Glyphicon glyph="chevron-right" />
       </div>
-    )
+    );
 
     return (
       <div>
@@ -78,8 +78,8 @@ class App extends Component {
           {this.props.content}
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;

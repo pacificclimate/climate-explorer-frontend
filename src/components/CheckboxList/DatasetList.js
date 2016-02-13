@@ -1,9 +1,9 @@
-var React = require("react");
+var React = require('react');
 
 var DatasetList = React.createClass({
 
-    render: function () {
-        return (
+  render: function () {
+    return (
             <div>
                 <input type="checkbox" /> This is checkbox <br />
                 <input type="checkbox" /> This is checkbox <br />
@@ -17,7 +17,7 @@ var DatasetList = React.createClass({
                 <input type="checkbox" /> This is checkbox <br />
             </div>
         );
-    }
+  }
 });
 
-module.exports = DatasetList
+module.exports = DatasetList;
