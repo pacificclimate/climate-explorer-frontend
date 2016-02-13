@@ -1,30 +1,31 @@
-import React, { PropTypes, Component } from 'react';
+var React = require("react");
 import { Glyphicon } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import styles from './PanelLayout-3vert.css';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+var App = React.createClass({
+  propTypes: {
+    content: React.PropTypes.node.isRequired,
+    right: React.PropTypes.node.isRequired,
+    left: React.PropTypes.node.isRequired
+  },
+
+  getInitialState: function() {
+    return {
       lOpen: true,
-      rOpen: false
+      rOpen: false,
     }
-  }
-  static propTypes = {
-    content: PropTypes.node.isRequired,
-    right: PropTypes.node.isRequired,
-    left: PropTypes.node.isRequired
-  }
+  },
+
 
   toggleLeft() {
     this.setState({lOpen: !this.state.lOpen});
-  }
+  },
 
   toggleRight() {
     this.setState({rOpen: !this.state.rOpen});
-  }
+  },
 
   render() {
     var lClass = classNames(
@@ -45,13 +46,13 @@ class App extends Component {
       !this.state.lOpen && styles.lclosed
     )
 
-    const glyphLeft = (
+    var glyphLeft = (
       <div className={classNames(styles.verticalAlign, styles.glyph)}>
         <Glyphicon glyph="chevron-left" /><br /><br /><Glyphicon glyph="chevron-left" />
       </div>
     )
 
-    const glyphRight = (
+    var glyphRight = (
       <div className={classNames(styles.verticalAlign, styles.glyph)}>
         <Glyphicon glyph="chevron-right" /><br /><br /><Glyphicon glyph="chevron-right" />
       </div>
@@ -80,6 +81,6 @@ class App extends Component {
       </div>
     )
   }
-}
+});
 
-export default App
+module.exports = App
