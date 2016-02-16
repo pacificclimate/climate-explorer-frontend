@@ -285,6 +285,30 @@ var parseTimeSeriesForC3 = function(graph_data) {
   };
 }
 
+/*
+    Takes a multistats object of the following form and 
+    1) flattens it, and
+    2) rounds numeric values 
+    for passing to the DataTable component for rendering:
+
+    {
+      "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": 
+      {
+        "median": 278.34326171875,
+        "min": 225.05545043945312,
+        "units": "K",
+        "mean": 273.56732177734375,
+        "max": 303.601318359375,
+        "ncells": 8192,
+        "stdev": 22.509726901403784,
+        "run": "r1i1p1"
+      },
+      "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": 
+      {
+        ...
+      }
+    };
+*/
 var parseBootstrapTableData = function(data) {
     var flatData = [];
     var model_count = 0;
@@ -313,6 +337,9 @@ var parseBootstrapTableData = function(data) {
     return flatData;
 }
 
+/*
+    Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
+*/
 var createWorksheetSummaryCells = function(summary_data, time_of_year) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
@@ -340,6 +367,9 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
     return { 'num_rows': num_summary_rows, 'num_cols': num_summary_cols, 'cells': cells };
 }
 
+/*
+    Helper function for exportTableDataToWorksheet, creates data column headers and data entries for exported worksheet
+*/
 var fillWorksheetDataCells = function(data) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
@@ -366,6 +396,9 @@ var fillWorksheetDataCells = function(data) {
     return { 'num_rows': num_data_rows, 'num_cols': num_data_cols, 'cells': cells };
 }
 
+/*
+    Helper function for exportTableDataToWorksheet, combines summary rows, data column headers, and data into one worksheet
+*/
 var assembleWorksheet = function (summary_cells, data_cells) {
     var R = 0;
     var C = 0;
@@ -395,6 +428,10 @@ var assembleWorksheet = function (summary_cells, data_cells) {
     return ws;
 }
 
+/*
+    Takes current data displayed in the DataTable and contextual data from user input, 
+    creates an XLSX or CSV file, and serves it to the user for download.
+*/
 var exportTableDataToWorksheet = function(data, format) {
     // create workbook object containing one or more worksheets
     var wb = {}
