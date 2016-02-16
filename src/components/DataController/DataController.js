@@ -4,7 +4,7 @@ import _ from 'underscore';
 import ReactTabs, { Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import { Button, Input, Row, Col } from 'react-bootstrap'
 
-import { dataApiToC3, parseTimeSeriesForC3, parseBootstrapTableData, exportTableDataToSpreadsheet } from '../../core/util'
+import { dataApiToC3, parseTimeSeriesForC3, parseBootstrapTableData, exportTableDataToWorksheet } from '../../core/util'
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector'
@@ -202,8 +202,8 @@ var DataController = React.createClass({
           </Col>
         </Row>
           <DataTable data={statsData} />
-          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData, 'xlsx')}>Export To XLSX</Button>
-          <Button onClick={exportTableDataToSpreadsheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
+          <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'xlsx')}>Export To XLSX</Button>
+          <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
       </div>
   )}
 })
