@@ -1,8 +1,9 @@
 jest.dontMock('../util');
 jest.dontMock('underscore');
+jest.dontMock('xlsx');
 
 var _ = require('underscore');
-
+var xlsx = require('xlsx');
 
 const testData = {
   model_id1: {
@@ -182,6 +183,7 @@ const outputC3TimeSeriesTooltipInfo = {
 };
 
 
+
 describe('parseTimeSeriesForC3', function() {
   it('Correctly parses a JSON object with time series data from one model for plotting with C3', function() {
     var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
@@ -191,4 +193,117 @@ describe('parseTimeSeriesForC3', function() {
     expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
 
   });
+});
+
+const bootstrapTableTestData = {
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": 
+  {
+    "median": 278.34326171875,
+    "min": 225.05545043945312,
+    "units": "K",
+    "mean": 273.56732177734375,
+    "max": 303.601318359375,
+    "ncells": 8192,
+    "stdev": 22.509726901403784,
+    "run": "r1i1p1"
+  },
+  "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": 
+  {
+    "median": 278.4786682128906,
+    "min": 225.04750061035156,
+    "units": "K",
+    "mean": 273.87298583984375,
+    "max": 303.7774963378906,
+    "ncells": 8192,
+    "stdev": 22.323802147796965,
+    "run": "r1i1p1"
+  }
+};
+
+const bootstrapTableTestExpected = [
+    {
+    "run": "r1i1p1",
+    "min": 225.06,
+    "max": 303.60,
+    "w_mean": 273.57,
+    "median": 278.34,
+    "w_stdev": 22.51,
+    "units": "K",
+    "model_period": "1961 - 1990"
+    },
+    {
+    "run": "r1i1p1",
+    "min": 225.05,
+    "max": 303.78,
+    "w_mean": 273.87,
+    "median": 278.48,
+    "w_stdev": 22.32,
+    "units": "K",
+    "model_period": "1971 - 2000"
+    }
+];
+
+describe('parseBootstrapTableData', function() {
+    it('Correctly flattens a stats object for passing to the DataTable component', function() {
+        var util = require('../util');
+        var result = util.parseBootstrapTableData(bootstrapTableTestData);
+        expect(result).toEqual(bootstrapTableTestExpected);
+    });
+});
+
+const worksheetSummaryData = { model_id: "CSIRO-Mk3-6-0", variable_id: "pr", experiment: "rcp26", variable_name: "Precipitation" }
+const worksheetTimeOfYear = 'Winter - DJF'
+const worksheetSummaryCellsExpected = { num_rows: 3, num_cols: 5, 
+    cells: [
+            { t: "s", v: "Model" },
+            { t: "s", v: "Emissions Scenario" },
+            { t: "s", v: "Time of Year" },
+            { t: "s", v: "Variable ID" },
+            { t: "s", v: "Variable Name" },
+            { t: "s", v: "CSIRO-Mk3-6-0" },
+            { t: "s", v: "rcp26" },
+            { t: "s", v: "Winter - DJF" },
+            { t: "s", v: "pr" },
+            { t: "s", v: "Precipitation" },
+            { t: "s", v: "" },
+            { t: "s", v: "" },
+            { t: "s", v: "" },
+            { t: "s", v: "" },
+            { t: "s", v: "" }
+        ]
+    }
+
+const worksheetTestData = [
+        { model_period: "2040 - 2069", run: "r1i1p1", min: 0, max: 22.08, w_mean: 2.34, median: 1.34, w_stdev: 3.01, units: "mm" }, 
+        { model_period: "2070 - 2099", run: "r1i1p1", min: 0, max: 22.66, w_mean: 2.36, median: 1.39, w_stdev: 2.97, units: "mm" },
+        { model_period: "2010 - 2039", run: "r1i1p1", min: 0, max: 21.97, w_mean: 2.31, median: 1.35, w_stdev: 2.94, units: "mm" }
+    ]
+const worksheetDataCellsInfo = {num_rows: 4, num_cols: 8}
+const worksheetRange = "A1:I9";
+
+describe('createWorksheetSummaryCells', function() {
+    it('Correctly forms and counts worksheet summary cells', function() {
+        var util = require('../util');
+        var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+        expect(result).toEqual(worksheetSummaryCellsExpected);
+    });
+});
+
+describe('fillWorksheetDataRows', function() {
+    it('Correctly fills and counts worksheet data cells', function() {
+        var util = require('../util');
+        var result = util.fillWorksheetDataCells(worksheetTestData);
+        expect(result.num_rows).toEqual(worksheetDataCellsInfo.num_rows);
+        expect(result.num_cols).toEqual(worksheetDataCellsInfo.num_cols);
+    });
+});
+
+describe('assembleWorksheet', function() {
+    it('Correctly assembles worksheet from summary and data cells', function() {
+        var util = require('../util');
+        var summary_cells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+        var data_cells = util.fillWorksheetDataCells(worksheetTestData);
+        var ws = util.assembleWorksheet(summary_cells, data_cells);
+        expect(ws['!ref']).toEqual(worksheetRange);
+    });
 });
