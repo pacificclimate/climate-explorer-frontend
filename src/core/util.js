@@ -316,7 +316,7 @@ var parseBootstrapTableData = function(data) {
 var createWorksheetSummaryCells = function(summary_data, time_of_year) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
-
+    var cell;
     // write summary rows at top of worksheet
     var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
     var summary_keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
@@ -328,11 +328,11 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
             if(R == 0) var cell = {v: summary_header[C]};
             else if(R == 1) {
                 if(summary_keys[C] == 'time_of_year') {
-                  var cell = {v: time_of_year};      
+                  cell = {v: time_of_year};      
                 }
-                else var cell = {v: summary_data[summary_keys[C]]};
+                else cell = {v: summary_data[summary_keys[C]]};
             }
-            else var cell = {v: ""};
+            else cell = {v: ""};
             cell.t = 's';
             cells.push(cell);
         }
@@ -343,7 +343,7 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
 var fillWorksheetDataCells = function(data) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
-
+    var cell;
     // populate worksheet with table data
     var column_labels = ["Model Period", "Run", "Min", "Max", "W.Mean", "Median", "W.Std.Dev", "Units" ];
     var data_keys = ["model_period", "run", "min", "max", "w_mean", "median", "w_stdev", "units" ];
@@ -353,9 +353,9 @@ var fillWorksheetDataCells = function(data) {
     for(var R = 0; R < num_data_rows; ++R) {
         for(var C = 0; C < num_data_cols; ++C) {
             // create header row
-            if(R == 0) var cell = {v: column_labels[C]};
+            if(R == 0) cell = {v: column_labels[C]};
             // create cell object: .v is the actual data
-            else var cell = {v: data[R-1][data_keys[C]]};
+            else cell = {v: data[R-1][data_keys[C]]};
             if(cell.v === null) continue;
             // determine the cell type 
             if(typeof cell.v === 'number') cell.t = 'n';
