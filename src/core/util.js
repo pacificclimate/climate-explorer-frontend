@@ -299,12 +299,6 @@ var parseBootstrapTableData = function(data) {
         }
         var period = year_range[0] + " - " + year_range[1];
         var modelInfo = {
-            "model_id": data[model]['model_id'],
-            "variable_id": data[model]['variable_id'],
-            "variable_name": data[model]['variable_name'],
-            "emissions_scenario": data[model]['experiment'],
-            "time_of_year": data[model]['time_of_year'],
-
             "model_period": period,
             "run": data[model]['run'],
             "min": +data[model]['min'].toFixed(PRECISION),
@@ -319,72 +313,115 @@ var parseBootstrapTableData = function(data) {
     return flatData;
 }
 
-var exportTableDataToSpreadsheet = function(data, format){
-    // Create workbook object containing one or more worksheets
-    var wb = {}
-    wb.Sheets = {};
-    wb.SheetNames = [];
-    var ws = {};
-    var time_of_year = "";
+var createWorksheetSummaryCells = function(summary_data, time_of_year) {
+    // store worksheet cell contents to be later encoded as per output format
+    var cells = [];
 
     // write summary rows at top of worksheet
-    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name (TODO)"];
+    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
     var summary_keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
-    var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
-                          "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
-                          "Fall - SON", "Annual"];
+
     var num_summary_rows = 3;
     var num_summary_cols = summary_keys.length
-    for(var R = 0; R < num_summary_rows; ++R){
-      for(var C = 0; C < num_summary_cols; ++C){
-        if(R == 0) var cell = {v: summary_header[C]};
-        else if(R == 1) {
-          if(summary_keys[C] == 'time_of_year'){
-            var cell = {v: times_of_year[this.state.dataTableTimeOfYear]};
-            var short_season_label = cell.v.substr(0, cell.v.indexOf(' ')); // will return string before whitespace
-            if(short_season_label) time_of_year = short_season_label; else time_of_year = cell.v;       
-          }
-          else var cell = {v: this.props[summary_keys[C]]};
+    for(var R = 0; R < num_summary_rows; ++R) {
+        for(var C = 0; C < num_summary_cols; ++C) {
+            if(R == 0) var cell = {v: summary_header[C]};
+            else if(R == 1) {
+                if(summary_keys[C] == 'time_of_year') {
+                  var cell = {v: time_of_year};      
+                }
+                else var cell = {v: summary_data[summary_keys[C]]};
+            }
+            else var cell = {v: ""};
+            cell.t = 's';
+            cells.push(cell);
         }
-        else var cell = {v: ""};
-        cell.t = 's';
-        var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
-        ws[cell_ref] = cell;
-      }
     }
+    return { 'num_rows': num_summary_rows, 'num_cols': num_summary_cols, 'cells': cells };
+}
+
+var fillWorksheetDataCells = function(data) {
+    // store worksheet cell contents to be later encoded as per output format
+    var cells = [];
 
     // populate worksheet with table data
     var column_labels = ["Model Period", "Run", "Min", "Max", "W.Mean", "Median", "W.Std.Dev", "Units" ];
     var data_keys = ["model_period", "run", "min", "max", "w_mean", "median", "w_stdev", "units" ];
-    var num_data_rows = Object.keys(data).length;
+    var num_data_rows = Object.keys(data).length + 1;
     var num_data_cols = data_keys.length
 
-    for(var R = 0; R <= num_data_rows; ++R){
-        for(var C = 0; C < num_data_cols; ++C){
+    for(var R = 0; R < num_data_rows; ++R) {
+        for(var C = 0; C < num_data_cols; ++C) {
             // create header row
             if(R == 0) var cell = {v: column_labels[C]};
             // create cell object: .v is the actual data
             else var cell = {v: data[R-1][data_keys[C]]};
             if(cell.v === null) continue;
-            // create the correct cell reference
-            var cell_ref = XLSX.utils.encode_cell({c:C,r:R + num_summary_rows});
             // determine the cell type 
             if(typeof cell.v === 'number') cell.t = 'n';
             else cell.t = 's';
-            // add to worksheet object
-            ws[cell_ref] = cell;
+            cells.push(cell);
         }
     }
-    // set worksheet range bounds
+    return { 'num_rows': num_data_rows, 'num_cols': num_data_cols, 'cells': cells };
+}
+
+var assembleWorksheet = function (summary_cells, data_cells) {
+    var R = 0;
+    var C = 0;
+    var cell;
+    var cell_ref;
+    var ws = {};
+
+    for(R = 0; R < summary_cells.num_rows; ++R) {
+        for(C = 0; C < summary_cells.num_cols; ++C) {
+            cell_ref = XLSX.utils.encode_cell({c:C,r:R});
+            ws[cell_ref] = summary_cells.cells[(R * summary_cells.num_cols) + C];
+        }
+    }
+    for(var data_row = 0; data_row < data_cells.num_rows; ++data_row) {
+        for(var data_col = 0; data_col < data_cells.num_cols; ++data_col) {
+            cell_ref = XLSX.utils.encode_cell({c:data_col,r:R+data_row});
+            ws[cell_ref] = data_cells.cells[(data_row * data_cells.num_cols) + data_col];
+        }
+    }
+    // set combined worksheet range bounds
     var range = {
       s: {c:0, r:0}, 
       e: {
-          c: (num_summary_cols > num_data_cols ? num_summary_cols : num_data_cols), 
-          r: num_summary_rows + num_data_rows + 1}};
+          c: (summary_cells.num_cols > data_cells.num_cols ? summary_cells.num_cols : data_cells.num_cols), 
+          r: summary_cells.num_rows + data_cells.num_rows + 1}};
     ws['!ref'] = XLSX.utils.encode_range(range);
+    return ws;
+}
+
+var exportTableDataToWorksheet = function(data, format) {
+    // create workbook object containing one or more worksheets
+    var wb = {}
+    wb.Sheets = {};
+    wb.SheetNames = [];
+
+    // convert timestep ID (0-16) to string format
+    var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
+                      "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
+                      "Fall - SON", "Annual"];
+    var time_of_year = times_of_year[this.state.dataTableTimeOfYear];
+
+    // prepare summary cells
+    var summary_cells = createWorksheetSummaryCells(this.props, time_of_year);
+
+    // if time_of_year is a season, overwrite it with a short version label for use in output filename (e.g. "Summer - JJA" -> "Summer")
+    var short_season_label = time_of_year.substr(0, time_of_year.indexOf(' ')); // will return string before whitespace
+    if(short_season_label) time_of_year = short_season_label;
+
+    // prepare data cells
+    var data_cells = fillWorksheetDataCells(data);
+
+    // assemble summary_cells and data_cells into one XLSX-encoded worksheet
+    var ws = assembleWorksheet(summary_cells, data_cells);
 
     // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
-    var ws_name = "Stats_Table_" + data[0].variable_id + "_" + time_of_year;
+    var ws_name = "Stats_Table_" + this.props.variable_id + "_" + time_of_year;
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
@@ -411,19 +448,21 @@ var exportTableDataToSpreadsheet = function(data, format){
         return buf;
     }
 
+    var out_data;
     if(format == 'csv'){
-        var out_data = new Blob([to_csv(wb)],{type:""});
+        out_data = new Blob([to_csv(wb)],{type:""});
     }
     else if(format == 'xlsx') { 
         // convert workbook to XLSX and prepare for download
         var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
-        var out_data = new Blob([s2ab(wbout)],{type:""});
+        out_data = new Blob([s2ab(wbout)],{type:""});
     }
     // form output filename
-    var output_filename = "PCIC_CE_StatsTableExport_" + data[0].model_id + "_" + data[0].emissions_scenario + 
-                            "_" + data[0].variable_id + "_" + time_of_year + "." + format;
+    var output_filename = "PCIC_CE_StatsTableExport_" + this.props.model_id + "_" + this.props.experiment + 
+                            "_" + this.props.variable_id + "_" + time_of_year + "." + format;
     // serve up file for download
     filesaver.saveAs(out_data, output_filename);
 }
 
-module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, exportTableDataToSpreadsheet }
+module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, 
+    createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet, exportTableDataToWorksheet }
