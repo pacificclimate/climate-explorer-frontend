@@ -325,7 +325,7 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
     var num_summary_cols = summary_keys.length
     for(var R = 0; R < num_summary_rows; ++R) {
         for(var C = 0; C < num_summary_cols; ++C) {
-            if(R == 0) var cell = {v: summary_header[C]};
+            if(R == 0) cell = {v: summary_header[C]};
             else if(R == 1) {
                 if(summary_keys[C] == 'time_of_year') {
                   cell = {v: time_of_year};      
