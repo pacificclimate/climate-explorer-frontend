@@ -202,8 +202,10 @@ var DataController = React.createClass({
           </Col>
         </Row>
           <DataTable data={statsData} />
-          <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'xlsx')}>Export To XLSX</Button>
-          <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
+            <div style={{marginTop: "10px"}}>
+              <Button style={{ marginRight: "10px"}} onClick={exportTableDataToWorksheet.bind(this, statsData, 'xlsx')}>Export To XLSX</Button>
+              <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
+            </div>
       </div>
   )}
 })
