@@ -353,14 +353,20 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
 
     for(var R = 0; R < num_rows; ++R) {
         for(var C = 0; C < num_cols; ++C) {
-            if(R == 0) { cell = {v: header[C]} }
+            if(R == 0) { 
+              cell = {v: header[C]} 
+            }
             else if(R == 1) {
                 if(keys[C] == 'time_of_year') {
                   cell = {v: time_of_year};      
                 }
-                else { cell = {v: summary_data[keys[C]]} }
+                else { 
+                  cell = {v: summary_data[keys[C]]} 
+                }
             }
-            else { cell = {v: ""} };
+            else { 
+              cell = {v: ""} 
+            }
             cell.t = 's';
             cells.push(cell);
         }
@@ -385,13 +391,23 @@ var fillWorksheetDataCells = function(data) {
     for(var R = 0; R < num_data_rows; ++R) {
         for(var C = 0; C < num_data_cols; ++C) {
             // create header row
-            if(R == 0) cell = {v: column_labels[C]};
+            if(R == 0) { 
+              cell = {v: column_labels[C]} 
+            }
             // create cell object: .v is the actual data
-            else cell = {v: data[R-1][data_keys[C]]};
-            if(cell.v === null) continue;
+            else { 
+              cell = {v: data[R-1][data_keys[C]]} 
+            }
+            if(cell.v === null) {
+              continue;
+            }
             // determine the cell type 
-            if(typeof cell.v === 'number') cell.t = 'n';
-            else cell.t = 's';
+            if(typeof cell.v === 'number') { 
+              cell.t = 'n' 
+            }
+            else { 
+              cell.t = 's'
+            }
             cells.push(cell);
         }
     }
