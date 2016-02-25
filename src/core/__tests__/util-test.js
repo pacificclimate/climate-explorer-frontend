@@ -182,8 +182,6 @@ const outputC3TimeSeriesTooltipInfo = {
   }
 };
 
-
-
 describe('parseTimeSeriesForC3', function() {
   it('Correctly parses a JSON object with time series data from one model for plotting with C3', function() {
     var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
@@ -225,9 +223,9 @@ const bootstrapTableTestExpected = [
     "run": "r1i1p1",
     "min": 225.06,
     "max": 303.60,
-    "w_mean": 273.57,
+    "mean": 273.57,
     "median": 278.34,
-    "w_stdev": 22.51,
+    "stdev": 22.51,
     "units": "K",
     "model_period": "1961 - 1990"
     },
@@ -235,9 +233,9 @@ const bootstrapTableTestExpected = [
     "run": "r1i1p1",
     "min": 225.05,
     "max": 303.78,
-    "w_mean": 273.87,
+    "mean": 273.87,
     "median": 278.48,
-    "w_stdev": 22.32,
+    "stdev": 22.32,
     "units": "K",
     "model_period": "1971 - 2000"
     }
@@ -274,9 +272,9 @@ const worksheetSummaryCellsExpected = { num_rows: 3, num_cols: 5,
     }
 
 const worksheetTestData = [
-        { model_period: "2040 - 2069", run: "r1i1p1", min: 0, max: 22.08, w_mean: 2.34, median: 1.34, w_stdev: 3.01, units: "mm" }, 
-        { model_period: "2070 - 2099", run: "r1i1p1", min: 0, max: 22.66, w_mean: 2.36, median: 1.39, w_stdev: 2.97, units: "mm" },
-        { model_period: "2010 - 2039", run: "r1i1p1", min: 0, max: 21.97, w_mean: 2.31, median: 1.35, w_stdev: 2.94, units: "mm" }
+        { model_period: "2040 - 2069", run: "r1i1p1", min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: "mm" }, 
+        { model_period: "2070 - 2099", run: "r1i1p1", min: 0, max: 22.66, mean: 2.36, median: 1.39, stdev: 2.97, units: "mm" },
+        { model_period: "2010 - 2039", run: "r1i1p1", min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: "mm" }
     ]
 const worksheetDataCellsInfo = {num_rows: 4, num_cols: 8}
 const worksheetRange = "A1:I9";

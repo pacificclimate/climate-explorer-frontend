@@ -15,9 +15,9 @@ var DataTable = React.createClass({
                     <TableHeaderColumn dataField="run" dataAlign="center" dataSort={true}>Run</TableHeaderColumn>
                     <TableHeaderColumn dataField="min" dataAlign="center" dataSort={true}>Min</TableHeaderColumn>
                     <TableHeaderColumn dataField="max" dataAlign="center" dataSort={true}>Max</TableHeaderColumn>
-                    <TableHeaderColumn dataField="w_mean" dataAlign="center" dataSort={true}>W.Mean</TableHeaderColumn>
+                    <TableHeaderColumn dataField="mean" dataAlign="center" dataSort={true}>Mean</TableHeaderColumn>
                     <TableHeaderColumn dataField="median" dataAlign="center" dataSort={true}>Median</TableHeaderColumn>
-                    <TableHeaderColumn dataField="w_stdev" dataAlign="center" dataSort={true}>W.Std.Dev</TableHeaderColumn>
+                    <TableHeaderColumn dataField="stdev" dataAlign="center" dataSort={true}>Std.Dev</TableHeaderColumn>
                     <TableHeaderColumn dataField="units" dataAlign="center" dataSort={true}>Units</TableHeaderColumn>
                 </BootstrapTable>
             </div>

@@ -311,9 +311,8 @@ var parseTimeSeriesForC3 = function(graph_data) {
 */
 var parseBootstrapTableData = function(data) {
     var flatData = [];
-    var model_count = 0;
     for (let model in data) {
-        var year_range_re = new RegExp("[0-9]{8}","g");
+        var year_range_re = new RegExp("[0-9]{8}");
         var year_range = [];
         var lastIndex = 0;
         while (year_range_re.test(model)){
@@ -327,9 +326,9 @@ var parseBootstrapTableData = function(data) {
             "run": data[model]['run'],
             "min": +data[model]['min'].toFixed(PRECISION),
             "max": +data[model]['max'].toFixed(PRECISION),
-            "w_mean": +data[model]['mean'].toFixed(PRECISION),
+            "mean": +data[model]['mean'].toFixed(PRECISION),
             "median": +data[model]['median'].toFixed(PRECISION),
-            "w_stdev": +data[model]['stdev'].toFixed(PRECISION),
+            "stdev": +data[model]['stdev'].toFixed(PRECISION),
             "units": data[model]['units']
         };
         flatData.push(modelInfo); 
@@ -339,44 +338,47 @@ var parseBootstrapTableData = function(data) {
 
 /*
     Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
 var createWorksheetSummaryCells = function(summary_data, time_of_year) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
     var cell;
     // write summary rows at top of worksheet
-    var summary_header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
-    var summary_keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
+    var header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
+    var keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
 
-    var num_summary_rows = 3;
-    var num_summary_cols = summary_keys.length
-    for(var R = 0; R < num_summary_rows; ++R) {
-        for(var C = 0; C < num_summary_cols; ++C) {
-            if(R == 0) cell = {v: summary_header[C]};
+    var num_rows = 3;
+    var num_cols = keys.length
+
+    for(var R = 0; R < num_rows; ++R) {
+        for(var C = 0; C < num_cols; ++C) {
+            if(R == 0) { cell = {v: header[C]} }
             else if(R == 1) {
-                if(summary_keys[C] == 'time_of_year') {
+                if(keys[C] == 'time_of_year') {
                   cell = {v: time_of_year};      
                 }
-                else cell = {v: summary_data[summary_keys[C]]};
+                else { cell = {v: summary_data[keys[C]]} }
             }
-            else cell = {v: ""};
+            else { cell = {v: ""} };
             cell.t = 's';
             cells.push(cell);
         }
     }
-    return { 'num_rows': num_summary_rows, 'num_cols': num_summary_cols, 'cells': cells };
+    return { 'num_rows': num_rows, 'num_cols': num_cols, 'cells': cells };
 }
 
 /*
     Helper function for exportTableDataToWorksheet, creates data column headers and data entries for exported worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
 var fillWorksheetDataCells = function(data) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
     var cell;
     // populate worksheet with table data
-    var column_labels = ["Model Period", "Run", "Min", "Max", "W.Mean", "Median", "W.Std.Dev", "Units" ];
-    var data_keys = ["model_period", "run", "min", "max", "w_mean", "median", "w_stdev", "units" ];
+    var column_labels = ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ];
+    var data_keys = ["model_period", "run", "min", "max", "mean", "median", "stdev", "units" ];
     var num_data_rows = Object.keys(data).length + 1;
     var num_data_cols = data_keys.length
 
@@ -398,6 +400,7 @@ var fillWorksheetDataCells = function(data) {
 
 /*
     Helper function for exportTableDataToWorksheet, combines summary rows, data column headers, and data into one worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
 var assembleWorksheet = function (summary_cells, data_cells) {
     var R = 0;
@@ -431,18 +434,20 @@ var assembleWorksheet = function (summary_cells, data_cells) {
 /*
     Takes current data displayed in the DataTable and contextual data from user input, 
     creates an XLSX or CSV file, and serves it to the user for download.
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
-var exportTableDataToWorksheet = function(data, format) {
+var exportTableDataToWorksheet = function(data, format, time_of_year) {
     // create workbook object containing one or more worksheets
-    var wb = {}
-    wb.Sheets = {};
-    wb.SheetNames = [];
+    var wb = {
+    Sheets: {},
+    SheetNames: []
+    };
 
     // convert timestep ID (0-16) to string format
     var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
                       "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
                       "Fall - SON", "Annual"];
-    var time_of_year = times_of_year[this.state.dataTableTimeOfYear];
+    // var time_of_year = times_of_year[this.state.dataTableTimeOfYear];
 
     // prepare summary cells
     var summary_cells = createWorksheetSummaryCells(this.props, time_of_year);
@@ -478,7 +483,7 @@ var exportTableDataToWorksheet = function(data, format) {
         return result.join("\n");
     }
 
-    function s2ab(s) {
+    function xml_to_binary_string(s) {
         var buf = new ArrayBuffer(s.length);
         var view = new Uint8Array(buf);
         for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
@@ -492,7 +497,7 @@ var exportTableDataToWorksheet = function(data, format) {
     else if(format == 'xlsx') { 
         // convert workbook to XLSX and prepare for download
         var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
-        out_data = new Blob([s2ab(wbout)],{type:""});
+        out_data = new Blob([xml_to_binary_string(wbout)],{type:""});
     }
     // form output filename
     var output_filename = "PCIC_CE_StatsTableExport_" + this.props.model_id + "_" + this.props.experiment + 
