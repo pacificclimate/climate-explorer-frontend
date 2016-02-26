@@ -161,6 +161,10 @@ var DataController = React.createClass({
     }.bind(this))
   },
 
+  exportDataTable: function(format) {
+    exportTableDataToWorksheet(this.props, this.state.statsData, format, this.state.dataTableTimeOfYear)
+  },
+
   render: function() {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : {data:{columns:[]}, axis:{}};
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : {data:{columns:[]}, axis:{}};
@@ -203,8 +207,8 @@ var DataController = React.createClass({
         </Row>
         <DataTable data={statsData} />
         <div style={{marginTop: "10px"}}>
-          <Button style={{ marginRight: "10px"}} onClick={exportTableDataToWorksheet.bind(this, statsData, 'xlsx', this.state.dataTableTimeOfYear)}>Export To XLSX</Button>
-          <Button onClick={exportTableDataToWorksheet.bind(this, statsData, 'csv')}>Export To CSV</Button>
+          <Button style={{ marginRight: "10px"}} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
+          <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
         </div>
       </div>
   )}

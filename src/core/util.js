@@ -331,7 +331,7 @@ var parseBootstrapTableData = function(data) {
     Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
-var createWorksheetSummaryCells = function(summary_data, time_of_year) {
+var createWorksheetSummaryCells = function(metadata, time_of_year) {
     // store worksheet cell contents to be later encoded as per output format
     var cells = [];
     var cell;
@@ -352,7 +352,7 @@ var createWorksheetSummaryCells = function(summary_data, time_of_year) {
                   cell = {v: time_of_year};      
                 }
                 else { 
-                  cell = {v: summary_data[keys[C]]} 
+                  cell = {v: metadata[keys[C]]}
                 }
             }
             else { 
@@ -438,30 +438,32 @@ var assembleWorksheet = function (summary_cells, data_cells) {
     return ws;
 }
 
+var timeIndexToTimeOfYear = function(timeidx) {
+    // convert timestep ID (0-16) to string format
+    var times_of_year = [
+        "January", "February", "March", "April", "May", "June", "July", "August", "September",
+        "October", "November", "December", "Winter-DJF", "Spring-MAM", "Summer-JJA",
+        "Fall-SON", "Annual"
+    ];
+    return times_of_year[timeidx];
+}
+
 /*
     Takes current data displayed in the DataTable and contextual data from user input, 
     creates an XLSX or CSV file, and serves it to the user for download.
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
-var exportTableDataToWorksheet = function(data, format, time_of_year) {
+var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     // create workbook object containing one or more worksheets
     var wb = {
-    Sheets: {},
-    SheetNames: []
+        Sheets: {},
+        SheetNames: []
     };
 
-    // convert timestep ID (0-16) to string format
-    var times_of_year = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
-                      "October", "November", "December", "Winter - DJF", "Spring - MAM", "Summer - JJA", 
-                      "Fall - SON", "Annual"];
-    // var time_of_year = times_of_year[this.state.dataTableTimeOfYear];
+    var time_of_year = timeIndexToTimeOfYear(timeidx)
 
     // prepare summary cells
-    var summary_cells = createWorksheetSummaryCells(this.props, time_of_year);
-
-    // if time_of_year is a season, overwrite it with a short version label for use in output filename (e.g. "Summer - JJA" -> "Summer")
-    var short_season_label = time_of_year.substr(0, time_of_year.indexOf(' ')); // will return string before whitespace
-    if(short_season_label) time_of_year = short_season_label;
+    var summary_cells = createWorksheetSummaryCells(metadata, time_of_year);
 
     // prepare data cells
     var data_cells = fillWorksheetDataCells(data);
@@ -470,7 +472,7 @@ var exportTableDataToWorksheet = function(data, format, time_of_year) {
     var ws = assembleWorksheet(summary_cells, data_cells);
 
     // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
-    var ws_name = "Stats_Table_" + this.props.variable_id + "_" + time_of_year;
+    var ws_name = "Stats_Table_" + metadata.variable_id + "_" + time_of_year;
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
@@ -507,8 +509,8 @@ var exportTableDataToWorksheet = function(data, format, time_of_year) {
         out_data = new Blob([xml_to_binary_string(wbout)],{type:""});
     }
     // form output filename
-    var output_filename = "PCIC_CE_StatsTableExport_" + this.props.model_id + "_" + this.props.experiment + 
-                            "_" + this.props.variable_id + "_" + time_of_year + "." + format;
+    var output_filename = "PCIC_CE_StatsTableExport_" + metadata.model_id + "_" + metadata.experiment + 
+                            "_" + metadata.variable_id + "_" + time_of_year + "." + format;
     // serve up file for download
     filesaver.saveAs(out_data, output_filename);
 }
