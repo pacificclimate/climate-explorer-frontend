@@ -332,37 +332,21 @@ var parseBootstrapTableData = function(data) {
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
 var createWorksheetSummaryCells = function(metadata, time_of_year) {
-    // store worksheet cell contents to be later encoded as per output format
-    var cells = [];
-    var cell;
-    // write summary rows at top of worksheet
+
+    var rows = [];
+
     var header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
-    var keys = ["model_id", "experiment", "time_of_year", "variable_id", "variable_name"];
+    rows.push(header)
 
-    var num_rows = 3;
-    var num_cols = keys.length
+    rows.push([
+	metadata.model_id,
+	metadata.experiment,
+	metadata.time_of_year,
+	metadata.variable_id,
+	metadata.variable_name
+    ])
 
-    for(var R = 0; R < num_rows; ++R) {
-        for(var C = 0; C < num_cols; ++C) {
-            if(R == 0) { 
-              cell = {v: header[C]} 
-            }
-            else if(R == 1) {
-                if(keys[C] == 'time_of_year') {
-                  cell = {v: time_of_year};      
-                }
-                else { 
-                  cell = {v: metadata[keys[C]]}
-                }
-            }
-            else { 
-              cell = {v: ""} 
-            }
-            cell.t = 's';
-            cells.push(cell);
-        }
-    }
-    return { 'num_rows': num_rows, 'num_cols': num_cols, 'cells': cells };
+    return rows
 }
 
 /*
@@ -370,39 +354,15 @@ var createWorksheetSummaryCells = function(metadata, time_of_year) {
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
 var fillWorksheetDataCells = function(data) {
-    // store worksheet cell contents to be later encoded as per output format
-    var cells = [];
-    var cell;
-    // populate worksheet with table data
-    var column_labels = ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ];
-    var data_keys = ["model_period", "run", "min", "max", "mean", "median", "stdev", "units" ];
-    var num_data_rows = Object.keys(data).length + 1;
-    var num_data_cols = data_keys.length
 
-    for(var R = 0; R < num_data_rows; ++R) {
-        for(var C = 0; C < num_data_cols; ++C) {
-            // create header row
-            if(R == 0) { 
-              cell = {v: column_labels[C]} 
-            }
-            // create cell object: .v is the actual data
-            else { 
-              cell = {v: data[R-1][data_keys[C]]} 
-            }
-            if(cell.v === null) {
-              continue;
-            }
-            // determine the cell type 
-            if(typeof cell.v === 'number') { 
-              cell.t = 'n' 
-            }
-            else { 
-              cell.t = 's'
-            }
-            cells.push(cell);
-        }
-    }
-    return { 'num_rows': num_data_rows, 'num_cols': num_data_cols, 'cells': cells };
+    var rows =_.map(data, function(stats) {
+        return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units]
+    });
+
+    var column_labels = ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ];
+    rows.unshift(column_labels)
+
+    return rows
 }
 
 /*
