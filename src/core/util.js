@@ -310,23 +310,21 @@ var parseTimeSeriesForC3 = function(graph_data) {
     };
 */
 var parseBootstrapTableData = function(data) {
-    var flatData = [];
-    for (let model in data) {
-	var split_years = model.split('_')[5].split('-');
-        var period = split_years[0].slice(0,4) + " - " + split_years[1].slice(0,4);
+    return _.map(data, function(stats, model) {
+        var splitYears = model.split('_')[5].split('-');
+        var period = splitYears[0].slice(0,4) + " - " + splitYears[1].slice(0,4);
         var modelInfo = {
             "model_period": period,
-            "run": data[model]['run'],
-            "min": +data[model]['min'].toFixed(PRECISION),
-            "max": +data[model]['max'].toFixed(PRECISION),
-            "mean": +data[model]['mean'].toFixed(PRECISION),
-            "median": +data[model]['median'].toFixed(PRECISION),
-            "stdev": +data[model]['stdev'].toFixed(PRECISION),
-            "units": data[model]['units']
+            "run": stats['run'],
+            "min": +stats['min'].toFixed(PRECISION),
+            "max": +stats['max'].toFixed(PRECISION),
+            "mean": +stats['mean'].toFixed(PRECISION),
+            "median": +stats['median'].toFixed(PRECISION),
+            "stdev": +stats['stdev'].toFixed(PRECISION),
+            "units": stats['units']
         };
-        flatData.push(modelInfo); 
-    }
-    return flatData;
+        return modelInfo;
+    });
 }
 
 /*
