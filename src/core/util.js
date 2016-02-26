@@ -312,15 +312,8 @@ var parseTimeSeriesForC3 = function(graph_data) {
 var parseBootstrapTableData = function(data) {
     var flatData = [];
     for (let model in data) {
-        var year_range_re = new RegExp("[0-9]{8}");
-        var year_range = [];
-        var lastIndex = 0;
-        while (year_range_re.test(model)){
-            year_range_re.lastIndex = lastIndex;
-            year_range.push(year_range_re.exec(model)[0].slice(0,4));
-            lastIndex = year_range_re.lastIndex;
-        }
-        var period = year_range[0] + " - " + year_range[1];
+	var split_years = model.split('_')[5].split('-');
+        var period = split_years[0].slice(0,4) + " - " + split_years[1].slice(0,4);
         var modelInfo = {
             "model_period": period,
             "run": data[model]['run'],
