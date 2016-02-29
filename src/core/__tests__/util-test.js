@@ -251,25 +251,22 @@ describe('parseBootstrapTableData', function() {
 
 const worksheetSummaryData = { model_id: "CSIRO-Mk3-6-0", variable_id: "pr", experiment: "rcp26", variable_name: "Precipitation" }
 const worksheetTimeOfYear = 'Winter - DJF'
-const worksheetSummaryCellsExpected = { num_rows: 3, num_cols: 5, 
-    cells: [
-            { t: "s", v: "Model" },
-            { t: "s", v: "Emissions Scenario" },
-            { t: "s", v: "Time of Year" },
-            { t: "s", v: "Variable ID" },
-            { t: "s", v: "Variable Name" },
-            { t: "s", v: "CSIRO-Mk3-6-0" },
-            { t: "s", v: "rcp26" },
-            { t: "s", v: "Winter - DJF" },
-            { t: "s", v: "pr" },
-            { t: "s", v: "Precipitation" },
-            { t: "s", v: "" },
-            { t: "s", v: "" },
-            { t: "s", v: "" },
-            { t: "s", v: "" },
-            { t: "s", v: "" }
-        ]
+const worksheetSummaryCellsExpected = { 
+    0: { 
+        0: 'Model',
+        1: 'Emissions Scenario',
+        2: 'Time of Year',
+        3: 'Variable ID',
+        4: 'Variable Name'
+    },
+    1: { 
+        0: 'CSIRO-Mk3-6-0',
+        1: 'rcp26',
+        2: 'Winter - DJF',
+        3: 'pr',
+        4: 'Precipitation'
     }
+}
 
 const worksheetTestData = [
         { model_period: "2040 - 2069", run: "r1i1p1", min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: "mm" }, 
