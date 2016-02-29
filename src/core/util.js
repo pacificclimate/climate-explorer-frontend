@@ -1,4 +1,4 @@
-var moment = require("moment/moment");
+var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
@@ -86,13 +86,13 @@ var generateAxisInfo = function(units) {
  */
 var generateXAxis = function(data) {
   return ['x'].concat(_.map(_.keys(data), function(d) {
-    return moment(d, moment.ISO_8601).utc().format("YYYY-MM-DD")
+    return moment(d, moment.ISO_8601).utc().format('YYYY-MM-DD')
   }))
 };
 
 /*
  * Sample input:
- * {"r1i1p1": {"units": "K", "data": {"2025-04-16T00:00:00Z": 281}}}
+ * {'r1i1p1': {'units': 'K', 'data': {'2025-04-16T00:00:00Z': 281}}}
  */
 var dataApiToC3 = function(data) {
   // Initialize the x axis data to the first
@@ -150,7 +150,7 @@ var parseDataForC3 = function(data) {
 
   for (let model in data) {
     var dataSeries = [model];
-    var xLabel = model.concat("_xs");
+    var xLabel = model.concat('_xs');
     var xSeries = [xLabel];
     var yUnits;
     var yAxisCount; // to accommodate plotting multiple climate variables
@@ -164,7 +164,7 @@ var parseDataForC3 = function(data) {
       else { // this is the units of the series, which also defines the y axes
         if (key === 'units' && data[model][key] !== yUnits) { // don't create redundant axes
           yUnits = String(data[model][key]);
-          var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
+          var modelYaxisLabel = yAxisCount ? 'y'.concat(yAxisCount) : 'y';
 
           allModelsData['axes'][model] = modelYaxisLabel;
           axisInfo[modelYaxisLabel] = {
@@ -211,10 +211,10 @@ var parseTimeSeriesForC3 = function(graph_data) {
     labels: {
       format: {
         'Seasonal Average': function (v, id, i, j){
-          if (i == 0 || i == 11){ return "Winter" }
-          if (i == 3) { return "Spring" }
-          if (i == 6) { return "Summer" }
-          if (i == 9) { return "Fall" }
+          if (i == 0 || i == 11){ return 'Winter' }
+          if (i == 3) { return 'Spring' }
+          if (i == 6) { return 'Summer' }
+          if (i == 9) { return 'Fall' }
         }
       }
     },
@@ -292,18 +292,18 @@ var parseTimeSeriesForC3 = function(graph_data) {
     for passing to the DataTable component for rendering:
 
     {
-      "tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231": 
+      'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231': 
       {
-        "median": 278.34326171875,
-        "min": 225.05545043945312,
-        "units": "K",
-        "mean": 273.56732177734375,
-        "max": 303.601318359375,
-        "ncells": 8192,
-        "stdev": 22.509726901403784,
-        "run": "r1i1p1"
+        'median': 278.34326171875,
+        'min': 225.05545043945312,
+        'units': 'K',
+        'mean': 273.56732177734375,
+        'max': 303.601318359375,
+        'ncells': 8192,
+        'stdev': 22.509726901403784,
+        'run': 'r1i1p1'
       },
-      "tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231": 
+      'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231': 
       {
         ...
       }
@@ -312,16 +312,16 @@ var parseTimeSeriesForC3 = function(graph_data) {
 var parseBootstrapTableData = function(data) {
     return _.map(data, function(stats, model) {
         var splitYears = model.split('_')[5].split('-');
-        var period = splitYears[0].slice(0,4) + " - " + splitYears[1].slice(0,4);
+        var period = splitYears[0].slice(0,4) + ' - ' + splitYears[1].slice(0,4);
         var modelInfo = {
-            "model_period": period,
-            "run": stats['run'],
-            "min": +stats['min'].toFixed(PRECISION),
-            "max": +stats['max'].toFixed(PRECISION),
-            "mean": +stats['mean'].toFixed(PRECISION),
-            "median": +stats['median'].toFixed(PRECISION),
-            "stdev": +stats['stdev'].toFixed(PRECISION),
-            "units": stats['units']
+            'model_period': period,
+            'run': stats['run'],
+            'min': +stats['min'].toFixed(PRECISION),
+            'max': +stats['max'].toFixed(PRECISION),
+            'mean': +stats['mean'].toFixed(PRECISION),
+            'median': +stats['median'].toFixed(PRECISION),
+            'stdev': +stats['stdev'].toFixed(PRECISION),
+            'units': stats['units']
         };
         return modelInfo;
     });
@@ -335,7 +335,7 @@ var createWorksheetSummaryCells = function(metadata, time_of_year) {
 
     var rows = [];
 
-    var header = ["Model", "Emissions Scenario", "Time of Year", "Variable ID", "Variable Name"];
+    var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];
     rows.push(header)
 
     rows.push([
@@ -359,7 +359,7 @@ var fillWorksheetDataCells = function(data) {
         return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units]
     });
 
-    var column_labels = ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ];
+    var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units' ];
     rows.unshift(column_labels)
 
     return rows
@@ -398,9 +398,9 @@ var assembleWorksheet = function (cells) {
 var timeIndexToTimeOfYear = function(timeidx) {
     // convert timestep ID (0-16) to string format
     var times_of_year = [
-        "January", "February", "March", "April", "May", "June", "July", "August", "September",
-        "October", "November", "December", "Winter-DJF", "Spring-MAM", "Summer-JJA",
-        "Fall-SON", "Annual"
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+        'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
+        'Fall-SON', 'Annual'
     ];
     return times_of_year[timeidx];
 }
@@ -429,7 +429,7 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     var ws = assembleWorksheet(summary_cells.concat([[]], data_cells));
 
     // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
-    var ws_name = "Stats_Table_" + metadata.variable_id + "_" + time_of_year;
+    var ws_name = 'Stats_Table_' + metadata.variable_id + '_' + time_of_year;
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
@@ -446,7 +446,7 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     if(format == 'csv'){
         out_data = new Blob(
             [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
-            {type:""}
+            {type:''}
         );
     }
     else if(format == 'xlsx') { 
