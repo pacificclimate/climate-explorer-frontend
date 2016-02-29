@@ -269,15 +269,21 @@ const worksheetSummaryCellsExpected = {
 }
 
 const worksheetTestData = [
-        { model_period: "2040 - 2069", run: "r1i1p1", min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: "mm" }, 
-        { model_period: "2070 - 2099", run: "r1i1p1", min: 0, max: 22.66, mean: 2.36, median: 1.39, stdev: 2.97, units: "mm" },
-        { model_period: "2010 - 2039", run: "r1i1p1", min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: "mm" }
+        { model_period: '2040 - 2069', run: 'r1i1p1', min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: 'mm' }, 
+        { model_period: '2070 - 2099', run: 'r1i1p1', min: 0, max: 22.66, mean: 2.36, median: 1.39, stdev: 2.97, units: 'mm' },
+        { model_period: '2010 - 2039', run: 'r1i1p1', min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: 'mm' }
     ]
-const worksheetDataCellsInfo = {num_rows: 4, num_cols: 8}
+const worksheetDataRowsExpected = [
+    ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ],
+    ['2040 - 2069', 'r1i1p1', 0, 22.08, 2.34, 1.34, 3.01, 'mm' ], 
+    ['2070 - 2099', 'r1i1p1', 0, 22.66, 2.36, 1.39, 2.97, 'mm' ],
+    ['2010 - 2039', 'r1i1p1', 0, 21.97, 2.31, 1.35, 2.94, 'mm']
+]
+
 const worksheetRange = "A1:I9";
 
 describe('createWorksheetSummaryCells', function() {
-    it('Correctly forms and counts worksheet summary cells', function() {
+    it('Correctly forms worksheet summary cells', function() {
         var util = require('../util');
         var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
         expect(result).toEqual(worksheetSummaryCellsExpected);
@@ -285,11 +291,10 @@ describe('createWorksheetSummaryCells', function() {
 });
 
 describe('fillWorksheetDataRows', function() {
-    it('Correctly fills and counts worksheet data cells', function() {
+    it('Correctly fills worksheet data cells', function() {
         var util = require('../util');
         var result = util.fillWorksheetDataCells(worksheetTestData);
-        expect(result.num_rows).toEqual(worksheetDataCellsInfo.num_rows);
-        expect(result.num_cols).toEqual(worksheetDataCellsInfo.num_cols);
+        expect(result).toEqual(worksheetDataRowsExpected);
     });
 });
 
