@@ -339,11 +339,11 @@ var createWorksheetSummaryCells = function(metadata, time_of_year) {
     rows.push(header)
 
     rows.push([
-	metadata.model_id,
-	metadata.experiment,
-	metadata.time_of_year,
-	metadata.variable_id,
-	metadata.variable_name
+      metadata.model_id,
+      metadata.experiment,
+      time_of_year,
+      metadata.variable_id,
+      metadata.variable_name
     ])
 
     return rows
@@ -369,31 +369,28 @@ var fillWorksheetDataCells = function(data) {
     Helper function for exportTableDataToWorksheet, combines summary rows, data column headers, and data into one worksheet
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
-var assembleWorksheet = function (summary_cells, data_cells) {
-    var R = 0;
-    var C = 0;
-    var cell;
+var assembleWorksheet = function (cells) {
     var cell_ref;
     var ws = {};
+    var maxCols = 0;
+    cells.forEach(function(row, rowIndex){
+      if (row.length > maxCols){
+        maxCols = row.length
+      }
+      row.forEach(function(cellValue, colIndex){
+        cell_ref = XLSX.utils.encode_cell({c:colIndex,r:rowIndex});
+        ws[cell_ref] = { v: cellValue }
+      })
+    })
 
-    for(R = 0; R < summary_cells.num_rows; ++R) {
-        for(C = 0; C < summary_cells.num_cols; ++C) {
-            cell_ref = XLSX.utils.encode_cell({c:C,r:R});
-            ws[cell_ref] = summary_cells.cells[(R * summary_cells.num_cols) + C];
-        }
-    }
-    for(var data_row = 0; data_row < data_cells.num_rows; ++data_row) {
-        for(var data_col = 0; data_col < data_cells.num_cols; ++data_col) {
-            cell_ref = XLSX.utils.encode_cell({c:data_col,r:R+data_row});
-            ws[cell_ref] = data_cells.cells[(data_row * data_cells.num_cols) + data_col];
-        }
-    }
     // set combined worksheet range bounds
     var range = {
-      s: {c:0, r:0}, 
+      s: {c:0, r:0},
       e: {
-          c: (summary_cells.num_cols > data_cells.num_cols ? summary_cells.num_cols : data_cells.num_cols), 
-          r: summary_cells.num_rows + data_cells.num_rows + 1}};
+        c: maxCols-1,
+        r: cells.length-1
+      }
+    };
     ws['!ref'] = XLSX.utils.encode_range(range);
     return ws;
 }
@@ -428,8 +425,8 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     // prepare data cells
     var data_cells = fillWorksheetDataCells(data);
 
-    // assemble summary_cells and data_cells into one XLSX-encoded worksheet
-    var ws = assembleWorksheet(summary_cells, data_cells);
+    // assemble summary_cells, empty row, and data_cells into one XLSX-encoded worksheet
+    var ws = assembleWorksheet(summary_cells.concat([[]], data_cells));
 
     // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
     var ws_name = "Stats_Table_" + metadata.variable_id + "_" + time_of_year;
