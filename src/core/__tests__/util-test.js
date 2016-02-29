@@ -249,8 +249,8 @@ describe('parseBootstrapTableData', function() {
     });
 });
 
-const worksheetSummaryData = { model_id: "CSIRO-Mk3-6-0", variable_id: "pr", experiment: "rcp26", variable_name: "Precipitation" }
-const worksheetTimeOfYear = 'Winter - DJF'
+const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation' }
+const worksheetTimeOfYear = 'Winter-DJF'
 const worksheetSummaryCellsExpected = { 
     0: { 
         0: 'Model',
@@ -262,7 +262,7 @@ const worksheetSummaryCellsExpected = {
     1: { 
         0: 'CSIRO-Mk3-6-0',
         1: 'rcp26',
-        2: 'Winter - DJF',
+        2: 'Winter-DJF',
         3: 'pr',
         4: 'Precipitation'
     }
@@ -274,13 +274,13 @@ const worksheetTestData = [
         { model_period: '2010 - 2039', run: 'r1i1p1', min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: 'mm' }
     ]
 const worksheetDataRowsExpected = [
-    ["Model Period", "Run", "Min", "Max", "Mean", "Median", "Std.Dev", "Units" ],
+    ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units' ],
     ['2040 - 2069', 'r1i1p1', 0, 22.08, 2.34, 1.34, 3.01, 'mm' ], 
     ['2070 - 2099', 'r1i1p1', 0, 22.66, 2.36, 1.39, 2.97, 'mm' ],
     ['2010 - 2039', 'r1i1p1', 0, 21.97, 2.31, 1.35, 2.94, 'mm']
 ]
 
-const worksheetRange = "A1:I9";
+const worksheetRange = 'A1:H7';
 
 describe('createWorksheetSummaryCells', function() {
     it('Correctly forms worksheet summary cells', function() {
@@ -303,7 +303,7 @@ describe('assembleWorksheet', function() {
         var util = require('../util');
         var summary_cells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
         var data_cells = util.fillWorksheetDataCells(worksheetTestData);
-        var ws = util.assembleWorksheet(summary_cells, data_cells);
+        var ws = util.assembleWorksheet(summary_cells.concat([[]], data_cells));
         expect(ws['!ref']).toEqual(worksheetRange);
     });
 });
