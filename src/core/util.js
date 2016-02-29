@@ -331,7 +331,7 @@ var parseBootstrapTableData = function(data) {
     Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
 */
-var createWorksheetSummaryCells = function(metadata, time_of_year) {
+var createWorksheetSummaryCells = function(metadata, timeOfYear) {
 
     var rows = [];
 
@@ -341,7 +341,7 @@ var createWorksheetSummaryCells = function(metadata, time_of_year) {
     rows.push([
       metadata.model_id,
       metadata.experiment,
-      time_of_year,
+      timeOfYear,
       metadata.variable_id,
       metadata.variable_name
     ])
@@ -373,11 +373,11 @@ var assembleWorksheet = function (cells) {
     var cell_ref;
     var ws = {};
     var maxCols = 0;
-    cells.forEach(function(row, rowIndex){
+    cells.forEach(function(row, rowIndex) {
       if (row.length > maxCols){
         maxCols = row.length
       }
-      row.forEach(function(cellValue, colIndex){
+      row.forEach(function(cellValue, colIndex) {
         cell_ref = XLSX.utils.encode_cell({c:colIndex,r:rowIndex});
         ws[cell_ref] = { v: cellValue, t: 's' }
       })
@@ -397,12 +397,12 @@ var assembleWorksheet = function (cells) {
 
 var timeIndexToTimeOfYear = function(timeidx) {
     // convert timestep ID (0-16) to string format
-    var times_of_year = [
+    var timesOfYear = [
         'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
         'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
         'Fall-SON', 'Annual'
     ];
-    return times_of_year[timeidx];
+    return timesOfYear[timeidx];
 }
 
 /*
@@ -417,19 +417,19 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
         SheetNames: []
     };
 
-    var time_of_year = timeIndexToTimeOfYear(timeidx);
+    var timeOfYear = timeIndexToTimeOfYear(timeidx);
 
     // prepare summary cells
-    var summary_cells = createWorksheetSummaryCells(metadata, time_of_year);
+    var summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
 
     // prepare data cells
-    var data_cells = fillWorksheetDataCells(data);
+    var dataCells = fillWorksheetDataCells(data);
 
-    // assemble summary_cells, empty row, and data_cells into one XLSX-encoded worksheet
-    var ws = assembleWorksheet(summary_cells.concat([[]], data_cells));
+    // assemble summaryCells, empty row, and dataCells into one XLSX-encoded worksheet
+    var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
 
     // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
-    var ws_name = 'Stats_Table_' + metadata.variable_id + '_' + time_of_year;
+    var ws_name = 'Stats_Table_' + metadata.variable_id + '_' + timeOfYear;
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
@@ -443,20 +443,20 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     }
 
     var out_data;
-    if(format == 'csv'){
+    if (format == 'csv') {
         out_data = new Blob(
             [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
             {type:''}
         );
     }
-    else if(format == 'xlsx') { 
+    else if (format == 'xlsx') { 
         // convert workbook to XLSX and prepare for download
         var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
         out_data = new Blob([xml_to_binary_string(wbout)],{type:""});
     }
     // form output filename
     var output_filename = "PCIC_CE_StatsTableExport_" + metadata.model_id + "_" + metadata.experiment + 
-                            "_" + metadata.variable_id + "_" + time_of_year + "." + format;
+                            "_" + metadata.variable_id + "_" + timeOfYear + "." + format;
     // serve up file for download
     filesaver.saveAs(out_data, output_filename);
 }

@@ -301,9 +301,9 @@ describe('fillWorksheetDataRows', function() {
 describe('assembleWorksheet', function() {
     it('Correctly assembles worksheet from summary and data cells', function() {
         var util = require('../util');
-        var summary_cells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-        var data_cells = util.fillWorksheetDataCells(worksheetTestData);
-        var ws = util.assembleWorksheet(summary_cells.concat([[]], data_cells));
+        var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+        var dataCells = util.fillWorksheetDataCells(worksheetTestData);
+        var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
         expect(ws['!ref']).toEqual(worksheetRange);
     });
 });
