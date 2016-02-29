@@ -379,7 +379,7 @@ var assembleWorksheet = function (cells) {
       }
       row.forEach(function(cellValue, colIndex){
         cell_ref = XLSX.utils.encode_cell({c:colIndex,r:rowIndex});
-        ws[cell_ref] = { v: cellValue }
+        ws[cell_ref] = { v: cellValue, t: 's' }
       })
     })
 
@@ -417,7 +417,7 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
         SheetNames: []
     };
 
-    var time_of_year = timeIndexToTimeOfYear(timeidx)
+    var time_of_year = timeIndexToTimeOfYear(timeidx);
 
     // prepare summary cells
     var summary_cells = createWorksheetSummaryCells(metadata, time_of_year);
@@ -433,32 +433,21 @@ var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
     wb.SheetNames.push(ws_name);
     wb.Sheets[ws_name] = ws;
 
-    // Note: we will probably want to split the rest of this out into a separate function 
-    // to combine multiple worksheets if/when we want to export additional data (e.g. DataGraph points)
-    function to_csv(workbook) {
-        var result = [];
-        workbook.SheetNames.forEach(function(sheetName) {
-            var csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-            if(csv.length > 0){
-                // Uncomment the following 2 lines of code to support multiple worksheets
-                // result.push("SHEET: " + sheetName);
-                // result.push("");
-                result.push(csv);
-            }
-        });
-        return result.join("\n");
-    }
-
     function xml_to_binary_string(s) {
         var buf = new ArrayBuffer(s.length);
         var view = new Uint8Array(buf);
-        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        for (var i=0; i<=s.length; ++i) {
+          view[i] = s.charCodeAt(i) & 0xFF;
+        }
         return buf;
     }
 
     var out_data;
     if(format == 'csv'){
-        out_data = new Blob([to_csv(wb)],{type:""});
+        out_data = new Blob(
+            [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
+            {type:""}
+        );
     }
     else if(format == 'xlsx') { 
         // convert workbook to XLSX and prepare for download
