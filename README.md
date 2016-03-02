@@ -57,3 +57,17 @@ npm test
 docker build -t climate-explorer-frontend .
 docker run --rm -it -e "CE_BACKEND_URL=http://localhost:8000/api" -v $(pwd)/client:/app -p 8080:8080 --name frontend climate-explorer-frontend
 ```
+
+## Releasing
+
+Creating a versioned release involves:
+
+1. Incrementing `version` in `package.json`
+2. Summarize the changes from the last version in `NEWS.md`
+3. Commit these changes, then tag the release:
+
+```bash
+git add package.json NEWS.md
+git commit -m"Bump to version x.x.x
+git tag -a -m"x.x.x" x.x.x
+```
