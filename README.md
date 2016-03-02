@@ -68,6 +68,7 @@ Creating a versioned release involves:
 
 ```bash
 git add package.json NEWS.md
-git commit -m"Bump to version x.x.x
+git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
+git push --follow-tags
 ```
