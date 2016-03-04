@@ -51,6 +51,15 @@ var CanadaMap = React.createClass({
         this.setState({area: wkt})
         this.props.onSetArea(wkt);
     },
+
+    setArea: function (layer) {
+        this.drawnItems.getLayers().map(function (layer) {
+            this.drawnItems.removeLayer(layer);
+        }.bind(this));
+        this.drawnItems.addLayer(layer);
+        this.handleSetArea(layer.toGeoJSON());
+    },
+
     componentDidMount: function() {
         var map = this.map = L.map(this._map, {
             crs: this.props.crs,
@@ -72,7 +81,7 @@ var CanadaMap = React.createClass({
         //FIXME - Problem: ncWMS layer 404s if we don't provide a dataset/variable. Solution: conditionally add layer to map
         var ncwmsLayer =  this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
-        var drawnItems = new L.FeatureGroup();
+        var drawnItems = this.drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
 
         var drawOptions = {
@@ -91,9 +100,9 @@ var CanadaMap = React.createClass({
         var onDraw = function(e) {
             var layer = e.layer;
 
-            drawnItems.getLayers().map((layer) => drawnItems.removeLayer(layer));
-            drawnItems.addLayer(layer);
-            this.handleSetArea(layer.toGeoJSON());
+            this.setArea(e.layer)
+
+
         }.bind(this);
 
         var onEdit = function(e) {
