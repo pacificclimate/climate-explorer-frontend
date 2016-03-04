@@ -73,6 +73,15 @@ module.exports = {
         hot: true,
         inline: true,
         progress: true,
-	colors: true
-    }
+        colors: true
+    },
+    // 'node' and 'externals' added as a fix to make xlsx.js work with Webpack. See: https://github.com/SheetJS/js-xlsx/issues/285
+    node: {
+            fs: 'empty'
+    },
+    externals: [
+        {
+            './cptable': 'var cptable'
+        }
+    ]
 };

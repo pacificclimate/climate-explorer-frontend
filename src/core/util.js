@@ -1,5 +1,7 @@
-var moment = require("moment/moment");
+var moment = require('moment/moment');
 var _ = require('underscore');
+import XLSX from 'xlsx';
+import * as filesaver from 'filesaver.js';
 
 // set the decimal precision of displayed values
 var PRECISION = 2;
@@ -84,13 +86,13 @@ var generateAxisInfo = function(units) {
  */
 var generateXAxis = function(data) {
   return ['x'].concat(_.map(_.keys(data), function(d) {
-    return moment(d, moment.ISO_8601).utc().format("YYYY-MM-DD")
+    return moment(d, moment.ISO_8601).utc().format('YYYY-MM-DD')
   }))
 };
 
 /*
  * Sample input:
- * {"r1i1p1": {"units": "K", "data": {"2025-04-16T00:00:00Z": 281}}}
+ * {'r1i1p1': {'units': 'K', 'data': {'2025-04-16T00:00:00Z': 281}}}
  */
 var dataApiToC3 = function(data) {
   // Initialize the x axis data to the first
@@ -148,7 +150,7 @@ var parseDataForC3 = function(data) {
 
   for (let model in data) {
     var dataSeries = [model];
-    var xLabel = model.concat("_xs");
+    var xLabel = model.concat('_xs');
     var xSeries = [xLabel];
     var yUnits;
     var yAxisCount; // to accommodate plotting multiple climate variables
@@ -162,7 +164,7 @@ var parseDataForC3 = function(data) {
       else { // this is the units of the series, which also defines the y axes
         if (key === 'units' && data[model][key] !== yUnits) { // don't create redundant axes
           yUnits = String(data[model][key]);
-          var modelYaxisLabel = yAxisCount ? "y".concat(yAxisCount) : "y";
+          var modelYaxisLabel = yAxisCount ? 'y'.concat(yAxisCount) : 'y';
 
           allModelsData['axes'][model] = modelYaxisLabel;
           axisInfo[modelYaxisLabel] = {
@@ -209,10 +211,10 @@ var parseTimeSeriesForC3 = function(graph_data) {
     labels: {
       format: {
         'Seasonal Average': function (v, id, i, j){
-          if (i == 0 || i == 11){ return "Winter" }
-          if (i == 3) { return "Spring" }
-          if (i == 6) { return "Summer" }
-          if (i == 9) { return "Fall" }
+          if (i == 0 || i == 11){ return 'Winter' }
+          if (i == 3) { return 'Spring' }
+          if (i == 6) { return 'Summer' }
+          if (i == 9) { return 'Fall' }
         }
       }
     },
@@ -283,4 +285,181 @@ var parseTimeSeriesForC3 = function(graph_data) {
   };
 }
 
-module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3 }
+/*
+    Takes a multistats object of the following form and 
+    1) flattens it, and
+    2) rounds numeric values 
+    for passing to the DataTable component for rendering:
+
+    {
+      'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231': 
+      {
+        'median': 278.34326171875,
+        'min': 225.05545043945312,
+        'units': 'K',
+        'mean': 273.56732177734375,
+        'max': 303.601318359375,
+        'ncells': 8192,
+        'stdev': 22.509726901403784,
+        'run': 'r1i1p1'
+      },
+      'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231': 
+      {
+        ...
+      }
+    };
+*/
+var parseBootstrapTableData = function(data) {
+    return _.map(data, function(stats, model) {
+        var splitYears = model.split('_')[5].split('-');
+        var period = splitYears[0].slice(0,4) + ' - ' + splitYears[1].slice(0,4);
+        var modelInfo = {
+            'model_period': period,
+            'run': stats['run'],
+            'min': +stats['min'].toFixed(PRECISION),
+            'max': +stats['max'].toFixed(PRECISION),
+            'mean': +stats['mean'].toFixed(PRECISION),
+            'median': +stats['median'].toFixed(PRECISION),
+            'stdev': +stats['stdev'].toFixed(PRECISION),
+            'units': stats['units']
+        };
+        return modelInfo;
+    });
+}
+
+/*
+    Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
+*/
+var createWorksheetSummaryCells = function(metadata, timeOfYear) {
+
+    var rows = [];
+
+    var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];
+    rows.push(header)
+
+    rows.push([
+      metadata.model_id,
+      metadata.experiment,
+      timeOfYear,
+      metadata.variable_id,
+      metadata.variable_name
+    ])
+
+    return rows
+}
+
+/*
+    Helper function for exportTableDataToWorksheet, creates data column headers and data entries for exported worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
+*/
+var fillWorksheetDataCells = function(data) {
+
+    var rows =_.map(data, function(stats) {
+        return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units]
+    });
+
+    var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units' ];
+    rows.unshift(column_labels)
+
+    return rows
+}
+
+/*
+    Helper function for exportTableDataToWorksheet, combines summary rows, data column headers, and data into one worksheet
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
+*/
+var assembleWorksheet = function (cells) {
+    var cell_ref;
+    var ws = {};
+    var maxCols = 0;
+    cells.forEach(function(row, rowIndex) {
+      if (row.length > maxCols){
+        maxCols = row.length
+      }
+      row.forEach(function(cellValue, colIndex) {
+        cell_ref = XLSX.utils.encode_cell({c:colIndex,r:rowIndex});
+        ws[cell_ref] = { v: cellValue, t: 's' }
+      })
+    })
+
+    // set combined worksheet range bounds
+    var range = {
+      s: {c:0, r:0},
+      e: {
+        c: maxCols-1,
+        r: cells.length-1
+      }
+    };
+    ws['!ref'] = XLSX.utils.encode_range(range);
+    return ws;
+}
+
+var timeIndexToTimeOfYear = function(timeidx) {
+    // convert timestep ID (0-16) to string format
+    var timesOfYear = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+        'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
+        'Fall-SON', 'Annual'
+    ];
+    return timesOfYear[timeidx];
+}
+
+/*
+    Takes current data displayed in the DataTable and contextual data from user input, 
+    creates an XLSX or CSV file, and serves it to the user for download.
+    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx 
+*/
+var exportTableDataToWorksheet = function(metadata, data, format, timeidx) {
+    // create workbook object containing one or more worksheets
+    var wb = {
+        Sheets: {},
+        SheetNames: []
+    };
+
+    var timeOfYear = timeIndexToTimeOfYear(timeidx);
+
+    // prepare summary cells
+    var summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
+
+    // prepare data cells
+    var dataCells = fillWorksheetDataCells(data);
+
+    // assemble summaryCells, empty row, and dataCells into one XLSX-encoded worksheet
+    var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
+
+    // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
+    var ws_name = 'Stats_Table_' + metadata.variable_id + '_' + timeOfYear;
+    wb.SheetNames.push(ws_name);
+    wb.Sheets[ws_name] = ws;
+
+    function xml_to_binary_string(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i=0; i<=s.length; ++i) {
+          view[i] = s.charCodeAt(i) & 0xFF;
+        }
+        return buf;
+    }
+
+    var out_data;
+    if (format == 'csv') {
+        out_data = new Blob(
+            [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
+            {type:''}
+        );
+    }
+    else if (format == 'xlsx') { 
+        // convert workbook to XLSX and prepare for download
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+        out_data = new Blob([xml_to_binary_string(wbout)],{type:""});
+    }
+    // form output filename
+    var output_filename = "PCIC_CE_StatsTableExport_" + metadata.model_id + "_" + metadata.experiment + 
+                            "_" + metadata.variable_id + "_" + timeOfYear + "." + format;
+    // serve up file for download
+    filesaver.saveAs(out_data, output_filename);
+}
+
+module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData, 
+    createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet, exportTableDataToWorksheet }
