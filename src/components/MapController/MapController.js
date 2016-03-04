@@ -157,15 +157,16 @@ var MapController = React.createClass({
                   <Col lg={4} md={4}>
                     <ButtonGroup>
                       <DropdownButton title={'Export Polygon'} onSelect={this.exportPolygon}>
-                        <MenuItem eventKey='kml'>KML</MenuItem>
-                        <MenuItem eventKey='wkt'>WKT</MenuItem>
+                        <MenuItem eventKey='shp'>Shapefile</MenuItem>
                         <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
+                        <MenuItem eventKey='wkt'>WKT</MenuItem>
+                        <MenuItem eventKey='kml'>KML</MenuItem>
                         <MenuItem eventKey='gpx'>GPX</MenuItem>
                       </DropdownButton>
                       <DropdownButton title={'Import Polygon'} onSelect={this.importPolygon}>
-                        <MenuItem eventKey='kml'>KML</MenuItem>
-                        <MenuItem eventKey='wkt'>WKT</MenuItem>
                         <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
+                        <MenuItem eventKey='wkt'>WKT</MenuItem>
+                        <MenuItem eventKey='kml'>KML</MenuItem>
                         <MenuItem eventKey='gpx'>GPX</MenuItem>
                       </DropdownButton>
                     </ButtonGroup>

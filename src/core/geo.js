@@ -1,11 +1,10 @@
 import { saveAs } from 'filesaver.js';
 import togeojson from 'togeojson';
 import { parse, stringify } from 'wellknown';
+import _tokml from 'tokml';
+import _togpx from 'togpx';
 
-var _tokml = require('tokml');
-// import tokml as tkml from 'tokml';
-var _togpx = require('togpx');
-// import togpx as tgpx from 'togpx';
+import { download } from 'shp-write';
 
 var g = {
 
@@ -50,6 +49,15 @@ var g = {
     return _togpx(this.feature);
   },
 
+  // shp: function (f) {
+  //   // TODO
+  //   return;
+  // },
+
+  // toShp: function () {
+
+  // },
+
   save: function (format) {
     switch (format) {
       case 'wkt':
@@ -78,6 +86,10 @@ var g = {
           new Blob([this.toGPX()], { type: 'text/plain;charset=utf-8' }),
           'feature.gpx'
         );
+        break;
+
+      case 'shp':
+        download(this.toGeoJSONobj()); // doesn't work, needs to be a FeatureCollection
         break;
 
       default:
