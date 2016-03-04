@@ -73,9 +73,9 @@ var MapController = React.createClass({
     }
   },
 
-  handleSetArea: function(wkt) {
-    this.setState({area: wkt});
-    this.props.onSetArea(wkt);
+  handleSetArea: function(geojson) {
+    this.setState({area: geojson});
+    this.props.onSetArea(g.geojson(geojson).toWKT());
   },
 
   requestTimeMetadata: function(unique_id) {
@@ -89,8 +89,7 @@ var MapController = React.createClass({
   },
 
   exportPolygon: function(e, key) {
-    g.wkt(this.state.area).save(key);
-
+    g.geojson(this.state.area).save(key);
   },
 
   importPolygon: function(e, key) {

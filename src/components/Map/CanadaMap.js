@@ -1,6 +1,5 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var GeoJSONToWKT = require('wellknown').stringify;
 var _ = require('underscore');
 
 var utils = require("./utils");
@@ -94,7 +93,7 @@ var CanadaMap = React.createClass({
 
             drawnItems.getLayers().map((layer) => drawnItems.removeLayer(layer));
             drawnItems.addLayer(layer);
-            this.handleSetArea(GeoJSONToWKT(layer.toGeoJSON()));
+            this.handleSetArea(layer.toGeoJSON());
         }.bind(this);
 
         var onEdit = function(e) {
