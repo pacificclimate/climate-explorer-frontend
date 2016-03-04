@@ -1,7 +1,8 @@
 import React, { PropTypes, Component } from 'react';
-import { Input, Row, Col } from 'react-bootstrap';
+import { Input, Row, Col, ButtonGroup, DropdownButton, Button, MenuItem } from 'react-bootstrap';
 import _ from 'underscore';
 import urljoin from 'url-join';
+import saveAs from 'filesaver.js';
 
 import classNames from 'classnames';
 
@@ -9,6 +10,7 @@ import { CanadaMap } from '../Map/CanadaMap';
 import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
+import g from '../../core/geo';
 
 import styles from './MapController.css';
 
@@ -72,6 +74,7 @@ var MapController = React.createClass({
   },
 
   handleSetArea: function(wkt) {
+    this.setState({area: wkt});
     this.props.onSetArea(wkt);
   },
 
@@ -83,6 +86,15 @@ var MapController = React.createClass({
         model_id: unique_id
       }
     });
+  },
+
+  exportPolygon: function(e, key) {
+    g.wkt(this.state.area).save(key);
+
+  },
+
+  importPolygon: function(e, key) {
+    console.log(key)
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -136,18 +148,34 @@ var MapController = React.createClass({
               onSetArea={this.handleSetArea}>
               <div className={styles.controls}>
                 <Row>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <TimeOfYearSelector onChange={this.updateTime} />
                   </Col>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
+                  </Col>
+                  <Col lg={4} md={4}>
+                    <ButtonGroup>
+                      <DropdownButton title={'Export Polygon'} onSelect={this.exportPolygon}>
+                        <MenuItem eventKey='kml'>KML</MenuItem>
+                        <MenuItem eventKey='wkt'>WKT</MenuItem>
+                        <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
+                        <MenuItem eventKey='gpx'>GPX</MenuItem>
+                      </DropdownButton>
+                      <DropdownButton title={'Import Polygon'} onSelect={this.importPolygon}>
+                        <MenuItem eventKey='kml'>KML</MenuItem>
+                        <MenuItem eventKey='wkt'>WKT</MenuItem>
+                        <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
+                        <MenuItem eventKey='gpx'>GPX</MenuItem>
+                      </DropdownButton>
+                    </ButtonGroup>
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
                   </Col>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
                   </Col>
                 </Row>
