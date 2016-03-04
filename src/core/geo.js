@@ -49,6 +49,13 @@ var g = {
     return _togpx(this.feature);
   },
 
+  toFeatureCollection: function () {
+    return {
+      type: 'FeatureCollection',
+      features: [this.feature],
+    };
+  },
+
   // shp: function (f) {
   //   // TODO
   //   return;
@@ -89,7 +96,7 @@ var g = {
         break;
 
       case 'shp':
-        download(this.toGeoJSONobj()); // doesn't work, needs to be a FeatureCollection
+        download(this.toFeatureCollection(this.toGeoJSONobj()));
         break;
 
       default:
