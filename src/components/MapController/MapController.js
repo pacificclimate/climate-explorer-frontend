@@ -92,8 +92,10 @@ var MapController = React.createClass({
     g.geojson(this.state.area).save(key);
   },
 
-  importPolygon: function(e, key) {
-    console.log(key)
+  importPolygon: function(file) {
+    g.load(file, function(geojson) {
+      this.handleSetArea(geojson);
+    }.bind(this));
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -144,7 +146,8 @@ var MapController = React.createClass({
               time={this.state.wmstime}
               dataset={this.state.dataset}
               variable={this.state.variable}
-              onSetArea={this.handleSetArea}>
+              onSetArea={this.handleSetArea}
+              area={this.state.area}>
               <div className={styles.controls}>
                 <Row>
                   <Col lg={4} md={4}>
@@ -162,7 +165,9 @@ var MapController = React.createClass({
                         <MenuItem eventKey='kml'>KML</MenuItem>
                         <MenuItem eventKey='gpx'>GPX</MenuItem>
                       </DropdownButton>
-                      <DropdownButton title={'Import Polygon'} onSelect={this.importPolygon}>
+                      <DropdownButton title={'Import Polygon'}>
+                        <Input type='file' label='File' help='File containing a single polygon'
+                               onChange={function(e) {this.importPolygon(e.currentTarget.files[0])}.bind(this)} />
                         <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
                         <MenuItem eventKey='wkt'>WKT</MenuItem>
                         <MenuItem eventKey='kml'>KML</MenuItem>

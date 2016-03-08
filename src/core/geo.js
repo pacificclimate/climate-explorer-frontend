@@ -104,6 +104,15 @@ var g = {
 
     }
   },
+  load: function(file, success) {
+    var ext = file.name.split('.')[1]
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      console.log(evt.target.result);
+      success(JSON.parse(evt.target.result));
+    };
+    reader.readAsText(file);
+  },
 };
 
 module.exports = g;

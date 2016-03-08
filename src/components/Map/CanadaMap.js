@@ -11,7 +11,10 @@ var CanadaMap = React.createClass({
     propTypes: {
         dataset: React.PropTypes.string,
         variable: React.PropTypes.string,
+        // To keep things simple, areas within this component should only be
+        // passed around (or up to a higher component) as GeoJSON
         onSetArea: React.PropTypes.func.isRequired,
+        area: React.PropTypes.object,
     },
 
     getInitialState: function () {
@@ -47,19 +50,23 @@ var CanadaMap = React.createClass({
         _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'opacity', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
         return params;
     },
-    handleSetArea: function(wkt) {
-        this.setState({area: wkt})
-        this.props.onSetArea(wkt);
-    },
-
-    setArea: function (layer) {
+    clearMapFeatures: function() {
         this.drawnItems.getLayers().map(function (layer) {
             this.drawnItems.removeLayer(layer);
         }.bind(this));
-        this.drawnItems.addLayer(layer);
-        this.handleSetArea(layer.toGeoJSON());
     },
-
+    // generally called for a new area originating from within this component
+    // propagate the area up the component stack
+    handleSetArea: function(geojson) {
+        this.setState({area: geojson})
+        this.props.onSetArea(geojson);
+    },
+    // area received from props; don't propagate back up the component stack
+    handleNewArea: function(geojson) {
+        this.setState({area: geojson});
+        this.clearMapFeatures();
+        this.drawnItems.addLayer(L.geoJson(geojson));
+    },
     componentDidMount: function() {
         var map = this.map = L.map(this._map, {
             crs: this.props.crs,
@@ -100,8 +107,9 @@ var CanadaMap = React.createClass({
         var onDraw = function(e) {
             var layer = e.layer;
 
-            this.setArea(e.layer)
-
+            this.clearMapFeatures();
+            this.drawnItems.addLayer(layer);
+            this.handleSetArea(layer.toGeoJSON());
 
         }.bind(this);
 
@@ -112,7 +120,7 @@ var CanadaMap = React.createClass({
                 alert("Something went wrong editing the feature");
                 return;
             }
-            this.handleSetArea(GeoJSONToWKT(layers[0].toGeoJSON()));
+            this.handleSetArea(layers[0].toGeoJSON());
         }.bind(this);
 
         var onDelete = function(e) {
@@ -144,6 +152,9 @@ var CanadaMap = React.createClass({
         var params = {layers: newProps.dataset + "/" + newProps.variable};
         _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
         this.ncwmsLayer.setParams(params);
+	if (this.state.area !== newProps.area) {
+            this.handleNewArea(newProps.area);
+	}
     },
     render: function() {
         return (
