@@ -35,7 +35,7 @@
     "filesaver.js": "^0.2.0",
     "jquery": "^2.1.4",
     "leaflet": "0.7.3",
-    "leaflet-draw": "^0.2.3",
+    "leaflet-draw": "^0.3.0",
     "moment": "^2.10.6",
     "proj4": "^2.3.10",
     "proj4leaflet": "^0.7.1",
@@ -55,6 +55,7 @@
     "eslint-plugin-react": "^3.16.1",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
+    "filesaver.js": "^0.2.0",
     "jest-cli": "^0.5.1",
     "json-stable-stringify": "^1.0.0",
     "normalize.css": "^3.0.3",
@@ -68,12 +69,16 @@
     "react-dom": "^0.14.2",
     "react-hot-loader": "^1.3.0",
     "react-tabs": "^0.5.1",
+    "shp-write": "^0.2.5",
     "style-loader": "^0.13.0",
+    "togeojson": "^0.13.0",
+    "togpx": "^0.4.0",
+    "tokml": "^0.4.0",
     "underscore": "^1.8.3",
     "url-join": "0.0.1",
     "url-loader": "^0.5.6",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1",
-    "wellknown": "^0.4.0"
+    "wellknown": "^0.4.1"
   }
 }

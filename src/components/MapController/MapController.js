@@ -1,7 +1,8 @@
 import React, { PropTypes, Component } from 'react';
-import { Input, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 import urljoin from 'url-join';
+import saveAs from 'filesaver.js';
 
 import classNames from 'classnames';
 
@@ -9,6 +10,9 @@ import { CanadaMap } from '../Map/CanadaMap';
 import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
+import GeoExporter from '../GeoExporter';
+import GeoLoader from '../GeoLoader';
+import g from '../../core/geo';
 
 import styles from './MapController.css';
 
@@ -71,8 +75,9 @@ var MapController = React.createClass({
     }
   },
 
-  handleSetArea: function(wkt) {
-    this.props.onSetArea(wkt);
+  handleSetArea: function(geojson) {
+    this.setState({area: geojson});
+    this.props.onSetArea(geojson ? g.geojson(geojson).toWKT() : undefined);
   },
 
   requestTimeMetadata: function(unique_id) {
@@ -133,21 +138,26 @@ var MapController = React.createClass({
               time={this.state.wmstime}
               dataset={this.state.dataset}
               variable={this.state.variable}
-              onSetArea={this.handleSetArea}>
+              onSetArea={this.handleSetArea}
+              area={this.state.area}>
               <div className={styles.controls}>
                 <Row>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <TimeOfYearSelector onChange={this.updateTime} />
                   </Col>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
+                  </Col>
+                  <Col lg={4} md={4}>
+                    <GeoExporter.Modal area={this.state.area} />
+                    <GeoLoader onLoadArea={this.handleSetArea} />
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
                   </Col>
-                  <Col lg={4} md={6}>
+                  <Col lg={4} md={4}>
                     <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
                   </Col>
                 </Row>
