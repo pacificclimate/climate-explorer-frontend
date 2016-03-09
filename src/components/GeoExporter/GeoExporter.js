@@ -4,10 +4,8 @@ import { DropdownButton, MenuItem, ButtonGroup, Button, Modal } from 'react-boot
 import g from '../../core/geo';
 
 
-var exportPolygon = function(key) {
-  console.log(key);
-  console.log(this.props.area);
-  g.geojson(this.props.area).save(key);
+var exportPolygon = function(area, format) {
+  g.geojson(area).save(format);
 };
 
 var GeoExporterDropdown = React.createClass({
@@ -17,8 +15,13 @@ var GeoExporterDropdown = React.createClass({
   },
 
   render() {
+
+    var boundExport = function(e, key) {
+      exportPolygon(this.props.area, key);
+    }.bind(this);
+
     return (
-      <DropdownButton show={this.state.area} title={'Export Polygon'} onSelect={exportPolygon}>
+      <DropdownButton title={'Export Polygon'} onSelect={boundExport}>
         <MenuItem eventKey='shp'>Shapefile</MenuItem>
         <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
         <MenuItem eventKey='wkt'>WKT</MenuItem>
@@ -72,11 +75,11 @@ var GeoExporterModal = React.createClass({
 
           <Modal.Body>
             <ButtonGroup>
-              <Button onClick={exportPolygon.bind(this, 'shp')}>Shapefile</Button>
-              <Button onClick={exportPolygon.bind(this, 'geojson')}>GeoJSON</Button>
-              <Button onClick={exportPolygon.bind(this, 'wkt')}>WKT</Button>
-              <Button onClick={exportPolygon.bind(this, 'kml')}>KML</Button>
-              <Button onClick={exportPolygon.bind(this, 'gpx')}>GPX</Button>
+              <Button onClick={exportPolygon.bind(this, this.props.area, 'shp')}>Shapefile</Button>
+              <Button onClick={exportPolygon.bind(this, this.props.area, 'geojson')}>GeoJSON</Button>
+              <Button onClick={exportPolygon.bind(this, this.props.area, 'wkt')}>WKT</Button>
+              <Button onClick={exportPolygon.bind(this, this.props.area, 'kml')}>KML</Button>
+              <Button onClick={exportPolygon.bind(this, this.props.area, 'gpx')}>GPX</Button>
             </ButtonGroup>
           </Modal.Body>
 
