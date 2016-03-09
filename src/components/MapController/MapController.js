@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Input, Row, Col, ButtonGroup, DropdownButton, Button, MenuItem } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 import urljoin from 'url-join';
 import saveAs from 'filesaver.js';
