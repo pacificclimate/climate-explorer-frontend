@@ -30,7 +30,7 @@ var GeoExporterDropdown = React.createClass({
 
 });
 
-export { GeoExporterDropdown as Modal };
+export { GeoExporterDropdown as Dropdown };
 
 var GeoExporterModal = React.createClass({
 
