@@ -66,7 +66,14 @@ var CanadaMap = React.createClass({
         this.setState({area: geojson});
         this.clearMapFeatures();
         // L.geoJson returns a FeatureGroup. Only add first layer of group.
-        this.drawnItems.addLayer(L.geoJson(geojson).getLayers()[0]);
+        this.drawnItems.addLayer(L.geoJson(geojson, {
+            stroke: true,
+            color: '#f06eaa',
+            weight: 4,
+            opacity: 0.5,
+            fill: false,
+            clickable: true
+        }).getLayers()[0]);
     },
     componentDidMount: function() {
         var map = this.map = L.map(this._map, {
