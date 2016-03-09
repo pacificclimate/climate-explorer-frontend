@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Row, Col, Button, Glyphicon, Modal } from 'react-bootstrap';
+import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap';
 import _ from 'underscore';
 import urljoin from 'url-join';
 import saveAs from 'filesaver.js';
@@ -143,14 +143,19 @@ var MapController = React.createClass({
               onSetArea={this.handleSetArea}
               area={this.state.area}>
 
-              <div className={styles.controls}>
-                <Button onClick={this.open}><Glyphicon glyph="menu-hamburger" /></Button>
+              <div className={styles.controls} class="btn-group-vertical" role="group">
+                <ButtonGroup vertical>
+                  <Button onClick={this.open}><Glyphicon glyph="menu-hamburger" /></Button>
+                  <GeoExporter.Modal area={this.state.area} />
+                  <GeoLoader onLoadArea={this.handleSetArea} />
+                </ButtonGroup>
               </div>
               </CanadaMap>
             </div>
           </Col>
         </Row>
-        <Modal show={this.state.showModal} onHide={this.close}>
+
+        <Modal show={this.state.showModal} onHide={this.close} animation="false" >
 
           <Modal.Header closeButton>
             <Modal.Title>Map Options</Modal.Title>
@@ -168,8 +173,6 @@ var MapController = React.createClass({
                       onChange={this.updateSelection.bind(this, 'logscale')}
                       items={color_scales} value={this.state.logscale} />
 
-            <GeoExporter.Modal area={this.state.area} />
-            <GeoLoader onLoadArea={this.handleSetArea} />
           </Modal.Body>
 
           <Modal.Footer>

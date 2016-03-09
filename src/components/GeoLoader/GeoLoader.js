@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Input, Button, Modal } from 'react-bootstrap';
+import { Input, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
@@ -28,9 +28,7 @@ var GeoLoader = React.createClass({
     return (
       <div>
 
-        <Button onClick={this.open}>
-          Import Polygon
-        </Button>
+        <Button onClick={this.open}><Glyphicon glyph="open-file" /></Button>
 
         <Modal show={this.state.showModal} onHide={this.close}>
 

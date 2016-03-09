@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { DropdownButton, MenuItem, ButtonGroup, Button, Modal } from 'react-bootstrap';
+import { DropdownButton, MenuItem, ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
@@ -47,14 +47,12 @@ var GeoExporterModal = React.createClass({
     return (
       <div>
 
-        <Button onClick={this.open}>
-          Export Polygon
-        </Button>
+        <Button onClick={this.open}><Glyphicon glyph="save-file" /></Button>
 
         <Modal show={this.state.showModal} onHide={this.close}>
 
           <Modal.Header closeButton>
-            <Modal.Title>Select Format</Modal.Title>
+            <Modal.Title>Export Polygon by Type</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
