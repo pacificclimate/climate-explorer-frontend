@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import { DropdownButton, MenuItem, ButtonGroup, Button, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
+import ModalMixin from '../ModalMixin';
 
 
 var exportPolygon = function(area, format) {
@@ -37,26 +38,9 @@ export { GeoExporterDropdown as Dropdown };
 
 var GeoExporterModal = React.createClass({
 
+  mixins: [ModalMixin],
   propTypes: {
     area: React.PropTypes.object,
-  },
-
-  getInitialState() {
-    return {
-      showModal: false
-    };
-  },
-
-  close() {
-    this.setState({
-      showModal: false
-    });
-  },
-
-  open() {
-    this.setState({
-      showModal: true
-    });
   },
 
   render() {

@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import { Input, Button, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
+import ModalMixin from '../ModalMixin';
 
 /*
 
@@ -13,26 +14,9 @@ Calls callback with resulting geojson
 
 var GeoLoader = React.createClass({
 
+  mixins: [ModalMixin],
   propTypes: {
     onLoadArea: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      showModal: false
-    };
-  },
-
-  close() {
-    this.setState({
-      showModal: false
-    });
-  },
-
-  open() {
-    this.setState({
-      showModal: true
-    });
   },
 
   importPolygon: function(file) {
