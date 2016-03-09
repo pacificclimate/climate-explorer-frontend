@@ -36,6 +36,7 @@ var GeoLoader = React.createClass({
   },
 
   importPolygon: function(file) {
+    this.close();
     g.load(file, this.props.onLoadArea);
   },
 
