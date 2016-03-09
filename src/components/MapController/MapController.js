@@ -10,6 +10,7 @@ import { CanadaMap } from '../Map/CanadaMap';
 import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
+import GeoExporter from '../GeoExporter';
 import g from '../../core/geo';
 
 import styles from './MapController.css';
@@ -88,10 +89,6 @@ var MapController = React.createClass({
     });
   },
 
-  exportPolygon: function(e, key) {
-    g.geojson(this.state.area).save(key);
-  },
-
   importPolygon: function(file) {
     g.load(file, function(geojson) {
       this.handleSetArea(geojson);
@@ -158,20 +155,11 @@ var MapController = React.createClass({
                   </Col>
                   <Col lg={4} md={4}>
                     <ButtonGroup>
-                      <DropdownButton title={'Export Polygon'} onSelect={this.exportPolygon}>
-                        <MenuItem eventKey='shp'>Shapefile</MenuItem>
-                        <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
-                        <MenuItem eventKey='wkt'>WKT</MenuItem>
-                        <MenuItem eventKey='kml'>KML</MenuItem>
-                        <MenuItem eventKey='gpx'>GPX</MenuItem>
-                      </DropdownButton>
+                      <GeoExporter.Modal area={this.state.area} />
+
                       <DropdownButton title={'Import Polygon'}>
                         <Input type='file' label='File' help='File containing a single polygon'
                                onChange={function(e) {this.importPolygon(e.currentTarget.files[0])}.bind(this)} />
-                        <MenuItem eventKey='geojson'>GeoJSON</MenuItem>
-                        <MenuItem eventKey='wkt'>WKT</MenuItem>
-                        <MenuItem eventKey='kml'>KML</MenuItem>
-                        <MenuItem eventKey='gpx'>GPX</MenuItem>
                       </DropdownButton>
                     </ButtonGroup>
                   </Col>
