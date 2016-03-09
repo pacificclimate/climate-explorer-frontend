@@ -155,7 +155,7 @@ var MapController = React.createClass({
           </Col>
         </Row>
 
-        <Modal show={this.state.showModal} onHide={this.close} animation="false" >
+        <Modal show={this.state.showModal} onHide={this.close} >
 
           <Modal.Header closeButton>
             <Modal.Title>Map Options</Modal.Title>
