@@ -9,7 +9,7 @@ var timesofyear = [[0, 'January'], [1, 'February'], [2, 'March'],
 
 var TimeOfYearSelector = React.createClass({
   render: function() {
-    return (<Selector label="Time of year" onChange={this.props.onChange} items={timesofyear} />);
+    return (<Selector label="Time of year" onChange={this.props.onChange} items={timesofyear} value={this.props.value} />);
   }
 });
 

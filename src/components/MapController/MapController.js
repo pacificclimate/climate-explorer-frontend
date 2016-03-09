@@ -157,10 +157,17 @@ var MapController = React.createClass({
           </Modal.Header>
 
           <Modal.Body>
-            <TimeOfYearSelector onChange={this.updateTime} />
-            <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
-            <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
-            <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
+            <TimeOfYearSelector onChange={this.updateTime}
+                                value={this.state.timeidx} />
+            <Selector label={"Dataset"} onChange={this.updateDataset}
+                      items={ids} value={this.state.dataset} />
+            <Selector label={"Color pallette"}
+                      onChange={this.updateSelection.bind(this, 'styles')}
+                      items={pallettes} value={this.state.styles} />
+            <Selector label={"Color scale"}
+                      onChange={this.updateSelection.bind(this, 'logscale')}
+                      items={color_scales} value={this.state.logscale} />
+
             <GeoExporter.Modal area={this.state.area} />
             <GeoLoader onLoadArea={this.handleSetArea} />
           </Modal.Body>
