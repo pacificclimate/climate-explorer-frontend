@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button, Glyphicon, Modal } from 'react-bootstrap';
 import _ from 'underscore';
 import urljoin from 'url-join';
 import saveAs from 'filesaver.js';
@@ -13,11 +13,13 @@ import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
+import ModalMixin from '../ModalMixin';
 
 import styles from './MapController.css';
 
 var MapController = React.createClass({
 
+  mixins: [ModalMixin],
   propTypes: {
     variable: React.PropTypes.string,
     meta: React.PropTypes.array,
@@ -140,32 +142,35 @@ var MapController = React.createClass({
               variable={this.state.variable}
               onSetArea={this.handleSetArea}
               area={this.state.area}>
+
               <div className={styles.controls}>
-                <Row>
-                  <Col lg={4} md={4}>
-                    <TimeOfYearSelector onChange={this.updateTime} />
-                  </Col>
-                  <Col lg={4} md={4}>
-                    <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
-                  </Col>
-                  <Col lg={4} md={4}>
-                    <GeoExporter.Modal area={this.state.area} />
-                    <GeoLoader onLoadArea={this.handleSetArea} />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={4} md={4}>
-                    <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
-                  </Col>
-                  <Col lg={4} md={4}>
-                    <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
-                  </Col>
-                </Row>
+                <Button onClick={this.open}><Glyphicon glyph="menu-hamburger" /></Button>
               </div>
               </CanadaMap>
             </div>
           </Col>
         </Row>
+        <Modal show={this.state.showModal} onHide={this.close}>
+
+          <Modal.Header closeButton>
+            <Modal.Title>Map Options</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <TimeOfYearSelector onChange={this.updateTime} />
+            <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
+            <Selector label={"Color pallette"} onChange={this.updateSelection.bind(this, 'styles')} items={pallettes} />
+            <Selector label={"Color scale"} onChange={this.updateSelection.bind(this, 'logscale')} items={color_scales} />
+            <GeoExporter.Modal area={this.state.area} />
+            <GeoLoader onLoadArea={this.handleSetArea} />
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button onClick={this.close}>Close</Button>
+          </Modal.Footer>
+
+        </Modal>
+
       </div>
     )
   }

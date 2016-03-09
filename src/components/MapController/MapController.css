@@ -7,7 +7,6 @@
 
 .controls {
     position: absolute;
-    top: 0;
-    left: 75px;
-    right: 30px;
+    top: 5px;
+    right: 5px;
 }
