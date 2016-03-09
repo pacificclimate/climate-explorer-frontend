@@ -11,6 +11,7 @@ import ExperimentSelector from '../ExperimentSelector';
 import Selector from '../Selector/Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import GeoExporter from '../GeoExporter';
+import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
 
 import styles from './MapController.css';
@@ -89,12 +90,6 @@ var MapController = React.createClass({
     });
   },
 
-  importPolygon: function(file) {
-    g.load(file, function(geojson) {
-      this.handleSetArea(geojson);
-    }.bind(this));
-  },
-
   componentWillReceiveProps: function(nextProps) {
     this.selectedDataset = nextProps.meta[0]
 
@@ -154,14 +149,8 @@ var MapController = React.createClass({
                     <Selector label={"Dataset"} onChange={this.updateDataset} items={ids} />
                   </Col>
                   <Col lg={4} md={4}>
-                    <ButtonGroup>
-                      <GeoExporter.Modal area={this.state.area} />
-
-                      <DropdownButton title={'Import Polygon'}>
-                        <Input type='file' label='File' help='File containing a single polygon'
-                               onChange={function(e) {this.importPolygon(e.currentTarget.files[0])}.bind(this)} />
-                      </DropdownButton>
-                    </ButtonGroup>
+                    <GeoExporter.Modal area={this.state.area} />
+                    <GeoLoader onLoadArea={this.handleSetArea} />
                   </Col>
                 </Row>
                 <Row>
