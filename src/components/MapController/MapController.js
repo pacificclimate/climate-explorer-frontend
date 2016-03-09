@@ -77,7 +77,7 @@ var MapController = React.createClass({
 
   handleSetArea: function(geojson) {
     this.setState({area: geojson});
-    this.props.onSetArea(g.geojson(geojson).toWKT());
+    this.props.onSetArea(geojson ? g.geojson(geojson).toWKT() : undefined);
   },
 
   requestTimeMetadata: function(unique_id) {
