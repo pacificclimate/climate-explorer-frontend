@@ -145,9 +145,9 @@ var MapController = React.createClass({
 
               <div className={styles.controls} class="btn-group-vertical" role="group">
                 <ButtonGroup vertical>
-                  <Button onClick={this.open}><Glyphicon glyph="menu-hamburger" /></Button>
-                  <GeoExporter.Modal area={this.state.area} />
-                  <GeoLoader onLoadArea={this.handleSetArea} />
+                  <Button onClick={this.open} title="Map settings"><Glyphicon glyph="menu-hamburger" /></Button>
+                  <GeoExporter.Modal area={this.state.area} title="Export polygon" />
+                  <GeoLoader onLoadArea={this.handleSetArea} title="Import polygon" />
                 </ButtonGroup>
               </div>
               </CanadaMap>

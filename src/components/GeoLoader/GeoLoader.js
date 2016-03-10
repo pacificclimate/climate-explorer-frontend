@@ -28,7 +28,7 @@ var GeoLoader = React.createClass({
     return (
       <div>
 
-        <Button onClick={this.open}><Glyphicon glyph="open-file" /></Button>
+        <Button onClick={this.open} title={this.props.title}><Glyphicon glyph="open-file" /></Button>
 
         <Modal show={this.state.showModal} onHide={this.close}>
 

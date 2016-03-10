@@ -47,7 +47,7 @@ var GeoExporterModal = React.createClass({
     return (
       <div>
 
-        <Button onClick={this.open}><Glyphicon glyph="save-file" /></Button>
+        <Button onClick={this.open} title={this.props.title}><Glyphicon glyph="save-file" /></Button>
 
         <Modal show={this.state.showModal} onHide={this.close}>
 
