@@ -71,7 +71,8 @@ var CanadaMap = React.createClass({
             color: '#f06eaa',
             weight: 4,
             opacity: 0.5,
-            fill: false,
+            fill: true,
+            fillOpacity: 0.2,
             clickable: true
         }).getLayers()[0]);
     },
