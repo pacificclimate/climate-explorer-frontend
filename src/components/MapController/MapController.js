@@ -134,6 +134,7 @@ var MapController = React.createClass({
         <Row>
           <Col lg={12}>
             <div className={styles.map}>
+
               <CanadaMap
               logscale={this.state.logscale}
               styles={this.state.styles}
@@ -142,15 +143,16 @@ var MapController = React.createClass({
               variable={this.state.variable}
               onSetArea={this.handleSetArea}
               area={this.state.area}>
+              </CanadaMap>
 
-              <div className={styles.controls} class="btn-group-vertical" role="group">
+              <div className={styles.controls}>
                 <ButtonGroup vertical>
                   <Button onClick={this.open} title="Map settings"><Glyphicon glyph="menu-hamburger" /></Button>
                   <GeoExporter.Modal area={this.state.area} title="Export polygon" />
                   <GeoLoader onLoadArea={this.handleSetArea} title="Import polygon" />
                 </ButtonGroup>
               </div>
-              </CanadaMap>
+
             </div>
           </Col>
         </Row>
