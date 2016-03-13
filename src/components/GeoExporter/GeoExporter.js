@@ -6,6 +6,7 @@ import ModalMixin from '../ModalMixin';
 
 
 var exportPolygon = function(area, format) {
+  this.close();
   g.geojson(area).save(format);
 };
 
