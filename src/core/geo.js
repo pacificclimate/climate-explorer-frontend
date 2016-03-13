@@ -1,9 +1,10 @@
+import _ from 'underscore';
 import { saveAs } from 'filesaver.js';
 import togeojson from 'togeojson';
 import { parse, stringify } from 'wellknown';
 import _tokml from 'tokml';
 import _togpx from 'togpx';
-
+import shp from 'shpjs';
 import { download } from 'shp-write';
 
 var g = {
@@ -56,15 +57,6 @@ var g = {
     };
   },
 
-  // shp: function (f) {
-  //   // TODO
-  //   return;
-  // },
-
-  // toShp: function () {
-
-  // },
-
   save: function (format) {
     switch (format) {
       case 'wkt':
@@ -104,14 +96,41 @@ var g = {
 
     }
   },
-  load: function(file, success) {
-    var ext = file.name.split('.')[1]
+
+  loadTextFormat: function (file, success) {
     var reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
       success(JSON.parse(evt.target.result));
     };
     reader.readAsText(file);
   },
+
+  loadShapefile: function (file, success) {
+    /*
+    https://www.npmjs.com/package/shpjs
+    */
+
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      shp(evt.target.result).then(function (geojson) {
+        success(geojson);
+      });
+    };
+
+    reader.readAsArrayBuffer(file);
+  },
+
+  load: function (file, success) {
+    /* All load functions must call `success` handler with a GeoJSON feature */
+    var ext = file.name.split('.')[1];
+
+    if (_.contains(['geojson', 'json'], ext)) {
+      this.loadTextFormat(file, success);
+    } else if (ext === 'zip') {
+      this.loadShapefile(file, success);
+    }
+  },
+
 };
 
 module.exports = g;
