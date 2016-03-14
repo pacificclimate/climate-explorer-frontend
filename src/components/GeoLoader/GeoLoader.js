@@ -33,13 +33,14 @@ var GeoLoader = React.createClass({
         <Modal show={this.state.showModal} onHide={this.close}>
 
           <Modal.Header closeButton>
-            <Modal.Title>Import Polygon by Type</Modal.Title>
+            <Modal.Title>Import Polygon</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
+
             <Input type='file'
-              label='GeoJSON File'
-              help='File containing a single polygon'
+              label='Select file'
+              help='Accepts a zipped Shapefile or a single geojson Feature (not FeatureCollection)'
               onChange={function(e) {
                 this.importPolygon(e.currentTarget.files[0])
               }.bind(this)}
