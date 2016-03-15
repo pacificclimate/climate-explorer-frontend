@@ -118,7 +118,16 @@ var CanadaMap = React.createClass({
 
             this.clearMapFeatures();
             this.drawnItems.addLayer(layer);
-            this.handleSetArea(layer.toGeoJSON());
+
+            /*
+            Adding a property is required to create a proper dbf file when saving
+            as a shapefile. Without it, QGIS and ARC can load the shapefile,
+            but shpjs cannot convert back to geojson
+            */
+            var gj = layer.toGeoJSON();
+            gj.properties.source = 'PCIC Climate Explorer';
+
+            this.handleSetArea(gj);
 
         }.bind(this);
 

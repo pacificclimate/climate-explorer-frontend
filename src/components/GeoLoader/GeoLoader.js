@@ -19,9 +19,23 @@ var GeoLoader = React.createClass({
     onLoadArea: React.PropTypes.func.isRequired,
   },
 
+  importError: function () {
+    this.setState({
+      showError: true,
+    });
+  },
+
+  closeError: function () {
+    this.setState({
+      showError: false,
+    })
+  },
+
   importPolygon: function(file) {
     this.close();
-    g.load(file, this.props.onLoadArea);
+    g.load(file, this.props.onLoadArea, function () {
+      setTimeout(this.importError, 200) // Wait to avoid syling issues with Modal
+    }.bind(this));
   },
 
   render: function () {
@@ -33,13 +47,14 @@ var GeoLoader = React.createClass({
         <Modal show={this.state.showModal} onHide={this.close}>
 
           <Modal.Header closeButton>
-            <Modal.Title>Import Polygon by Type</Modal.Title>
+            <Modal.Title>Import Polygon</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
+
             <Input type='file'
-              label='GeoJSON File'
-              help='File containing a single polygon'
+              label='Select file'
+              help='Accepts a zipped Shapefile or a single geojson Feature (not FeatureCollection)'
               onChange={function(e) {
                 this.importPolygon(e.currentTarget.files[0])
               }.bind(this)}
@@ -51,6 +66,23 @@ var GeoLoader = React.createClass({
           </Modal.Footer>
 
         </Modal>
+
+        <Modal show={this.state.showError} onHide={this.closeError}>
+
+          <Modal.Header closeButton>
+            <Modal.Title>Error Importing Polygon</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            Currently accepted types are single GeoJSON features and zipped shapefiles with a single feature.
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button onClick={this.closeError}>Close</Button>
+          </Modal.Footer>
+
+        </Modal>
+
       </div>
     );
   },
