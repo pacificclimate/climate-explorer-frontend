@@ -120,7 +120,7 @@ var g = {
     reader.readAsArrayBuffer(file);
   },
 
-  load: function (file, success) {
+  load: function (file, success, fail) {
     /* All load functions must call `success` handler with a GeoJSON feature */
     var ext = file.name.split('.')[1];
 
@@ -128,6 +128,8 @@ var g = {
       this.loadTextFormat(file, success);
     } else if (ext === 'zip') {
       this.loadShapefile(file, success);
+    } else {
+      fail();
     }
   },
 
