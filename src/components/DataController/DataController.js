@@ -92,16 +92,16 @@ var DataController = React.createClass({
     $.when(my_data_promise, my_stats_promise, my_timeseries_promise)
      .done(function (data_response, stats_response, timeseries_response) {
        this.setState({
-        climoSeriesData: dataApiToC3(data_response[0]),
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats_response[0])),
-        timeSeriesData: parseTimeSeriesForC3(timeseries_response[0])
-      });
+         climoSeriesData: dataApiToC3(data_response[0]),
+         statsData: parseBootstrapTableData(this.injectRunIntoStats(stats_response[0])),
+         timeSeriesData: parseTimeSeriesForC3(timeseries_response[0])
+       });
      }.bind(this));
   },
 
   verifyParams: function (props) {
     var stringPropList = _.values(_.pick(props, 'meta', 'model_id', 'variable_id', 'experiment'));
-    return (stringPropList.length > 0) && stringPropList.every(Boolean)
+    return (stringPropList.length > 0) && stringPropList.every(Boolean);
   },
 
   componentDidMount: function () {

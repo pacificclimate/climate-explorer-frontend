@@ -132,14 +132,14 @@ var MapController = React.createClass({
 
     var map;
     if (this.state.dataset) {
-      map = <CanadaMap
+      map = (<CanadaMap
               logscale={this.state.logscale}
               styles={this.state.styles}
               time={this.state.wmstime}
               dataset={this.state.dataset}
               variable={this.state.variable}
               onSetArea={this.handleSetArea}
-              area={this.state.area} />;
+              area={this.state.area} />);
     } else {
       map = <Loader />;
     }

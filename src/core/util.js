@@ -226,8 +226,8 @@ var parseTimeSeriesForC3 = function (graph_data) {
     y: {
       label: { 'text': yUnits, 'position':'outer-middle' },
       tick: {
-          format: function (x) { return +x.toFixed(PRECISION); }
-        }
+        format: function (x) { return +x.toFixed(PRECISION); }
+      }
     }
   };
 
@@ -311,20 +311,20 @@ var parseTimeSeriesForC3 = function (graph_data) {
 */
 var parseBootstrapTableData = function (data) {
   return _.map(data, function (stats, model) {
-      var splitYears = model.split('_')[5].split('-');
-      var period = splitYears[0].slice(0, 4) + ' - ' + splitYears[1].slice(0, 4);
-      var modelInfo = {
-          'model_period': period,
-          'run': stats['run'],
-          'min': +stats['min'].toFixed(PRECISION),
-          'max': +stats['max'].toFixed(PRECISION),
-          'mean': +stats['mean'].toFixed(PRECISION),
-          'median': +stats['median'].toFixed(PRECISION),
-          'stdev': +stats['stdev'].toFixed(PRECISION),
-          'units': stats['units']
-        };
-      return modelInfo;
-    });
+    var splitYears = model.split('_')[5].split('-');
+    var period = splitYears[0].slice(0, 4) + ' - ' + splitYears[1].slice(0, 4);
+    var modelInfo = {
+        'model_period': period,
+        'run': stats['run'],
+        'min': +stats['min'].toFixed(PRECISION),
+        'max': +stats['max'].toFixed(PRECISION),
+        'mean': +stats['mean'].toFixed(PRECISION),
+        'median': +stats['median'].toFixed(PRECISION),
+        'stdev': +stats['stdev'].toFixed(PRECISION),
+        'units': stats['units']
+      };
+    return modelInfo;
+  });
 };
 
 /*
@@ -339,12 +339,12 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
   rows.push(header);
 
   rows.push([
-      metadata.model_id,
-      metadata.experiment,
-      timeOfYear,
-      metadata.variable_id,
-      metadata.variable_name
-    ]);
+    metadata.model_id,
+    metadata.experiment,
+    timeOfYear,
+    metadata.variable_id,
+    metadata.variable_name
+  ]);
 
   return rows;
 };
@@ -356,8 +356,8 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 var fillWorksheetDataCells = function (data) {
 
   var rows = _.map(data, function (stats) {
-      return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
-    });
+    return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
+  });
 
   var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'];
   rows.unshift(column_labels);
@@ -374,23 +374,23 @@ var assembleWorksheet = function (cells) {
   var ws = {};
   var maxCols = 0;
   cells.forEach(function (row, rowIndex) {
-      if (row.length > maxCols) {
+    if (row.length > maxCols) {
         maxCols = row.length;
       }
-      row.forEach(function (cellValue, colIndex) {
+    row.forEach(function (cellValue, colIndex) {
         cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
         ws[cell_ref] = { v: cellValue, t: 's' };
       });
-    });
+  });
 
     // set combined worksheet range bounds
   var range = {
-      s: { c:0, r:0 },
-      e: {
+    s: { c:0, r:0 },
+    e: {
         c: maxCols - 1,
         r: cells.length - 1
       }
-    };
+  };
   ws['!ref'] = XLSX.utils.encode_range(range);
   return ws;
 };
@@ -398,10 +398,10 @@ var assembleWorksheet = function (cells) {
 var timeIndexToTimeOfYear = function (timeidx) {
     // convert timestep ID (0-16) to string format
   var timesOfYear = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-      'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
-      'Fall-SON', 'Annual'
-    ];
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
+    'Fall-SON', 'Annual'
+  ];
   return timesOfYear[timeidx];
 };
 
@@ -413,9 +413,9 @@ var timeIndexToTimeOfYear = function (timeidx) {
 var exportTableDataToWorksheet = function (metadata, data, format, timeidx) {
     // create workbook object containing one or more worksheets
   var wb = {
-      Sheets: {},
-      SheetNames: []
-    };
+    Sheets: {},
+    SheetNames: []
+  };
 
   var timeOfYear = timeIndexToTimeOfYear(timeidx);
 
@@ -434,25 +434,25 @@ var exportTableDataToWorksheet = function (metadata, data, format, timeidx) {
   wb.Sheets[ws_name] = ws;
 
   function xml_to_binary_string(s) {
-      var buf = new ArrayBuffer(s.length);
-      var view = new Uint8Array(buf);
-      for (var i = 0; i <= s.length; ++i) {
-          view[i] = s.charCodeAt(i) & 0xFF;
-        }
-      return buf;
-    }
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i <= s.length; ++i) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+      }
+    return buf;
+  }
 
   var out_data;
   if (format === 'csv') {
-      out_data = new Blob(
+    out_data = new Blob(
             [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
             { type:'' }
         );
-    }
+  }
     else if (format === 'xlsx') {
         // convert workbook to XLSX and prepare for download
       var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary' });
-      out_data = new Blob([xml_to_binary_string(wbout)], { type:"" });
+      out_data = new Blob([xml_to_binary_string(wbout)], { type:'' });
     }
     // form output filename
   var output_filename = 'PCIC_CE_StatsTableExport_' + metadata.model_id + '_' + metadata.experiment +

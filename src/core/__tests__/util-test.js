@@ -243,29 +243,29 @@ const bootstrapTableTestExpected = [
 
 describe('parseBootstrapTableData', function () {
   it('Correctly flattens a stats object for passing to the DataTable component', function () {
-      var util = require('../util');
-      var result = util.parseBootstrapTableData(bootstrapTableTestData);
-      expect(result).toEqual(bootstrapTableTestExpected);
-    });
+    var util = require('../util');
+    var result = util.parseBootstrapTableData(bootstrapTableTestData);
+    expect(result).toEqual(bootstrapTableTestExpected);
+  });
 });
 
 const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation' };
 const worksheetTimeOfYear = 'Winter-DJF';
 const worksheetSummaryCellsExpected = {
   0: {
-      0: 'Model',
-      1: 'Emissions Scenario',
-      2: 'Time of Year',
-      3: 'Variable ID',
-      4: 'Variable Name'
-    },
+    0: 'Model',
+    1: 'Emissions Scenario',
+    2: 'Time of Year',
+    3: 'Variable ID',
+    4: 'Variable Name'
+  },
   1: {
-      0: 'CSIRO-Mk3-6-0',
-      1: 'rcp26',
-      2: 'Winter-DJF',
-      3: 'pr',
-      4: 'Precipitation'
-    }
+    0: 'CSIRO-Mk3-6-0',
+    1: 'rcp26',
+    2: 'Winter-DJF',
+    3: 'pr',
+    4: 'Precipitation'
+  }
 };
 
 const worksheetTestData = [
@@ -284,26 +284,26 @@ const worksheetRange = 'A1:H7';
 
 describe('createWorksheetSummaryCells', function () {
   it('Correctly forms worksheet summary cells', function () {
-      var util = require('../util');
-      var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-      expect(result).toEqual(worksheetSummaryCellsExpected);
-    });
+    var util = require('../util');
+    var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+    expect(result).toEqual(worksheetSummaryCellsExpected);
+  });
 });
 
 describe('fillWorksheetDataRows', function () {
   it('Correctly fills worksheet data cells', function () {
-      var util = require('../util');
-      var result = util.fillWorksheetDataCells(worksheetTestData);
-      expect(result).toEqual(worksheetDataRowsExpected);
-    });
+    var util = require('../util');
+    var result = util.fillWorksheetDataCells(worksheetTestData);
+    expect(result).toEqual(worksheetDataRowsExpected);
+  });
 });
 
 describe('assembleWorksheet', function () {
   it('Correctly assembles worksheet from summary and data cells', function () {
-      var util = require('../util');
-      var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-      var dataCells = util.fillWorksheetDataCells(worksheetTestData);
-      var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
-      expect(ws['!ref']).toEqual(worksheetRange);
-    });
+    var util = require('../util');
+    var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+    var dataCells = util.fillWorksheetDataCells(worksheetTestData);
+    var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
+    expect(ws['!ref']).toEqual(worksheetRange);
+  });
 });

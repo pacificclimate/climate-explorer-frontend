@@ -54,7 +54,7 @@ describe('Selector', function () {
     );
 
     var selectorNode = TestUtils.findRenderedDOMComponentWithTag(selector, 'select');
-    TestUtils.Simulate.change(selectorNode, { target: { value: "new value" } });
+    TestUtils.Simulate.change(selectorNode, { target: { value: 'new value' } });
 
     expect(dummyCallback).toBeCalled();
   });

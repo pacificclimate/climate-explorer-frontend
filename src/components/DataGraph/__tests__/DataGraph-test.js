@@ -7,23 +7,23 @@ import TestUtils from 'react-addons-test-utils';
 const DataGraph = require('../DataGraph');
 
 const testData = {
-    'model_id1': {
-        'units': 'degC',
-        '2050': 21.0,
-        '2080': 35.0,
-        '2020': 11.0
+  'model_id1': {
+      'units': 'degC',
+      '2050': 21.0,
+      '2080': 35.0,
+      '2020': 11.0
     },
-    'model_id2': {
-        'units': 'mm',
-        '2050': 240.0,
-        '2020': 300.0
+  'model_id2': {
+      'units': 'mm',
+      '2050': 240.0,
+      '2020': 300.0
     }
 };
 
 const timeseriesTestData = {
   'id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',
   'units': 'K',
-  'data': {'1986-01-16T00:00:00Z': 275.75720932904414,
+  'data': { '1986-01-16T00:00:00Z': 275.75720932904414,
           '1986-02-15T00:00:00Z': 273.4294128417969,
           '1986-03-16T00:00:00Z': 273.4919128417969,
           '1986-04-16T00:00:00Z': 274.8638610839844,

@@ -4,11 +4,11 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 var DataTable = React.createClass({
 
   propTypes: {
-      data: React.PropTypes.array
-    },
+    data: React.PropTypes.array
+  },
 
   render: function () {
-      return (
+    return (
             <div id={'table'}>
                 <BootstrapTable data={this.props.data} striped hover >
                     <TableHeaderColumn dataField="model_period" isKey dataAlign="center" dataSort>Model Period</TableHeaderColumn>
@@ -22,7 +22,7 @@ var DataTable = React.createClass({
                 </BootstrapTable>
             </div>
         );
-    }
+  }
 });
 
 export default DataTable;
