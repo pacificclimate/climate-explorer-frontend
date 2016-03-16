@@ -28,12 +28,12 @@ var BCMap = React.createClass({
       maxBounds: L.latLngBounds([[45, -148], [62, -108]]),
       layers: [
         L.tileLayer(TILECACHE_URL + '1.0.0/bc_osm/{z}/{x}/{y}.png',
-            {
-              subdomains: 'abc',
-              noWrap: true,
-              maxZoom: 12,
-              attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            })
+          {
+            subdomains: 'abc',
+            noWrap: true,
+            maxZoom: 12,
+            attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          })
       ]
     });
 

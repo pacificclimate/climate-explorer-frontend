@@ -84,12 +84,12 @@ var CanadaMap = React.createClass({
       maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
       layers: [
         L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
-            {
-              subdomains: 'abc',
-              noWrap: true,
-              maxZoom: 10,
-              attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            })
+          {
+            subdomains: 'abc',
+            noWrap: true,
+            maxZoom: 10,
+            attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          })
       ]
     });
 
@@ -169,7 +169,7 @@ var CanadaMap = React.createClass({
     var params = { layers: newProps.dataset + '/' + newProps.variable };
     _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
     this.ncwmsLayer.setParams(params);
-	                  if (this.state.area !== newProps.area) {
+	                      if (this.state.area !== newProps.area) {
   this.handleNewArea(newProps.area);
 	}
   },
@@ -178,7 +178,7 @@ var CanadaMap = React.createClass({
             <div className={styles.map}>
 		<div ref={ (c) => this._map = c } className={styles.map} />
 		{ this.props.children }
-	        </div>
+	         </div>
         );
   }
 });
