@@ -15,7 +15,8 @@ var Slider = React.createClass({
     ticksPositions: React.PropTypes.array,
     toolTip: React.PropTypes.bool,
     selection: React.PropTypes.string,
-    onSlide: React.PropTypes.func
+    onSlide: React.PropTypes.func,
+    onSlideStop: React.PropTypes.func,
   },
 
   getDefaultProps: function () {
@@ -32,7 +33,7 @@ var Slider = React.createClass({
       selection: 'none',
       onSlideStop: function (event) {
         console.log(event);
-      }
+      },
     };
   },
 
@@ -63,9 +64,9 @@ var Slider = React.createClass({
 
   render: function () {
     return (
-            <div style={{ width: '100%' }} />
-        );
-  }
+      <div style={{ width: '100%' }} />
+    );
+  },
 });
 
 module.exports = Slider;

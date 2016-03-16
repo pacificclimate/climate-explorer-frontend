@@ -14,9 +14,8 @@ var TimeSlider = React.createClass({
           ticksLabels={['J', 'F', 'M', 'A', 'M', 'J ', 'J', 'A', 'S', 'O', 'N', 'D', 'DJF', 'MAM', 'JJA', 'SON', 'ANN']}
         />
       </div>
-
     );
-  }
+  },
 });
 
 module.exports = TimeSlider;
