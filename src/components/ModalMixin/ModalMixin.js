@@ -2,19 +2,19 @@ var ModalMixin = {
 
   getInitialState() {
     return {
-      showModal: false
+      showModal: false,
     };
   },
 
   close() {
     this.setState({
-      showModal: false
+      showModal: false,
     });
   },
 
   open() {
     this.setState({
-      showModal: true
+      showModal: true,
     });
   },
 
