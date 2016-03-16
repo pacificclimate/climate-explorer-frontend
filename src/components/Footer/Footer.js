@@ -12,13 +12,12 @@ class Footer extends Component {
         <Grid fluid>
           <Row>
             <Col lg={4}>
-              <a className="" href="https://pacificclimate.org/">
+              <a href='https://pacificclimate.org/'>
                 <img
-                  className=""
                   src={require('./logo.png')}
-                  width="328"
-                  height="38"
-                  alt="Pacific Climate Impacts Consortium"
+                  width='328'
+                  height='38'
+                  alt='Pacific Climate Impacts Consortium'
                 />
               </a>
             </Col>
