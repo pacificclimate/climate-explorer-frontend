@@ -51,6 +51,14 @@ npm start
 npm test
 ```
 
+### Linting
+
+Linting is configured with ESLint and largely follows the AirBnb preset.
+
+You can lint all files `npm run lint`, or a specific file `npm run lint:glob <file_name_or_glob>`.
+
+Use the `git/hooks/pre-commit-eslint` to abort a commit if any staged `*.js` files fail linting (warnings OK).
+
 ### Setup using Docker
 
 ```bash
