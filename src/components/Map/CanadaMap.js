@@ -1,8 +1,7 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var _ = require('underscore');
+import React from 'react';
+import _ from 'underscore';
 
-var utils = require('./utils');
+import utils from './utils';
 
 import styles from './map.css';
 
@@ -11,15 +10,16 @@ var CanadaMap = React.createClass({
   propTypes: {
     dataset: React.PropTypes.string,
     variable: React.PropTypes.string,
-        // To keep things simple, areas within this component should only be
-        // passed around (or up to a higher component) as GeoJSON
+    crs: React.PropTypes.object,
+    // To keep things simple, areas within this component should only be
+    // passed around (or up to a higher component) as GeoJSON
     onSetArea: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
   },
 
   getInitialState: function () {
     return {
-      area: undefined
+      area: undefined,
     };
   },
 
@@ -30,7 +30,7 @@ var CanadaMap = React.createClass({
         '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
         [-150, -10, -50, 90],
         {
-          resolutions: utils.generate_resolutions(0.09765625, 10)
+          resolutions: utils.generateResolutions(0.09765625, 10),
         }
       ),
       noWrap: true,
@@ -42,26 +42,42 @@ var CanadaMap = React.createClass({
       numcolorbands: 254,
       version: '1.1.1',
       srs: 'EPSG:4326',
-      logscale: false
+      logscale: false,
     };
   },
+
   getWMSParams: function () {
     var params = { layers: this.props.dataset + '/' + this.props.variable };
-    _.extend(params, _.pick(this.props, 'noWrap', 'format', 'transparent', 'opacity', 'styles', 'time', 'numcolorbands', 'version', 'srs', 'colorscalerange', 'logscale'));
+    _.extend(params, _.pick(this.props,
+      'noWrap',
+      'format',
+      'transparent',
+      'opacity',
+      'styles',
+      'time',
+      'numcolorbands',
+      'version',
+      'srs',
+      'colorscalerange',
+      'logscale'
+    ));
     return params;
   },
+
   clearMapFeatures: function () {
     this.drawnItems.getLayers().map(function (layer) {
       this.drawnItems.removeLayer(layer);
     }.bind(this));
   },
-    // generally called for a new area originating from within this component
-    // propagate the area up the component stack
+
+  // generally called for a new area originating from within this component
+  // propagate the area up the component stack
   handleSetArea: function (geojson) {
     this.setState({ area: geojson });
     this.props.onSetArea(geojson);
   },
-    // area received from props; don't propagate back up the component stack
+
+  // area received from props; don't propagate back up the component stack
   handleNewArea: function (geojson) {
     this.setState({ area: geojson });
     this.clearMapFeatures();
@@ -73,9 +89,10 @@ var CanadaMap = React.createClass({
       opacity: 0.5,
       fill: true,
       fillOpacity: 0.2,
-      clickable: true
+      clickable: true,
     }).getLayers()[0]);
   },
+
   componentDidMount: function () {
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
@@ -83,30 +100,28 @@ var CanadaMap = React.createClass({
       maxZoom: 10,
       maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
       layers: [
-        L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
-          {
-            subdomains: 'abc',
-            noWrap: true,
-            maxZoom: 10,
-            attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          })
-      ]
+        L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png', {
+          subdomains: 'abc',
+          noWrap: true,
+          maxZoom: 10,
+          attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }),
+      ],
     });
 
-    var datalayerName = 'Climate raster';
-    var ncwmsLayer = this.ncwmsLayer = new L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
+    this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
     var drawnItems = this.drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
     var drawOptions = {
       edit: {
-        featureGroup: drawnItems
+        featureGroup: drawnItems,
       },
       draw: {
         marker: false,
         circle: false,
-        polyline: false
+        polyline: false,
       },
     };
     var drawControl = new L.Control.Draw(drawOptions);
@@ -118,22 +133,21 @@ var CanadaMap = React.createClass({
       this.clearMapFeatures();
       this.drawnItems.addLayer(layer);
 
-            /*
-            Adding a property is required to create a proper dbf file when saving
-            as a shapefile. Without it, QGIS and ARC can load the shapefile,
-            but shpjs cannot convert back to geojson
-            */
+      /*
+      Adding a property is required to create a proper dbf file when saving
+      as a shapefile. Without it, QGIS and ARC can load the shapefile,
+      but shpjs cannot convert back to geojson
+      */
       var gj = layer.toGeoJSON();
       gj.properties.source = 'PCIC Climate Explorer';
-
       this.handleSetArea(gj);
-
     }.bind(this);
 
     var onEdit = function (e) {
       var layers = e.layers.getLayers();
-      if (layers.length !== 1) { //Should never happen
-                // TODO: use a better popup (bind handleAlert at top level?)
+      if (layers.length !== 1) {
+        // Should never happen
+        // TODO: use a better popup (bind handleAlert at top level?)
         alert('Something went wrong editing the feature');
         return;
       }
@@ -142,8 +156,9 @@ var CanadaMap = React.createClass({
 
     var onDelete = function (e) {
       var layers = e.layers.getLayers();
-      if (layers.length !== 1) { //Should never happen
-                // TODO: use a better popup (bind handleAlert at top level?)
+      if (layers.length !== 1) {
+        // Should never happen
+        // TODO: use a better popup (bind handleAlert at top level?)
         alert('Something went wrong deleting this feature');
         return;
       }
@@ -156,8 +171,8 @@ var CanadaMap = React.createClass({
 
     map.on('click', this.onMapClick);
     map.setView(L.latLng(60, -100), 0);
-
   },
+
   componentWillUnmount: function () {
     this.map.off('click', this.onMapClick);
     this.map = null;
@@ -177,10 +192,9 @@ var CanadaMap = React.createClass({
     return (
       <div className={styles.map}>
         <div ref={ (c) => this._map = c } className={styles.map} />
-        { this.props.children }
       </div>
     );
-  }
+  },
 });
 
 module.exports.CanadaMap = CanadaMap;
