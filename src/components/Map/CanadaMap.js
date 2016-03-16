@@ -26,13 +26,13 @@ var CanadaMap = React.createClass({
   getDefaultProps: function () {
     return {
       crs: new L.Proj.CRS.TMS(
-                'EPSG:4326',
-                '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
-                [-150, -10, -50, 90],
+        'EPSG:4326',
+        '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
+        [-150, -10, -50, 90],
         {
           resolutions: utils.generate_resolutions(0.09765625, 10)
         }
-            ),
+      ),
       noWrap: true,
       format: 'image/png',
       transparent: 'true',
@@ -169,17 +169,17 @@ var CanadaMap = React.createClass({
     var params = { layers: newProps.dataset + '/' + newProps.variable };
     _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
     this.ncwmsLayer.setParams(params);
-	                      if (this.state.area !== newProps.area) {
-  this.handleNewArea(newProps.area);
-	}
+    if (this.state.area !== newProps.area) {
+      this.handleNewArea(newProps.area);
+    }
   },
   render: function () {
     return (
-            <div className={styles.map}>
-		<div ref={ (c) => this._map = c } className={styles.map} />
-		{ this.props.children }
-	         </div>
-        );
+      <div className={styles.map}>
+        <div ref={ (c) => this._map = c } className={styles.map} />
+        { this.props.children }
+      </div>
+    );
   }
 });
 
