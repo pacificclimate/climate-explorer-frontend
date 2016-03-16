@@ -6,7 +6,6 @@ import Header from '../Header';
 import Footer from '../Footer';
 
 import AppController from '../AppController';
-import DatasetList from '../CheckboxList/DatasetList';
 
 import styles from './IndexPage.css';
 
