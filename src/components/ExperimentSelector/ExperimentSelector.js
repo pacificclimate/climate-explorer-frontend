@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
 
@@ -6,19 +6,22 @@ import styles from './ExperimentSelector.css';
 
 var ExperimentSelector = React.createClass({
 
+  propTypes: {
+    onChange: React.PropTypes.function,
+  },
+
   getInitialState: function () {
     return {
-      items: []
+      items: [],
     };
   },
 
   componentDidMount: function () {
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'models'),
-      crossDomain: true
+      crossDomain: true,
     }).done(function (data) {
-      data = _.uniq(data);
-      this.setState({ items: data });
+      this.setState({ items: _.uniq(data) });
     }.bind(this));
   },
 
@@ -35,7 +38,7 @@ var ExperimentSelector = React.createClass({
         </select>
       </div>
     );
-  }
+  },
 });
 
 export default ExperimentSelector;

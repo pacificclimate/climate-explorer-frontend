@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react';
+import React from 'react';
 var C3 = require('c3/c3');
 import _ from 'underscore';
 import styles from './DataGraph.css';
@@ -13,16 +13,16 @@ var DataGraph = React.createClass({
   getDefaultProps: function () {
     return {
       padding: {
-        right: 50
+        right: 50,
       },
       size: {
-        height: 380
+        height: 380,
       },
       color: {
-        pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+        pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5'],
       },
-      data:{
-        columns: []
+      data: {
+        columns: [],
       },
     };
   },
@@ -46,7 +46,7 @@ var DataGraph = React.createClass({
     return (
             <div ref={(c) => this._node = c} className={styles.container}></div>
         );
-  }
+  },
 });
 
 export default DataGraph;
