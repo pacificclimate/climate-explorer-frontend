@@ -20,20 +20,20 @@ var Slider = React.createClass({
 
   getDefaultProps: function () {
     return {
-        id: '',
-        min: 0,
-        max: 100,
-        step: 1,
-        value: 50,
-        ticks: [],
-        ticksLabels: [],
-        ticksPositions: [],
-        toolTip: false,
-        selection: 'none',
-        onSlideStop: function (event) {
-            console.log(event);
-          }
-      };
+      id: '',
+      min: 0,
+      max: 100,
+      step: 1,
+      value: 50,
+      ticks: [],
+      ticksLabels: [],
+      ticksPositions: [],
+      toolTip: false,
+      selection: 'none',
+      onSlideStop: function (event) {
+          console.log(event);
+        }
+    };
   },
 
   componentWillUpdate: function (nextProps, nextState) {
@@ -43,22 +43,22 @@ var Slider = React.createClass({
   componentDidMount: function () {
     var toolTip = this.props.toolTip ? 'show' : 'hide';
     var slider = this.slider = new BootstrapSlider(ReactDOM.findDOMNode(this), {
-        id: this.props.id,
-        min: this.props.min,
-        max: this.props.max,
-        step: this.props.step,
-        value: this.props.value,
-        ticks: this.props.ticks,
-        ticks_labels: this.props.ticksLabels,
-        ticks_positions: this.props.ticksPositions,
-        tooltip: toolTip,
-        selection: this.props.selection,
-      });
+      id: this.props.id,
+      min: this.props.min,
+      max: this.props.max,
+      step: this.props.step,
+      value: this.props.value,
+      ticks: this.props.ticks,
+      ticks_labels: this.props.ticksLabels,
+      ticks_positions: this.props.ticksPositions,
+      tooltip: toolTip,
+      selection: this.props.selection,
+    });
 
     slider.on('slideStop', function (event) {
-        this.props.onSlideStop(event);
-        this.slider.setValue(event);
-      }.bind(this));
+      this.props.onSlideStop(event);
+      this.slider.setValue(event);
+    }.bind(this));
   },
 
   render: function () {

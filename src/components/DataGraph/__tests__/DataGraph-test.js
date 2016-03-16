@@ -8,16 +8,16 @@ const DataGraph = require('../DataGraph');
 
 const testData = {
   'model_id1': {
-      'units': 'degC',
-      '2050': 21.0,
-      '2080': 35.0,
-      '2020': 11.0
-    },
+    'units': 'degC',
+    '2050': 21.0,
+    '2080': 35.0,
+    '2020': 11.0
+  },
   'model_id2': {
-      'units': 'mm',
-      '2050': 240.0,
-      '2020': 300.0
-    }
+    'units': 'mm',
+    '2050': 240.0,
+    '2020': 300.0
+  }
 };
 
 const timeseriesTestData = {

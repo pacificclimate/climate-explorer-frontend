@@ -314,15 +314,15 @@ var parseBootstrapTableData = function (data) {
     var splitYears = model.split('_')[5].split('-');
     var period = splitYears[0].slice(0, 4) + ' - ' + splitYears[1].slice(0, 4);
     var modelInfo = {
-        'model_period': period,
-        'run': stats['run'],
-        'min': +stats['min'].toFixed(PRECISION),
-        'max': +stats['max'].toFixed(PRECISION),
-        'mean': +stats['mean'].toFixed(PRECISION),
-        'median': +stats['median'].toFixed(PRECISION),
-        'stdev': +stats['stdev'].toFixed(PRECISION),
-        'units': stats['units']
-      };
+      'model_period': period,
+      'run': stats['run'],
+      'min': +stats['min'].toFixed(PRECISION),
+      'max': +stats['max'].toFixed(PRECISION),
+      'mean': +stats['mean'].toFixed(PRECISION),
+      'median': +stats['median'].toFixed(PRECISION),
+      'stdev': +stats['stdev'].toFixed(PRECISION),
+      'units': stats['units']
+    };
     return modelInfo;
   });
 };
@@ -375,21 +375,21 @@ var assembleWorksheet = function (cells) {
   var maxCols = 0;
   cells.forEach(function (row, rowIndex) {
     if (row.length > maxCols) {
-        maxCols = row.length;
-      }
+      maxCols = row.length;
+    }
     row.forEach(function (cellValue, colIndex) {
-        cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
-        ws[cell_ref] = { v: cellValue, t: 's' };
-      });
+      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
+      ws[cell_ref] = { v: cellValue, t: 's' };
+    });
   });
 
     // set combined worksheet range bounds
   var range = {
     s: { c:0, r:0 },
     e: {
-        c: maxCols - 1,
-        r: cells.length - 1
-      }
+      c: maxCols - 1,
+      r: cells.length - 1
+    }
   };
   ws['!ref'] = XLSX.utils.encode_range(range);
   return ws;
@@ -437,8 +437,8 @@ var exportTableDataToWorksheet = function (metadata, data, format, timeidx) {
     var buf = new ArrayBuffer(s.length);
     var view = new Uint8Array(buf);
     for (var i = 0; i <= s.length; ++i) {
-        view[i] = s.charCodeAt(i) & 0xFF;
-      }
+      view[i] = s.charCodeAt(i) & 0xFF;
+    }
     return buf;
   }
 
