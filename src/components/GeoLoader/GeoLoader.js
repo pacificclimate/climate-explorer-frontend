@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react';
+import React from 'react';
 import { Input, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
@@ -14,10 +14,12 @@ Calls callback with resulting geojson
 
 var GeoLoader = React.createClass({
 
-  mixins: [ModalMixin],
   propTypes: {
     onLoadArea: React.PropTypes.func.isRequired,
+    title: React.PropTypes.string,
   },
+
+  mixins: [ModalMixin],
 
   importError: function () {
     this.setState({
@@ -28,13 +30,13 @@ var GeoLoader = React.createClass({
   closeError: function () {
     this.setState({
       showError: false,
-    })
+    });
   },
 
-  importPolygon: function(file) {
+  importPolygon: function (file) {
     this.close();
     g.load(file, this.props.onLoadArea, function () {
-      setTimeout(this.importError, 200) // Wait to avoid syling issues with Modal
+      setTimeout(this.importError, 200); // Wait to avoid syling issues with Modal
     }.bind(this));
   },
 
@@ -42,7 +44,9 @@ var GeoLoader = React.createClass({
     return (
       <div>
 
-        <Button onClick={this.open} title={this.props.title}><Glyphicon glyph="open-file" /></Button>
+        <Button onClick={this.open} title={this.props.title}>
+          <Glyphicon glyph='open-file' />
+        </Button>
 
         <Modal show={this.state.showModal} onHide={this.close}>
 
@@ -55,8 +59,8 @@ var GeoLoader = React.createClass({
             <Input type='file'
               label='Select file'
               help='Accepts a zipped Shapefile or a single geojson Feature (not FeatureCollection)'
-              onChange={function(e) {
-                this.importPolygon(e.currentTarget.files[0])
+              onChange={function (e) {
+                this.importPolygon(e.currentTarget.files[0]);
               }.bind(this)}
             />
           </Modal.Body>

@@ -57,7 +57,7 @@ const outputC3DataAxisInfo = {
   }
 };
 
-describe('parseDataForC3', function() {
+describe('parseDataForC3', function () {
   var parseDataForC3 = require('../util').dataApiToC3;
   // it('Correctly parses a JSON object with average data from multiple models for plotting with C3', function() {
 
@@ -68,7 +68,7 @@ describe('parseDataForC3', function() {
 
   // });
 
-  xit('can handle a minimum data set', function() {
+  xit('can handle a minimum data set', function () {
     var input = {
       'r1i1p1': {
         'data': {
@@ -77,11 +77,11 @@ describe('parseDataForC3', function() {
         },
         'units': 'K'
       }
-    }
+    };
     var expected = {
       data: {
-        columns: [ ['x', '2025-01-16', '2025-02-16'],
-                   ['r1i1p1', 275, 280] ],
+        columns: [['x', '2025-01-16', '2025-02-16'],
+                   ['r1i1p1', 275, 280]],
         x: 'x',
         axes: {
           r1i1p1: 'y'
@@ -101,7 +101,7 @@ describe('parseDataForC3', function() {
           }
         }
       }
-    }
+    };
 
     var result = parseDataForC3(input);
 
@@ -112,7 +112,7 @@ describe('parseDataForC3', function() {
 const testTimeSeries = {
   'id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',
   'units': 'K',
-  'data': {'1986-01-16T00:00:00Z': 275.75720932904414,
+  'data': { '1986-01-16T00:00:00Z': 275.75720932904414,
       '1986-02-15T00:00:00Z': 273.4294128417969,
       '1986-03-16T00:00:00Z': 273.4919128417969,
       '1986-04-16T00:00:00Z': 274.8638610839844,
@@ -146,8 +146,8 @@ const outputC3TimeSeries = {
       'Annual Average',
       275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375,
       275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375
-      ]
-    ],
+    ]
+  ],
     // types: {
     //   model: 'line',
     //   'Annual Average': 'step',
@@ -166,24 +166,24 @@ const outputC3TimeSeries = {
     // axes: {model:'y'},
 };
 
-const outputC3TimeSeriesAxisInfo = { 
+const outputC3TimeSeriesAxisInfo = {
   x: { type:'category',
     categories:['January', 'February', 'March', 'April', 'May',
           'June', 'July', 'August', 'September', 'October',
           'November', 'December']
   },
-  y: { label: { 'text': 'K', 'position':'outer-middle' }}
+  y: { label: { 'text': 'K', 'position':'outer-middle' } }
 };
 
 const outputC3TimeSeriesTooltipInfo = {
   grouped: true,
   format: {
-    value: function (value) { return value + ' ' + 'K' }
+    value: function (value) { return value + ' ' + 'K'; }
   }
 };
 
-describe('parseTimeSeriesForC3', function() {
-  it('Correctly parses a JSON object with time series data from one model for plotting with C3', function() {
+describe('parseTimeSeriesForC3', function () {
+  it('Correctly parses a JSON object with time series data from one model for plotting with C3', function () {
     var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
 
     var result = parseTimeSeriesForC3(testTimeSeries);
@@ -194,32 +194,32 @@ describe('parseTimeSeriesForC3', function() {
 });
 
 const bootstrapTableTestData = {
-  'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231': 
-  {
-    'median': 278.34326171875,
-    'min': 225.05545043945312,
-    'units': 'K',
-    'mean': 273.56732177734375,
-    'max': 303.601318359375,
-    'ncells': 8192,
-    'stdev': 22.509726901403784,
-    'run': 'r1i1p1'
-  },
-  'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231': 
-  {
-    'median': 278.4786682128906,
-    'min': 225.04750061035156,
-    'units': 'K',
-    'mean': 273.87298583984375,
-    'max': 303.7774963378906,
-    'ncells': 8192,
-    'stdev': 22.323802147796965,
-    'run': 'r1i1p1'
-  }
+  'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
+    {
+      'median': 278.34326171875,
+      'min': 225.05545043945312,
+      'units': 'K',
+      'mean': 273.56732177734375,
+      'max': 303.601318359375,
+      'ncells': 8192,
+      'stdev': 22.509726901403784,
+      'run': 'r1i1p1'
+    },
+  'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
+    {
+      'median': 278.4786682128906,
+      'min': 225.04750061035156,
+      'units': 'K',
+      'mean': 273.87298583984375,
+      'max': 303.7774963378906,
+      'ncells': 8192,
+      'stdev': 22.323802147796965,
+      'run': 'r1i1p1'
+    }
 };
 
 const bootstrapTableTestExpected = [
-    {
+  {
     'run': 'r1i1p1',
     'min': 225.06,
     'max': 303.60,
@@ -228,8 +228,8 @@ const bootstrapTableTestExpected = [
     'stdev': 22.51,
     'units': 'K',
     'model_period': '1961 - 1990'
-    },
-    {
+  },
+  {
     'run': 'r1i1p1',
     'min': 225.05,
     'max': 303.78,
@@ -238,72 +238,72 @@ const bootstrapTableTestExpected = [
     'stdev': 22.32,
     'units': 'K',
     'model_period': '1971 - 2000'
-    }
+  }
 ];
 
-describe('parseBootstrapTableData', function() {
-    it('Correctly flattens a stats object for passing to the DataTable component', function() {
-        var util = require('../util');
-        var result = util.parseBootstrapTableData(bootstrapTableTestData);
-        expect(result).toEqual(bootstrapTableTestExpected);
-    });
+describe('parseBootstrapTableData', function () {
+  it('Correctly flattens a stats object for passing to the DataTable component', function () {
+    var util = require('../util');
+    var result = util.parseBootstrapTableData(bootstrapTableTestData);
+    expect(result).toEqual(bootstrapTableTestExpected);
+  });
 });
 
-const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation' }
-const worksheetTimeOfYear = 'Winter-DJF'
-const worksheetSummaryCellsExpected = { 
-    0: { 
-        0: 'Model',
-        1: 'Emissions Scenario',
-        2: 'Time of Year',
-        3: 'Variable ID',
-        4: 'Variable Name'
-    },
-    1: { 
-        0: 'CSIRO-Mk3-6-0',
-        1: 'rcp26',
-        2: 'Winter-DJF',
-        3: 'pr',
-        4: 'Precipitation'
-    }
-}
+const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation' };
+const worksheetTimeOfYear = 'Winter-DJF';
+const worksheetSummaryCellsExpected = {
+  0: {
+    0: 'Model',
+    1: 'Emissions Scenario',
+    2: 'Time of Year',
+    3: 'Variable ID',
+    4: 'Variable Name'
+  },
+  1: {
+    0: 'CSIRO-Mk3-6-0',
+    1: 'rcp26',
+    2: 'Winter-DJF',
+    3: 'pr',
+    4: 'Precipitation'
+  }
+};
 
 const worksheetTestData = [
-        { model_period: '2040 - 2069', run: 'r1i1p1', min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: 'mm' }, 
+        { model_period: '2040 - 2069', run: 'r1i1p1', min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: 'mm' },
         { model_period: '2070 - 2099', run: 'r1i1p1', min: 0, max: 22.66, mean: 2.36, median: 1.39, stdev: 2.97, units: 'mm' },
         { model_period: '2010 - 2039', run: 'r1i1p1', min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: 'mm' }
-    ]
+];
 const worksheetDataRowsExpected = [
-    ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units' ],
-    ['2040 - 2069', 'r1i1p1', 0, 22.08, 2.34, 1.34, 3.01, 'mm' ], 
-    ['2070 - 2099', 'r1i1p1', 0, 22.66, 2.36, 1.39, 2.97, 'mm' ],
+    ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'],
+    ['2040 - 2069', 'r1i1p1', 0, 22.08, 2.34, 1.34, 3.01, 'mm'],
+    ['2070 - 2099', 'r1i1p1', 0, 22.66, 2.36, 1.39, 2.97, 'mm'],
     ['2010 - 2039', 'r1i1p1', 0, 21.97, 2.31, 1.35, 2.94, 'mm']
-]
+];
 
 const worksheetRange = 'A1:H7';
 
-describe('createWorksheetSummaryCells', function() {
-    it('Correctly forms worksheet summary cells', function() {
-        var util = require('../util');
-        var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-        expect(result).toEqual(worksheetSummaryCellsExpected);
-    });
+describe('createWorksheetSummaryCells', function () {
+  it('Correctly forms worksheet summary cells', function () {
+    var util = require('../util');
+    var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+    expect(result).toEqual(worksheetSummaryCellsExpected);
+  });
 });
 
-describe('fillWorksheetDataRows', function() {
-    it('Correctly fills worksheet data cells', function() {
-        var util = require('../util');
-        var result = util.fillWorksheetDataCells(worksheetTestData);
-        expect(result).toEqual(worksheetDataRowsExpected);
-    });
+describe('fillWorksheetDataRows', function () {
+  it('Correctly fills worksheet data cells', function () {
+    var util = require('../util');
+    var result = util.fillWorksheetDataCells(worksheetTestData);
+    expect(result).toEqual(worksheetDataRowsExpected);
+  });
 });
 
-describe('assembleWorksheet', function() {
-    it('Correctly assembles worksheet from summary and data cells', function() {
-        var util = require('../util');
-        var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-        var dataCells = util.fillWorksheetDataCells(worksheetTestData);
-        var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
-        expect(ws['!ref']).toEqual(worksheetRange);
-    });
+describe('assembleWorksheet', function () {
+  it('Correctly assembles worksheet from summary and data cells', function () {
+    var util = require('../util');
+    var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+    var dataCells = util.fillWorksheetDataCells(worksheetTestData);
+    var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
+    expect(ws['!ref']).toEqual(worksheetRange);
+  });
 });

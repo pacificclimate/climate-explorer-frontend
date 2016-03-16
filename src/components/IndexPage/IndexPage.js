@@ -1,10 +1,5 @@
-import React, { PropTypes, Component } from 'react';
-
-import classNames from 'classnames';
-
+import React, { Component } from 'react';
 import Header from '../Header';
-import Footer from '../Footer';
-
 import AppController from '../AppController';
 
 import styles from './IndexPage.css';
@@ -21,8 +16,8 @@ class App extends Component {
           <AppController />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;
