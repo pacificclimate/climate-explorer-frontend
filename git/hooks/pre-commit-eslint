@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+# Run eslint and abort commit if errors
+# Put this to .git/hooks/post-checkout
+#
+# Stronly influenced by: http://stackoverflow.com/questions/15703065/setup-pre-commit-hook-jshint
+#
+
+# Only eslint changed files
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "\.js$")
+if [ "$FILES" = "" ]; then 
+    exit 0 
+fi
+
+PASS=true
+
+echo "Validating JavaScript:"
+
+for F in ${FILES}; do
+    echo "npm run lint:glob -- --quiet ${F} 2>/dev/null"
+    OUTPUT=$(npm run lint:glob -- --quiet ${F} 2>/dev/null)
+    STATUS=$?
+    if [ ! $STATUS ]; then
+        echo "ESLint Passed: ${F}"
+    else
+        echo "ESLint Failed: ${F}"
+        echo "${OUTPUT}"
+        pass=false
+    fi
+done
+
+echo "JavaScript validation complete"
+
+if ! $pass; then
+    echo "COMMIT FAILED: Fix linting errors and try again."
+    exit 1
+else
+    echo "COMMIT SUCCEEDED"
+fi
