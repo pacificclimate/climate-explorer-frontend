@@ -8,9 +8,22 @@ var timesofyear = [[0, 'January'], [1, 'February'], [2, 'March'],
     [15, 'Fall - SON'], [16, 'Annual']];
 
 var TimeOfYearSelector = React.createClass({
+
+  propTypes: {
+    onChange: React.PropTypes.any, // Using 'function' logs warnings
+    value: React.PropTypes.number,
+  },
+
   render: function () {
-    return (<Selector label="Time of year" onChange={this.props.onChange} items={timesofyear} value={this.props.value} />);
-  }
+    return (
+      <Selector
+        label='Time of year'
+        onChange={this.props.onChange}
+        items={timesofyear}
+        value={this.props.value}
+      />
+    );
+  },
 });
 
 export default TimeOfYearSelector;

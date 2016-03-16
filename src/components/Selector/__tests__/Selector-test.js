@@ -2,13 +2,11 @@ jest.dontMock('../Selector');
 jest.dontMock('react-bootstrap');
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
 const Selector = require('../Selector');
 
 describe('Selector', function () {
-
   it('sets the label', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector label={'New Label'} />
@@ -58,5 +56,4 @@ describe('Selector', function () {
 
     expect(dummyCallback).toBeCalled();
   });
-
 });
