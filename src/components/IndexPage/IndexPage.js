@@ -21,8 +21,8 @@ class App extends Component {
           <AppController />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;

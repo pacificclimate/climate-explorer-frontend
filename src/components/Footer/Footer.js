@@ -9,7 +9,7 @@ class Footer extends Component {
   render() {
     return (
       <div className={classNames(styles.footer)}>
-        <Grid fluid={true}>
+        <Grid fluid>
           <Row>
             <Col lg={4}>
               <a className="" href="https://pacificclimate.org/">

@@ -6,9 +6,9 @@ import TestUtils from 'react-addons-test-utils';
 
 const DataTable = require('../DataTable');
 
-describe('DataTable', function() {
+describe('DataTable', function () {
 
-  it('renders', function(){
+  it('renders', function () {
     var table = TestUtils.renderIntoDocument(
       <DataTable data={[]} />
     );

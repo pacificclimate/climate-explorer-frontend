@@ -28,13 +28,13 @@ var GeoLoader = React.createClass({
   closeError: function () {
     this.setState({
       showError: false,
-    })
+    });
   },
 
-  importPolygon: function(file) {
+  importPolygon: function (file) {
     this.close();
     g.load(file, this.props.onLoadArea, function () {
-      setTimeout(this.importError, 200) // Wait to avoid syling issues with Modal
+      setTimeout(this.importError, 200); // Wait to avoid syling issues with Modal
     }.bind(this));
   },
 
@@ -55,8 +55,8 @@ var GeoLoader = React.createClass({
             <Input type='file'
               label='Select file'
               help='Accepts a zipped Shapefile or a single geojson Feature (not FeatureCollection)'
-              onChange={function(e) {
-                this.importPolygon(e.currentTarget.files[0])
+              onChange={function (e) {
+                this.importPolygon(e.currentTarget.files[0]);
               }.bind(this)}
             />
           </Modal.Body>

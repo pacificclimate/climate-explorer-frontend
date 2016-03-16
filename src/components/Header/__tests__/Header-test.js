@@ -7,10 +7,10 @@ import TestUtils from 'react-addons-test-utils';
 
 const Header = require('../Header');
 
-describe('Header', function() {
+describe('Header', function () {
 
-  it('renders', function(){
+  it('renders', function () {
     var header = TestUtils.renderIntoDocument(<Header />);
-    expect(TestUtils.isCompositeComponent(header)).toBeTruthy()
+    expect(TestUtils.isCompositeComponent(header)).toBeTruthy();
   });
 });

@@ -6,32 +6,32 @@ import styles from './ExperimentSelector.css';
 
 var ExperimentSelector = React.createClass({
 
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       items: []
-    }
+    };
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'models'),
       crossDomain: true
-    }).done(function(data) {
+    }).done(function (data) {
       data = _.uniq(data);
       this.setState({ items: data });
     }.bind(this));
   },
 
-  onChange: function(event) {
-    this.setState({value: event.target.value});
+  onChange: function (event) {
+    this.setState({ value: event.target.value });
     this.props.onChange(event.target.value);
   },
 
-  render: function() {
+  render: function () {
     return (
       <div className={styles.selector}>
         <select onChange={this.onChange} value={this.state.value}>
-          { this.state.items.map(function(item){ return <option key={item}>{item} </option> }) }
+          { this.state.items.map(function (item) { return <option key={item}>{item} </option>; }) }
         </select>
       </div>
     );

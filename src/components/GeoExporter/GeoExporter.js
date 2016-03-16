@@ -5,7 +5,7 @@ import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
 
 
-var exportPolygon = function(area, format) {
+var exportPolygon = function (area, format) {
   this.close();
   g.geojson(area).save(format);
 };
@@ -18,7 +18,7 @@ var GeoExporterDropdown = React.createClass({
 
   render() {
 
-    var boundExport = function(e, key) {
+    var boundExport = function (e, key) {
       exportPolygon(this.props.area, key);
     }.bind(this);
 
@@ -30,7 +30,7 @@ var GeoExporterDropdown = React.createClass({
         <MenuItem eventKey='kml'>KML</MenuItem>
         <MenuItem eventKey='gpx'>GPX</MenuItem>
       </DropdownButton>
-    )
+    );
   },
 
 });
@@ -82,4 +82,4 @@ export { GeoExporterModal as Modal };
 export default {
   Modal: GeoExporterModal,
   Dropdown: GeoExporterDropdown,
-}
+};
