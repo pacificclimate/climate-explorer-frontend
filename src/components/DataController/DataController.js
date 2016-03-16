@@ -1,10 +1,14 @@
-import React, { PropTypes, Component } from 'react';
+import React from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
-import ReactTabs, { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Button, Input, Row, Col } from 'react-bootstrap';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Button, Row, Col } from 'react-bootstrap';
 
-import { dataApiToC3, parseTimeSeriesForC3, parseBootstrapTableData, exportTableDataToWorksheet } from '../../core/util';
+import {
+  dataApiToC3,
+  parseTimeSeriesForC3,
+  parseBootstrapTableData,
+  exportTableDataToWorksheet } from '../../core/util';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -17,7 +21,7 @@ var DataController = React.createClass({
     variable_id: React.PropTypes.string,
     experiment: React.PropTypes.string,
     area: React.PropTypes.string,
-    meta: React.PropTypes.array
+    meta: React.PropTypes.array,
   },
 
   getInitialState: function () {
@@ -27,7 +31,7 @@ var DataController = React.createClass({
       timeSeriesDatasetId: '',
       climoSeriesData: undefined,
       timeSeriesData: undefined,
-      statsData: undefined
+      statsData: undefined,
     };
   },
 
@@ -37,7 +41,7 @@ var DataController = React.createClass({
       var selected = this.props.meta.filter(function (el) {
         return el.unique_id === key;
       });
-      val['run'] = selected[0].ensemble_member;
+      _.extend(val, { run: selected[0].ensemble_member });
     }.bind(this));
     return data;
   },
@@ -51,8 +55,8 @@ var DataController = React.createClass({
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: timeidx
-      }
+        time: timeidx,
+      },
     });
   },
 
@@ -65,8 +69,8 @@ var DataController = React.createClass({
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: timeidx
-      }
+        time: timeidx,
+      },
     });
   },
 
@@ -75,26 +79,26 @@ var DataController = React.createClass({
       url: urljoin(CE_BACKEND_URL, 'timeseries'),
       crossDomain: true,
       data: {
-        id_ : timeSeriesDatasetId || null,
+        id_: timeSeriesDatasetId || null,
         variable: props.variable_id,
-        area: props.area || null
-      }
+        area: props.area || null,
+      },
     });
   },
 
   getData: function (props) {
-    var my_data_promise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
+    var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
-    var my_stats_promise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
+    var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
-    var my_timeseries_promise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
+    var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
 
-    $.when(my_data_promise, my_stats_promise, my_timeseries_promise)
-     .done(function (data_response, stats_response, timeseries_response) {
+    $.when(myDataPromise, myStatsPromise, myTimeseriesPromise)
+     .done(function (dataResponse, statsResponse, timeseriesResponse) {
        this.setState({
-         climoSeriesData: dataApiToC3(data_response[0]),
-         statsData: parseBootstrapTableData(this.injectRunIntoStats(stats_response[0])),
-         timeSeriesData: parseTimeSeriesForC3(timeseries_response[0])
+         climoSeriesData: dataApiToC3(dataResponse[0]),
+         statsData: parseBootstrapTableData(this.injectRunIntoStats(statsResponse[0])),
+         timeSeriesData: parseTimeSeriesForC3(timeseriesResponse[0]),
        });
      }.bind(this));
   },
@@ -110,6 +114,15 @@ var DataController = React.createClass({
     }
   },
 
+  componentWillReceiveProps: function (nextProps) {
+    this.setState({
+      timeSeriesDatasetId: nextProps.meta[0].unique_id,
+    });
+    if (this.verifyParams(nextProps)) {
+      this.getData(nextProps);
+    }
+  },
+
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before Ajax calls alter the state
     return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
@@ -118,30 +131,20 @@ var DataController = React.createClass({
            JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta);
   },
 
-  componentWillReceiveProps: function (nextProps) {
-    this.setState({
-      timeSeriesDatasetId: nextProps.meta[0].unique_id
-    });
-    if (this.verifyParams(nextProps)) {
-      this.getData(nextProps);
-    }
-  },
-
   updateProjChangeTimeOfYear: function (timeidx) {
     this.setState({
-      projChangeTimeOfYear: timeidx
+      projChangeTimeOfYear: timeidx,
     });
     this.getDataPromise(this.props, timeidx).done(function (data) {
       this.setState({
         climoSeriesData: dataApiToC3(data),
       });
     }.bind(this));
-
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
     this.setState({
-      dataTableTimeOfYear: timeidx
+      dataTableTimeOfYear: timeidx,
     });
     this.getStatsPromise(this.props, timeidx).done(function (data) {
       this.setState({
@@ -156,7 +159,7 @@ var DataController = React.createClass({
     });
     this.getTimeseriesPromise(this.props, dataset).done(function (data) {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(data)
+        timeSeriesData: parseTimeSeriesForC3(data),
       });
     }.bind(this));
   },
@@ -166,12 +169,12 @@ var DataController = React.createClass({
   },
 
   render: function () {
-    var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data:{ columns:[] }, axis:{} };
-    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data:{ columns:[] }, axis:{} };
+    var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
+    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
     var ids = this.props.meta.map(function (el) {
       var period = el.unique_id.split('_').slice(5)[0];
-      var period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
+      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
       var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
       return l;
     });
@@ -211,7 +214,8 @@ var DataController = React.createClass({
           <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
         </div>
       </div>
-  );}
+    );
+  },
 });
 
 export default DataController;

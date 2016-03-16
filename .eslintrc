@@ -30,5 +30,7 @@
     "react/prefer-es6-class": 0,
     "guard-for-in": 0,
     "react/jsx-no-bind": 1,
+    "react/sort-comp": 1,
+    "prefer-template": 0,
   }
 }
