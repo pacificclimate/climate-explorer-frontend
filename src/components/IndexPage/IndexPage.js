@@ -3,7 +3,6 @@ import React, { PropTypes, Component } from 'react';
 import classNames from 'classnames';
 
 import Header from '../Header';
-import Layout from '../PanelLayout-3vert';
 import Footer from '../Footer';
 
 import AppController from '../AppController';
