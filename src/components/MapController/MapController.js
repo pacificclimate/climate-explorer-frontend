@@ -3,6 +3,7 @@ import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap
 import _ from 'underscore';
 import urljoin from 'url-join';
 import saveAs from 'filesaver.js';
+import Loader from 'react-loader';
 
 import classNames from 'classnames';
 
@@ -129,21 +130,27 @@ var MapController = React.createClass({
       return a[1] > b[1] ? 1 : -1;
     });
 
-    return (
-      <div>
-        <Row>
-          <Col lg={12}>
-            <div className={styles.map}>
-
-              <CanadaMap
+    var map
+    if (this.state.dataset) {
+      map = <CanadaMap
               logscale={this.state.logscale}
               styles={this.state.styles}
               time={this.state.wmstime}
               dataset={this.state.dataset}
               variable={this.state.variable}
               onSetArea={this.handleSetArea}
-              area={this.state.area}>
-              </CanadaMap>
+              area={this.state.area} />
+    } else {
+      map = <Loader />
+    }
+
+    return (
+      <div>
+        <Row>
+          <Col lg={12}>
+            <div className={styles.map}>
+
+              {map}
 
               <div className={styles.controls}>
                 <ButtonGroup vertical>
