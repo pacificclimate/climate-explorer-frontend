@@ -31,8 +31,8 @@ var Slider = React.createClass({
       toolTip: false,
       selection: 'none',
       onSlideStop: function (event) {
-          console.log(event);
-        }
+        console.log(event);
+      }
     };
   },
 

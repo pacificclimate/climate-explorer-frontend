@@ -29,9 +29,9 @@ var CanadaMap = React.createClass({
                 'EPSG:4326',
                 '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
                 [-150, -10, -50, 90],
-          {
-            resolutions: utils.generate_resolutions(0.09765625, 10)
-          }
+        {
+          resolutions: utils.generate_resolutions(0.09765625, 10)
+        }
             ),
       noWrap: true,
       format: 'image/png',
@@ -83,14 +83,14 @@ var CanadaMap = React.createClass({
       maxZoom: 10,
       maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
       layers: [
-          L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
-              {
-                subdomains: 'abc',
-                noWrap: true,
-                maxZoom: 10,
-                attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              })
-        ]
+        L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png',
+            {
+              subdomains: 'abc',
+              noWrap: true,
+              maxZoom: 10,
+              attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            })
+      ]
     });
 
     var datalayerName = 'Climate raster';
@@ -101,13 +101,13 @@ var CanadaMap = React.createClass({
 
     var drawOptions = {
       edit: {
-          featureGroup: drawnItems
-        },
+        featureGroup: drawnItems
+      },
       draw: {
-          marker: false,
-          circle: false,
-          polyline: false
-        },
+        marker: false,
+        circle: false,
+        polyline: false
+      },
     };
     var drawControl = new L.Control.Draw(drawOptions);
     map.addControl(drawControl);
@@ -134,9 +134,9 @@ var CanadaMap = React.createClass({
       var layers = e.layers.getLayers();
       if (layers.length !== 1) { //Should never happen
                 // TODO: use a better popup (bind handleAlert at top level?)
-          alert('Something went wrong editing the feature');
-          return;
-        }
+        alert('Something went wrong editing the feature');
+        return;
+      }
       this.handleSetArea(layers[0].toGeoJSON());
     }.bind(this);
 
@@ -144,9 +144,9 @@ var CanadaMap = React.createClass({
       var layers = e.layers.getLayers();
       if (layers.length !== 1) { //Should never happen
                 // TODO: use a better popup (bind handleAlert at top level?)
-          alert('Something went wrong deleting this feature');
-          return;
-        }
+        alert('Something went wrong deleting this feature');
+        return;
+      }
       this.handleSetArea(undefined);
     }.bind(this);
 
@@ -169,7 +169,7 @@ var CanadaMap = React.createClass({
     var params = { layers: newProps.dataset + '/' + newProps.variable };
     _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
     this.ncwmsLayer.setParams(params);
-	              if (this.state.area !== newProps.area) {
+	                  if (this.state.area !== newProps.area) {
   this.handleNewArea(newProps.area);
 	}
   },
@@ -178,7 +178,7 @@ var CanadaMap = React.createClass({
             <div className={styles.map}>
 		<div ref={ (c) => this._map = c } className={styles.map} />
 		{ this.props.children }
-	       </div>
+	        </div>
         );
   }
 });

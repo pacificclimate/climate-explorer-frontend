@@ -27,14 +27,14 @@ var BCMap = React.createClass({
       maxZoom: 12,
       maxBounds: L.latLngBounds([[45, -148], [62, -108]]),
       layers: [
-          L.tileLayer(TILECACHE_URL + '1.0.0/bc_osm/{z}/{x}/{y}.png',
-              {
-                subdomains: 'abc',
-                noWrap: true,
-                maxZoom: 12,
-                attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              })
-        ]
+        L.tileLayer(TILECACHE_URL + '1.0.0/bc_osm/{z}/{x}/{y}.png',
+            {
+              subdomains: 'abc',
+              noWrap: true,
+              maxZoom: 12,
+              attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            })
+      ]
     });
 
     map.on('click', this.onMapClick);
