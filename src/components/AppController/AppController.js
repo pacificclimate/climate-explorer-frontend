@@ -28,7 +28,7 @@ var App = React.createClass({
     var vars;
     $.ajax({
       url: urljoin(CE_BACKEND_URL, 'multimeta'),
-      ensemble_name: CE_ENSEMBLE_NAME,
+      data: { ensemble_name: CE_ENSEMBLE_NAME },
       crossDomain: true,
     }).done(function (data) {
       for (var key in data) {
