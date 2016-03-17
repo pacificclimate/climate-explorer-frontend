@@ -51,6 +51,16 @@ npm start
 npm test
 ```
 
+### Linting
+
+Linting is configured with ESLint and largely follows the AirBnb preset.
+
+You can lint all files `npm run lint`, or a specific file `npm run lint:glob <file_name_or_glob>`.
+
+Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks directory) to abort a commit if any staged `*.js` files fail linting (warnings OK).
+
+If you *realy* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
+
 ### Setup using Docker
 
 ```bash
