@@ -65,6 +65,7 @@ var DataController = React.createClass({
       url: urljoin(CE_BACKEND_URL, 'multistats'),
       crossDomain: true,
       data: {
+        ensemble_name: CE_ENSEMBLE_NAME,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
