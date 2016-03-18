@@ -4,9 +4,9 @@ import _ from 'underscore';
 import { Button } from 'react-bootstrap';
 
 import {
-  parseTimeSeriesForC3,
   parseBootstrapTableData,
   exportTableDataToWorksheet } from '../../core/util';
+import { timeseriesToC3 } from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 
@@ -76,7 +76,7 @@ var DataController = React.createClass({
      .done(function (statsResponse, timeseriesResponse) {
        this.setState({
          statsData: parseBootstrapTableData(this.injectRunIntoStats(statsResponse[0])),
-         timeSeriesData: parseTimeSeriesForC3(timeseriesResponse[0]),
+         timeSeriesData: timeseriesToC3(timeseriesResponse[0]),
        });
      }.bind(this));
   },
