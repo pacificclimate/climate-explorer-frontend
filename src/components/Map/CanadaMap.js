@@ -217,7 +217,7 @@ var CanadaMap = React.createClass({
     map.addControl(new PrintControl());
 
     map.on('click', this.onMapClick);
-    map.setView(L.latLng(60, -100), 0);
+    map.setView(L.latLng(55, -125), 2);
   },
 
   componentWillUnmount: function () {
