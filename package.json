@@ -59,6 +59,7 @@
     "filesaver.js": "^0.2.0",
     "jest-cli": "^0.5.1",
     "json-stable-stringify": "^1.0.0",
+    "leaflet-image": "^0.1.0",
     "normalize.css": "^3.0.3",
     "perfect-scrollbar": "^0.6.7",
     "postcss-cssnext": "^2.2.0",
