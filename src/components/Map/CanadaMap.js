@@ -1,5 +1,7 @@
 import React from 'react';
 import _ from 'underscore';
+import leafletImage from 'leaflet-image';
+import { saveAs } from 'filesaver.js';
 
 import utils from './utils';
 
@@ -111,6 +113,10 @@ var CanadaMap = React.createClass({
 
     this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
 
+    /*
+    Draw controls
+    */
+
     var drawnItems = this.drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
@@ -168,6 +174,47 @@ var CanadaMap = React.createClass({
     map.on('draw:created', onDraw);
     map.on('draw:edited', onEdit);
     map.on('draw:deleted', onDelete);
+
+    /*
+    Print controls
+    */
+
+    var doImage = function (err, canvas) {
+      console.log(err);
+      var dataURL = canvas.toDataURL('image/png');
+
+      var data = atob(dataURL.substring('data:image/png;base64,'.length));
+      var asArray = new Uint8Array(data.length);
+
+      for (var i = 0, len = data.length; i < len; ++i) {
+        asArray[i] = data.charCodeAt(i);
+      }
+      var blob = new Blob([asArray.buffer], { type: 'image/png' });
+      saveAs(blob, 'map.png');
+    };
+
+    var initPrintControl = function () {
+      this.container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+      L.DomEvent
+        .addListener(this.container, 'click', L.DomEvent.stopPropagation)
+        .addListener(this.container, 'click', L.DomEvent.preventDefault);
+      this.button = L.DomUtil.create('a', styles.leafletControlImage, this.container);
+
+      L.DomEvent.addListener(this.container, 'click', function () {
+        leafletImage(map, doImage);
+      });
+
+      return this.container;
+    };
+
+    var PrintControl = L.Control.extend({
+      options: {
+        position: 'topleft',
+      },
+      onAdd: initPrintControl,
+    });
+
+    map.addControl(new PrintControl());
 
     map.on('click', this.onMapClick);
     map.setView(L.latLng(60, -100), 0);
