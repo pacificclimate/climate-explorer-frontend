@@ -62,7 +62,7 @@ var MapController = React.createClass({
       this.selectedDataset.times = data[uniqueId].times;
 
       this.setState({
-        tims: data[uniqueId].times,
+        times: data[uniqueId].times,
         timeidx: 0, // Time indices may not be equivalent across datasets
         dataset: this.selectedDataset.unique_id,
         wmstime: data[uniqueId].times[0],
