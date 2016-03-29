@@ -1,0 +1,6 @@
+{
+  "name": "MotiApp",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MotiApp.js"
+}
