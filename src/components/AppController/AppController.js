@@ -74,25 +74,18 @@ var App = React.createClass({
       return _.unique(this.state.meta.map(function (el) {return el[thing];}));
     }.bind(this);
 
-    // Source, format and sort variable names
-    var varArray = _.zip(getThings('variable_id'), getThings('variable_name'));
-    var varNames = _.map(varArray, function (v) {
-      return v[0] + ' - ' + v[1];
-    });
-    var varOptions = _.zip(getThings('variable_id'), varNames).sort(function (a, b) {
-      return a[0] > b[0] ? 1 : -1;
-    });
-
     return (
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions}/>
+            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={getThings('model_id')}/>
+          </Col>
+          <Col lg={4} md={4}>
+            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={getThings('variable_id')}/>
           </Col>
           <Col lg={4} md={4}>
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={getThings('experiment')}/>
           </Col>
-          <Col lg={4} md={4} />
         </Row>
         <Row>
           <Col lg={6}>
