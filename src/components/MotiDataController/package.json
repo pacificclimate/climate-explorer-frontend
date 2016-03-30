@@ -1,0 +1,6 @@
+{
+  "name": "MotiDataController",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MotiDataController.js"
+}

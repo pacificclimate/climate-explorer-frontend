@@ -4,7 +4,7 @@ import _ from 'underscore';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import MapController from '../MapController';
-import DataController from '../DataController/DataController';
+import MotiDataController from '../MotiDataController';
 import Selector from '../Selector';
 
 var App = React.createClass({
@@ -103,7 +103,7 @@ var App = React.createClass({
             </div>
           </Col>
           <Col lg={6}>
-            <DataController
+            <MotiDataController
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
