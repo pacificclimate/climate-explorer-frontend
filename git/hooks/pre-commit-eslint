@@ -21,7 +21,7 @@ for F in ${FILES}; do
     echo "npm run lint:glob -- --quiet ${F} 2>/dev/null"
     OUTPUT=$(npm run lint:glob -- --quiet ${F} 2>/dev/null)
     STATUS=$?
-    if [ ! $STATUS ]; then
+    if [ $STATUS -eq 0 ]; then
         echo "ESLint Passed: ${F}"
     else
         echo "ESLint Failed: ${F}"
