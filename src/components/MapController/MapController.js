@@ -2,10 +2,10 @@ import React from 'react';
 import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap';
 import urljoin from 'url-join';
 import Loader from 'react-loader';
+import _ from 'underscore';
 
 import { CanadaMap } from '../Map/CanadaMap';
 import Selector from '../Selector/Selector';
-import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
@@ -46,7 +46,7 @@ var MapController = React.createClass({
   updateTime: function (timeidx) {
     this.setState({
       timeidx: timeidx,
-      wmstime: this.selectedDataset.times[timeidx],
+      wmstime: this.state.times[timeidx],
     });
   },
 
@@ -61,8 +61,10 @@ var MapController = React.createClass({
       this.selectedDataset.times = data[uniqueId].times;
 
       this.setState({
+        times: data[uniqueId].times,
+        timeidx: 0, // Time indices may not be equivalent across datasets
         dataset: this.selectedDataset.unique_id,
-        wmstime: this.selectedDataset.times[this.state.timeidx],
+        wmstime: data[uniqueId].times[0],
         variable: this.selectedDataset.variable_id,
       });
     }.bind(this));
@@ -93,11 +95,11 @@ var MapController = React.createClass({
     this.selectedDataset = nextProps.meta[0];
 
     this.requestTimeMetadata(this.selectedDataset.unique_id).done(function (data) {
-      this.selectedDataset.times = data[this.selectedDataset.unique_id].times;
-
       this.setState({
+        times: data[this.selectedDataset.unique_id].times,
+        timeidx: 0,
         dataset: this.selectedDataset.unique_id,
-        wmstime: this.selectedDataset.times[this.state.timeidx],
+        wmstime: data[this.selectedDataset.unique_id].times[0],
         variable: this.selectedDataset.variable_id,
       });
     }.bind(this));
@@ -115,6 +117,8 @@ var MapController = React.createClass({
                      ['boxfill/occam_inv', 'inverted occam'],
                     ];
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
+
+    // Determine available datasets and display selector if multiple
     var ids = this.props.meta.map(function (el) {
       var period = el.unique_id.split('_').slice(5)[0];
       period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
@@ -122,6 +126,19 @@ var MapController = React.createClass({
       return l;
     }).sort(function (a, b) {
       return a[1] > b[1] ? 1 : -1;
+    });
+
+    var datasetSelector;
+    if (ids.length > 1) {
+      datasetSelector = (<Selector
+        label={"Select Dataset"}
+        onChange={this.updateDataset}
+        items={ids} value={this.state.dataset}
+      />);
+    }
+
+    var timeOptions = _.map(this.state.times, function (v, k) {
+      return [k, v];
     });
 
     var map;
@@ -168,14 +185,11 @@ var MapController = React.createClass({
           </Modal.Header>
 
           <Modal.Body>
-            <TimeOfYearSelector
-              onChange={this.updateTime}
-              value={this.state.timeidx}
-            />
+            { datasetSelector }
             <Selector
-              label={"Dataset"}
-              onChange={this.updateDataset}
-              items={ids} value={this.state.dataset}
+              label={"Time Selection"}
+              onChange={this.updateTime}
+              items={timeOptions}
             />
             <Selector
               label={"Color pallette"}

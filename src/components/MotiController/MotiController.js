@@ -2,9 +2,10 @@ import React from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import MapController from '../MapController';
-import DataController from '../DataController/DataController';
+import MotiDataController from '../MotiDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
+
 
 var App = React.createClass({
 
@@ -23,14 +24,12 @@ var App = React.createClass({
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={this.getMetadataItems('model_id')}/>
-          </Col>
-          <Col lg={4} md={4}>
             <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()}/>
           </Col>
           <Col lg={4} md={4}>
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')}/>
           </Col>
+          <Col lg={4} md={4} />
         </Row>
         <Row>
           <Col lg={6}>
@@ -42,7 +41,7 @@ var App = React.createClass({
             </div>
           </Col>
           <Col lg={6}>
-            <DataController
+            <MotiDataController
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
