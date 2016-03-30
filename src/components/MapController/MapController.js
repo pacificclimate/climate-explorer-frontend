@@ -6,7 +6,6 @@ import _ from 'underscore';
 
 import { CanadaMap } from '../Map/CanadaMap';
 import Selector from '../Selector/Selector';
-import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
@@ -118,6 +117,26 @@ var MapController = React.createClass({
                      ['boxfill/occam_inv', 'inverted occam'],
                     ];
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
+
+    // Determine available datasets and display selector if multiple
+    var ids = this.props.meta.map(function (el) {
+      var period = el.unique_id.split('_').slice(5)[0];
+      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
+      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
+      return l;
+    }).sort(function (a, b) {
+      return a[1] > b[1] ? 1 : -1;
+    });
+
+    var datasetSelector;
+    if (ids.length > 1) {
+      datasetSelector = (<Selector
+        label={"Select Dataset"}
+        onChange={this.updateDataset}
+        items={ids} value={this.state.dataset}
+      />);
+    }
+
     var timeOptions = _.map(this.state.times, function (v, k) {
       return [k, v];
     });
@@ -166,6 +185,7 @@ var MapController = React.createClass({
           </Modal.Header>
 
           <Modal.Body>
+            { datasetSelector }
             <Selector
               label={"Time Selection"}
               onChange={this.updateTime}
