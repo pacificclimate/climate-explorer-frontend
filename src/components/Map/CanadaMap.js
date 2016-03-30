@@ -17,6 +17,7 @@ var CanadaMap = React.createClass({
     // passed around (or up to a higher component) as GeoJSON
     onSetArea: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
+    origin: React.PropTypes.object,
   },
 
   getInitialState: function () {
@@ -45,6 +46,7 @@ var CanadaMap = React.createClass({
       version: '1.1.1',
       srs: 'EPSG:4326',
       logscale: false,
+      origin: { lat: 60, lon: -100, zoom: 0 },
     };
   },
 
@@ -217,7 +219,7 @@ var CanadaMap = React.createClass({
     map.addControl(new PrintControl());
 
     map.on('click', this.onMapClick);
-    map.setView(L.latLng(55, -125), 2);
+    map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
   },
 
   componentWillUnmount: function () {
