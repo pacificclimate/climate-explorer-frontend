@@ -56,7 +56,7 @@ var MotiDataController = React.createClass({
 
     return (
       <div>
-
+        <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
 
         <DataTable data={statsData} />

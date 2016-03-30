@@ -22,7 +22,7 @@ var timeseriesToC3 = function (data) {
     xFormat: '%Y-%m-%d',
     columns: [
       ['x'].concat(_.map(_.keys(data.data), utcDateToYYYYMMDD)),
-      ["Ensemble Mean"].concat(_.values(data.data)),
+      ['Ensemble Mean'].concat(_.values(data.data)),
     ],
   };
 
@@ -34,7 +34,13 @@ var timeseriesToC3 = function (data) {
         type: 'timeseries',
         tick: {
           format: '%Y',
-          count: 11
+          count: 11,
+        },
+      },
+      y: {
+        label: {
+          text: data.units,
+          position: 'outer-middle',
         },
       },
     },
