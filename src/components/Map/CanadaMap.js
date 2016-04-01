@@ -197,6 +197,7 @@ var CanadaMap = React.createClass({
 
     var initPrintControl = function () {
       this.container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+      this.container.title = 'Download map image';
       L.DomEvent
         .addListener(this.container, 'click', L.DomEvent.stopPropagation)
         .addListener(this.container, 'click', L.DomEvent.preventDefault);

@@ -168,7 +168,7 @@ var MapController = React.createClass({
 
               <div className={styles.controls}>
                 <ButtonGroup vertical>
-                  <Button onClick={this.open} title='Map settings'><Glyphicon glyph='menu-hamburger' /></Button>
+                  <Button onClick={this.open} title='Map Settings'><Glyphicon glyph='menu-hamburger' /></Button>
                   <GeoExporter.Modal area={this.state.area} title='Export polygon' />
                   <GeoLoader onLoadArea={this.handleSetArea} title='Import polygon' />
                 </ButtonGroup>
@@ -181,7 +181,7 @@ var MapController = React.createClass({
         <Modal show={this.state.showModal} onHide={this.close} >
 
           <Modal.Header closeButton>
-            <Modal.Title>Map Options</Modal.Title>
+            <Modal.Title>Map Settings</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -192,7 +192,7 @@ var MapController = React.createClass({
               items={timeOptions}
             />
             <Selector
-              label={"Color pallette"}
+              label={"Colour Pallette"}
               onChange={this.updateSelection.bind(this, 'styles')}
               items={pallettes}
               value={this.state.styles}
