@@ -106,12 +106,12 @@ var DataController = React.createClass({
 
     return (
       <div>
+        <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <Tabs>
           <TabList>
             <Tab>Annual Cycle</Tab>
             <Tab>Projected Change</Tab>
           </TabList>
-          <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
