@@ -7,3 +7,31 @@
     background-size: 20px 20px;
     background-repeat: no-repeat;
 }
+
+.leafletControlColorbar {
+    position: relative;
+    width: 20px;
+    height: 300px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 10px;
+
+}
+
+.leafletControlColorbar .label {
+    position: absolute;
+    right: 20px;
+}
+
+.leafletControlColorbar .max {
+    top: -0.5em;
+}
+
+.leafletControlColorbar .mid {
+    top: 50%;
+
+}
+
+.leafletControlColorbar .min {
+    bottom: -0.5em;
+}

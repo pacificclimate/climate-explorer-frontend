@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
 import { saveAs } from 'filesaver.js';
+import cn from 'classnames';
 
 import utils from './utils';
 
@@ -218,6 +219,40 @@ var CanadaMap = React.createClass({
     });
 
     map.addControl(new PrintControl());
+
+    /*
+    Colorbar control
+    */
+
+    var initColorBar = function () {
+      this.container = L.DomUtil.create('div', 'leaflet-control');
+      L.DomEvent
+        .addListener(this.container, 'click', L.DomEvent.stopPropagation)
+        .addListener(this.container, 'click', L.DomEvent.preventDefault);
+      this.bar = L.DomUtil.create('div', styles.leafletControlColorbar, this.container);
+      this.max = L.DomUtil.create('div', cn(styles.label, styles.max), this.bar);
+      this.max.innerHTML = 'max';
+      this.mid = L.DomUtil.create('div', cn(styles.label, styles.mid), this.bar);
+      this.mid.innerHTML = 'mid';
+      this.min = L.DomUtil.create('div', cn(styles.label, styles.min), this.bar);
+      this.min.innerHTML = 'min';
+
+      return this.container;
+    };
+
+    var ColorbarControl = L.Control.extend({
+      options: {
+        position: 'bottomright',
+      },
+      initialize: function (layer, options) {
+        this.layer = layer;
+        L.Util.setOptions(this, options);
+      },
+      onAdd: initColorBar,
+    });
+
+    map.addControl(new ColorbarControl(this.ncwmsLayer));
+
 
     map.on('click', this.onMapClick);
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
