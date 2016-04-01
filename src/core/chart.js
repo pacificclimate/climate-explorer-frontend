@@ -13,9 +13,6 @@ var utcDateToYYYYMMDD = function (d) {
 
 var timeseriesToC3 = function (data) {
   var c3Data;
-  console.log(data);
-  // var axisInfo;
-  // var tooltipInfo;
 
   c3Data = {
     x: 'x',
