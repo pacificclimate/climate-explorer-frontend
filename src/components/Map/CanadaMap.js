@@ -115,6 +115,7 @@ var CanadaMap = React.createClass({
     });
 
     this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
+    map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
     /*
     Draw controls
@@ -224,38 +225,79 @@ var CanadaMap = React.createClass({
     Colorbar control
     */
 
-    var initColorBar = function () {
-      this.container = L.DomUtil.create('div', 'leaflet-control');
-      L.DomEvent
-        .addListener(this.container, 'click', L.DomEvent.stopPropagation)
-        .addListener(this.container, 'click', L.DomEvent.preventDefault);
-      this.bar = L.DomUtil.create('div', styles.leafletControlColorbar, this.container);
-      this.max = L.DomUtil.create('div', cn(styles.label, styles.max), this.bar);
-      this.max.innerHTML = 'max';
-      this.mid = L.DomUtil.create('div', cn(styles.label, styles.mid), this.bar);
-      this.mid.innerHTML = 'mid';
-      this.min = L.DomUtil.create('div', cn(styles.label, styles.min), this.bar);
-      this.min.innerHTML = 'min';
-
-      return this.container;
-    };
-
     var ColorbarControl = L.Control.extend({
       options: {
         position: 'bottomright',
       },
+
       initialize: function (layer, options) {
         this.layer = layer;
         L.Util.setOptions(this, options);
       },
-      onAdd: initColorBar,
+
+      onAdd: function () {
+        this.container = L.DomUtil.create('div', 'leaflet-control');
+        L.DomEvent
+          .addListener(this.container, 'click', L.DomEvent.stopPropagation)
+          .addListener(this.container, 'click', L.DomEvent.preventDefault);
+        this.bar = L.DomUtil.create('div', styles.leafletControlColorbar, this.container);
+        this.maxElement = L.DomUtil.create('div', cn(styles.label, styles.max), this.bar);
+        this.maxElement.innerHTML = 'max';
+        this.midElement = L.DomUtil.create('div', cn(styles.label, styles.mid), this.bar);
+        this.midElement.innerHTML = 'mid';
+        this.minElement = L.DomUtil.create('div', cn(styles.label, styles.min), this.bar);
+        this.minElement.innerHTML = 'min';
+
+        // TODO add event listener on layer change
+
+        this.refreshValues();
+
+        return this.container;
+      },
+
+      refreshValues: function () {
+        /*
+        Source new values from the ncWMS server.
+        Possible future breakage due to using layer._url and layer._map.
+        */
+        $.ajax(this.layer._url, {
+          crossDomain: true,
+          data: {
+            request: 'GetMetadata',
+            item: 'minmax',
+            layers: this.layer.options.layers,
+            bbox: this.layer._map.getBounds().toBBoxString(),
+            time: this.layer.options.time,
+            srs: this.layer.options.srs,
+            width: 100,
+            height: 100,
+          },
+        }).done(function (data) {
+          console.log(data);
+
+          this.min = data.min;
+          this.max = data.max;
+
+          this.redraw();
+        });
+      },
+
+      getMidpoint: function () {
+        if (this.layer.params.logscale) {
+          var min = this.minimum <= 0 ? 1 : this.minimum;
+          return Math.exp(((Math.log(this.maximum) - Math.log(min)) / 2) + Math.log(min));
+        }
+        return (this.minimum + this.maximum) / 2;
+      },
+
+      redraw: function () {
+        this.maxElement.innerHTML = this.max;
+        this.midElement.innerHTML = this.getMidpoint();
+        this.minElement.innerHTML = this.min;
+      },
     });
 
     map.addControl(new ColorbarControl(this.ncwmsLayer));
-
-
-    map.on('click', this.onMapClick);
-    map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
   },
 
   componentWillUnmount: function () {
