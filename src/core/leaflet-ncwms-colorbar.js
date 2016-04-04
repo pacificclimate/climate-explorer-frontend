@@ -20,17 +20,20 @@ var ncWMSColorbarControl = L.Control.extend({
   onAdd: function () {
     // Container element
     this.container = L.DomUtil.create('div', 'leaflet-control');
-    this.container.style.position = 'relative';
-    this.container.style.width = '20px';
-    this.container.style.height = '300px';
-    this.container.style.borderWidth = '2px';
-    this.container.style.borderStyle = 'solid';
-    this.container.style.borderRadius = '10px';
-    this.container.style.opacity = '0.75';
-    this.container.style.color = '#424242';
-    this.container.style.fontWeight = 'bold';
-    this.container.style.textShadow = '0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white';
-    this.container.style.whiteSpace = 'nowrap';
+
+    Object.assign(this.container.style, {
+      position: 'relative',
+      width: '20px',
+      height: '300px',
+      borderWidth: '2px',
+      borderStyle: 'solid',
+      borderRadius: '10px',
+      opacity: '0.75',
+      color: '#424242',
+      fontWeight: 'bold',
+      textShadow: '0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white',
+      whiteSpace: 'nowrap',
+    });
 
     // Set up event handling
     L.DomEvent
@@ -39,7 +42,6 @@ var ncWMSColorbarControl = L.Control.extend({
     this.layer.on('loading', function () {
       this.refreshValues();
     }.bind(this));
-
 
     // Create and style labels
     var applyLabelStyle = function (el) {
