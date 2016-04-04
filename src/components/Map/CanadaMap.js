@@ -293,29 +293,30 @@ var CanadaMap = React.createClass({
           data: {
             request: 'GetMetadata',
             item: 'minmax',
-            layers: this.layer.options.layers,
+            layers: this.layer.wmsParams.layers,
             bbox: this.layer._map.getBounds().toBBoxString(),
-            time: this.layer.options.time,
-            srs: this.layer.options.srs,
+            time: this.layer.wmsParams.time,
+            srs: this.layer.wmsParams.srs,
             width: 100,
             height: 100,
           },
         }).done(function (data) {
-          console.log(data);
-
           this.min = data.min;
           this.max = data.max;
-
           this.redraw();
         }.bind(this));
       },
 
-      getMidpoint: function () {
-        if (this.layer.wmsParams.logscale) {
-          var min = this.min <= 0 ? 1 : this.min;
-          return Math.exp(((Math.log(this.max) - Math.log(min)) / 2) + Math.log(min));
+      getMidpoint: function (mn, mx, logscale) {
+        var mid;
+
+        if (logscale === true || logscale === 'true') {
+          var logMin = mn <= 0 ? 1 : mn;
+          mid = Math.exp(((Math.log(mx) - Math.log(logMin)) / 2) + Math.log(logMin));
+        } else {
+          mid = (mn + mx) / 2;
         }
-        return (this.min + this.max) / 2;
+        return mid;
       },
 
       graphicUrl: function () {
@@ -331,7 +332,7 @@ var CanadaMap = React.createClass({
       redraw: function () {
         this.container.style.backgroundImage = 'url("' + this.graphicUrl() + '")';
         this.maxContainer.innerHTML = this.max;
-        this.midContainer.innerHTML = this.getMidpoint();
+        this.midContainer.innerHTML = this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale);
         this.minContainer.innerHTML = this.min;
       },
     });
