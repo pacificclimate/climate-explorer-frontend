@@ -249,13 +249,16 @@ var CanadaMap = React.createClass({
         this.container.style.textShadow = '0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white';
         this.container.style.whiteSpace = 'nowrap';
 
+        // Set up event handling
         L.DomEvent
           .addListener(this.container, 'click', L.DomEvent.stopPropagation)
           .addListener(this.container, 'click', L.DomEvent.preventDefault);
         this.layer.on('load', function () {
           this.refreshValues();
         }.bind(this));
-        // Label elements
+
+
+        // Create and style labels
         var applyLabelStyle = function (el) {
           el.style.position = 'absolute';
           el.style.right = '20px';
@@ -276,10 +279,7 @@ var CanadaMap = React.createClass({
         this.minContainer.style.bottom = '-0.5em';
         this.minContainer.innerHTML = 'min';
 
-        // TODO add event listener on layer change
-
         this.refreshValues();
-
         return this.container;
       },
 
