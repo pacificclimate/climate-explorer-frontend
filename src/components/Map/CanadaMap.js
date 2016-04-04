@@ -310,7 +310,18 @@ var CanadaMap = React.createClass({
         return (this.min + this.max) / 2;
       },
 
+      graphicUrl: function () {
+        var palette = this.layer.wmsParams.styles.split('/')[1];
+        return this.layer._url + '?REQUEST=GetLegendGraphic' +
+          '&COLORBARONLY=true' +
+          '&WIDTH=1' +
+          '&HEIGHT=300' +
+          '&PALETTE=' + palette +
+          '&NUMCOLORBANDS=254';
+      },
+
       redraw: function () {
+        this.container.style.backgroundImage = 'url("' + this.graphicUrl() + '")';
         this.maxContainer.innerHTML = this.max;
         this.midContainer.innerHTML = this.getMidpoint();
         this.minContainer.innerHTML = this.min;
