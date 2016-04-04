@@ -299,15 +299,15 @@ var CanadaMap = React.createClass({
           this.max = data.max;
 
           this.redraw();
-        });
+        }.bind(this));
       },
 
       getMidpoint: function () {
-        if (this.layer.params.logscale) {
-          var min = this.minimum <= 0 ? 1 : this.minimum;
-          return Math.exp(((Math.log(this.maximum) - Math.log(min)) / 2) + Math.log(min));
+        if (this.layer.wmsParams.logscale) {
+          var min = this.min <= 0 ? 1 : this.min;
+          return Math.exp(((Math.log(this.max) - Math.log(min)) / 2) + Math.log(min));
         }
-        return (this.minimum + this.maximum) / 2;
+        return (this.min + this.max) / 2;
       },
 
       redraw: function () {
