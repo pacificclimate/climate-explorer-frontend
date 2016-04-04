@@ -252,7 +252,9 @@ var CanadaMap = React.createClass({
         L.DomEvent
           .addListener(this.container, 'click', L.DomEvent.stopPropagation)
           .addListener(this.container, 'click', L.DomEvent.preventDefault);
-
+        this.layer.on('load', function () {
+          this.refreshValues();
+        }.bind(this));
         // Label elements
         var applyLabelStyle = function (el) {
           el.style.position = 'absolute';
