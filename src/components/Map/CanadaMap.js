@@ -243,6 +243,12 @@ var CanadaMap = React.createClass({
         this.container.style.borderWidth = '2px';
         this.container.style.borderStyle = 'solid';
         this.container.style.borderRadius = '10px';
+        this.container.style.opacity = '0.75';
+        this.container.style.color = '#424242';
+        this.container.style.fontWeight = 'bold';
+        this.container.style.textShadow = '0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white';
+        this.container.style.whiteSpace = 'nowrap';
+
         L.DomEvent
           .addListener(this.container, 'click', L.DomEvent.stopPropagation)
           .addListener(this.container, 'click', L.DomEvent.preventDefault);
