@@ -2,9 +2,14 @@
  * Relies upon global Leaflet variable 'L'
 */
 
+var round = function (number, places) {
+  return Math.round(number * Math.pow(10, places)) / Math.pow(10, places);
+};
+
 var ncWMSColorbarControl = L.Control.extend({
   options: {
     position: 'bottomright',
+    decimalPlaces: 2,
   },
 
   initialize: function (layer, options) {
@@ -109,9 +114,9 @@ var ncWMSColorbarControl = L.Control.extend({
 
   redraw: function () {
     this.container.style.backgroundImage = 'url("' + this.graphicUrl() + '")';
-    this.maxContainer.innerHTML = this.max;
-    this.midContainer.innerHTML = this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale);
-    this.minContainer.innerHTML = this.min;
+    this.maxContainer.innerHTML = round(this.max, this.options.decimalPlaces);
+    this.midContainer.innerHTML = round(this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale), this.options.decimalPlaces);
+    this.minContainer.innerHTML = round(this.min, this.options.decimalPlaces);
   },
 });
 
