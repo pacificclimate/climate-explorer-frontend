@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
 import { saveAs } from 'filesaver.js';
-import cn from 'classnames';
 
 import utils from './utils';
 
@@ -236,17 +235,38 @@ var CanadaMap = React.createClass({
       },
 
       onAdd: function () {
+        // Container element
         this.container = L.DomUtil.create('div', 'leaflet-control');
+        this.container.style.position = 'relative';
+        this.container.style.width = '20px';
+        this.container.style.height = '300px';
+        this.container.style.borderWidth = '2px';
+        this.container.style.borderStyle = 'solid';
+        this.container.style.borderRadius = '10px';
         L.DomEvent
           .addListener(this.container, 'click', L.DomEvent.stopPropagation)
           .addListener(this.container, 'click', L.DomEvent.preventDefault);
-        this.bar = L.DomUtil.create('div', styles.leafletControlColorbar, this.container);
-        this.maxElement = L.DomUtil.create('div', cn(styles.label, styles.max), this.bar);
-        this.maxElement.innerHTML = 'max';
-        this.midElement = L.DomUtil.create('div', cn(styles.label, styles.mid), this.bar);
-        this.midElement.innerHTML = 'mid';
-        this.minElement = L.DomUtil.create('div', cn(styles.label, styles.min), this.bar);
-        this.minElement.innerHTML = 'min';
+
+        // Label elements
+        var applyLabelStyle = function (el) {
+          el.style.position = 'absolute';
+          el.style.right = '20px';
+        };
+
+        this.maxContainer = L.DomUtil.create('div', '', this.container);
+        applyLabelStyle(this.maxContainer);
+        this.maxContainer.style.top = '-0.5em';
+        this.maxContainer.innerHTML = 'max';
+
+        this.midContainer = L.DomUtil.create('div', '', this.container);
+        applyLabelStyle(this.midContainer);
+        this.midContainer.style.top = '50%';
+        this.midContainer.innerHTML = 'mid';
+
+        this.minContainer = L.DomUtil.create('div', '', this.container);
+        applyLabelStyle(this.minContainer);
+        this.minContainer.style.bottom = '-0.5em';
+        this.minContainer.innerHTML = 'min';
 
         // TODO add event listener on layer change
 
@@ -291,9 +311,9 @@ var CanadaMap = React.createClass({
       },
 
       redraw: function () {
-        this.maxElement.innerHTML = this.max;
-        this.midElement.innerHTML = this.getMidpoint();
-        this.minElement.innerHTML = this.min;
+        this.maxContainer.innerHTML = this.max;
+        this.midContainer.innerHTML = this.getMidpoint();
+        this.minContainer.innerHTML = this.min;
       },
     });
 
