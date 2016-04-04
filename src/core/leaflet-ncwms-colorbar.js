@@ -71,23 +71,50 @@ var ncWMSColorbarControl = L.Control.extend({
     Source new values from the ncWMS server.
     Possible future breakage due to using layer._url and layer._map.
     */
-    $.ajax(this.layer._url, {
-      crossDomain: true,
-      data: {
-        request: 'GetMetadata',
-        item: 'minmax',
-        layers: this.layer.wmsParams.layers,
-        bbox: this.layer._map.getBounds().toBBoxString(),
-        time: this.layer.wmsParams.time,
-        srs: this.layer.wmsParams.srs,
-        width: 100,
-        height: 100,
-      },
-    }).done(function (data) {
-      this.min = data.min;
-      this.max = data.max;
+
+    if (this.layer.wmsParams.colorscalerange) {
+      // Use colorscalerange if defined on the layer
+      this.min = this.layer.wmsParams.colorscalerange.split(',')[0];
+      this.max = this.layer.wmsParams.colorscalerange.split(',')[1];
       this.redraw();
-    }.bind(this));
+    } else {
+      // Get layer bounds from `layerDetails`
+      var getLayerInfo = $.ajax(this.layer._url, {
+        context: this,
+        dataType: 'json',
+        crossDomain: true,
+        data: {
+          request: 'GetMetadata',
+          item: 'layerDetails',
+          layerName: this.layer.wmsParams.layers,
+          time: this.layer.wmsParams.time,
+        },
+      });
+
+      // Use that layerInfo bbox to for minmax request
+      var getMinMax = function (layerInfo) {
+        return $.ajax(this.layer._url, {
+          context: this,
+          crossDomain: true,
+          data: {
+            request: 'GetMetadata',
+            item: 'minmax',
+            layers: this.layer.wmsParams.layers,
+            bbox: layerInfo.bbox.join(),
+            time: this.layer.wmsParams.time,
+            srs: this.layer.wmsParams.srs,
+            width: 100,
+            height: 100,
+          },
+        });
+      };
+
+      $.when(getLayerInfo).then(getMinMax).done(function (data) {
+        this.min = data.min;
+        this.max = data.max;
+        this.redraw();
+      });
+    }
   },
 
   getMidpoint: function (mn, mx, logscale) {
