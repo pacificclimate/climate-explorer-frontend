@@ -31,7 +31,7 @@ var ncWMSColorbarControl = L.Control.extend({
     L.DomEvent
       .addListener(this.container, 'click', L.DomEvent.stopPropagation)
       .addListener(this.container, 'click', L.DomEvent.preventDefault);
-    this.layer.on('load', function () {
+    this.layer.on('loading', function () {
       this.refreshValues();
     }.bind(this));
 
