@@ -1,3 +1,9 @@
 .map {
     height: 100%;
 }
+
+.leafletControlImage {
+    background-image: url('./print_icon.png');
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+}
