@@ -5,6 +5,7 @@ import { saveAs } from 'filesaver.js';
 
 import utils from './utils';
 import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
+import NcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 import styles from './map.css';
 
@@ -222,6 +223,9 @@ var CanadaMap = React.createClass({
     map.addControl(new PrintControl());
 
     map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
+    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer, {
+      position: 'bottomright',
+    }));
   },
 
   componentWillUnmount: function () {
