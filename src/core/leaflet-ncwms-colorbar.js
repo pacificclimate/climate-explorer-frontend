@@ -1,5 +1,7 @@
 /*
- * Relies upon global Leaflet variable 'L'
+ * Requires global Leaflet variable `L`
+ * Compatible with any ncWMS server which fulfills `minmax` and
+ * `layerDetails` `GetMetadata` requests.
 */
 
 var round = function (number, places) {
