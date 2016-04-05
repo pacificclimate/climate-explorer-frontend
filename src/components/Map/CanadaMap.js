@@ -4,6 +4,7 @@ import leafletImage from 'leaflet-image';
 import { saveAs } from 'filesaver.js';
 
 import utils from './utils';
+import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 
 import styles from './map.css';
 
@@ -114,6 +115,7 @@ var CanadaMap = React.createClass({
     });
 
     this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
+    map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
     /*
     Draw controls
@@ -219,8 +221,7 @@ var CanadaMap = React.createClass({
 
     map.addControl(new PrintControl());
 
-    map.on('click', this.onMapClick);
-    map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
+    map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
   },
 
   componentWillUnmount: function () {

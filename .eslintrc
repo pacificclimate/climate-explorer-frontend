@@ -33,5 +33,6 @@
     "react/sort-comp": 1,
     "prefer-template": 0,
     "jsx-quotes": [2, "prefer-single"],
+    "no-param-reassign": [2, { "props": false }]
   }
 }
