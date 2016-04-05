@@ -85,8 +85,8 @@ var ncWMSColorbarControl = L.Control.extend({
 
     if (this.layer.wmsParams.colorscalerange) {
       // Use colorscalerange if defined on the layer
-      this.min = this.layer.wmsParams.colorscalerange.split(',')[0];
-      this.max = this.layer.wmsParams.colorscalerange.split(',')[1];
+      this.min = +this.layer.wmsParams.colorscalerange.split(',')[0];
+      this.max = +this.layer.wmsParams.colorscalerange.split(',')[1];
       this.redraw();
     } else {
       // Get layer bounds from `layerDetails`
