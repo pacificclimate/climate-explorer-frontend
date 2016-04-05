@@ -223,7 +223,9 @@ var CanadaMap = React.createClass({
     map.addControl(new PrintControl());
 
     map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
-    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer));
+    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer, {
+      position: 'bottomright',
+    }));
   },
 
   componentWillUnmount: function () {

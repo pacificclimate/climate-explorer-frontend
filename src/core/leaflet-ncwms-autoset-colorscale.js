@@ -22,6 +22,7 @@ var ncWMSAutoscaleControl = L.Control.extend({
 
     this.button = L.DomUtil.create('a', '', this.container);
     this.button.innerHTML = 'AS';
+    this.button.style.fontWeight = 'bold';
 
     // Set up event handling
     L.DomEvent
