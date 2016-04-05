@@ -10,6 +10,13 @@ var ncWMSColorbarControl = L.Control.extend({
   options: {
     position: 'bottomright',
     decimalPlaces: 2,
+    width: 20,
+    height: 300,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderRadius: 10,
+    opacity: 0.75,
+    color: '#424242',
   },
 
   initialize: function (layer, options) {
@@ -23,13 +30,13 @@ var ncWMSColorbarControl = L.Control.extend({
 
     Object.assign(this.container.style, {
       position: 'relative',
-      width: '20px',
-      height: '300px',
-      borderWidth: '2px',
-      borderStyle: 'solid',
-      borderRadius: '10px',
-      opacity: '0.75',
-      color: '#424242',
+      width: this.options.width + 'px',
+      height: this.options.height + 'px',
+      borderWidth: this.options.borderWidth + 'px',
+      borderStyle: this.options.borderStyle,
+      borderRadius: this.options.borderRadius + 'px',
+      opacity: this.options.opacity,
+      color: this.options.color,
       fontWeight: 'bold',
       textShadow: '0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white',
       whiteSpace: 'nowrap',
@@ -46,8 +53,8 @@ var ncWMSColorbarControl = L.Control.extend({
     // Create and style labels
     var applyLabelStyle = function (el) {
       el.style.position = 'absolute';
-      el.style.right = '20px';
-    };
+      el.style.right = this.options.width + 'px';
+    }.bind(this);
 
     this.maxContainer = L.DomUtil.create('div', '', this.container);
     applyLabelStyle(this.maxContainer);
@@ -136,9 +143,9 @@ var ncWMSColorbarControl = L.Control.extend({
     return this.layer._url + '?REQUEST=GetLegendGraphic' +
       '&COLORBARONLY=true' +
       '&WIDTH=1' +
-      '&HEIGHT=300' +
+      '&HEIGHT=' + this.options.height +
       '&PALETTE=' + palette +
-      '&NUMCOLORBANDS=254';
+      '&NUMCOLORBANDS=' + this.layer.wmsParams.numcolorbands;
   },
 
   redraw: function () {
