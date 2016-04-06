@@ -238,6 +238,11 @@ var CanadaMap = React.createClass({
   componentWillReceiveProps: function (newProps) {
     var params = { layers: newProps.dataset + '/' + newProps.variable };
     _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
+
+    // FIXME: This isn't ideal. Leaflet doesn't support /removing/
+    // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
+    delete(this.ncwmsLayer.wmsParams.colorscalerange);
+
     this.ncwmsLayer.setParams(params);
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
