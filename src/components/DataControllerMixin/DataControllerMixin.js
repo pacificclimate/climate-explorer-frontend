@@ -51,6 +51,16 @@ var ModalMixin = {
         area: props.area || null,
         time: timeidx,
       },
+    }).then(function(data, textstatus, jqXHR) {
+      if($.isEmptyObject(data)) {
+        return $.Deferred().reject(jqXHR, "empty", textstatus);
+      }
+      for(var run in data) {
+        if(!('data' in data[run]) || !('units' in data[run])){
+          return $.Deferred().reject(jqXHR, "incomplete", textstatus);            
+        }
+      }
+      return $.Deferred().resolve(data, textstatus, jqXHR);
     });
   },
 
@@ -66,6 +76,19 @@ var ModalMixin = {
         area: props.area || null,
         time: timeidx,
       },
+    }).then(function(data, textstatus, jqXHR){
+      if($.isEmptyObject(data)) {
+        return $.Deferred().reject(jqHXR, "empty", textstatus);
+      }
+      for(var file in data) {
+        if(!('mean' in data[file])|| !('stdev' in data[file]) || 
+           !('min' in data[file]) || !('max' in data[file]) || 
+           !('median' in data[file]) || !('ncells' in data[file]) || 
+           !('units' in data[file]) || !('time' in data[file])) {
+            return $.Deferred().reject(jqXHR, "incomplete", textstatus);
+        }
+      }
+      return $.Deferred().resolve(data,textstatus,jqXHR);
     });
   },
 
@@ -78,9 +101,37 @@ var ModalMixin = {
         variable: props.variable_id,
         area: props.area || null,
       },
+    }).then(function (data, textstatus, jqXHR) {
+      if($.isEmptyObject(data)) {
+        return $.Deferred().reject(jqXHR, "empty", textstatus);
+      }
+      else if(!('id' in data) || !('units' in data) || !('data' in data)) {
+        return $.Deferred().reject(jqXHR, "incomplete", textstatus);
+      }
+      return $.Deferred().resolve(data, textstatus, jqXHR);
     });
   },
-
+  
+  errorDescription: function (errorCode) {
+    
+    var errorMessages = {
+        "nocontent": "Error: requested data not available from this dataset",
+        "timeout": "Error: Data server timed out",
+        "parsererror": "Error: Data server misconfigured",
+        "abort": "Error: Connection to data server broken",
+        "error": "Error: Data server internal error",
+        "incomplete": "Error: Incomplete data received from data server",
+        "empty": "Error: requested model and emissions scenario data unavailable"
+    };
+    
+    if(errorCode in errorMessages) {
+      return errorMessages[errorCode];
+    }
+    else {
+      return "Unexpected error: " + errorCode;
+    }
+  },
+  
 };
 
 export default ModalMixin;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col } from 'react-bootstrap';
+import Loader from 'react-loader';
 
 import {
   dataApiToC3,
@@ -36,60 +37,112 @@ var DataController = React.createClass({
   },
 
   getData: function (props) {
+          
+    this.setTimeSeriesNoDataMessage("Loading Data");
+    this.setClimoSeriesNoDataMessage("Loading Data");
+    this.setStatsTableNoDataMessage("Loading Data");
+      
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-
-    $.when(myDataPromise, myStatsPromise, myTimeseriesPromise)
-     .done(function (dataResponse, statsResponse, timeseriesResponse) {
-       this.setState({
-         climoSeriesData: dataApiToC3(dataResponse[0]),
-         statsData: parseBootstrapTableData(this.injectRunIntoStats(statsResponse[0])),
-         timeSeriesData: parseTimeSeriesForC3(timeseriesResponse[0]),
-       });
-     }.bind(this));
-  },
-
-  shouldComponentUpdate: function (nextProps, nextState) {
-    // This guards against re-rendering before Ajax calls alter the state
-    return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
-           JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
-           JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
-           JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta);
-  },
-
-  updateProjChangeTimeOfYear: function (timeidx) {
-    this.setState({
-      projChangeTimeOfYear: timeidx,
-    });
-    this.getDataPromise(this.props, timeidx).done(function (data) {
+    
+    $.when(myDataPromise).then(function (data, textstatus, jqXHR) {
       this.setState({
         climoSeriesData: dataApiToC3(data),
       });
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
+      this.setClimoSeriesNoDataMessage(this.errorDescription(textstatus));
+    }.bind(this));
+    
+    $.when(myStatsPromise).then(function (data, textstatus, jqXHR) {
+      this.setState({
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
+      });
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown){
+      this.setStatsTableNoDataMessage(this.errorDescription(textstatus));
+      this.setState({statsData: []});
+    }.bind(this));
+    
+    $.when(myTimeseriesPromise).then(function (data, textstatus, jqXHR) {
+      this.setState({
+        timeSeriesData: parseTimeSeriesForC3(data),
+      });
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
+      this.setTimeSeriesNoDataMessage(this.errorDescription(textstatus));
+    }.bind(this));    
+  },
+    
+  setTimeSeriesNoDataMessage: function(message) {
+    this.setState({
+      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+                        axis: {} },
+      });
+  },
+  
+  setClimoSeriesNoDataMessage: function(message) {
+    this.setState({
+      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+                         axis: {} },
+      });
+  },
+  
+  setStatsTableNoDataMessage: function(message) {
+    this.setState({
+      statsTableOptions: { noDataText: message },
+    });
+  },
+  
+  shouldComponentUpdate: function (nextProps, nextState) {
+    // This guards against re-rendering before Ajax calls alter the state
+     return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
+     JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
+     JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
+     JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
+     nextState.statsTableOptions !== this.state.statsTableOptions;
+  },
+
+  updateProjChangeTimeOfYear: function (timeidx) {
+    this.setClimoSeriesNoDataMessage("Loading Data");
+    this.setState({
+      projChangeTimeOfYear: timeidx,
+    });
+    this.getDataPromise(this.props, timeidx).then(function (data) {
+      this.setState({
+        climoSeriesData: dataApiToC3(data),
+      });
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
+      this.setClimoSeriesNoDataMessage(this.errorDescription(textstatus));
     }.bind(this));
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
+    this.setStatsTableNoDataMessage("Loading Data");
     this.setState({
       dataTableTimeOfYear: timeidx,
     });
-    this.getStatsPromise(this.props, timeidx).done(function (data) {
+    this.getStatsPromise(this.props, timeidx).then(function (data) {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
       });
-    }.bind(this));
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown){
+        this.setStatsTableNoDataMessage(this.errorDescription(textstatus));
+        this.setState({statsData: []});
+      }.bind(this));
   },
 
   updateAnnCycleDataset: function (dataset) {
+    this.setTimeSeriesNoDataMessage("Loading Data");
     this.setState({
       timeSeriesDatasetId: dataset,
     });
-    this.getTimeseriesPromise(this.props, dataset).done(function (data) {
+    this.getTimeseriesPromise(this.props, dataset).then(function (data) {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(data),
       });
+    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
+      this.setTimeSeriesNoDataMessage(this.errorDescription(textstatus));
     }.bind(this));
   },
 
@@ -134,7 +187,7 @@ var DataController = React.createClass({
             <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
           </Col>
         </Row>
-        <DataTable data={statsData} />
+        <DataTable data={statsData}  options={this.state.statsTableOptions}/>
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
           <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>

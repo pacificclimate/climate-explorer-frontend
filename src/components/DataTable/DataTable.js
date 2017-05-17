@@ -10,7 +10,7 @@ var DataTable = React.createClass({
   render: function () {
     return (
       <div id={'table'}>
-        <BootstrapTable data={this.props.data} striped hover >
+        <BootstrapTable data={this.props.data} options={this.props.options} striped hover >
           <TableHeaderColumn dataField='model_period' isKey dataAlign='center' dataSort>Model Period</TableHeaderColumn>
           <TableHeaderColumn dataField='run' dataAlign='center' dataSort>Run</TableHeaderColumn>
           <TableHeaderColumn dataField='min' dataAlign='center' dataSort>Min</TableHeaderColumn>
