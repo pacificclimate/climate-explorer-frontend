@@ -55,7 +55,7 @@ var MapController = React.createClass({
       return el.unique_id === uniqueId;
     })[0];
 
-    this.requestTimeMetadata(uniqueId).then(function (response) {
+    this.requestTimeMetadata(uniqueId).then(response => {
       this.selectedDataset.times = response.data[uniqueId].times;
 
       this.setState({
@@ -65,7 +65,7 @@ var MapController = React.createClass({
         wmstime: response.data[uniqueId].times[0],
         variable: this.selectedDataset.variable_id,
       });
-    }.bind(this));
+    });
   },
 
   findUniqueId: function () {
@@ -91,7 +91,7 @@ var MapController = React.createClass({
   componentWillReceiveProps: function (nextProps) {
     this.selectedDataset = nextProps.meta[0];
 
-    this.requestTimeMetadata(this.selectedDataset.unique_id).then(function (response) {
+    this.requestTimeMetadata(this.selectedDataset.unique_id).then(response => {
       this.setState({
         times: response.data[this.selectedDataset.unique_id].times,
         timeidx: 0,
@@ -99,7 +99,7 @@ var MapController = React.createClass({
         wmstime: response.data[this.selectedDataset.unique_id].times[0],
         variable: this.selectedDataset.variable_id,
       });
-    }.bind(this));
+    });
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {

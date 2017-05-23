@@ -92,22 +92,17 @@ var ncWMSColorbarControl = L.Control.extend({
     } else {
       // Get layer bounds from `layerDetails`
       var getLayerInfo = axios(this.layer._url, {
-        // context: this,
         dataType: 'json',
-        // crossDomain: true,
         params: {
           request: 'GetMetadata',
           item: 'layerDetails',
           layerName: this.layer.wmsParams.layers,
           time: this.layer.wmsParams.time,
         },
-      });
-
-      // Use that layerInfo bbox to for minmax request
-      var getMinMax = function (layerInfo) {
+      });      
+      
+      var getMinMax = layerInfo => {
         return axios(this.layer._url, {
-          // context: this,
-          // crossDomain: true,
           params: {
             request: 'GetMetadata',
             item: 'minmax',
@@ -119,13 +114,13 @@ var ncWMSColorbarControl = L.Control.extend({
             height: 100,
           },
         });
-      }.bind(this);
-
-      getLayerInfo.then(getMinMax).then(function (response) {
+      };
+            
+      getLayerInfo.then(getMinMax).then(response => {
         this.min = response.data.min;
         this.max = response.data.max;
         this.redraw();
-      }.bind(this));
+      });
     }
   },
 

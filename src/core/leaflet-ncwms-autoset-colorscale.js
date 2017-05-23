@@ -50,9 +50,9 @@ var ncWMSAutoscaleControl = L.Control.extend({
         width: 100,
         height: 100,
       },
-    }).then(function (response) {
+    }).then(response => {
       this.layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
-    }.bind(this));
+    });
   },
 });
 

@@ -50,29 +50,29 @@ var DataController = React.createClass({
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
     
 
-    myDataPromise.then(function(response) {
+    myDataPromise.then(response => {
       this.setState({
         climoSeriesData: dataApiToC3(response.data),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
-    }.bind(this));
+    });
     
-    myStatsPromise.then(function(response) {
+    myStatsPromise.then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    }.bind(this)); 
+    }); 
     
-    myTimeseriesPromise.then(function(response) {
+    myTimeseriesPromise.then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
-    }.bind(this));
+    });
   },
     
   setTimeSeriesNoDataMessage: function(message) {
@@ -111,13 +111,13 @@ var DataController = React.createClass({
     this.setState({
       projChangeTimeOfYear: timeidx,
     });   
-    this.getDataPromise(this.props, timeidx).then(function(response) {
+    this.getDataPromise(this.props, timeidx).then(response => {
       this.setState({
         climoSeriesData: dataApiToC3(response.data),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
-    }.bind(this));    
+    });    
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
@@ -125,13 +125,13 @@ var DataController = React.createClass({
     this.setState({
       dataTableTimeOfYear: timeidx,
     });    
-    this.getStatsPromise(this.props, timeidx).then(function(response){
+    this.getStatsPromise(this.props, timeidx).then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    }.bind(this));
+    });
   },
 
   updateAnnCycleDataset: function (dataset) {
@@ -139,31 +139,14 @@ var DataController = React.createClass({
     this.setState({
       timeSeriesDatasetId: dataset,
     });
-    this.getTimeseriesPromise(this.props, dataset).then(function(response) {
+    this.getTimeseriesPromise(this.props, dataset).then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
-    }.bind(this));
+    });
   },
-  
-  // displayError: function(error, displayMethod) {
-  // if(error.response) { // data server sent a non-200 response
-  // displayMethod("Error: " + error.response.status + " received from data
-  // server.");
-  // }else if(error.request) { // data server didn't respond
-  // displayMethod("Error: no response received from data server.");
-  // }else { // either a failed data validation
-      // or a generic and somewhat unhelpful "Network Error" from axios
-      // Testing turned up "Network Error" in two cases:
-      // the server is down, or the server has a 500 error
-      // other http error statuses tested were reflected in
-      // error.response.status as expected
-      // (see https://github.com/mzabriskie/axios/issues/383)
-   // displayMethod(error.message);
-   // }
-  // },
   
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };

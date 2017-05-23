@@ -20,9 +20,9 @@ var ExperimentSelector = React.createClass({
   componentDidMount: function () {
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'models'),
-    }).then(function (response) {
+    }).then(response => {
       this.setState({ items: _.uniq(response.data) });
-    }.bind(this));
+    });
   },
 
   onChange: function (event) {

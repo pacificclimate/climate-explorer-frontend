@@ -37,21 +37,21 @@ var MotiDataController = React.createClass({
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
    
-    myStatsPromise.then(function(response) {
+    myStatsPromise.then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    }.bind(this)); 
+    }); 
     
-    myTimeseriesPromise.then(function(response) {
+    myTimeseriesPromise.then(response => {
       this.setState({
         timeSeriesData: timeseriesToC3(response.data),
       });
-    }.bind(this)).catch(function(error) {
+    }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
-    }.bind(this));  
+    });  
   },
   
   setTimeSeriesNoDataMessage: function(message) {

@@ -16,7 +16,7 @@ var AppMixin = {
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: CE_ENSEMBLE_NAME },
-      }).then(function (response) {
+      }).then(response => {
         for (var key in response.data) {
           vars = Object.keys(response.data[key].variables);
 
@@ -28,14 +28,14 @@ var AppMixin = {
               }, _.omit(response.data[key], 'variables')));
             }
           }
-
-        this.setState({
-          meta: models,
-          model_id: models[0].model_id,
-          variable_id: models[0].variable_id,
-          experiment: models[0].experiment,
-          });
-        }.bind(this));
+        
+         this.setState({
+         meta: models,
+         model_id: models[0].model_id,
+         variable_id: models[0].variable_id,
+         experiment: models[0].experiment,
+         });
+        });
   },
 
   handleSetArea: function (wkt) {
