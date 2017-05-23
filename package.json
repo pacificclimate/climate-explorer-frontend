@@ -30,6 +30,7 @@
     ]
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "bootstrap": "^3.3.5",
     "bootstrap-slider": "^5.1.0",
     "c3": "~0.4.11-rc4",

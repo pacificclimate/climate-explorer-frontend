@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
 import { exportTableDataToWorksheet } from '../../core/util';
+import axios from 'axios';
 
 var ModalMixin = {
 
@@ -14,6 +15,7 @@ var ModalMixin = {
       this.getData(this.props);
     }
   },
+  
 
   componentWillReceiveProps: function (nextProps) {
     this.setState({
@@ -40,98 +42,102 @@ var ModalMixin = {
   },
 
   getDataPromise: function (props, timeidx) {
-    return $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'data'),
-      crossDomain: true,
-      data: {
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'data'),
+      params: {
         ensemble_name: CE_ENSEMBLE_NAME,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
-        area: props.area || null,
+        area: props.area || "",
         time: timeidx,
-      },
-    }).then(function(data, textstatus, jqXHR) {
-      if($.isEmptyObject(data)) {
-        return $.Deferred().reject(jqXHR, "empty", textstatus);
       }
-      for(var run in data) {
-        if(!('data' in data[run]) || !('units' in data[run])){
-          return $.Deferred().reject(jqXHR, "incomplete", textstatus);            
-        }
-      }
-      return $.Deferred().resolve(data, textstatus, jqXHR);
-    });
+    }).then(this.validateAnnualData);    
   },
 
   getStatsPromise: function (props, timeidx) {
-    return $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'multistats'),
-      crossDomain: true,
-      data: {
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
+      params: {
         ensemble_name: CE_ENSEMBLE_NAME,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: timeidx,
-      },
-    }).then(function(data, textstatus, jqXHR){
-      if($.isEmptyObject(data)) {
-        return $.Deferred().reject(jqHXR, "empty", textstatus);
+        time: timeidx,   
       }
-      for(var file in data) {
-        if(!('mean' in data[file])|| !('stdev' in data[file]) || 
-           !('min' in data[file]) || !('max' in data[file]) || 
-           !('median' in data[file]) || !('ncells' in data[file]) || 
-           !('units' in data[file]) || !('time' in data[file])) {
-            return $.Deferred().reject(jqXHR, "incomplete", textstatus);
-        }
-      }
-      return $.Deferred().resolve(data,textstatus,jqXHR);
-    });
+    }).then(this.validateStatsData);
   },
 
   getTimeseriesPromise: function (props, timeSeriesDatasetId) {
-    return $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'timeseries'),
-      crossDomain: true,
-      data: {
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
+      params: {
         id_: timeSeriesDatasetId || null,
         variable: props.variable_id,
-        area: props.area || null,
-      },
-    }).then(function (data, textstatus, jqXHR) {
-      if($.isEmptyObject(data)) {
-        return $.Deferred().reject(jqXHR, "empty", textstatus);
+        area: props.area || "",
       }
-      else if(!('id' in data) || !('units' in data) || !('data' in data)) {
-        return $.Deferred().reject(jqXHR, "incomplete", textstatus);
+    }).then(this.validateTimeseriesData);    
+  },
+    
+  validateStatsData: function (response) {
+    if(_.isEmpty(response.data) || (typeof response.data == "string")) {
+      throw new Error("Error: statistical data unavailable for this model");
+    }
+    for(var file in response.data) {
+      if(!('mean' in response.data[file])|| (isNaN(response.data[file].mean)) ||
+        !('stdev' in response.data[file]) || (isNaN(response.data[file].stdev)) ||
+        !('min' in response.data[file]) || (isNaN(response.data[file].min)) ||
+        !('max' in response.data[file]) || (isNaN(response.data[file].max)) ||
+        !('median' in response.data[file]) || (isNaN(response.data[file].median)) ||
+        !('ncells' in response.data[file]) || (isNaN(response.data[file].ncells)) ||
+        !('units' in response.data[file]) ||
+        !('time' in response.data[file])) {
+        throw new Error("Error: statistical data for this model is incomplete"); 
+        }
       }
-      return $.Deferred().resolve(data, textstatus, jqXHR);
-    });
-  },
-  
-  errorDescription: function (errorCode) {
+    return response;
+    },
     
-    var errorMessages = {
-        "nocontent": "Error: requested data not available from this dataset",
-        "timeout": "Error: Data server timed out",
-        "parsererror": "Error: Data server misconfigured",
-        "abort": "Error: Connection to data server broken",
-        "error": "Error: Data server internal error",
-        "incomplete": "Error: Incomplete data received from data server",
-        "empty": "Error: requested model and emissions scenario data unavailable"
-    };
-    
-    if(errorCode in errorMessages) {
-      return errorMessages[errorCode];
-    }
-    else {
-      return "Unexpected error: " + errorCode;
-    }
-  },
+    validateTimeSeriesData: function(response) {
+      if(_.isEmpty(response.data)) {
+        throw new Error("Error: timeseries data unavailable for this model.");
+      }
+      if(!('id' in response.data) || 
+          !('units' in response.data) || 
+          !('data' in response.data)) {
+        throw new Error("Error: timeseries data for this model is incomplete");
+      }
+      return response;      
+    },
   
+    validateAnnualData : function(response){
+      if(_.isEmpty(response.data)) {
+        throw new Error("Error: annual data unavailable for this model.");
+      }
+      for(var run in response.data) {
+        if(!('data' in response.data[run]) || !('units' in response.data[run])) {
+          throw new Error("Error: annual data for this model is incomplete.");
+        }
+      }
+      return response; 
+    },
+    
+    displayError: function(error, displayMethod) {
+      if(error.response) { // data server sent a non-200 response
+        displayMethod("Error: " + error.response.status + " received from data server.");
+      }else if(error.request) { // data server didn't respond
+        displayMethod("Error: no response received from data server.");
+      }else {  // either a failed data validation
+        // or a generic and somewhat unhelpful "Network Error" from axios
+        // Testing turned up "Network Error" in two cases:
+        // the server is down, or the server has a 500 error.
+        // Other http error statuses tested were reflected in
+        // error.response.status as expected
+        // (see https://github.com/mzabriskie/axios/issues/383)
+        displayMethod(error.message);
+      }
+    }
 };
 
 export default ModalMixin;

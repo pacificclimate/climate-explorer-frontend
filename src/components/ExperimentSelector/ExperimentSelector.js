@@ -1,6 +1,7 @@
 import React from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
+import axios from 'axios';
 
 import styles from './ExperimentSelector.css';
 
@@ -17,11 +18,10 @@ var ExperimentSelector = React.createClass({
   },
 
   componentDidMount: function () {
-    $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'models'),
-      crossDomain: true,
-    }).done(function (data) {
-      this.setState({ items: _.uniq(data) });
+    axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'models'),
+    }).then(function (response) {
+      this.setState({ items: _.uniq(response.data) });
     }.bind(this));
   },
 

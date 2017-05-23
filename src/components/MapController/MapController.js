@@ -3,6 +3,7 @@ import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap
 import urljoin from 'url-join';
 import Loader from 'react-loader';
 import _ from 'underscore';
+import axios from 'axios';
 
 import { CanadaMap } from '../Map/CanadaMap';
 import Selector from '../Selector/Selector';
@@ -24,11 +25,8 @@ var MapController = React.createClass({
   mixins: [ModalMixin],
 
   /**
-   * State items also set from meta object array
-   * Includes:
-   *   - dataset
-   *   - wmstime
-   *   - variable
+   * State items also set from meta object array Includes: - dataset - wmstime -
+   * variable
    */
   getInitialState: function () {
     return {
@@ -57,14 +55,14 @@ var MapController = React.createClass({
       return el.unique_id === uniqueId;
     })[0];
 
-    this.requestTimeMetadata(uniqueId).done(function (data) {
-      this.selectedDataset.times = data[uniqueId].times;
+    this.requestTimeMetadata(uniqueId).then(function (response) {
+      this.selectedDataset.times = response.data[uniqueId].times;
 
       this.setState({
-        times: data[uniqueId].times,
+        times: response.data[uniqueId].times,
         timeidx: 0, // Time indices may not be equivalent across datasets
         dataset: this.selectedDataset.unique_id,
-        wmstime: data[uniqueId].times[0],
+        wmstime: response.data[uniqueId].times[0],
         variable: this.selectedDataset.variable_id,
       });
     }.bind(this));
@@ -82,10 +80,9 @@ var MapController = React.createClass({
   },
 
   requestTimeMetadata: function (uniqueId) {
-    return $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'metadata'),
-      crossDomain: true,
-      data: {
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
+      params: {
         model_id: uniqueId,
       },
     });
@@ -94,12 +91,12 @@ var MapController = React.createClass({
   componentWillReceiveProps: function (nextProps) {
     this.selectedDataset = nextProps.meta[0];
 
-    this.requestTimeMetadata(this.selectedDataset.unique_id).done(function (data) {
+    this.requestTimeMetadata(this.selectedDataset.unique_id).then(function (response) {
       this.setState({
-        times: data[this.selectedDataset.unique_id].times,
+        times: response.data[this.selectedDataset.unique_id].times,
         timeidx: 0,
         dataset: this.selectedDataset.unique_id,
-        wmstime: data[this.selectedDataset.unique_id].times[0],
+        wmstime: response.data[this.selectedDataset.unique_id].times[0],
         variable: this.selectedDataset.variable_id,
       });
     }.bind(this));

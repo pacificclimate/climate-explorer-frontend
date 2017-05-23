@@ -3,6 +3,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
 
+
 import {
   dataApiToC3,
   parseTimeSeriesForC3,
@@ -48,30 +49,30 @@ var DataController = React.createClass({
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
     
-    $.when(myDataPromise).then(function (data, textstatus, jqXHR) {
+
+    myDataPromise.then(function(response) {
       this.setState({
-        climoSeriesData: dataApiToC3(data),
+        climoSeriesData: dataApiToC3(response.data),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
-      this.setClimoSeriesNoDataMessage(this.errorDescription(textstatus));
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setClimoSeriesNoDataMessage);
     }.bind(this));
     
-    $.when(myStatsPromise).then(function (data, textstatus, jqXHR) {
+    myStatsPromise.then(function(response) {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown){
-      this.setStatsTableNoDataMessage(this.errorDescription(textstatus));
-      this.setState({statsData: []});
-    }.bind(this));
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    }.bind(this)); 
     
-    $.when(myTimeseriesPromise).then(function (data, textstatus, jqXHR) {
+    myTimeseriesPromise.then(function(response) {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(data),
+        timeSeriesData: parseTimeSeriesForC3(response.data),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
-      this.setTimeSeriesNoDataMessage(this.errorDescription(textstatus));
-    }.bind(this));    
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
+    }.bind(this));
   },
     
   setTimeSeriesNoDataMessage: function(message) {
@@ -91,11 +92,13 @@ var DataController = React.createClass({
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
+      statsData: [],
     });
   },
   
   shouldComponentUpdate: function (nextProps, nextState) {
-    // This guards against re-rendering before Ajax calls alter the state
+    // This guards against re-rendering before calls to the data sever alter the
+    // state
      return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
      JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
      JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
@@ -107,29 +110,28 @@ var DataController = React.createClass({
     this.setClimoSeriesNoDataMessage("Loading Data");
     this.setState({
       projChangeTimeOfYear: timeidx,
-    });
-    this.getDataPromise(this.props, timeidx).then(function (data) {
+    });   
+    this.getDataPromise(this.props, timeidx).then(function(response) {
       this.setState({
-        climoSeriesData: dataApiToC3(data),
+        climoSeriesData: dataApiToC3(response.data),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
-      this.setClimoSeriesNoDataMessage(this.errorDescription(textstatus));
-    }.bind(this));
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setClimoSeriesNoDataMessage);
+    }.bind(this));    
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
     this.setStatsTableNoDataMessage("Loading Data");
     this.setState({
       dataTableTimeOfYear: timeidx,
-    });
-    this.getStatsPromise(this.props, timeidx).then(function (data) {
+    });    
+    this.getStatsPromise(this.props, timeidx).then(function(response){
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown){
-        this.setStatsTableNoDataMessage(this.errorDescription(textstatus));
-        this.setState({statsData: []});
-      }.bind(this));
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    }.bind(this));
   },
 
   updateAnnCycleDataset: function (dataset) {
@@ -137,15 +139,32 @@ var DataController = React.createClass({
     this.setState({
       timeSeriesDatasetId: dataset,
     });
-    this.getTimeseriesPromise(this.props, dataset).then(function (data) {
+    this.getTimeseriesPromise(this.props, dataset).then(function(response) {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(data),
+        timeSeriesData: parseTimeSeriesForC3(response.data),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
-      this.setTimeSeriesNoDataMessage(this.errorDescription(textstatus));
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
     }.bind(this));
   },
-
+  
+  // displayError: function(error, displayMethod) {
+  // if(error.response) { // data server sent a non-200 response
+  // displayMethod("Error: " + error.response.status + " received from data
+  // server.");
+  // }else if(error.request) { // data server didn't respond
+  // displayMethod("Error: no response received from data server.");
+  // }else { // either a failed data validation
+      // or a generic and somewhat unhelpful "Network Error" from axios
+      // Testing turned up "Network Error" in two cases:
+      // the server is down, or the server has a 500 error
+      // other http error statuses tested were reflected in
+      // error.response.status as expected
+      // (see https://github.com/mzabriskie/axios/issues/383)
+   // displayMethod(error.message);
+   // }
+  // },
+  
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };

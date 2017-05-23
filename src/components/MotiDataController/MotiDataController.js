@@ -36,24 +36,22 @@ var MotiDataController = React.createClass({
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-
-    $.when(myStatsPromise).then(function (data, textstatus, jqXHR) {
+   
+    myStatsPromise.then(function(response) {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown){
-      this.setStatsTableNoDataMessage(this.errorDescription(textstatus));
-      this.setState({statsData: []});
-    }.bind(this));
-      
-    $.when(myTimeseriesPromise).then(function (data, textstatus, jqXHR) {
-      this.setState({
-        timeSeriesData: timeseriesToC3(data),
-      });
-    }.bind(this)).fail(function (jqXHR, textstatus, errorThrown) {
-      this.setTimeSeriesNoDataMessage(this.errorDescription(textstatus));
-    }.bind(this));    
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    }.bind(this)); 
     
+    myTimeseriesPromise.then(function(response) {
+      this.setState({
+        timeSeriesData: timeseriesToC3(response.data),
+      });
+    }.bind(this)).catch(function(error) {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
+    }.bind(this));  
   },
   
   setTimeSeriesNoDataMessage: function(message) {
@@ -66,11 +64,13 @@ var MotiDataController = React.createClass({
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
+      statsData: [],
     });
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
-    // This guards against re-rendering before Ajax calls alter the state
+    // This guards against re-rendering before calls to the data server alter
+    // the state
     return JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
            JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
            JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
