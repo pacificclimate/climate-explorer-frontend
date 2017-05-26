@@ -10,10 +10,7 @@ var App = React.createClass({
 
   /**
    * Initial state set upon metadata returning in {@link App#componentDidMount}.
-   * Includes:
-   *   - model_id
-   *   - variable_id
-   *   - experiment
+   * Includes: - model_id - variable_id - experiment
    */
 
   mixins: [AppMixin],
@@ -23,13 +20,13 @@ var App = React.createClass({
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={this.getMetadataItems('model_id')}/>
+            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={this.getMetadataItems('model_id')} value={this.state.model_id}/>
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()}/>
+            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')}/>
+            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')} value={this.state.experiment}/>
           </Col>
         </Row>
         <Row>
