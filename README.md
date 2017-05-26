@@ -59,13 +59,46 @@ You can lint all files `npm run lint`, or a specific file `npm run lint:glob <fi
 
 Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks directory) to abort a commit if any staged `*.js` files fail linting (warnings OK).
 
-If you *realy* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
+If you *really* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
 
 ### Setup using Docker
 
 ```bash
-docker build -t climate-explorer-frontend .
-docker run --rm -it -e "CE_BACKEND_URL=http://localhost:8000/api" -v $(pwd)/client:/app -p 8080:8080 --name frontend climate-explorer-frontend
+git clone https://github.com/pacificclimate/climate-explorer-frontend
+cd climate-explorer-frontend
+```
+
+Due to security concerns about DNS rebinding attacks, webpack validates the Host header of requests made to it. If the request's Host doesn't match what webpack thinks its own host is, webpack returns an Invalid Host Header error. While run in docker, webpack's internal IP is 0.0.0.0, so any requests it receives made to any other address, such as the docker node's public address, will fail. [Here's a good article about it.](https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a)
+
+The solution is to add a "public" argument with the docker node's public domain or ip address to the startup command for webpack in the `scripts` attribute of climate-explorer-frontend's `package.json`. 
+
+```json
+"scripts": {
+    "start": "webpack-dev-server --host 0.0.0.0 --public docker.node.address.here",
+    "build": "webpack --progress --colors",
+    "test": "jest --verbose",
+    "lint": "eslint .",
+    "lint:glob": "eslint"
+  },
+```
+
+Only addresses are validated, not ports, so it doesn't matter what port you assign the docker container when it is running.
+
+Then build a docker image:
+
+```bash
+docker build -t pcic/climate-explorer-frontend-image .
+```
+
+You can set the environmental configuration variables each time you run the image using docker's -e flag. You probably only need to set `CE_BACKEND_URL` to point to wherever you've set up the data server, and maybe `CE_ENSEMBLE_NAME`. 
+
+
+```bash
+docker run -it -e "CE_BACKEND_URL=http://location.of.dataserver:dataserverport/api"
+               -e "CE_ENSEMBLE_NAME=ce" 
+               -p whateverexternalport:8080 
+               --name climate-explorer-frontend
+               climate-explorer-frontend-image
 ```
 
 ## Releasing
