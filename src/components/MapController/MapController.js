@@ -24,7 +24,7 @@ var MapController = React.createClass({
 
   mixins: [ModalMixin],
 
-  /**
+  /*
    * State items also set from meta object array Includes: - dataset - wmstime -
    * variable
    */
@@ -138,7 +138,7 @@ var MapController = React.createClass({
       return [k, v];
     });
 
-    var map;
+    var map, mapFooter;
     if (this.state.dataset) {
       map = (
         <CanadaMap
@@ -150,9 +150,23 @@ var MapController = React.createClass({
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />
+      );    
+      var dataAttributes = this.state.dataset.split('_');
+      var run = dataAttributes[4];
+      var startYear = dataAttributes[5].slice(0, 4);
+      var endYear = dataAttributes[5].slice(9, 13);
+      var time = this.state.wmstime.slice(0,10);
+      mapFooter = (
+        <h5>
+          Dataset: {run} &nbsp;
+          {startYear} - {endYear} &nbsp;
+          Time: {time}
+        </h5>
       );
+      
     } else {
       map = <Loader />;
+      mapFooter = "";
     }
 
     return (
@@ -170,7 +184,9 @@ var MapController = React.createClass({
                   <GeoLoader onLoadArea={this.handleSetArea} title='Import polygon' />
                 </ButtonGroup>
               </div>
-
+              <div className={styles.footer}>
+                {mapFooter}
+              </div>
             </div>
           </Col>
         </Row>
