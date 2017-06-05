@@ -35,7 +35,6 @@
     "bootstrap-slider": "^5.1.0",
     "c3": "~0.4.11-rc4",
     "filesaver.js": "^0.2.0",
-    "jquery": "^2.1.4",
     "leaflet": "0.7.3",
     "leaflet-draw": "^0.3.0",
     "moment": "^2.10.6",

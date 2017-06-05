@@ -85,17 +85,13 @@ var ModalMixin = {
       throw new Error("Error: statistical data unavailable for this model");
     }
     for(var file in response.data) {
-      if(!('mean' in response.data[file])|| (isNaN(response.data[file].mean)) ||
-        !('stdev' in response.data[file]) || (isNaN(response.data[file].stdev)) ||
-        !('min' in response.data[file]) || (isNaN(response.data[file].min)) ||
-        !('max' in response.data[file]) || (isNaN(response.data[file].max)) ||
-        !('median' in response.data[file]) || (isNaN(response.data[file].median)) ||
-        !('ncells' in response.data[file]) || (isNaN(response.data[file].ncells)) ||
-        !('units' in response.data[file]) ||
-        !('time' in response.data[file])) {
-        throw new Error("Error: statistical data for this model is incomplete"); 
-        }
+      if(_.some('mean stdev min max median ncells'.split(''),
+          attr => !(attr in respone.data[file]) || isNAN(response.data[file][attr])) ||
+          _.some('units time'.split(' '),
+              attr => !(attr in response.data[file]))) {
+        throw new Error("Error: statistical data for this model is incomplete");
       }
+    }
     return response;
     },
     
@@ -103,9 +99,7 @@ var ModalMixin = {
       if(_.isEmpty(response.data)) {
         throw new Error("Error: timeseries data unavailable for this model.");
       }
-      if(!('id' in response.data) || 
-          !('units' in response.data) || 
-          !('data' in response.data)) {
+      if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
         throw new Error("Error: timeseries data for this model is incomplete");
       }
       return response;      
