@@ -3,6 +3,7 @@
  * Compatible with any ncWMS server which fulfills the `minmax`
  * `GetMetadata` requests.
 */
+import axios from 'axios';
 
 var ncWMSAutoscaleControl = L.Control.extend({
   options: {
@@ -35,13 +36,11 @@ var ncWMSAutoscaleControl = L.Control.extend({
 
   autoscale: function () {
     /*
-    Get min/max for current view then update layer params
-    */
-
-    $.ajax(this.layer._url, {
-      context: this,
-      crossDomain: true,
-      data: {
+     * Get min/max for current view then update layer params
+     */
+    
+    axios(this.layer._url, {
+      params: {
         request: 'GetMetadata',
         item: 'minmax',
         layers: this.layer.wmsParams.layers,
@@ -51,8 +50,8 @@ var ncWMSAutoscaleControl = L.Control.extend({
         width: 100,
         height: 100,
       },
-    }).done(function (data) {
-      this.layer.setParams({ colorscalerange: data.min + ',' + data.max });
+    }).then(response => {
+      this.layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
     });
   },
 });

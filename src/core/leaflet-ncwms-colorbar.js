@@ -3,6 +3,7 @@
  * Compatible with any ncWMS server which fulfills `minmax` and
  * `layerDetails` `GetMetadata` requests.
 */
+import axios from 'axios';
 
 var round = function (number, places) {
   return Math.round(number * Math.pow(10, places)) / Math.pow(10, places);
@@ -79,10 +80,10 @@ var ncWMSColorbarControl = L.Control.extend({
 
   refreshValues: function () {
     /*
-    Source new values from the ncWMS server.
-    Possible future breakage due to using layer._url and layer._map.
-    */
-
+     * Source new values from the ncWMS server. Possible future breakage due to
+     * using layer._url and layer._map.
+     */
+    
     if (this.layer.wmsParams.colorscalerange) {
       // Use colorscalerange if defined on the layer
       this.min = +this.layer.wmsParams.colorscalerange.split(',')[0];
@@ -90,28 +91,23 @@ var ncWMSColorbarControl = L.Control.extend({
       this.redraw();
     } else {
       // Get layer bounds from `layerDetails`
-      var getLayerInfo = $.ajax(this.layer._url, {
-        context: this,
+      var getLayerInfo = axios(this.layer._url, {
         dataType: 'json',
-        crossDomain: true,
-        data: {
+        params: {
           request: 'GetMetadata',
           item: 'layerDetails',
           layerName: this.layer.wmsParams.layers,
           time: this.layer.wmsParams.time,
         },
-      });
-
-      // Use that layerInfo bbox to for minmax request
-      var getMinMax = function (layerInfo) {
-        return $.ajax(this.layer._url, {
-          context: this,
-          crossDomain: true,
-          data: {
+      });      
+      
+      var getMinMax = layerInfo => {
+        return axios(this.layer._url, {
+          params: {
             request: 'GetMetadata',
             item: 'minmax',
             layers: this.layer.wmsParams.layers,
-            bbox: layerInfo.bbox.join(),
+            bbox: layerInfo.data.bbox.join(),
             time: this.layer.wmsParams.time,
             srs: this.layer.wmsParams.srs,
             width: 100,
@@ -119,10 +115,10 @@ var ncWMSColorbarControl = L.Control.extend({
           },
         });
       };
-
-      $.when(getLayerInfo).then(getMinMax).done(function (data) {
-        this.min = data.min;
-        this.max = data.max;
+            
+      getLayerInfo.then(getMinMax).then(response => {
+        this.min = response.data.min;
+        this.max = response.data.max;
         this.redraw();
       });
     }

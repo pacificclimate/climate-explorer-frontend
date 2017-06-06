@@ -1,6 +1,8 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col } from 'react-bootstrap';
+import Loader from 'react-loader';
+
 
 import {
   dataApiToC3,
@@ -36,63 +38,116 @@ var DataController = React.createClass({
   },
 
   getData: function (props) {
+          
+    this.setTimeSeriesNoDataMessage("Loading Data");
+    this.setClimoSeriesNoDataMessage("Loading Data");
+    this.setStatsTableNoDataMessage("Loading Data");
+      
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
+    
 
-    $.when(myDataPromise, myStatsPromise, myTimeseriesPromise)
-     .done(function (dataResponse, statsResponse, timeseriesResponse) {
-       this.setState({
-         climoSeriesData: dataApiToC3(dataResponse[0]),
-         statsData: parseBootstrapTableData(this.injectRunIntoStats(statsResponse[0])),
-         timeSeriesData: parseTimeSeriesForC3(timeseriesResponse[0]),
-       });
-     }.bind(this));
+    myDataPromise.then(response => {
+      this.setState({
+        climoSeriesData: dataApiToC3(response.data),
+      });
+    }).catch(error => {
+      this.displayError(error, this.setClimoSeriesNoDataMessage);
+    });
+    
+    myStatsPromise.then(response => {
+      this.setState({
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+      });
+    }).catch(error => {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    }); 
+    
+    myTimeseriesPromise.then(response => {
+      this.setState({
+        timeSeriesData: parseTimeSeriesForC3(response.data),
+      });
+    }).catch(error => {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
+    });
   },
-
+    
+  setTimeSeriesNoDataMessage: function(message) {
+    this.setState({
+      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+                        axis: {} },
+      });
+  },
+  
+  setClimoSeriesNoDataMessage: function(message) {
+    this.setState({
+      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+                         axis: {} },
+      });
+  },
+  
+  setStatsTableNoDataMessage: function(message) {
+    this.setState({
+      statsTableOptions: { noDataText: message },
+      statsData: [],
+    });
+  },
+  
   shouldComponentUpdate: function (nextProps, nextState) {
-    // This guards against re-rendering before Ajax calls alter the state
-    return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
-           JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
-           JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
-           JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta);
+    // This guards against re-rendering before calls to the data sever alter the
+    // state
+     return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
+     JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
+     JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
+     JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
+     nextState.statsTableOptions !== this.state.statsTableOptions;
   },
 
   updateProjChangeTimeOfYear: function (timeidx) {
+    this.setClimoSeriesNoDataMessage("Loading Data");
     this.setState({
       projChangeTimeOfYear: timeidx,
-    });
-    this.getDataPromise(this.props, timeidx).done(function (data) {
+    });   
+    this.getDataPromise(this.props, timeidx).then(response => {
       this.setState({
-        climoSeriesData: dataApiToC3(data),
+        climoSeriesData: dataApiToC3(response.data),
       });
-    }.bind(this));
+    }).catch(error => {
+      this.displayError(error, this.setClimoSeriesNoDataMessage);
+    });    
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
+    this.setStatsTableNoDataMessage("Loading Data");
     this.setState({
       dataTableTimeOfYear: timeidx,
-    });
-    this.getStatsPromise(this.props, timeidx).done(function (data) {
+    });    
+    this.getStatsPromise(this.props, timeidx).then(response => {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
-    }.bind(this));
+    }).catch(error => {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    });
   },
 
   updateAnnCycleDataset: function (dataset) {
+    this.setTimeSeriesNoDataMessage("Loading Data");
     this.setState({
       timeSeriesDatasetId: dataset,
     });
-    this.getTimeseriesPromise(this.props, dataset).done(function (data) {
+    this.getTimeseriesPromise(this.props, dataset).then(response => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(data),
+        timeSeriesData: parseTimeSeriesForC3(response.data),
       });
-    }.bind(this));
+    }).catch(error => {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
+    });
   },
-
+  
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
@@ -134,7 +189,7 @@ var DataController = React.createClass({
             <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
           </Col>
         </Row>
-        <DataTable data={statsData} />
+        <DataTable data={statsData}  options={this.state.statsTableOptions}/>
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
           <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>

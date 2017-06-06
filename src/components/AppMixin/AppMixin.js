@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
+import axios from 'axios';
 
 var AppMixin = {
   getInitialState: function () {
@@ -11,30 +12,30 @@ var AppMixin = {
   componentDidMount: function () {
     var models = [];
     var vars;
-    $.ajax({
-      url: urljoin(CE_BACKEND_URL, 'multimeta'),
-      data: { ensemble_name: CE_ENSEMBLE_NAME },
-      crossDomain: true,
-    }).done(function (data) {
-      for (var key in data) {
-        vars = Object.keys(data[key].variables);
+       
+    axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
+      params: { ensemble_name: CE_ENSEMBLE_NAME },
+      }).then(response => {
+        for (var key in response.data) {
+          vars = Object.keys(response.data[key].variables);
 
-        for (var v in vars) {
-          models.push(_.extend({
-            unique_id: key,
-            variable_id: vars[v],
-            variable_name: data[key].variables[vars[v]],
-          }, _.omit(data[key], 'variables')));
-        }
-      }
-
-      this.setState({
-        meta: models,
-        model_id: models[0].model_id,
-        variable_id: models[0].variable_id,
-        experiment: models[0].experiment,
-      });
-    }.bind(this));
+          for (var v in vars) {
+            models.push(_.extend({
+              unique_id: key,
+              variable_id: vars[v],
+              variable_name: response.data[key].variables[vars[v]],
+              }, _.omit(response.data[key], 'variables')));
+            }
+          }
+        
+         this.setState({
+         meta: models,
+         model_id: models[0].model_id,
+         variable_id: models[0].variable_id,
+         experiment: models[0].experiment,
+         });
+        });
   },
 
   handleSetArea: function (wkt) {
