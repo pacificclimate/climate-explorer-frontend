@@ -13,8 +13,6 @@ var utcDateToYYYYMMDD = function (d) {
 
 var timeseriesToC3 = function (data) {
   var c3Data;
-  var aNumber = 3.44444;
-  var fixed = aNumber.toFixed(2);
 
   c3Data = {
     x: 'x',
