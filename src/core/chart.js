@@ -40,7 +40,7 @@ var timeseriesToC3 = function (data) {
           position: 'outer-middle',
         },
         tick: {
-          format: function(n) {return n.toFixed(2);},
+          format: function(n) {return Math.round(n * 100) / 100;},
         },
       },
     },
