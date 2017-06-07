@@ -3,9 +3,9 @@ import moment from 'moment';
 
 
 /*
- * This module provides funtions translate chart data from api source
- * to the destination chart type
-*/
+ * This module provides functions to translate chart data from api source to the
+ * destination chart type
+ */
 
 var utcDateToYYYYMMDD = function (d) {
   return moment(d).utc().format('YYYY-MM-DD');
@@ -38,6 +38,9 @@ var timeseriesToC3 = function (data) {
         label: {
           text: data.units,
           position: 'outer-middle',
+        },
+        tick: {
+          format: function (n) {return +n.toFixed(2);},
         },
       },
     },
