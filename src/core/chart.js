@@ -39,7 +39,9 @@ var timeseriesToC3 = function (data) {
           text: data.units,
           position: 'outer-middle',
         },
-        tick: {},
+        tick: {
+          
+        },
       },
     },
     tooltip: {
