@@ -183,14 +183,19 @@ const outputC3TimeSeriesTooltipInfo = {
 };
 
 describe('parseTimeSeriesForC3', function () {
-  it('Correctly parses a JSON object with time series data from one model for plotting with C3', function () {
-    var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
+  it('Correctly parses a JSON object with time series data from one model for plotting with C3', 
+    function () {
+      var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
+      var result = parseTimeSeriesForC3(testTimeSeries, true);
+      expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
+    });
 
-    var result = parseTimeSeriesForC3(testTimeSeries);
-
-    expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
-
-  });
+  it('Correctly simplifies a JSON object with time series data for plotting on the MOTI data portal',
+    function () {
+      var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
+      var result = parseTimeSeriesForC3(testTimeSeries, false);
+      expect(result.data.columns).toEqual(outputC3TimeSeries.columns.slice(0, 1));
+    });
 });
 
 const bootstrapTableTestData = {
