@@ -30,36 +30,36 @@ var MotiDataController = React.createClass({
 
   getData: function (props) {
     this.setTimeSeriesNoDataMessage("Loading Data");
-    this.setStatsTableNoDataMessage("Loading Data");  
-      
+    this.setStatsTableNoDataMessage("Loading Data");
+
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-   
+
     myStatsPromise.then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    }); 
-    
+    });
+
     myTimeseriesPromise.then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data, false),
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
-    });  
+    });
   },
-  
+
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                         axis: {} },
       });
   },
-    
+
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
@@ -83,6 +83,11 @@ var MotiDataController = React.createClass({
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
+        <div>
+          Download Data &nbsp;
+          <Button onClick={this.exportSingleTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
+          <Button onClick={this.exportSingleTimeSeries.bind(this, 'csv')}>CSV</Button>
+        </div>
         <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
 
         <DataTable data={statsData} options={this.state.statsTableOptions} />

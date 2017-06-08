@@ -170,7 +170,15 @@ var DataController = React.createClass({
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} />
+                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} /> 
+              </Col>
+              <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+                <div>
+                  Download Data
+                  <br/>
+                  <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
+                </div>
               </Col>
             </Row>
             <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
@@ -179,6 +187,14 @@ var DataController = React.createClass({
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
                 <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
+              </Col>
+              <Col>
+                <div>
+                  Download Data
+                  <br/>
+                  <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
+                </div>
               </Col>
             </Row>
             <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />

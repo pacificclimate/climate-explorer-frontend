@@ -18,18 +18,12 @@ var mergeC3Data = function (old, toAdd) {
 
 
 /*
- * Formats a single entry from a Climate Explorer `data` api call
- * into C3 compatible input
+ * Formats a single entry from a Climate Explorer `data` api call into C3
+ * compatible input
  *
- * Input:
- *   @param name: Run name
- *     eg: r1i1p1
- *   @param data: Js object of {timeval: result}
- *     eg: { '2025-04-16': 281.1234,
- *       '2055-04-16': 284.3456 }
- * Output:
- *  [ [ 'r1i1p1_xs', '2025-04-16', '2055-04-16' ],
- *    'r1i1p1', 281.12, 284.35 ] ]
+ * Input: @param name: Run name eg: r1i1p1 @param data: Js object of {timeval:
+ * result} eg: { '2025-04-16': 281.1234, '2055-04-16': 284.3456 } Output: [ [
+ * 'r1i1p1_xs', '2025-04-16', '2055-04-16' ], 'r1i1p1', 281.12, 284.35 ] ]
  */
 var genC3DataFromModel = function (name, data, unit, axisMap) {
   var axes = {};
@@ -43,8 +37,8 @@ var genC3DataFromModel = function (name, data, unit, axisMap) {
 /*
  * Generates a C3 compatible 'axis' object
  *
- * Returns an object with keys containing the c3 axis data
- * and a reverse unit to y axis label map
+ * Returns an object with keys containing the c3 axis data and a reverse unit to
+ * y axis label map
  *
  */
 var generateAxisInfo = function (units) {
@@ -91,8 +85,8 @@ var generateXAxis = function (data) {
 };
 
 /*
- * Sample input:
- * {'r1i1p1': {'units': 'K', 'data': {'2025-04-16T00:00:00Z': 281}}}
+ * Sample input: {'r1i1p1': {'units': 'K', 'data': {'2025-04-16T00:00:00Z':
+ * 281}}}
  */
 var dataApiToC3 = function (data) {
   // Initialize the x axis data to the first
@@ -117,9 +111,12 @@ var dataApiToC3 = function (data) {
   _.extend(c3AxisInfo, generateAxisInfo(units).axisData);
   var unitsMap = generateAxisInfo(units).unitsMap;
 
-  // NOTE: we have not found a way yet to display units if we have multiple axes of different
-  // units/variable type (e.g. 'mm' and 'degrees_C'), as the tooltip option is applied globally across
-  // all chart series.  So for now we assume the keys of unitsMap are all the same (i.e. just
+  // NOTE: we have not found a way yet to display units if we have multiple axes
+  // of different
+  // units/variable type (e.g. 'mm' and 'degrees_C'), as the tooltip option is
+  // applied globally across
+  // all chart series. So for now we assume the keys of unitsMap are all the
+  // same (i.e. just
   // one variable type is being displayed).
   var tooltipInfo = {
     grouped: true,
@@ -162,7 +159,8 @@ var parseDataForC3 = function (data) {
         dataSeries.push(val);
       }
       else { // this is the units of the series, which also defines the y axes
-        if (key === 'units' && data[model][key] !== yUnits) { // don't create redundant axes
+        if (key === 'units' && data[model][key] !== yUnits) { // don't create
+                                                              // redundant axes
           yUnits = String(data[model][key]);
           var modelYaxisLabel = yAxisCount ? 'y'.concat(yAxisCount) : 'y';
 
@@ -289,29 +287,14 @@ var parseTimeSeriesForC3 = function (graph_data, include_seasonal_data) {
 };
 
 /*
-    Takes a multistats object of the following form and
-    1) flattens it, and
-    2) rounds numeric values
-    for passing to the DataTable component for rendering:
-
-    {
-      'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
-      {
-        'median': 278.34326171875,
-        'min': 225.05545043945312,
-        'units': 'K',
-        'mean': 273.56732177734375,
-        'max': 303.601318359375,
-        'ncells': 8192,
-        'stdev': 22.509726901403784,
-        'run': 'r1i1p1'
-      },
-      'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
-      {
-        ...
-      }
-    };
-*/
+ * Takes a multistats object of the following form and 1) flattens it, and 2)
+ * rounds numeric values for passing to the DataTable component for rendering: {
+ * 'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231': { 'median':
+ * 278.34326171875, 'min': 225.05545043945312, 'units': 'K', 'mean':
+ * 273.56732177734375, 'max': 303.601318359375, 'ncells': 8192, 'stdev':
+ * 22.509726901403784, 'run': 'r1i1p1' },
+ * 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231': { ... } };
+ */
 var parseBootstrapTableData = function (data) {
   return _.map(data, function (stats, model) {
     var splitYears = model.split('_')[5].split('-');
@@ -331,10 +314,11 @@ var parseBootstrapTableData = function (data) {
 };
 
 /*
-    Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
-    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
-*/
-
+ * Helper function for exportDataToWorksheet, creates summary rows that appear
+ * at the top of the exported worksheet for exported stats table or Projected
+ * Change data. Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
+ */
 var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 
   var rows = [];
@@ -354,10 +338,10 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 };
 
 /*
-    Helper function for exportTableDataToWorksheet, creates data column headers and data entries for exported worksheet
-    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
-*/
-
+ * Helper function for exportDataToWorksheet, creates data column headers and
+ * data entries for exported worksheet Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
+ */
 var fillWorksheetDataCells = function (data) {
 
   var rows = _.map(data, function (stats) {
@@ -371,9 +355,10 @@ var fillWorksheetDataCells = function (data) {
 };
 
 /*
-    Helper function for exportTableDataToWorksheet, combines summary rows, data column headers, and data into one worksheet
-    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
-*/
+ * Helper function for exportDataToWorksheet, combines summary rows, data column
+ * headers, and data into one worksheet Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
+ */
 var assembleWorksheet = function (cells) {
   var cell_ref;
   var ws = {};
@@ -411,32 +396,54 @@ var timeIndexToTimeOfYear = function (timeidx) {
 };
 
 /*
-    Takes current data displayed in the DataTable and contextual data from user input,
-    creates an XLSX or CSV file, and serves it to the user for download.
-    Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
-*/
-var exportTableDataToWorksheet = function (metadata, data, format, timeidx) {
-    // create workbook object containing one or more worksheets
+ * Takes current data displayed in the DataTable, Annual Cycle graph, or
+ * Projected Change graph, along with contextual data from user input, creates
+ * an XLSX or CSV file, and serves it to the user for download. Draws on example
+ * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
+ */
+var exportDataToWorksheet = function(datatype, metadata, data, format, timeidx) {
+  // create workbook object containing one or more worksheets
   var wb = {
-    Sheets: {},
-    SheetNames: []
+      Sheets: {},
+      SheetNames: []
   };
 
-  var timeOfYear = timeIndexToTimeOfYear(timeidx);
+  // prepare filename, metadata cells, and data cells
+  var summaryCells, dataCells, outputFilename;
+  switch(datatype) {
+    case "timeseries":
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
+      dataCells = fillMultiTimeSeriesWorksheetDataCells(data);
+      outputFilename = "PCIC_CE_TimeSeriesExport_" + metadata.model_id + "_" + metadata.experiment + "_" +
+                    metadata.variable_id + "." + format;
+      break;
+    case "stats":
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
+      dataCells = fillWorksheetDataCells(data);
+      outputFilename = 'PCIC_CE_StatsTableExport_' + metadata.model_id + '_' + metadata.experiment +
+                    '_' + metadata.variable_id + '_' + timeIndexToTimeOfYear(timeidx) + '.' + format;
+      break;
+    case "climoseries":
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
+      dataCells = fillClimoSeriesDataCells(data);
+      outputFilename = 'PCIC_CE_ProjectedChangeExport_' + metadata.model_id + '_' + metadata.experiment +
+                   '_' + metadata.variable_id + timeIndexToTimeOfYear(timeidx) + '.' + format;
+      break;
+    case "single-timeseries":
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
+      dataCells = fillSingleTimeSeriesWorksheetDataCells(data);
+      outputFilename = "PCIC_CE_TimeSeriesExport_" + metadata.model_id + "_" + metadata.experiment + "_" +
+                    metadata.variable_id + "." + format;
 
-    // prepare summary cells
-  var summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
+  }
 
-    // prepare data cells
-  var dataCells = fillWorksheetDataCells(data);
-
-    // assemble summaryCells, empty row, and dataCells into one XLSX-encoded worksheet
+  // assemble the worksheet and add it to the workbook.
+  // Note: sheetName will be truncated to 31 chars in
+  // XLSX export to meet Excel limitation
   var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
-
-    // add worksheet to workbook. Note: ws_name will be truncated to 31 chars in XLSX export to meet Excel limitation
-  var ws_name = 'Stats_Table_' + metadata.variable_id + '_' + timeOfYear;
-  wb.SheetNames.push(ws_name);
-  wb.Sheets[ws_name] = ws;
+  var sheetName = datatype + "_" + metadata.variable_id;
+  wb.SheetNames.push(sheetName);
+  wb.Sheets[sheetName] = ws;
 
   function xml_to_binary_string(s) {
     var buf = new ArrayBuffer(s.length);
@@ -447,24 +454,150 @@ var exportTableDataToWorksheet = function (metadata, data, format, timeidx) {
     return buf;
   }
 
+  // format workbook for either csv or xlsx
   var out_data;
   if (format === 'csv') {
     out_data = new Blob(
-            [XLSX.utils.sheet_to_csv(wb.Sheets[ws_name])],
-            { type:'' }
+        [XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])],
+        { type:'' }
+        );
+    }
+  else if (format === 'xlsx') {
+    var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
+    out_data = new Blob(
+        [xml_to_binary_string(wbout)],
+        { type:'' }
         );
   }
-    else if (format === 'xlsx') {
-        // convert workbook to XLSX and prepare for download
-      var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary' });
-      out_data = new Blob([xml_to_binary_string(wbout)], { type:'' });
+  // serve file for download
+  filesaver.saveAs(out_data, outputFilename);
+};
+/*
+ * Helper function for exportDataToWorksheet that generates metadata / summary
+ * cells for export of Annual Cycle data.
+ */
+var createTimeSeriesWorksheetSummaryCells = function (metadata) {
+
+  var rows = [];
+
+  var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name'];
+  rows.push(header);
+
+  rows.push([
+    metadata.model_id,
+    metadata.experiment,
+    metadata.variable_id,
+    metadata.variable_name
+  ]);
+
+  return rows;
+};
+
+/*
+ * Helper function for exportDataToWorksheet that generates data cells for
+ * Projected change climo series data.
+ */
+var fillClimoSeriesDataCells = function(data) {
+  var timestamps = [];
+  var rows = [];
+  var column_labels = ['Run'];
+
+  for(var run in data) {
+    for(var time in data[run].data) {
+      if(timestamps.indexOf(time) == -1) {
+        timestamps.push(time);
+      }
     }
-    // form output filename
-  var output_filename = 'PCIC_CE_StatsTableExport_' + metadata.model_id + '_' + metadata.experiment +
-                            '_' + metadata.variable_id + '_' + timeOfYear + '.' + format;
-    // serve up file for download
-  filesaver.saveAs(out_data, output_filename);
+  }
+  for(time in timestamps.sort()) {
+    column_labels.push(timestamps[time]);
+  }
+  column_labels.push("Units");
+
+  for(var run in data) {
+    var row = [run];
+    for(time in timestamps.sort()) {
+      row.push(data[run].data[timestamps[time]]);
+    }
+    row.push(data[run].units);
+    rows.push(row);
+  }
+  rows.unshift(column_labels);
+  return rows;
+};
+
+/*
+ * Helper function for exportDataToWorksheet that generates data cells for
+ * Annual Cycle export.
+ */
+var fillMultiTimeSeriesWorksheetDataCells = function(data) {
+  var column_labels = ['Model Period', 'Run'];
+  for(var i = 0; i < 12; i++) {
+    column_labels.push(timeIndexToTimeOfYear(i));
+  }
+  column_labels.push("Units");
+
+  var rows = _.map(data, function (run) {
+    var params = convertUniqueIdIntoParams(run.id);
+    var row = [];
+    row.push(params.period);
+    row.push(params.run);
+    var monthcount = 0;
+    for(let key in run.data) {
+      if(monthcount < 12) {
+        row.push(run.data[key]);
+      }
+      monthcount++;
+    }
+    row.push(run.units);
+    return row;
+  });
+
+  rows.unshift(column_labels);
+  return rows;
+};
+
+var fillSingleTimeSeriesWorksheetDataCells = function(data) {
+  var rows = [];
+  var column_labels = ['Model Period', 'Run'];
+  for (var i = 0; i < 12; i++) {
+    column_labels.push(timeIndexToTimeOfYear(i));
+  }
+  column_labels.push("Units");
+  rows.push(column_labels);
+
+  var row = [];
+  var params = convertUniqueIdIntoParams(data.id);
+  row.push(params.period);
+  row.push(params.run);
+  var monthcount = 0;
+  for(let key in data.data) {
+    if(monthcount < 12) {
+      row.push(data.data[key]);
+    }
+    monthcount++;
+  }
+  row.push(data.units);
+
+  rows.push(row);
+  return rows;
+};
+
+/*
+ * Helper function that extracts parameters of a dataset based on that dataset's
+ * unique_id.
+ */
+var convertUniqueIdIntoParams = function(id) {
+  var params = id.split("_");
+  return {
+    variable: params[0],
+    frequency: params[1],
+    model: params[2],
+    experiment: params[3],
+    run: params[4],
+    period: params[5]
+  };
 };
 
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData,
-    createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet, exportTableDataToWorksheet };
+    exportDataToWorksheet};
