@@ -1,8 +1,8 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
-import { exportTableDataToWorksheet, exportTimeSeriesDataToWorksheet,
-  exportMultiTimeSeriesDataToWorksheet, exportDataToWorksheet, parseTimeSeriesForC3 } from '../../core/util';
+import {parseTimeSeriesForC3} from '../../core/util';
+import {exportDataToWorksheet} from '../../core/export';
 
 var ModalMixin = {
 
