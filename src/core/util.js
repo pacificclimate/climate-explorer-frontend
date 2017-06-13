@@ -21,9 +21,14 @@ var mergeC3Data = function (old, toAdd) {
  * Formats a single entry from a Climate Explorer `data` api call into C3
  * compatible input
  *
- * Input: @param name: Run name eg: r1i1p1 @param data: Js object of {timeval:
- * result} eg: { '2025-04-16': 281.1234, '2055-04-16': 284.3456 } Output: [ [
- * 'r1i1p1_xs', '2025-04-16', '2055-04-16' ], 'r1i1p1', 281.12, 284.35 ] ]
+ * Input:
+ *   @param name: Run name eg: r1i1p1
+ *   @param data: Js object of {timeval: result}
+ *            eg: { '2025-04-16': 281.1234, '2055-04-16': 284.3456 }
+ * Output: [
+ *         ['r1i1p1_xs', '2025-04-16', '2055-04-16' ],
+ *         'r1i1p1', 281.12, 284.35 ]
+ *         ]
  */
 var genC3DataFromModel = function (name, data, unit, axisMap) {
   var axes = {};
@@ -85,8 +90,11 @@ var generateXAxis = function (data) {
 };
 
 /*
- * Sample input: {'r1i1p1': {'units': 'K', 'data': {'2025-04-16T00:00:00Z':
- * 281}}}
+ * Sample input: {'r1i1p1':
+ *                     {'units': 'K',
+ *                     'data': {'2025-04-16T00:00:00Z': 281}
+ *                     }
+ *               }
  */
 var dataApiToC3 = function (data) {
   // Initialize the x axis data to the first
@@ -112,12 +120,9 @@ var dataApiToC3 = function (data) {
   var unitsMap = generateAxisInfo(units).unitsMap;
 
   // NOTE: we have not found a way yet to display units if we have multiple axes
-  // of different
-  // units/variable type (e.g. 'mm' and 'degrees_C'), as the tooltip option is
-  // applied globally across
-  // all chart series. So for now we assume the keys of unitsMap are all the
-  // same (i.e. just
-  // one variable type is being displayed).
+  // of different units/variable type (e.g. 'mm' and 'degrees_C'), as the tooltip
+  // option is applied globally across all chart series. So for now we assume the
+  // keys of unitsMap are all the same (i.e. just one variable type is being displayed).
   var tooltipInfo = {
     grouped: true,
     format: {
@@ -288,12 +293,21 @@ var parseTimeSeriesForC3 = function (graph_data, include_seasonal_data) {
 
 /*
  * Takes a multistats object of the following form and 1) flattens it, and 2)
- * rounds numeric values for passing to the DataTable component for rendering: {
- * 'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231': { 'median':
- * 278.34326171875, 'min': 225.05545043945312, 'units': 'K', 'mean':
- * 273.56732177734375, 'max': 303.601318359375, 'ncells': 8192, 'stdev':
- * 22.509726901403784, 'run': 'r1i1p1' },
- * 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231': { ... } };
+ * rounds numeric values for passing to the DataTable component for rendering:
+ * {
+ *  'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
+ *    { 'median': 278.34326171875,
+ *      'min': 225.05545043945312,
+ *      'units': 'K',
+ *      'mean': 273.56732177734375,
+ *      'max': 303.601318359375,
+ *      'ncells': 8192,
+ *      'stdev': 22.509726901403784,
+ *      'run': 'r1i1p1'
+ *    },
+ * 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
+ *   { ... }
+ *   };
  */
 var parseBootstrapTableData = function (data) {
   return _.map(data, function (stats, model) {
