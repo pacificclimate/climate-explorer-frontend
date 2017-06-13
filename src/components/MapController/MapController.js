@@ -155,6 +155,11 @@ var MapController = React.createClass({
       var year = timestamp.getFullYear();
       var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
       var run = runMetadata.ensemble_member;
+
+      // FIXME: Time period should be determined from the metadata API
+      // which currently doesn't give time bounds information. See here:
+      // https://github.com/pacificclimate/climate-explorer-backend/issues/44
+      // When that issue is fixed, this code needs to be updated
       mapFooter = (
         <h5>
           Dataset: {run} &nbsp;
