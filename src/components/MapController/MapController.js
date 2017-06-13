@@ -24,7 +24,7 @@ var MapController = React.createClass({
 
   mixins: [ModalMixin],
 
-  /**
+  /*
    * State items also set from meta object array Includes: - dataset - wmstime -
    * variable
    */
@@ -138,7 +138,7 @@ var MapController = React.createClass({
       return [k, v];
     });
 
-    var map;
+    var map, mapFooter;
     if (this.state.dataset) {
       map = (
         <CanadaMap
@@ -151,8 +151,26 @@ var MapController = React.createClass({
           area={this.state.area}
         />
       );
+      var timestamp = new Date(Date.parse(this.state.times[0]));
+      var year = timestamp.getFullYear();
+      var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
+      var run = runMetadata.ensemble_member;
+
+      // FIXME: Time period should be determined from the metadata API
+      // which currently doesn't give time bounds information. See here:
+      // https://github.com/pacificclimate/climate-explorer-backend/issues/44
+      // When that issue is fixed, this code needs to be updated
+      mapFooter = (
+        <h5>
+          Dataset: {run} &nbsp;
+          {year - 15} - {year + 14} &nbsp;
+          Time: {this.state.wmstime}
+        </h5>
+      );
+
     } else {
       map = <Loader />;
+      mapFooter = "";
     }
 
     return (
@@ -170,7 +188,9 @@ var MapController = React.createClass({
                   <GeoLoader onLoadArea={this.handleSetArea} title='Import polygon' />
                 </ButtonGroup>
               </div>
-
+              <div className={styles.footer}>
+                {mapFooter}
+              </div>
             </div>
           </Col>
         </Row>
