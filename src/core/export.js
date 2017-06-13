@@ -289,6 +289,10 @@ var fillSingleTimeSeriesWorksheetDataCells = function(data, metadata) {
  * Assumes all values are associated with the fifteenth year of
  * a thirty-year simulation period.
  */
+//FIXME: Time period should be determined from the metadata API
+// which currently doesn't give time bounds information. See here:
+// https://github.com/pacificclimate/climate-explorer-backend/issues/44
+// When that issue is fixed, this code needs to be updated
 var inferPeriodFromTimeStamp = function (timestamp) {
   var year = parseInt(timestamp.slice(0, 4));
   return `${year - 15}-${year + 14}`;

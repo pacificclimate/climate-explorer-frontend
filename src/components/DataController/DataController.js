@@ -38,17 +38,17 @@ var DataController = React.createClass({
   },
 
   getData: function (props) {
-          
+
     this.setTimeSeriesNoDataMessage("Loading Data");
     this.setClimoSeriesNoDataMessage("Loading Data");
     this.setStatsTableNoDataMessage("Loading Data");
-      
+
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-    
+
 
     myDataPromise.then(response => {
       this.setState({
@@ -57,15 +57,15 @@ var DataController = React.createClass({
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
     });
-    
+
     myStatsPromise.then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    }); 
-    
+    });
+
     myTimeseriesPromise.then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data, true),
@@ -74,28 +74,28 @@ var DataController = React.createClass({
       this.displayError(error, this.setTimeSeriesNoDataMessage);
     });
   },
-    
+
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                         axis: {} },
       });
   },
-  
+
   setClimoSeriesNoDataMessage: function(message) {
     this.setState({
-      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, }, 
+      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                          axis: {} },
       });
   },
-  
+
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
       statsData: [],
     });
   },
-  
+
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
@@ -110,21 +110,21 @@ var DataController = React.createClass({
     this.setClimoSeriesNoDataMessage("Loading Data");
     this.setState({
       projChangeTimeOfYear: timeidx,
-    });   
+    });
     this.getDataPromise(this.props, timeidx).then(response => {
       this.setState({
         climoSeriesData: dataApiToC3(response.data),
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
-    });    
+    });
   },
 
   updateDataTableTimeOfYear: function (timeidx) {
     this.setStatsTableNoDataMessage("Loading Data");
     this.setState({
       dataTableTimeOfYear: timeidx,
-    });    
+    });
     this.getStatsPromise(this.props, timeidx).then(response => {
       this.setState({
         statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
@@ -147,11 +147,15 @@ var DataController = React.createClass({
       this.displayError(error, this.setTimeSeriesNoDataMessage);
     });
   },
-  
+
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
+    //FIXME: Time period should be determined from the metadata API
+    // which currently doesn't give time bounds information. See here:
+    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
+    // When that issue is fixed, this code needs to be updated
     var ids = this.props.meta.map(function (el) {
       var period = el.unique_id.split('_').slice(5)[0];
       period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
@@ -170,7 +174,7 @@ var DataController = React.createClass({
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} /> 
+                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} />
               </Col>
               <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
                 <div>
