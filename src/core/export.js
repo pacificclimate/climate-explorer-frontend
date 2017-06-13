@@ -18,75 +18,68 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, timeidx) 
       SheetNames: []
   };
 
-  //get the human-readable variable name from the API.
-  var variableNamePromise = getVariableNamePromise(metadata.variable_id, data);
+  // prepare filename, metadata cells, and data cells according to type of export
+  var summaryCells, dataCells, outputFilename;
+  var filenamePrefix = "PCIC_CE_";
+  var filenameInfix = "Export_" + metadata.model_id + "_" + metadata.experiment + "_" + metadata.variable_id;
+  var filenameSuffix = "." + format;
+  switch(datatype) {
+    case "timeseries":
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
+      dataCells = fillMultiTimeSeriesWorksheetDataCells(data, metadata);
+      outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
+      break;
+    case "stats":
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
+      dataCells = fillWorksheetDataCells(data);
+      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
+      break;
+    case "climoseries":
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
+      dataCells = fillClimoSeriesDataCells(data);
+      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
+      break;
+    case "single-timeseries":
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
+      dataCells = fillSingleTimeSeriesWorksheetDataCells(data, metadata);
+      outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
+      break;
+  }
 
+  // assemble the worksheet and add it to the workbook.
+  // Note: sheetName will be truncated to 31 chars in
+  // XLSX export to meet Excel limitation
+  var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
+  var sheetName = `${datatype}_${metadata.variable_id}`;
+  wb.SheetNames.push(sheetName);
+  wb.Sheets[sheetName] = ws;
 
-  variableNamePromise.then(variableName => {
-
-    // prepare filename, metadata cells, and data cells according to type of export
-    var summaryCells, dataCells, outputFilename;
-    var filenamePrefix = "PCIC_CE_";
-    var filenameInfix = "Export_" + metadata.model_id + "_" + metadata.experiment + "_" + metadata.variable_id;
-    var filenameSuffix = "." + format;
-    switch(datatype) {
-      case "timeseries":
-        summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, variableName);
-        dataCells = fillMultiTimeSeriesWorksheetDataCells(data, metadata);
-        outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
-        break;
-      case "stats":
-        summaryCells = createWorksheetSummaryCells(metadata, variableName, timeIndexToTimeOfYear(timeidx));
-        dataCells = fillWorksheetDataCells(data);
-        outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
-        break;
-      case "climoseries":
-        summaryCells = createWorksheetSummaryCells(metadata, variableName, timeIndexToTimeOfYear(timeidx));
-        dataCells = fillClimoSeriesDataCells(data);
-        outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
-        break;
-      case "single-timeseries":
-        summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, variableName);
-        dataCells = fillSingleTimeSeriesWorksheetDataCells(data, metadata);
-        outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
-        break;
+  function xml_to_binary_string(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i <= s.length; ++i) {
+      view[i] = s.charCodeAt(i) & 0xFF;
     }
+    return buf;
+  }
 
-    // assemble the worksheet and add it to the workbook.
-    // Note: sheetName will be truncated to 31 chars in
-    // XLSX export to meet Excel limitation
-    var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
-    var sheetName = `${datatype}_${metadata.variable_id}`;
-    wb.SheetNames.push(sheetName);
-    wb.Sheets[sheetName] = ws;
-
-    function xml_to_binary_string(s) {
-      var buf = new ArrayBuffer(s.length);
-      var view = new Uint8Array(buf);
-      for (var i = 0; i <= s.length; ++i) {
-        view[i] = s.charCodeAt(i) & 0xFF;
-      }
-      return buf;
+  // format workbook for either csv or xlsx
+  var out_data;
+  if (format === 'csv') {
+    out_data = new Blob(
+        [XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])],
+        { type:'' }
+        );
     }
-
-    // format workbook for either csv or xlsx
-    var out_data;
-    if (format === 'csv') {
-      out_data = new Blob(
-          [XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])],
-          { type:'' }
-          );
-      }
-    else if (format === 'xlsx') {
-      var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
-      out_data = new Blob(
-          [xml_to_binary_string(wbout)],
-          { type:'' }
-          );
-    }
-    // serve file for download
-    filesaver.saveAs(out_data, outputFilename);
-  });
+  else if (format === 'xlsx') {
+    var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
+    out_data = new Blob(
+        [xml_to_binary_string(wbout)],
+        { type:'' }
+        );
+  }
+  // serve file for download
+  filesaver.saveAs(out_data, outputFilename);
 };
 
 /*
@@ -95,7 +88,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, timeidx) 
  * Change data. Draws on example code from js-xlsx docs:
  * https://github.com/SheetJS/js-xlsx
  */
-var createWorksheetSummaryCells = function (metadata, variableName, timeOfYear) {
+var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 
   var rows = [];
 
@@ -107,7 +100,7 @@ var createWorksheetSummaryCells = function (metadata, variableName, timeOfYear) 
     metadata.experiment,
     timeOfYear,
     metadata.variable_id,
-    variableName,
+    metadata.meta[0].variable_name
   ]);
 
   return rows;
@@ -175,7 +168,7 @@ var timeIndexToTimeOfYear = function (timeidx) {
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
-var createTimeSeriesWorksheetSummaryCells = function (metadata, variableName) {
+var createTimeSeriesWorksheetSummaryCells = function (metadata) {
 
   var rows = [];
 
@@ -186,7 +179,7 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, variableName) {
     metadata.model_id,
     metadata.experiment,
     metadata.variable_id,
-    variableName,
+    metadata.meta[0].variable_name,
   ]);
 
   return rows;
@@ -290,23 +283,6 @@ var fillSingleTimeSeriesWorksheetDataCells = function(data, metadata) {
   return rows;
 };
 
-/*
- * Asynchronous function that gets the human-friendly name of a variable from its
- * canonical name using the API.
- */
-
-var getVariableNamePromise = function(variable, data) {
-  var sampleData = Array.isArray(data) ? data[0] : data;
-  return axios({
-    baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
-    params: {
-      model_id: sampleData.id,
-    }
-  }).then(response => {
-    return response.data[sampleData.id].variables[variable];
-    });
-};
-
 /* Helper function that returns period info (IE, 2010 - 2039)
  * based on the time stamp of associated data. Stopgap until the
  * API provides a safer version of this information.
@@ -318,4 +294,6 @@ var inferPeriodFromTimeStamp = function (timestamp) {
   return `${year - 15}-${year + 14}`;
 };
 
-module.exports = {exportDataToWorksheet};
+module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet,
+    createTimeSeriesWorksheetSummaryCells, fillClimoSeriesDataCells, fillMultiTimeSeriesWorksheetDataCells,
+    fillSingleTimeSeriesWorksheetDataCells};
