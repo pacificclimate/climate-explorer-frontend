@@ -150,20 +150,19 @@ var MapController = React.createClass({
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />
-      );    
-      var dataAttributes = this.state.dataset.split('_');
-      var run = dataAttributes[4];
-      var startYear = dataAttributes[5].slice(0, 4);
-      var endYear = dataAttributes[5].slice(9, 13);
-      var time = this.state.wmstime.slice(0,10);
+      );
+      var timestamp = new Date(Date.parse(this.state.times[0]));
+      var year = timestamp.getFullYear();
+      var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
+      var run = runMetadata.ensemble_member;
       mapFooter = (
         <h5>
           Dataset: {run} &nbsp;
-          {startYear} - {endYear} &nbsp;
-          Time: {time}
+          {year - 15} - {year + 14} &nbsp;
+          Time: {this.state.wmstime}
         </h5>
       );
-      
+
     } else {
       map = <Loader />;
       mapFooter = "";
