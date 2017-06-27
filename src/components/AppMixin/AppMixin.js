@@ -12,7 +12,7 @@ var AppMixin = {
   componentDidMount: function () {
     var models = [];
     var vars;
-       
+
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: CE_ENSEMBLE_NAME },
@@ -28,11 +28,12 @@ var AppMixin = {
               }, _.omit(response.data[key], 'variables')));
             }
           }
-        
+
          this.setState({
          meta: models,
          model_id: models[0].model_id,
          variable_id: models[0].variable_id,
+         variable2_id: models[0].variable_id,
          experiment: models[0].experiment,
          });
         });
@@ -45,6 +46,14 @@ var AppMixin = {
   getfilteredMeta: function () {
     var l = this.state.meta.filter(function (x) {
       return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id;
+    }, this);
+    l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
+    return l;
+  },
+
+  getfilteredMeta2: function() {
+    var l = this.state.meta.filter(function (x) {
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable2_id;
     }, this);
     l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
@@ -64,6 +73,8 @@ var AppMixin = {
   updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
+    console.log("Setting app state, it is now:");
+    console.log(this.state);
   },
 
   getMetadataItems: function (name) {
