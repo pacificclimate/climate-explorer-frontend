@@ -341,5 +341,59 @@ var timeIndexToTimeOfYear = function (timeidx) {
   return timesOfYear[timeidx];
 };
 
+//This function accepts two objects each representing data and
+//formatting input for a C3 DataGraph and merges the second graph
+//into the first one, returning a C3 DataGraph
+//configuration object displaying both sets of data.
+//If the original graphs have the same y-axis label (ie, units)
+//the combined graph will have a single y-axis. Otherwise,
+//each dataset will have its own y-axis.
+//If either constituent graph displays multiple lines, only the first
+//will be present in the merged graph.
+//Aside from the y-axis or axes, formatting is derived from the
+//first graph passed ("mainGraph").
 
-module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData};
+var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphName) {
+
+  var sameUnits = mainGraph.axis.y.label.text == auxGraph.axis.y.label.text;
+
+  //make sure we're trying to merge data this operation makes sense for
+  //(data.type == line)
+  _.map([mainGraph, auxGraph], function(graph){
+    var dataToMerge = graph.data.columns[0][0];
+    var dataDisplayType = graph.data.types[dataToMerge];
+    if(dataDisplayType && (dataDisplayType != "line")) {
+      throw new Error(`Error: cannot display merged ${dataDisplayType} data.`);
+    }
+  });
+
+  var mergedGraph = {};
+  mergedGraph.tooltip = mainGraph.tooltip;
+  mergedGraph.data = {};
+  mergedGraph.data.columns = [];
+  mergedGraph.data.columns.push(mainGraph.data.columns[0]);
+  mergedGraph.data.columns[0][0] = mainGraphName;
+  mergedGraph.data.columns.push(auxGraph.data.columns[0]);
+  mergedGraph.data.columns[1][0] = auxGraphName;
+  mergedGraph.data.axes = {};
+  mergedGraph.data.axes[mainGraphName] = "y";
+
+  mergedGraph.axis = {};
+  mergedGraph.axis.x = mainGraph.axis.x;
+  mergedGraph.axis.y = mainGraph.axis.y;
+  mergedGraph.axis.y.label.text = mainGraphName.concat(" ", mergedGraph.axis.y.label.text);
+  mergedGraph.axis.y.show = true;
+
+  if(!sameUnits) {
+    mergedGraph.axis.y2 = auxGraph.axis.y;
+    mergedGraph.axis.y2.label.text = auxGraphName.concat(" ", mergedGraph.axis.y2.label.text);
+    mergedGraph.data.axes[auxGraphName] = "y2";
+    mergedGraph.axis.y2.show = true;
+  }
+
+  return mergedGraph;
+};
+
+module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData,
+    createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet, exportTableDataToWorksheet,
+    mergeC3DataGraphs};
