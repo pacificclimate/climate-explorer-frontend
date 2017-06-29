@@ -5,7 +5,6 @@ import Loader from 'react-loader';
 import _ from 'underscore';
 import axios from 'axios';
 
-import { CanadaMap } from '../Map/CanadaMap';
 import { DualMap } from '../Map/DualMap';
 import Selector from '../Selector/Selector';
 import GeoExporter from '../GeoExporter';
@@ -19,8 +18,9 @@ var DualMapController = React.createClass({
 
   propTypes: {
     variable: React.PropTypes.string,
-    variable2: React.PropTypes.string,
+    comparand: React.PropTypes.string,
     meta: React.PropTypes.array,
+    comparandMeta: React.PropTypes.array,
     onSetArea: React.PropTypes.func.isRequired,
   },
 
@@ -32,9 +32,12 @@ var DualMapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      styles: 'boxfill/ferret',
+      scalarPalette: 'seq-Greys',
+      scalarLogscale: false,
+      contourPalette: 'x-Occam',
+      numberOfContours: 10,
+      contourLogscale: false,
       timeidx: 0,
-      logscale: false,
     };
   },
 
@@ -50,8 +53,9 @@ var DualMapController = React.createClass({
     });
   },
 
+  //FIXME:Update comparand time here too!
   updateDataset: function (uniqueId) {
-    console.log("mapcontroller.updateDataser called");
+    console.log("mapcontroller.updateDataset called");
     // Updates dataset in state. Updates time value to match new dataset
 
     this.selectedDataset = this.props.meta.filter(function (el) {
@@ -92,21 +96,19 @@ var DualMapController = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    //console.log("mapController will receive props called");
-    //console.log("the props received are:");
-    //console.log(nextProps);
+
     this.selectedDataset = nextProps.meta[0];
-    this.secondaryDataset = nextProps.meta2[0];
+    this.secondaryDataset = nextProps.comparandMeta[0];
 
     this.requestTimeMetadata(this.selectedDataset.unique_id).then(response => {
       this.setState({
         times: response.data[this.selectedDataset.unique_id].times,
         timeidx: 0,
         dataset: this.selectedDataset.unique_id,
-        secondary: this.secondaryDataset.unique_id,
+        comparandDataset: this.secondaryDataset.unique_id,
         wmstime: response.data[this.selectedDataset.unique_id].times[0],
         variable: this.selectedDataset.variable_id,
-        variable2: this.secondaryDataset.variable_id,
+        comparand: this.secondaryDataset.variable_id,
       });
     });
   },
@@ -114,40 +116,6 @@ var DualMapController = React.createClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before we have required data
     return JSON.stringify(nextState) !== JSON.stringify(this.state);
-  },
-
-  //FIXME: This is a bad idea of a function intended to compensate for the fact
-  //that ncWMS requires timestamps within an NC file to be monotonic, that is
-  //it rejects files with seasonal averages because the associated dates are out of
-  //chronological order.
-  //There must be a better way to do this. Delete this function as soon as it is found.
-  timestringToPeriod: function(timestring) {
-    var day = timestring.slice(5,10);
-    var names = {
-        "01-16": "January",
-        "02-15": "February",
-        "03-16": "March",
-        "04-16": "April",
-        "05-16": "May",
-        "06-16": "June",
-        "07-16": "July",
-        "08-16": "August",
-        "09-16": "September",
-        "10-16": "October",
-        "11-16": "November",
-        "12-16": "December",
-        "01-15": "Winter-DJF",
-        "04-17": "Spring-MAM",
-        "07-17": "Summer-JJA",
-        "10-17": "Fall-SON",
-        "07-02": "Annual"
-    };
-    if(day in names) {
-      return names[day];
-    }
-    else {
-      return timestring;
-    }
   },
 
   render: function () {
@@ -158,6 +126,22 @@ var DualMapController = React.createClass({
                      ['boxfill/occam', 'occam'],
                      ['boxfill/occam_inv', 'inverted occam'],
                     ];
+
+    var singleColourPalettes = [
+      ['seq-Blues', 'light blues'],
+      ['seq-BkBu', 'dark blues'],
+      ['seq-Greens', 'light greens'],
+      ['seq-BkGN', 'dark greens'],
+      ['seq-Oranges', 'oranges'],
+      ['seq-BuPu', 'purples'],
+      ['seq-Greys', 'greys'],
+      ['seq-BkYl', 'yellows'],
+      ['x-Occam', 'rainbow'],
+      ['default', 'ocean'],
+      ['seq-cubeYF', 'cube'],
+      ['seq-psu-magma', 'sunset']
+    ];
+
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
 
     // Determine available datasets and display selector if multiple
@@ -181,20 +165,23 @@ var DualMapController = React.createClass({
     }
 
     var timeOptions = _.map(this.state.times, function (v, k) {
-      return [k, this.timestringToPeriod(v)];
+      return [k, v];
     }.bind(this));
 
     var map, mapFooter;
     if (this.state.dataset) {
       map = (
         <DualMap
-          logscale={this.state.logscale}
-          styles={this.state.styles}
+          scalarPalette={this.state.scalarPalette}
+          scalarLogscale={this.state.scalarLogscale}
+          contourPalette={this.state.contourPalette}
+          numberOfContours={parseInt(this.state.numberOfContours)}
+          contourLogscale={this.state.contourLogscale}
           time={this.state.wmstime}
           dataset={this.state.dataset}
-          dataset2={this.state.secondary}
+          comparandDataset={this.state.comparandDataset}
           variable={this.state.variable}
-          variable2={this.state.variable2}
+          comparand={this.state.comparand}
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />
@@ -259,17 +246,36 @@ var DualMapController = React.createClass({
               items={timeOptions}
             />
             <Selector
-              label={"Colour Pallette"}
-              onChange={this.updateSelection.bind(this, 'styles')}
-              items={pallettes}
-              value={this.state.styles}
+              label={"Block Colour Palette"}
+              onChange={this.updateSelection.bind(this, 'scalarPalette')}
+              items={singleColourPalettes}
+              value={this.state.scalarPalette}
             />
             <Selector
-              label={"Color scale"}
-              onChange={this.updateSelection.bind(this, 'logscale')}
+              label={"Block Color scale"}
+              onChange={this.updateSelection.bind(this, 'scalarLogscale')}
               items={colorScales}
               value={this.state.logscale}
             />
+            <Selector
+              label={"Isoline Colour Palette"}
+              onChange={this.updateSelection.bind(this, 'contourPalette')}
+              items={singleColourPalettes}
+              value={this.state.contourPalette}
+            />
+            <Selector
+              label={"Number of Isolines"}
+              onChange={this.updateSelection.bind(this, 'numberOfContours')}
+              items={[4, 6, 8, 10, 12]}
+              value={this.state.numberOfContours}
+            />
+            <Selector
+              label={"Isoline Colour scale"}
+              onChange={this.updateSelection.bind(this, 'contourLogscale')}
+              items={colorScales}
+              value={this.state.contourLogscale}
+            />
+
 
           </Modal.Body>
 

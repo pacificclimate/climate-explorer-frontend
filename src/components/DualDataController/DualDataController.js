@@ -44,7 +44,8 @@ var DualDataController = React.createClass({
     this.setClimoSeriesNoDataMessage("Loading Data");
 
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
-    var myDataPromise2 = this.getDataPromise(this.getVariableSwappedProps(props), this.state.projChangeTimeOfYear);
+    var myDataPromise2 = this.getDataPromise(props, this.state.projChangeTimeOfYear);
+    //var myDataPromise2 = this.getDataPromise(this.getVariableSwappedProps(props), this.state.projChangeTimeOfYear);
 
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);

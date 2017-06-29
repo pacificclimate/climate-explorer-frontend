@@ -37,7 +37,7 @@ var App = React.createClass({
             <div>
               <DualMapController
                 meta = {this.getfilteredMeta()}
-                meta2 = {this.getfilteredMeta2()}
+                comparandMeta = {this.getfilteredMeta2()}
                 onSetArea={this.handleSetArea}
               />
             </div>

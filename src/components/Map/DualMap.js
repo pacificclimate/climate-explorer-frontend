@@ -16,12 +16,19 @@ var DualMap = React.createClass({
   propTypes: {
     dataset: React.PropTypes.string,
     variable: React.PropTypes.string,
+    comparandDataset: React.PropTypes.string,
+    comparand: React.PropTypes.string,
     crs: React.PropTypes.object,
     // To keep things simple, areas within this component should only be
     // passed around (or up to a higher component) as GeoJSON
     onSetArea: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
     origin: React.PropTypes.object,
+    scalarPalette: React.PropTypes.string,
+    scalarLogscale: React.PropTypes.bool,
+    contourPalette: React.PropTypes.string,
+    numberOfContours: React.PropTypes.number,
+    contourLogscale: React.PropTypes.bool
   },
 
   getInitialState: function () {
@@ -43,8 +50,8 @@ var DualMap = React.createClass({
       ),
       noWrap: true,
       format: 'image/png',
-      transparent: 'true',
-      opacity: 0.7,
+      transparent: true,
+      opacity: 80,
       styles: 'boxfill/ferret',
       time: '2000-01-01',
       numcolorbands: 254,
@@ -55,60 +62,35 @@ var DualMap = React.createClass({
     };
   },
 
-  getWMSParams: function () {
-    console.log("getWMSParams called");
-    alert("shouldn't be calling me.");
-    var params = { layers: this.props.dataset + '/' + this.props.variable };
-    _.extend(params, _.pick(this.props,
-      'noWrap',
-      'format',
-      'transparent',
-      'opacity',
-      'styles',
-      'time',
-      'numcolorbands',
-      'version',
-      'srs',
-      'colorscalerange',
-      'logscale'
-    ));
-    return params;
-  },
-
-  //temporary workaround to get ncWMS2 working.
-  stubWMSParams: function(props) {
-    console.log("stubWMSParams called.");
-    console.log("at the time, props is:");
-    console.log(props);
+  scalarWMSParams: function(props) {
     return {
       noWrap: true,
       layers: `${props.dataset}/${props.variable}`,
       format: "image/png",
       transparent: true,
       opacity: 80,
-      styles: "default-scalar/seq-GreysRev",
+      styles: `default-scalar/${props.scalarPalette}`,
       time: this.props.time,
       numcolorbands:254,
       version: "1.1.1",
       srs: "EPSG:4326",
-      logscale: false
+      logscale: props.scalarLogscale
     };
   },
 
-  stubWMSParams2: function(props) {
-    console.log("stubWMSParams2 called");
+  contourWMSParams: function(props) {
     return {
       noWrap: true,
-      layers:  `${props.dataset2}/${props.variable2}`,
+      layers:  `${props.comparandDataset}/${props.comparand}`,
       format: "image/png",
       transparent: true,
       opacity: 80,
-      styles: "colored_contours/psu-magma",
+      styles: `colored_contours/${props.contourPalette}`,
       time: this.props.time,
-      numcolorbands:254,
+      numcontours: props.numberOfContours, //?? doesn7t seem to be working
       version: "1.1.1",
       srs: "EPSG:4326",
-      logscale: false
+      logscale: props.contourLogscale
     };
   },
 
@@ -161,10 +143,13 @@ var DualMap = React.createClass({
       ],
     });
 
-    //this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.stubWMSParams()).addTo(map);
-    this.ncwmsLayer=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.stubWMSParams(this.props)).addTo(map);
-    this.ncwmsLayer2=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.stubWMSParams2(this.props)).addTo(map);
+    this.ncwmsScalarLayer=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.scalarWMSParams(this.props)).addTo(map);
+    this.ncwmsContourLayer=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.contourWMSParams(this.props)).addTo(map);
+
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
+
+    this.ncwmsScalarLayer.setParams({opacity: 80});
+    this.ncwmsContourLayer.setParams({opacity: 80});
 
     /*
     Draw controls
@@ -293,17 +278,13 @@ var DualMap = React.createClass({
     console.log("newProps = ");
     console.log(newProps);
 
-    var params = { layers: newProps.dataset + '/' + newProps.variable };
-    _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
-
-
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
-    delete(this.ncwmsLayer.wmsParams.colorscalerange);
+    delete(this.ncwmsScalarLayer.wmsParams.colorscalerange);
+    delete(this.ncwmsContourLayer.wmsParams.colorscalerange);
 
-    //this.ncwmsLayer.setParams(params);
-    this.ncwmsLayer.setParams(this.stubWMSParams(newProps));
-    this.ncwmsLayer2.setParams(this.stubWMSParams2(newProps));
+    this.ncwmsScalarLayer.setParams(this.scalarWMSParams(newProps));
+    this.ncwmsContourLayer.setParams(this.contourWMSParams(newProps));
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
     }
