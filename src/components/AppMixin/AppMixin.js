@@ -43,21 +43,21 @@ var AppMixin = {
     this.setState({ area: wkt });
   },
 
-  getfilteredMeta: function () {
+  getfilteredMeta: function (variableFilter = this.state.variable_id) {
     var l = this.state.meta.filter(function (x) {
-      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id;
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === variableFilter;
     }, this);
     l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
   },
 
-  getfilteredMeta2: function() {
-    var l = this.state.meta.filter(function (x) {
-      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable2_id;
-    }, this);
-    l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
-    return l;
-  },
+//  getfilteredMeta2: function() {
+//    var l = this.state.meta.filter(function (x) {
+//      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable2_id;
+//    }, this);
+//    l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
+//    return l;
+//  },
 
   getVariableIdNameArray: function () {
     var varArray = _.zip(this.getMetadataItems('variable_id'), this.getMetadataItems('variable_name'));

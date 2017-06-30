@@ -29,7 +29,7 @@ var App = React.createClass({
             <Selector label={"Variable #1 (Color blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'variable2_id')} items={this.getVariableIdNameArray()} value={this.state.variable2_id ? this.state.variable2_id : this.state.variable_id}/>
+            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={this.getVariableIdNameArray()} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
           </Col>
         </Row>
         <Row>
@@ -37,7 +37,7 @@ var App = React.createClass({
             <div>
               <DualMapController
                 meta = {this.getfilteredMeta()}
-                comparandMeta = {this.getfilteredMeta2()}
+                comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}
                 onSetArea={this.handleSetArea}
               />
             </div>
@@ -46,11 +46,11 @@ var App = React.createClass({
             <DualDataController
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
-              variable2_id={this.state.variable2_id ? this.state.variable2_id : this.state.variable_id}
+              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={this.state.area}
               meta = {this.getfilteredMeta()}
-              meta2 = {this.state.variable2_id ? this.getfilteredMeta2() : this.getfilteredMeta()}
+              comparandMeta = {this.state.comparand_id ? this.getfilteredMeta(this.state.comparand_id) : this.getfilteredMeta()}
             />
           </Col>
         </Row>
