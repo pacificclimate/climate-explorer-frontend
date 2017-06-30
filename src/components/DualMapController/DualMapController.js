@@ -121,12 +121,6 @@ var DualMapController = React.createClass({
   render: function () {
     console.log("MAPCONTROLLER RERENDERED!");
 
-    var pallettes = [['boxfill/ferret', 'ferret'],
-                     ['boxfill/rainbow', 'rainbow'],
-                     ['boxfill/occam', 'occam'],
-                     ['boxfill/occam_inv', 'inverted occam'],
-                    ];
-
     var singleColourPalettes = [
       ['seq-Blues', 'light blues'],
       ['seq-BkBu', 'dark blues'],
@@ -139,7 +133,7 @@ var DualMapController = React.createClass({
       ['x-Occam', 'rainbow'],
       ['default', 'ocean'],
       ['seq-cubeYF', 'cube'],
-      ['seq-psu-magma', 'sunset']
+      ['psu-magma', 'sunset']
     ];
 
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
