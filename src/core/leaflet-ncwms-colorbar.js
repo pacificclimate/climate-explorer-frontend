@@ -83,7 +83,7 @@ var ncWMSColorbarControl = L.Control.extend({
      * Source new values from the ncWMS server. Possible future breakage due to
      * using layer._url and layer._map.
      */
-    
+
     if (this.layer.wmsParams.colorscalerange) {
       // Use colorscalerange if defined on the layer
       this.min = +this.layer.wmsParams.colorscalerange.split(',')[0];
@@ -99,26 +99,31 @@ var ncWMSColorbarControl = L.Control.extend({
           layerName: this.layer.wmsParams.layers,
           time: this.layer.wmsParams.time,
         },
-      });      
-      
+      });
+
       var getMinMax = layerInfo => {
         return axios(this.layer._url, {
           params: {
             request: 'GetMetadata',
             item: 'minmax',
-            layers: this.layer.wmsParams.layers,
+            layers: escape(this.layer.wmsParams.layers),
+            styles: 'default-scalar',
+            version: '1.1.1',
             bbox: layerInfo.data.bbox.join(),
-            time: this.layer.wmsParams.time,
             srs: this.layer.wmsParams.srs,
+            crs: this.layer.wmsParams.srs,
+            time: this.layer.wmsParams.time,
+            elevation: 0,
             width: 100,
             height: 100,
           },
         });
       };
-            
+
       getLayerInfo.then(getMinMax).then(response => {
         this.min = response.data.min;
         this.max = response.data.max;
+        console.log("got everything!");
         this.redraw();
       });
     }

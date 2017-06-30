@@ -38,15 +38,19 @@ var ncWMSAutoscaleControl = L.Control.extend({
     /*
      * Get min/max for current view then update layer params
      */
-    
+
     axios(this.layer._url, {
       params: {
         request: 'GetMetadata',
         item: 'minmax',
         layers: this.layer.wmsParams.layers,
+        styles: 'default-scalar',
+        version: '1.1.1',
         bbox: this.layer._map.getBounds().toBBoxString(),
-        time: this.layer.wmsParams.time,
         srs: this.layer.wmsParams.srs,
+        crs: this.layer.wmsParams.srs,
+        time: this.layer.wmsParams.time,
+        elevation: 0,
         width: 100,
         height: 100,
       },

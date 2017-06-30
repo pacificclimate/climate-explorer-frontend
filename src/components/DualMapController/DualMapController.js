@@ -54,8 +54,8 @@ var DualMapController = React.createClass({
   },
 
   //FIXME:Update comparand time here too!
+  //will require ugly dataset name munging and a better test dataset
   updateDataset: function (uniqueId) {
-    console.log("mapcontroller.updateDataset called");
     // Updates dataset in state. Updates time value to match new dataset
 
     this.selectedDataset = this.props.meta.filter(function (el) {
@@ -180,8 +180,6 @@ var DualMapController = React.createClass({
           area={this.state.area}
         />
       );
-      console.log("Map call from MapController = ");
-      console.log(map);
       var timestamp = new Date(Date.parse(this.state.times[0]));
       var year = timestamp.getFullYear();
       var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})

@@ -54,7 +54,7 @@ var DualMap = React.createClass({
       opacity: 80,
       styles: 'boxfill/ferret',
       time: '2000-01-01',
-      numcolorbands: 254,
+      numcolorbands: 249,
       version: '1.1.1',
       srs: 'EPSG:4326',
       logscale: false,
@@ -71,7 +71,7 @@ var DualMap = React.createClass({
       opacity: 80,
       styles: `default-scalar/${props.scalarPalette}`,
       time: this.props.time,
-      numcolorbands:254,
+      numcolorbands: 249,
       version: "1.1.1",
       srs: "EPSG:4326",
       logscale: props.scalarLogscale
@@ -88,6 +88,7 @@ var DualMap = React.createClass({
       styles: `colored_contours/${props.contourPalette}`,
       time: this.props.time,
       numcontours: props.numberOfContours, //?? doesn7t seem to be working
+      numcolorbands: 249,
       version: "1.1.1",
       srs: "EPSG:4326",
       logscale: props.contourLogscale
@@ -143,8 +144,8 @@ var DualMap = React.createClass({
       ],
     });
 
-    this.ncwmsScalarLayer=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.scalarWMSParams(this.props)).addTo(map);
-    this.ncwmsContourLayer=L.tileLayer.wms("http://localhost:8080/ncwms228/wms", this.contourWMSParams(this.props)).addTo(map);
+    this.ncwmsScalarLayer=L.tileLayer.wms(NCWMS_URL, this.scalarWMSParams(this.props)).addTo(map);
+    this.ncwmsContourLayer=L.tileLayer.wms(NCWMS_URL, this.contourWMSParams(this.props)).addTo(map);
 
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
@@ -259,8 +260,11 @@ var DualMap = React.createClass({
 
     map.addControl(new PrintControl());
 
-    map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
-    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer, {
+    map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
+      position: 'bottomleft'
+        }));
+    map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer));
+    map.addControl(new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
       position: 'bottomright',
     }));
   },

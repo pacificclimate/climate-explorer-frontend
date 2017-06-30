@@ -33,7 +33,6 @@ var AppMixin = {
          meta: models,
          model_id: models[0].model_id,
          variable_id: models[0].variable_id,
-         variable2_id: models[0].variable_id,
          experiment: models[0].experiment,
          });
         });
@@ -73,8 +72,6 @@ var AppMixin = {
   updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
-    console.log("Setting app state, it is now:");
-    console.log(this.state);
   },
 
   getMetadataItems: function (name) {
