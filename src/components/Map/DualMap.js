@@ -264,9 +264,9 @@ var DualMap = React.createClass({
       position: 'bottomleft'
         }));
     map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer));
-    map.addControl(new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
-      position: 'bottomright',
-    }));
+    var autoscale = new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {position: 'bottomright'});
+    autoscale.addLayer(this.ncwmsContourLayer);
+    map.addControl(autoscale);
   },
 
   componentWillUnmount: function () {

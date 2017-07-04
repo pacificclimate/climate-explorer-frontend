@@ -125,7 +125,7 @@ var DualMapController = React.createClass({
       ['seq-Blues', 'light blues'],
       ['seq-BkBu', 'dark blues'],
       ['seq-Greens', 'light greens'],
-      ['seq-BkGN', 'dark greens'],
+      ['seq-BkGn', 'dark greens'],
       ['seq-Oranges', 'oranges'],
       ['seq-BuPu', 'purples'],
       ['seq-Greys', 'greys'],

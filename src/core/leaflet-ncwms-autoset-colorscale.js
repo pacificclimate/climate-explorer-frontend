@@ -11,8 +11,15 @@ var ncWMSAutoscaleControl = L.Control.extend({
   },
 
   initialize: function (layer, options) {
-    this.layer = layer;
+    //this.layer = layer;
+    this.layers = [];
+    this.layers.push(layer);
     L.Util.setOptions(this, options);
+    console.log("autoscale init: there are now " + this.layers.length + " layers!");
+  },
+
+  addLayer: function (layer) {
+    this.layers[this.layers.length] = layer;
   },
 
   onAdd: function () {
@@ -38,25 +45,28 @@ var ncWMSAutoscaleControl = L.Control.extend({
     /*
      * Get min/max for current view then update layer params
      */
-
-    axios(this.layer._url, {
-      params: {
-        request: 'GetMetadata',
-        item: 'minmax',
-        layers: this.layer.wmsParams.layers,
-        styles: 'default-scalar',
-        version: '1.1.1',
-        bbox: this.layer._map.getBounds().toBBoxString(),
-        srs: this.layer.wmsParams.srs,
-        crs: this.layer.wmsParams.srs,
-        time: this.layer.wmsParams.time,
-        elevation: 0,
-        width: 100,
-        height: 100,
-      },
-    }).then(response => {
-      this.layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
-    });
+    for(var i = 0; i < this.layers.length; i++) {
+      var layer = this.layers[i];
+      console.log("Starting layer " + i);
+      axios(layer._url, {
+        params: {
+          request: 'GetMetadata',
+          item: 'minmax',
+          layers: layer.wmsParams.layers,
+          styles: 'default-scalar',
+          version: '1.1.1',
+          bbox: layer._map.getBounds().toBBoxString(),
+          srs: layer.wmsParams.srs,
+          crs: layer.wmsParams.srs,
+          time: layer.wmsParams.time,
+          elevation: 0,
+          width: 100,
+          height: 100,
+        },
+      }).then(response => {
+        layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
+      });
+    }
   },
 });
 
