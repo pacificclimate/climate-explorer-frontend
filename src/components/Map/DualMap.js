@@ -236,7 +236,6 @@ var DualMap = React.createClass({
     };
 
     var initPrintControl = function () {
-      console.log("initPrintControl called");
       this.container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
       this.container.title = 'Download map image';
       L.DomEvent
@@ -261,12 +260,13 @@ var DualMap = React.createClass({
     map.addControl(new PrintControl());
 
     map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
-      position: 'bottomleft'
+      position: 'bottomright'
         }));
-    map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer));
     var autoscale = new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {position: 'bottomright'});
     autoscale.addLayer(this.ncwmsContourLayer);
     map.addControl(autoscale);
+    map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer, {position: 'bottomright'}));
+
   },
 
   componentWillUnmount: function () {

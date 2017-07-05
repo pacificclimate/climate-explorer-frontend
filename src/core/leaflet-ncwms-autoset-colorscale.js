@@ -15,7 +15,6 @@ var ncWMSAutoscaleControl = L.Control.extend({
     this.layers = [];
     this.layers.push(layer);
     L.Util.setOptions(this, options);
-    console.log("autoscale init: there are now " + this.layers.length + " layers!");
   },
 
   addLayer: function (layer) {
@@ -64,7 +63,11 @@ var ncWMSAutoscaleControl = L.Control.extend({
           height: 100,
         },
       }).then(response => {
-        layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
+        this.layers.forEach(function(layer){
+          if(layer.wmsParams.layers == response.config.params.layers) {
+            layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
+          }
+        });
       });
     }
   },
