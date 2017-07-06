@@ -1,7 +1,7 @@
 jest.dontMock('../Header');
 jest.dontMock('react-bootstrap');
 
-//this nonsense comment was added to allow a new commit.
+//comment changed
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
