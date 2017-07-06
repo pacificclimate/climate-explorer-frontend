@@ -68,7 +68,7 @@ var DataController = React.createClass({
     
     myTimeseriesPromise.then(response => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data),
+        timeSeriesData: parseTimeSeriesForC3(response.data, true),
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
@@ -141,7 +141,7 @@ var DataController = React.createClass({
     });
     this.getTimeseriesPromise(this.props, dataset).then(response => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data),
+        timeSeriesData: parseTimeSeriesForC3(response.data, true),
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);

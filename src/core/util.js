@@ -192,7 +192,7 @@ var parseDataForC3 = function (data) {
 };
 
 
-var parseTimeSeriesForC3 = function (graph_data) {
+var parseTimeSeriesForC3 = function (graph_data, include_seasonal_data) {
 
   var model = 'Monthly Mean';
   var yUnits = graph_data['units'];
@@ -243,7 +243,6 @@ var parseTimeSeriesForC3 = function (graph_data) {
   var summerSeries = [];
   var fallSeries = [];
   var winterSeries = [];
-  var seasonalLabel = ['Seasonal Average'];
   var annualSeries = ['Annual Average'];
 
   var idx = 0;
@@ -273,10 +272,14 @@ var parseTimeSeriesForC3 = function (graph_data) {
     idx++;
   }
   C3Data['columns'].push(monthlySeries);
-  // Form series for seasonal lines
-  var seasonalSeries = seasonalLabel.concat(winterSeries.slice(-2), springSeries, summerSeries, fallSeries, winterSeries.slice(0, 1));
-  C3Data['columns'].push(seasonalSeries);
-  C3Data['columns'].push(annualSeries);
+
+  if(include_seasonal_data) {
+    // Add seasonal and yearly means.
+    var seasonalLabel = ['Seasonal Average'];
+    var seasonalSeries = seasonalLabel.concat(winterSeries.slice(-2), springSeries, summerSeries, fallSeries, winterSeries.slice(0, 1));
+    C3Data['columns'].push(seasonalSeries);
+    C3Data['columns'].push(annualSeries);
+  }
 
   return {
     data: C3Data,
@@ -331,6 +334,7 @@ var parseBootstrapTableData = function (data) {
     Helper function for exportTableDataToWorksheet, creates summary rows that appear at the top of the exported worksheet
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
 */
+
 var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 
   var rows = [];
@@ -353,6 +357,7 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
     Helper function for exportTableDataToWorksheet, creates data column headers and data entries for exported worksheet
     Draws on example code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
 */
+
 var fillWorksheetDataCells = function (data) {
 
   var rows = _.map(data, function (stats) {

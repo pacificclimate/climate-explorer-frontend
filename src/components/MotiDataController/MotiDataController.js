@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-import {
+import { parseTimeSeriesForC3,
   parseBootstrapTableData } from '../../core/util';
-import { timeseriesToC3 } from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
@@ -47,7 +46,7 @@ var MotiDataController = React.createClass({
     
     myTimeseriesPromise.then(response => {
       this.setState({
-        timeSeriesData: timeseriesToC3(response.data),
+        timeSeriesData: parseTimeSeriesForC3(response.data, false),
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
