@@ -1,7 +1,9 @@
 jest.dontMock('../Header');
 jest.dontMock('react-bootstrap');
 
-//comment changed++++
+//test commits for running jest in serial mode:
+//+
+
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
