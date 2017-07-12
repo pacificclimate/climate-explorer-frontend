@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, ControlLabel } from 'react-bootstrap';
 
 import { parseTimeSeriesForC3,
   parseBootstrapTableData } from '../../core/util';
@@ -84,7 +84,7 @@ var MotiDataController = React.createClass({
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <div>
-          Download Data &nbsp;
+          <ControlLabel>Download Data &nbsp;</ControlLabel>
           <Button onClick={this.exportSingleTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
           <Button onClick={this.exportSingleTimeSeries.bind(this, 'csv')}>CSV</Button>
         </div>
