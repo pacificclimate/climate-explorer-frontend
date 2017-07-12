@@ -69,6 +69,7 @@ var DataController = React.createClass({
     myTimeseriesPromise.then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data, true),
+        timeSeriesDatasetId: props.meta[0].unique_id
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);

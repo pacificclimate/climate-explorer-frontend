@@ -11,7 +11,7 @@ import urljoin from 'url-join';
  * an XLSX or CSV file, and serves it to the user for download. Draws on example
  * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
  */
-var exportDataToWorksheet = function(datatype, metadata, data, format, timeidx) {
+var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
   // create workbook object containing one or more worksheets
   var wb = {
       Sheets: {},
@@ -25,24 +25,19 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, timeidx) 
   var filenameSuffix = "." + format;
   switch(datatype) {
     case "timeseries":
-      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
-      dataCells = fillMultiTimeSeriesWorksheetDataCells(data, metadata);
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, selection.dataset);
+      dataCells = generateDataCellsFromC3Graph(data, "Time Series");
       outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
-      dataCells = fillWorksheetDataCells(data);
-      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      dataCells = generateDataCellsFromDataTable(data);
+      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
       break;
     case "climoseries":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(timeidx));
-      dataCells = fillClimoSeriesDataCells(data);
-      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(timeidx)}${filenameSuffix}`;
-      break;
-    case "single-timeseries":
-      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata);
-      dataCells = fillSingleTimeSeriesWorksheetDataCells(data, metadata);
-      outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
+      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      dataCells = generateDataCellsFromC3Graph(data, "Run");
+      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
       break;
   }
 
@@ -111,7 +106,7 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
  * data entries for exported worksheet Draws on example code from js-xlsx docs:
  * https://github.com/SheetJS/js-xlsx
  */
-var fillWorksheetDataCells = function (data) {
+var generateDataCellsFromDataTable = function (data) {
 
   var rows = _.map(data, function (stats) {
     return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
@@ -168,120 +163,76 @@ var timeIndexToTimeOfYear = function (timeidx) {
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
-var createTimeSeriesWorksheetSummaryCells = function (metadata) {
+var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
 
   var rows = [];
-
-  var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name'];
+  var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name', 'Period', 'Run'];
   rows.push(header);
+
+  //FIXME: Time period should be determined from the metadata API
+  // which currently doesn't give time bounds information. See here:
+  // https://github.com/pacificclimate/climate-explorer-backend/issues/44
+  // When that issue is fixed, this code needs to be updated
+  var dataset = _.findWhere(metadata.meta, {unique_id: run});
+  var params = dataset.unique_id.split("_");
+  var sdate = params[params.length - 1].slice(0,4);
+  var edate = params[params.length - 1].slice(9, 13);
+
 
   rows.push([
     metadata.model_id,
     metadata.experiment,
     metadata.variable_id,
     metadata.meta[0].variable_name,
+    `${sdate}-${edate}`,
+    dataset.ensemble_member
   ]);
 
   return rows;
 };
 
 /*
- * Helper function for exportDataToWorksheet that generates data cells for
- * Projected Change climo series data.
+ * Helper function for exportDataToWorksheet that generates data table cells from
+ * a C3 graph configuration object.
  */
-var fillClimoSeriesDataCells = function(data) {
-  var timestamps = [];
+var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
+  var headers = [];
   var rows = [];
-  var column_labels = ['Run'];
+  var column_labels = [seriesLabel];
 
-  for(var run in data) {
-    for(var time in data[run].data) {
-      if(timestamps.indexOf(time) == -1) {
-        timestamps.push(time);
-      }
-    }
-  }
-  for(time in timestamps.sort()) {
-    column_labels.push(timestamps[time]);
-  }
-  column_labels.push("Units");
+  //This could be either a graph with a categorical x-axis, or a numerical
+  //x-axis. The C3 structure is slightly different.
+  //Numerical values are treated by C3 as data, categorical as axis metadata.
+  var graphHasCategoricalXAxis = (graph.axis.x.type == "category");
 
-  for(var run in data) {
-    var row = [run];
-    for(time in timestamps.sort()) {
-      row.push(data[run].data[timestamps[time]]);
+  if(graphHasCategoricalXAxis) {
+    column_labels = column_labels.concat(graph.axis.x.categories);
+    column_labels.push("units");
+  }
+
+  for(var i = 0; i < graph.data.columns.length; i++) {
+    //each column contains either data or numerical x-axis values
+    //The x-axis goes into column labels, data goes into rows.
+    var column = graph.data.columns[i];
+    if(column[0] == "x" && !graphHasCategoricalXAxis) {
+      column_labels = column_labels.concat(column.slice(1, column.length));
+      column_labels.push("units");
     }
-    row.push(data[run].units);
-    rows.push(row);
+    else {
+      var seriesName = column[0];
+      var row = [];
+      row = row.concat(column);
+
+      //get the corresponding units (or name of axis) - default to "y" if axis not listed
+      var seriesAxis = graph.data.axes[seriesName] ? graph.data.axes[seriesName] : "y";
+      row.push(graph.axis[seriesAxis].label.text);
+      rows.push(row);
+    }
   }
   rows.unshift(column_labels);
   return rows;
-};
 
-/*
- * Helper function for exportDataToWorksheet that generates data cells for
- * Annual Cycle export.
- */
-var fillMultiTimeSeriesWorksheetDataCells = function(data, metadata) {
-  var column_labels = ['Model Period', 'Run'];
-  for(var i = 0; i < 12; i++) {
-    column_labels.push(timeIndexToTimeOfYear(i));
-  }
-  column_labels.push("Units");
-
-  var rows = _.map(data, function (run) {
-    var runMetadata = metadata.meta.find(match => {return match.unique_id === run.id;});
-    var row = [];
-    row.push(inferPeriodFromTimeStamp(Object.keys(run.data)[0]));
-    row.push(runMetadata.ensemble_member);
-    var monthcount = 0;
-    for(let key in run.data) {
-      if(monthcount < 12) {
-        row.push(run.data[key]);
-      }
-      monthcount++;
-    }
-    row.push(run.units);
-    return row;
-  });
-
-  rows.unshift(column_labels);
-  return rows;
-};
-
-/*
- * Helper function for exportDataToWorksheet that outputs only a single Annual Cycle
- * experimental run.
- * This is for use by the MOTI portal, where there's no way for a user to select
- * an individual run, climate explorer just selectes and displays one arbitrarily.
- * Question: would users of this period need or want run information at all?
- */
-
-var fillSingleTimeSeriesWorksheetDataCells = function(data, metadata) {
-  var runMetadata = metadata.meta.find(match => {return match.unique_id === data.id;});
-  var rows = [];
-  var column_labels = ['Model Period', 'Run'];
-  for (var i = 0; i < 12; i++) {
-    column_labels.push(timeIndexToTimeOfYear(i));
-  }
-  column_labels.push("Units");
-  rows.push(column_labels);
-
-  var row = [];
-  row.push(inferPeriodFromTimeStamp(Object.keys(data.data)[0]));
-  row.push(runMetadata.ensemble_member);
-  var monthcount = 0;
-  for(let key in data.data) {
-    if(monthcount < 12) {
-      row.push(data.data[key]);
-    }
-    monthcount++;
-  }
-  row.push(data.units);
-
-  rows.push(row);
-  return rows;
-};
+}
 
 /* Helper function that returns period info (IE, 2010 - 2039)
  * based on the time stamp of associated data. Stopgap until the
@@ -298,6 +249,5 @@ var inferPeriodFromTimeStamp = function (timestamp) {
   return `${year - 15}-${year + 14}`;
 };
 
-module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet,
-    createTimeSeriesWorksheetSummaryCells, fillClimoSeriesDataCells, fillMultiTimeSeriesWorksheetDataCells,
-    fillSingleTimeSeriesWorksheetDataCells};
+module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
+    createTimeSeriesWorksheetSummaryCells, generateDataCellsFromC3Graph};

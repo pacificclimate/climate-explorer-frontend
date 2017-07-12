@@ -2,7 +2,7 @@ import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
 import {parseTimeSeriesForC3} from '../../core/util';
-import {exportDataToWorksheet} from '../../core/export';
+import {exportDataToWorksheet, generateDataCellsFromC3Graph} from '../../core/export';
 
 var ModalMixin = {
 
@@ -28,32 +28,15 @@ var ModalMixin = {
   },
 
   exportDataTable: function (format) {
-    exportDataToWorksheet("stats", this.props, this.state.statsData, format, this.state.dataTableTimeOfYear);
+    exportDataToWorksheet("stats", this.props, this.state.statsData, format, {timeidx: this.state.dataTableTimeOfYear});
   },
 
   exportTimeSeries: function(format) {
-    var runs = _.map(this.props.meta, function(run) {
-      return this.getTimeseriesPromise(this.props, run.unique_id);
-      }.bind(this));
-
-    Promise.all(runs).then(values => {
-      var data = _.map(values, (response => {return response.data;}));
-      exportDataToWorksheet("timeseries", this.props, data, format, null);
-    });
-  },
-
-  exportSingleTimeSeries: function(format) {
-    var timeSeriesPromise = this.getTimeseriesPromise(this.props, this.props.meta[0].unique_id);
-    timeSeriesPromise.then(response => {
-      exportDataToWorksheet("single-timeseries", this.props, response.data, format, null);
-    });
+    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, {dataset: this.state.timeSeriesDatasetId});
   },
 
   exportClimoSeries: function(format) {
-    var climoDataPromise = this.getDataPromise(this.props, this.state.projChangeTimeOfYear);
-    climoDataPromise.then( response => {
-      exportDataToWorksheet("climoseries", this.props, response.data, format, this.state.projChangeTimeOfYear);
-    });
+    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, {timeidx: this.state.projChangeTimeOfYear});
   },
 
   injectRunIntoStats: function (data) {

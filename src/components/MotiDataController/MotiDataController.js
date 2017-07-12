@@ -85,8 +85,8 @@ var MotiDataController = React.createClass({
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <div>
           <ControlLabel>Download Data &nbsp;</ControlLabel>
-          <Button onClick={this.exportSingleTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
-          <Button onClick={this.exportSingleTimeSeries.bind(this, 'csv')}>CSV</Button>
+          <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
+          <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
         </div>
         <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
 
