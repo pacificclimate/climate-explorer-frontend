@@ -49,6 +49,8 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   wb.SheetNames.push(sheetName);
   wb.Sheets[sheetName] = ws;
 
+  //function to generate binary string encodings required by XLSX format
+  //(not used for CSV format)
   function xml_to_binary_string(s) {
     var buf = new ArrayBuffer(s.length);
     var view = new Uint8Array(buf);
