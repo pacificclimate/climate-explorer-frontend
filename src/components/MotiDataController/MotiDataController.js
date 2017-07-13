@@ -7,6 +7,8 @@ import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
 
+import styles from './MotiDataController.css';
+
 var MotiDataController = React.createClass({
 
   propTypes: {
@@ -84,7 +86,7 @@ var MotiDataController = React.createClass({
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <div>
-          <ControlLabel>Download Data &nbsp;</ControlLabel>
+          <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
           <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
           <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
         </div>

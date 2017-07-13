@@ -21,7 +21,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   // prepare filename, metadata cells, and data cells according to type of export
   var summaryCells, dataCells, outputFilename;
   var filenamePrefix = "PCIC_CE_";
-  var filenameInfix = "Export_" + metadata.model_id + "_" + metadata.experiment + "_" + metadata.variable_id;
+  var filenameInfix = `Export_${metadata.model_id}_${metadata.experiment}_${metadata.variable_id}`;
   var filenameSuffix = "." + format;
   switch(datatype) {
     case "timeseries":

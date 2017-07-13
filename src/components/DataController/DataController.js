@@ -3,6 +3,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
 
+import styles from './DataController.css';
 
 import {
   dataApiToC3,
@@ -179,8 +180,7 @@ var DataController = React.createClass({
               </Col>
               <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
                 <div>
-                  <ControlLabel>Download Data</ControlLabel>
-                  <br/>
+                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
                   <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
                   <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
                 </div>
@@ -195,8 +195,7 @@ var DataController = React.createClass({
               </Col>
               <Col>
                 <div>
-                  <ControlLabel>Download Data</ControlLabel>
-                  <br/>
+                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
                   <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
                   <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
                 </div>
