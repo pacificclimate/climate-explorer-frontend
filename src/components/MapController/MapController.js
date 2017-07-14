@@ -116,6 +116,10 @@ var MapController = React.createClass({
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
 
     // Determine available datasets and display selector if multiple
+    //FIXME: Time period should be determined from the metadata API
+    // which currently doesn't give time bounds information. See here:
+    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
+    // When that issue is fixed, this code needs to be updated
     var ids = this.props.meta.map(function (el) {
       var period = el.unique_id.split('_').slice(5)[0];
       period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');

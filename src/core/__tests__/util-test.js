@@ -1,4 +1,5 @@
 jest.dontMock('../util');
+jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
 
@@ -148,22 +149,6 @@ const outputC3TimeSeries = {
       275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375
     ]
   ],
-    // types: {
-    //   model: 'line',
-    //   'Annual Average': 'step',
-    //   'Seasonal Average': 'step'
-    // },
-    // labels: {
-    //   format: {
-    //     'Seasonal Average': function (v, id, i, j){
-    //       if (i == 0 || i == 11){ return "Winter" }
-    //       if (i == 3) { return "Spring" }
-    //       if (i == 6) { return "Summer" }
-    //       if (i == 9) { return "Fall" }
-    //     }
-    //   }
-    // },
-    // axes: {model:'y'},
 };
 
 const outputC3TimeSeriesAxisInfo = {
@@ -183,14 +168,14 @@ const outputC3TimeSeriesTooltipInfo = {
 };
 
 describe('parseTimeSeriesForC3', function () {
-  it('Correctly parses a JSON object with time series data from one model for plotting with C3', 
+  it('parses a JSON object with time series data from one model for plotting with C3',
     function () {
       var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
       var result = parseTimeSeriesForC3(testTimeSeries, true);
       expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
     });
 
-  it('Correctly simplifies a JSON object with time series data for plotting on the MOTI data portal',
+  it('simplifies a JSON object with time series data for plotting on the MOTI data portal',
     function () {
       var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
       var result = parseTimeSeriesForC3(testTimeSeries, false);
@@ -254,7 +239,9 @@ describe('parseBootstrapTableData', function () {
   });
 });
 
-const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation' };
+const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation',
+    meta: [{variable_name: 'Precipitation'}]};
+
 const worksheetTimeOfYear = 'Winter-DJF';
 const worksheetSummaryCellsExpected = {
   0: {
@@ -288,27 +275,52 @@ const worksheetDataRowsExpected = [
 const worksheetRange = 'A1:H7';
 
 describe('createWorksheetSummaryCells', function () {
-  it('Correctly forms worksheet summary cells', function () {
-    var util = require('../util');
-    var result = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+  it('Generates summary cells for an exportable worksheet', function () {
+    var exportfiles = require('../export');
+    var result = exportfiles.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
     expect(result).toEqual(worksheetSummaryCellsExpected);
   });
 });
 
-describe('fillWorksheetDataRows', function () {
-  it('Correctly fills worksheet data cells', function () {
-    var util = require('../util');
-    var result = util.fillWorksheetDataCells(worksheetTestData);
+describe('generateDataCellsFromDataTable', function () {
+  it('Generates data cells for an exportable worksheet', function () {
+    var exportfiles = require('../export');
+    var result = exportfiles.generateDataCellsFromDataTable(worksheetTestData);
     expect(result).toEqual(worksheetDataRowsExpected);
   });
 });
 
 describe('assembleWorksheet', function () {
-  it('Correctly assembles worksheet from summary and data cells', function () {
-    var util = require('../util');
-    var summaryCells = util.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-    var dataCells = util.fillWorksheetDataCells(worksheetTestData);
-    var ws = util.assembleWorksheet(summaryCells.concat([[]], dataCells));
+  it('Assembles an exportable worksheet from summary and data cells', function () {
+    var exportfiles = require('../export');
+    var summaryCells = exportfiles.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
+    var dataCells = exportfiles.generateDataCellsFromDataTable(worksheetTestData);
+    var ws = exportfiles.assembleWorksheet(summaryCells.concat([[]], dataCells));
     expect(ws['!ref']).toEqual(worksheetRange);
+  });
+});
+
+describe('generateDataCellsFromC3Graph', function () {
+  it('Generates data for export from an annual cycle graph', function (){
+    var exportfiles = require('../export');
+    var testdata = require('./export-data');
+    var data = exportfiles.generateDataCellsFromC3Graph(testdata.sampleAnnualCycleGraph, "Time Series");
+    expect(data).toEqual(testdata.expectedAnnualGraphData);
+  });
+  it('Generates data for export from a projected change graph', function (){
+    var exportfiles = require('../export');
+    var testdata = require('./export-data');
+    var data = exportfiles.generateDataCellsFromC3Graph(testdata.sampleProjectedChangeGraph, "Run");
+    expect(data).toEqual(testdata.expectedProjectedChangeGraphData);
+  });
+});
+
+describe('createTimeSeriesWorksheetSummaryCells', function () {
+  it('Generates headers to export a time series', function () {
+    var exportfiles = require('../export');
+    var testdata = require('./export-data');
+    var headers = exportfiles.createTimeSeriesWorksheetSummaryCells(testdata.sampleMetadata,
+                                 testdata.sampleRun);
+    expect(headers).toEqual(testdata.expectedTimeSeriesHeaders);
   });
 });

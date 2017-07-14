@@ -1,7 +1,8 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
-import { exportTableDataToWorksheet } from '../../core/util';
 import axios from 'axios';
+import {parseTimeSeriesForC3} from '../../core/util';
+import {exportDataToWorksheet, generateDataCellsFromC3Graph} from '../../core/export';
 
 var ModalMixin = {
 
@@ -15,7 +16,7 @@ var ModalMixin = {
       this.getData(this.props);
     }
   },
-  
+
 
   componentWillReceiveProps: function (nextProps) {
     this.setState({
@@ -27,7 +28,15 @@ var ModalMixin = {
   },
 
   exportDataTable: function (format) {
-    exportTableDataToWorksheet(this.props, this.state.statsData, format, this.state.dataTableTimeOfYear);
+    exportDataToWorksheet("stats", this.props, this.state.statsData, format, {timeidx: this.state.dataTableTimeOfYear});
+  },
+
+  exportTimeSeries: function(format) {
+    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, {dataset: this.state.timeSeriesDatasetId});
+  },
+
+  exportClimoSeries: function(format) {
+    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, {timeidx: this.state.projChangeTimeOfYear});
   },
 
   injectRunIntoStats: function (data) {
@@ -52,7 +61,7 @@ var ModalMixin = {
         area: props.area || "",
         time: timeidx,
       }
-    }).then(this.validateAnnualData);    
+    }).then(this.validateAnnualData);
   },
 
   getStatsPromise: function (props, timeidx) {
@@ -64,7 +73,7 @@ var ModalMixin = {
         variable: props.variable_id,
         emission: props.experiment,
         area: props.area || null,
-        time: timeidx,   
+        time: timeidx,
       }
     }).then(this.validateStatsData);
   },
@@ -77,9 +86,9 @@ var ModalMixin = {
         variable: props.variable_id,
         area: props.area || "",
       }
-    }).then(this.validateTimeseriesData);    
+    }).then(this.validateTimeseriesData);
   },
-    
+
   validateStatsData: function (response) {
     if(_.isEmpty(response.data) || (typeof response.data == "string")) {
       throw new Error("Error: statistical data unavailable for this model");
@@ -94,7 +103,7 @@ var ModalMixin = {
     }
     return response;
     },
-    
+
     validateTimeSeriesData: function(response) {
       if(_.isEmpty(response.data)) {
         throw new Error("Error: timeseries data is unavailable for this model.");
@@ -102,9 +111,9 @@ var ModalMixin = {
       if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
         throw new Error("Error: timeseries data for this model is incomplete");
       }
-      return response;      
+      return response;
     },
-  
+
     validateAnnualData : function(response){
       if(_.isEmpty(response.data)) {
         throw new Error("Error: annual data unavailable for this model.");
@@ -114,9 +123,9 @@ var ModalMixin = {
           throw new Error("Error: annual data for this model is incomplete.");
         }
       }
-      return response; 
+      return response;
     },
-    
+
     displayError: function(error, displayMethod) {
       if(error.response) { // data server sent a non-200 response
         displayMethod("Error: " + error.response.status + " received from data server.");
@@ -132,6 +141,7 @@ var ModalMixin = {
         displayMethod(error.message);
       }
     }
+
 };
 
 export default ModalMixin;
