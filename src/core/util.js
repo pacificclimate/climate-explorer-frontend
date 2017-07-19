@@ -309,14 +309,10 @@ var parseTimeSeriesForC3 = function (graph_data, include_seasonal_data) {
  *   { ... }
  *   };
  */
-//FIXME: Time period should be determined from the metadata API
-//which currently doesn't give time bounds information. See here:
-//https://github.com/pacificclimate/climate-explorer-backend/issues/44
-//When that issue is fixed, this code needs to be updated
-var parseBootstrapTableData = function (data) {
+var parseBootstrapTableData = function (data, metadata) {
   return _.map(data, function (stats, model) {
-    var splitYears = model.split('_')[5].split('-');
-    var period = splitYears[0].slice(0, 4) + ' - ' + splitYears[1].slice(0, 4);
+    var modelMetadata = _.find(metadata, m => m.unique_id == model);
+    var period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
     var modelInfo = {
       'model_period': period,
       'run': stats['run'],

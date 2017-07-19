@@ -6,6 +6,7 @@ import { parseTimeSeriesForC3,
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
+import _ from 'underscore';
 
 import styles from './MotiDataController.css';
 
@@ -32,15 +33,23 @@ var MotiDataController = React.createClass({
 
   getData: function (props) {
     this.setTimeSeriesNoDataMessage("Loading Data");
-    this.setStatsTableNoDataMessage("Loading Data");
 
+    this.setStatsTableNoDataMessage("Loading Data");  
+    
+    var monthlyMetadata = _.find(props.meta, function(dataset) {
+      return dataset.model_id == props.model_id &&
+             dataset.variable_id == props.variable_id &&
+             dataset.experiment == props.experiment &&
+             dataset.timescale == "monthly";
+    });
+          
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
-    var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-
+    var myTimeseriesPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
+   
     myStatsPromise.then(response => {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);

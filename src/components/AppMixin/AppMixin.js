@@ -35,6 +35,7 @@ var AppMixin = {
          variable_id: models[0].variable_id,
          experiment: models[0].experiment,
          });
+         this.bodgeClimatologyPeriodIntoMetadata();
         });
   },
 
@@ -69,6 +70,20 @@ var AppMixin = {
   getMetadataItems: function (name) {
     return _.unique(this.state.meta.map(function (el) {return el[name];}));
   },
+  
+  //this VERY TEMPORARY function is a placeholder for metadata calls eventually
+  //returning climatology period information
+  //FIXME: get rid of this function when possible.
+  bodgeClimatologyPeriodIntoMetadata: function () {
+    for(var i = 0; i < this.state.meta.length; i++) {
+      var params = this.state.meta[i].unique_id.split('_');
+      var dates = params[6].split('-');
+      this.state.meta[i].start_date = dates[0].slice(0, 4);
+      this.state.meta[i].end_date = dates[1].slice(0, 4);
+    }
+    console.log(this.state);
+  },
+  
 };
 
 export default AppMixin;
