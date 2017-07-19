@@ -391,5 +391,4 @@ var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphNa
 };
 
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData,
-    createWorksheetSummaryCells, fillWorksheetDataCells, assembleWorksheet, exportTableDataToWorksheet,
     mergeC3DataGraphs};
