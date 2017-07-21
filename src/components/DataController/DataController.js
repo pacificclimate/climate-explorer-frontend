@@ -2,6 +2,7 @@ import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
+import _ from 'underscore';
 
 import styles from './DataController.css';
 
@@ -9,6 +10,7 @@ import {
   dataApiToC3,
   parseTimeSeriesForC3,
   parseBootstrapTableData } from '../../core/util';
+import {timeseriesToAnnualCycleGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -31,7 +33,7 @@ var DataController = React.createClass({
     return {
       projChangeTimeOfYear: 0,
       dataTableTimeOfYear: 0,
-      timeSeriesDatasetId: '',
+      timeSeriesRun: undefined,
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined,
@@ -43,12 +45,41 @@ var DataController = React.createClass({
     this.setTimeSeriesNoDataMessage("Loading Data");
     this.setClimoSeriesNoDataMessage("Loading Data");
     this.setStatsTableNoDataMessage("Loading Data");
+    
+    var monthlyMetadata = _.find(props.meta, function(dataset){
+      return dataset.model_id == props.model_id &&
+      dataset.variable_id == props.variable_id &&
+      dataset.experiment == props.experiment &&
+      dataset.timescale == "monthly";
+    });
 
+    var yearlyMetadata = _.find(props.meta, function(dataset){
+      return dataset.model_id == props.model_id &&
+      dataset.variable_id == props.variable_id &&
+      dataset.experiment == props.experiment &&
+      dataset.ensemble_member == monthlyMetadata.ensemble_member &&
+      dataset.start_date == monthlyMetadata.start_date &&
+      dataset.end_date == monthlyMetadata.end_date &&
+      dataset.timescale == "yearly";
+    });
+    
+    var seasonalMetadata = _.find(props.meta, function(dataset){
+      return dataset.model_id == props.model_id &&
+      dataset.variable_id == props.variable_id &&
+      dataset.experiment == props.experiment &&
+      dataset.ensemble_member == monthlyMetadata.ensemble_member &&
+      dataset.start_date == monthlyMetadata.start_date &&
+      dataset.end_date == monthlyMetadata.end_date &&
+      dataset.timescale == "seasonal";
+    });
+    
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
 
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
-    var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
+    var monthlyPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
+    var seasonalPromise = this.getTimeseriesPromise(props, seasonalMetadata.unique_id);
+    var yearlyPromise = this.getTimeseriesPromise(props, yearlyMetadata.unique_id);
 
 
     myDataPromise.then(response => {
@@ -61,16 +92,21 @@ var DataController = React.createClass({
 
     myStatsPromise.then(response => {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
 
-    myTimeseriesPromise.then(response => {
+    Promise.all([monthlyPromise, seasonalPromise, yearlyPromise]).then(series => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data, true),
-        timeSeriesDatasetId: props.meta[0].unique_id
+        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, 
+            series[0].data, series[1].data, series[2].data),
+        timeSeriesRun: {
+          start_date: monthlyMetadata.start_date,
+          end_date: monthlyMetadata.end_date,
+          ensemble_member: monthlyMetadata.ensemble_member
+        },
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
@@ -129,19 +165,30 @@ var DataController = React.createClass({
     });
     this.getStatsPromise(this.props, timeidx).then(response => {
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), this.props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
   },
 
-  updateAnnCycleDataset: function (dataset) {
+  updateAnnCycleDataset: function (run) {
     this.setTimeSeriesNoDataMessage("Loading Data");
     this.setState({
-      timeSeriesDatasetId: dataset,
+      timeSeriesRun: JSON.parse(run),
     });
-    this.getTimeseriesPromise(this.props, dataset).then(response => {
+    console.log("run = ");
+    console.log(run);
+    var dataset = _.find(this.props.meta, set => {
+      return set.model_id == this.props.model_id &&
+      set.variable_id == this.props.variable_id &&
+      set.experiment == this.props.experiment &&
+      set.timescale == "monthly" &&
+      set.start_date == JSON.parse(run).start_date &&
+      set.end_date == JSON.parse(run).end_date &&
+      set.ensemble_member == JSON.parse(run).ensemble_member;
+    });
+    this.getTimeseriesPromise(this.props, dataset.unique_id).then(response => {
       this.setState({
         timeSeriesData: parseTimeSeriesForC3(response.data, true),
       });
@@ -154,16 +201,18 @@ var DataController = React.createClass({
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
-    //FIXME: Time period should be determined from the metadata API
-    // which currently doesn't give time bounds information. See here:
-    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-    // When that issue is fixed, this code needs to be updated
+    
+    //make a list of all the unique combinations of run + climatological period
+    //a user could decide to view.
+    //Not sure JSON is the right way to do this, though.
+    //FIXME: figure out what can be used with the selector callback.
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
+        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
+            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
     });
+    ids = _.uniq(ids, false, function(item){return item[1]});
+
+    console.log(ids);
 
     return (
       <div>

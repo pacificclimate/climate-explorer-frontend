@@ -10,6 +10,7 @@ import {
   parseTimeSeriesForC3,
   parseBootstrapTableData,
   mergeC3DataGraphs} from '../../core/util';
+import{ timeseriesToAnnualCycleGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
@@ -60,14 +61,39 @@ var DualDataController = React.createClass({
     });
 
     //fetch and graph annual cycle data
+    var variableMetadata = _.find(props.meta, function(dataset){
+      return dataset.model_id == props.model_id &&
+      dataset.variable_id == props.variable_id &&
+      dataset.experiment == props.experiment &&
+      dataset.timescale == "monthly";
+    });
+    console.log("Dual variable:");
+    console.log(variableMetadata);
+    
+    var comparandMetadata = _.find(props.comparandMeta, function(dataset){
+      return dataset.model_id == props.model_id &&
+      dataset.variable_id == props.comparand_id &&
+      dataset.experiment == props.experiment &&
+      dataset.ensemble_member == variableMetadata.ensemble_member &&
+      dataset.start_date == variableMetadata.start_date &&
+      dataset.end_date == variableMetadata.end_date &&
+      dataset.timescale == "monthly";
+    });
+    console.log("comparandMeta = ");
+    console.log(props.comparandMeta);
+    console.log("Dual comparand:");
+    console.log(comparandMetadata);
+    
     var variableTimeseriesParams = {variable_id: props.variable_id, area: props.area};
-    var variableTimeseriesPromise = this.getTimeseriesPromise(variableTimeseriesParams, props.meta[0].unique_id);
+    var variableTimeseriesPromise = this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id);
     var comparandTimeseriesParams = {variable_id: props.comparand_id, area: props.area};
-    var comparandTimeseriesPromise = this.getTimeseriesPromise(comparandTimeseriesParams, props.comparandMeta[0].unique_id);
-    Promise.all([variableTimeseriesPromise, comparandTimeseriesPromise]).then(values=> {
+    var comparandTimeseriesPromise = this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id);
+    Promise.all([variableTimeseriesPromise, comparandTimeseriesPromise]).then(series=> {
       this.setState({
-        timeSeriesData: mergeC3DataGraphs(parseTimeSeriesForC3(values[0].data), this.props.variable_id,
-                                          parseTimeSeriesForC3(values[1].data), this.props.comparand_id)
+        //timeSeriesData: mergeC3DataGraphs(parseTimeSeriesForC3(values[0].data), this.props.variable_id,
+        //                                  parseTimeSeriesForC3(values[1].data), this.props.comparand_id)
+        timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], 
+                                                     series[0].data, series[1].data),
       });
     }).catch(error=>{
       this.displayError(error, this.setTimeSeriesNoDataMessage);

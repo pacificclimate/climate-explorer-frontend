@@ -35,6 +35,7 @@ var App = React.createClass({
                 meta = {this.getfilteredMeta()}
                 onSetArea={this.handleSetArea}
               />
+
             </div>
           </Col>
           <Col lg={6}>

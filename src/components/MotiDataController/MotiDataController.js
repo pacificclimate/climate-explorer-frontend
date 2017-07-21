@@ -6,6 +6,7 @@ import { parseTimeSeriesForC3,
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
+import {timeseriesToAnnualCycleGraph} from '../../core/chart';
 import _ from 'underscore';
 
 import styles from './MotiDataController.css';
@@ -57,8 +58,9 @@ var MotiDataController = React.createClass({
 
     myTimeseriesPromise.then(response => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data, false),
+        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, response.data),
       });
+      
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
     });

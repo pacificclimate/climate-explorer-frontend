@@ -208,6 +208,19 @@ const bootstrapTableTestData = {
     }
 };
 
+const bootstrapTableTestMeta = {
+    'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
+    {
+      'start_date': '1961',
+      'end_date': '1990'
+    },
+  'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
+    {
+      'start_date': '1971',
+      'end_date': '2000'
+    }
+};
+
 const bootstrapTableTestExpected = [
   {
     'run': 'r1i1p1',
@@ -234,7 +247,7 @@ const bootstrapTableTestExpected = [
 describe('parseBootstrapTableData', function () {
   it('Correctly flattens a stats object for passing to the DataTable component', function () {
     var util = require('../util');
-    var result = util.parseBootstrapTableData(bootstrapTableTestData);
+    var result = util.parseBootstrapTableData(bootstrapTableTestData, bootstrapTableTestMeta);
     expect(result).toEqual(bootstrapTableTestExpected);
   });
 });
