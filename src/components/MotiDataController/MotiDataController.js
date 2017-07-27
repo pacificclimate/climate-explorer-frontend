@@ -29,28 +29,35 @@ var MotiDataController = React.createClass({
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined,
+      dataTableTimeOfYear: 0,
     };
   },
 
+  /*
+   * Called when MotiController is first loaded. Selects and fetches an initial
+   * dataset to display in the stats table and annual cycle graph.
+   */
   getData: function (props) {
     this.setTimeSeriesNoDataMessage("Loading Data");
 
     this.setStatsTableNoDataMessage("Loading Data");  
     
-    var monthlyMetadata = _.find(props.meta, function(dataset) {
-      return dataset.model_id == props.model_id &&
-             dataset.variable_id == props.variable_id &&
-             dataset.experiment == props.experiment &&
-             dataset.timescale == "monthly";
-    });
+    var monthlyMetadata = _.findWhere(props.meta,{
+      model_id: props.model_id,
+      variable_id: props.variable_id,
+      experiment: props.experiment,
+      timescale: "monthly" });
           
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
     var myTimeseriesPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
    
     myStatsPromise.then(response => {
+      //This portal doesn't offer users a choice of what time of year to display
+      //stats for. It always shows annual stats.
+      var stats = this.filterAPIResults(response.data, {timescale: "yearly"}, props.meta);
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
@@ -66,6 +73,7 @@ var MotiDataController = React.createClass({
     });
   },
 
+  //Remove data from the Annual Cycle graph and display a message
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
       timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -73,6 +81,7 @@ var MotiDataController = React.createClass({
       });
   },
 
+  //Remove data from the Stats Table and display a message
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },

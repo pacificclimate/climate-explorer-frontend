@@ -171,14 +171,7 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
   var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name', 'Period', 'Run'];
   rows.push(header);
 
-  //FIXME: Time period should be determined from the metadata API
-  // which currently doesn't give time bounds information. See here:
-  // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-  // When that issue is fixed, this code needs to be updated
   var dataset = _.findWhere(metadata.meta, {unique_id: run});
-  var params = dataset.unique_id.split("_");
-  var sdate = params[params.length - 1].slice(0,4);
-  var edate = params[params.length - 1].slice(9, 13);
 
 
   rows.push([
@@ -186,7 +179,7 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
     metadata.experiment,
     metadata.variable_id,
     metadata.meta[0].variable_name,
-    `${sdate}-${edate}`,
+    `${dataset.start_date}-${dataset.end_date}`,
     dataset.ensemble_member
   ]);
 
@@ -235,21 +228,6 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
   return rows;
 
 }
-
-/* Helper function that returns period info (IE, 2010 - 2039)
- * based on the time stamp of associated data. Stopgap until the
- * API provides a safer version of this information.
- * Assumes all values are associated with the fifteenth year of
- * a thirty-year simulation period.
- */
-//FIXME: Time period should be determined from the metadata API
-// which currently doesn't give time bounds information. See here:
-// https://github.com/pacificclimate/climate-explorer-backend/issues/44
-// When that issue is fixed, this code needs to be updated
-var inferPeriodFromTimeStamp = function (timestamp) {
-  var year = parseInt(timestamp.slice(0, 4));
-  return `${year - 15}-${year + 14}`;
-};
 
 module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
     createTimeSeriesWorksheetSummaryCells, generateDataCellsFromC3Graph};

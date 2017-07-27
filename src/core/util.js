@@ -357,7 +357,7 @@ var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphNa
   //(data.type == line)
   _.map([mainGraph, auxGraph], function(graph){
     var dataToMerge = graph.data.columns[0][0];
-    var dataDisplayType = graph.data.types[dataToMerge];
+    var dataDisplayType = graph.data.types ? graph.data.types[dataToMerge] : "line";
     if(dataDisplayType && (dataDisplayType != "line")) {
       throw new Error(`Error: cannot display merged ${dataDisplayType} data.`);
     }
@@ -373,7 +373,17 @@ var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphNa
   mergedGraph.data.columns[1][0] = auxGraphName;
   mergedGraph.data.axes = {};
   mergedGraph.data.axes[mainGraphName] = "y";
+  mergedGraph.data.x = mainGraph.data.x;
 
+  //if this is a timeseries with an "x" data column, make sure it ends up 
+  //on the merged graph.
+  for(var i = 0; i < mainGraph.data.columns.length; i++) {
+    if(mainGraph.data.columns[i][0] == "x") {
+      mergedGraph.data.columns.push(mainGraph.data.columns[i]);
+    }
+  }
+  
+  
   mergedGraph.axis = {};
   mergedGraph.axis.x = mainGraph.axis.x;
   mergedGraph.axis.y = mainGraph.axis.y;
@@ -386,7 +396,7 @@ var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphNa
     mergedGraph.data.axes[auxGraphName] = "y2";
     mergedGraph.axis.y2.show = true;
   }
-
+  
   return mergedGraph;
 };
 

@@ -29,9 +29,9 @@ var AppMixin = {
             }
           }
 
-        //Temporary kludge until we decide whether the multimeta API
-        //call should return climatology period data.
-        //FIXME: get rid of this.
+        //Temporary kludge until the multimeta API is updated to
+        //return climatology period data.
+        //FIXME: remove this when it becomes unnecessary.
         models = _.map(models, function(model){
           var params = model.unique_id.split('_');
           var dates = params[6].split('-');
@@ -46,7 +46,6 @@ var AppMixin = {
          variable_id: models[0].variable_id,
          experiment: models[0].experiment,
          });
-         //this.bodgeClimatologyPeriodIntoMetadata();
         });
   },
 

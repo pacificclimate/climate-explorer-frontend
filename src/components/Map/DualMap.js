@@ -38,7 +38,6 @@ var DualMap = React.createClass({
   },
 
   getDefaultProps: function () {
-    console.log("getDefaultProps called");
     return {
       crs: new L.Proj.CRS.TMS(
         'EPSG:4326',
@@ -96,7 +95,6 @@ var DualMap = React.createClass({
   },
 
   clearMapFeatures: function () {
-    console.log("clearMapFeatures called");
     this.drawnItems.getLayers().map(function (layer) {
       this.drawnItems.removeLayer(layer);
     }.bind(this));
@@ -105,14 +103,12 @@ var DualMap = React.createClass({
   // generally called for a new area originating from within this component
   // propagate the area up the component stack
   handleSetArea: function (geojson) {
-    console.log("handleSetArea called");
     this.setState({ area: geojson });
     this.props.onSetArea(geojson);
   },
 
   // area received from props; don't propagate back up the component stack
   handleNewArea: function (geojson) {
-    console.log("handleNewArea called");
     this.setState({ area: geojson });
     this.clearMapFeatures();
         // L.geoJson returns a FeatureGroup. Only add first layer of group.
@@ -128,7 +124,6 @@ var DualMap = React.createClass({
   },
 
   componentDidMount: function () {
-    console.log("ComponentDidMount called");
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
       minZoom: 0,
@@ -201,7 +196,6 @@ var DualMap = React.createClass({
     }.bind(this);
 
     var onDelete = function (e) {
-      console.lot("onDelet called");
       var layers = e.layers.getLayers();
       if (layers.length !== 1) {
         // Should never happen
@@ -221,8 +215,6 @@ var DualMap = React.createClass({
     */
 
     var doImage = function (err, canvas) {
-      console.log("doImage called");
-      console.log(err);
       var dataURL = canvas.toDataURL('image/png');
 
       var data = atob(dataURL.substring('data:image/png;base64,'.length));
@@ -270,7 +262,6 @@ var DualMap = React.createClass({
   },
 
   componentWillUnmount: function () {
-    console.log("componentWillUnmount called");
     this.map.off('click', this.onMapClick);
     this.map = null;
   },
@@ -278,9 +269,6 @@ var DualMap = React.createClass({
     console.log('clicked on map');
   },
   componentWillReceiveProps: function (newProps) {
-    console.log("componentWillReceiveProps called.");
-    console.log("newProps = ");
-    console.log(newProps);
 
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
@@ -294,7 +282,6 @@ var DualMap = React.createClass({
     }
   },
   render: function () {
-    console.log("Render called");
     return (
       <div className={styles.map}>
         <div ref={ (c) => this._map = c } className={styles.map} />

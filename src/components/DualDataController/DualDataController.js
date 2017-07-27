@@ -33,7 +33,9 @@ var DualDataController = React.createClass({
   getInitialState: function () {
     return {
       projChangeTimeOfYear: 0,
+      projChangeTimeScale: "monthly",
       dataTableTimeOfYear: 0,
+      dataTableTimeScale: "monthly",
       timeSeriesDatasetId: '',
       climoSeriesData: undefined,
       timeSeriesData: undefined,
@@ -41,66 +43,66 @@ var DualDataController = React.createClass({
     };
   },
 
+  /*
+   * Called when Dual Data Controller is loaded. Selects and fetches
+   * initial data to display in the Projected Change graph and the Annual
+   * Cycle graph. Defaults to monthly resolution and January time index.
+   */
   getData: function (props) {
     this.setTimeSeriesNoDataMessage("Loading Data");
     this.setClimoSeriesNoDataMessage("Loading Data");
 
     //fetch and graph projected change data
     var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
-    var variableDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
+    var variableDataPromise = this.getDataPromise(props, 
+        this.state.projChangeTimeScale, this.state.projChangeTimeOfYear);
     var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
     comparandDataParams.variable_id = props.comparand_id;
-    var comparandDataPromise = this.getDataPromise(comparandDataParams, this.state.projChangeTimeOfYear);
+    var comparandDataPromise = this.getDataPromise(comparandDataParams, 
+        this.state.projChangeTimeScale, this.state.projChangeTimeOfYear);
     Promise.all([variableDataPromise, comparandDataPromise]).then(values=> {
       this.setState({
-        climoSeriesData: mergeC3DataGraphs(dataApiToC3(values[0].data), this.props.variable_id,
-                                           dataApiToC3(values[1].data), this.props.comparand_id)
+        climoSeriesData: mergeC3DataGraphs(dataApiToC3(values[0].data), props.variable_id,
+                                           dataApiToC3(values[1].data), props.comparand_id)
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
     });
 
     //fetch and graph annual cycle data
-    var variableMetadata = _.find(props.meta, function(dataset){
-      return dataset.model_id == props.model_id &&
-      dataset.variable_id == props.variable_id &&
-      dataset.experiment == props.experiment &&
-      dataset.timescale == "monthly";
-    });
-    console.log("Dual variable:");
-    console.log(variableMetadata);
+    var variableMetadata = _.findWhere(props.meta, {
+      model_id: props.model_id,
+      variable_id: props.variable_id,
+      experiment: props.experiment,
+      timescale: "monthly" });
     
-    var comparandMetadata = _.find(props.comparandMeta, function(dataset){
-      return dataset.model_id == props.model_id &&
-      dataset.variable_id == props.comparand_id &&
-      dataset.experiment == props.experiment &&
-      dataset.ensemble_member == variableMetadata.ensemble_member &&
-      dataset.start_date == variableMetadata.start_date &&
-      dataset.end_date == variableMetadata.end_date &&
-      dataset.timescale == "monthly";
-    });
-    console.log("comparandMeta = ");
-    console.log(props.comparandMeta);
-    console.log("Dual comparand:");
-    console.log(comparandMetadata);
+    var comparandMetadata = this.findMatchingMetadata(variableMetadata, 
+        {variable_id: props.comparand_id}, props.comparandMeta);
+
+    var timeseriesPromises = [];
     
     var variableTimeseriesParams = {variable_id: props.variable_id, area: props.area};
-    var variableTimeseriesPromise = this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id);
-    var comparandTimeseriesParams = {variable_id: props.comparand_id, area: props.area};
-    var comparandTimeseriesPromise = this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id);
-    Promise.all([variableTimeseriesPromise, comparandTimeseriesPromise]).then(series=> {
+    timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id));
+    
+    //we are assured that the required data exists for the primary variable + model + experiment, 
+    //but it is not guarenteed to exist for the comparison variable, so fall back to only
+    //showing one variable in that case.
+    if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
+      var comparandTimeseriesParams = {variable_id: props.comparand_id, area: props.area};
+      timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
+    }
+    
+    Promise.all(timeseriesPromises).then(series=> {
+      var data = _.map(series, function(s) {return s.data});
       this.setState({
-        //timeSeriesData: mergeC3DataGraphs(parseTimeSeriesForC3(values[0].data), this.props.variable_id,
-        //                                  parseTimeSeriesForC3(values[1].data), this.props.comparand_id)
-        timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], 
-                                                     series[0].data, series[1].data),
-      });
+        timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], ...data)
+        });      
     }).catch(error=>{
       this.displayError(error, this.setTimeSeriesNoDataMessage);
-      console.log(error);
     });
   },
 
+  //Clear data from the Annual Cycle graph and display a message
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
       timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -108,6 +110,7 @@ var DualDataController = React.createClass({
       });
   },
 
+  //Clear data from the Projected Change graph and display a message
   setClimoSeriesNoDataMessage: function(message) {
     this.setState({
       climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -124,28 +127,82 @@ var DualDataController = React.createClass({
      JSON.stringify(nextProps.comparandMeta) !== JSON.stringify(this.props.comparandMeta);
   },
 
+  /*
+   * Called when the user selects a time of year to display on the 
+   * Projected Change graph. Records the requested index (0-11) and time 
+   * resolution (monthly, seasonal, yearly) in state, fetches the new 
+   * data, and redraws the graph.
+   */
+  //TODO: make sure things fail gracefully if some resolutions are missing.
   updateProjChangeTimeOfYear: function (timeidx) {
+    var idx = JSON.parse(timeidx).timeidx;
+    var scale = JSON.parse(timeidx).timescale;    
     this.setClimoSeriesNoDataMessage("Loading Data");
     this.setState({
-      projChangeTimeOfYear: timeidx,
+      projChangeTimeOfYear: idx,
+      projChangeTimeScale: scale
     });
-    this.getDataPromise(this.props, timeidx).then(response => {
+
+    var variableDataParams = _.pick(this.props, 'model_id', 'experiment', 'area', 'variable_id');
+    var variableDataPromise = this.getDataPromise(variableDataParams, scale, idx);
+    var comparandDataParams = _.pick(this.props, 'model_id', 'experiment', 'area');
+    comparandDataParams.variable_id = this.props.comparand_id;
+    var comparandDataPromise = this.getDataPromise(comparandDataParams, scale, idx); 
+
+    Promise.all([variableDataPromise, comparandDataPromise]).then(values=> {
       this.setState({
-        climoSeriesData: dataApiToC3(response.data),
+        climoSeriesData: mergeC3DataGraphs(dataApiToC3(values[0].data), this.props.variable_id,
+                                           dataApiToC3(values[1].data), this.props.comparand_id)
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
     });
   },
 
-  updateAnnCycleDataset: function (dataset) {
+  /*
+   * Called when the user selects a specific run to view on the Annual Cycle
+   * graph. Stores the selected run and period in state, fetches new data,
+   * and updates the graph.
+   */
+  updateAnnCycleDataset: function (run) {
     this.setTimeSeriesNoDataMessage("Loading Data");
+    run = JSON.parse(run);
     this.setState({
-      timeSeriesDatasetId: dataset,
+      timeSeriesRun: run,
     });
-    this.getTimeseriesPromise(this.props, dataset).then(response => {
+    
+    var runMetadata = {
+        model_id: this.props.model_id,
+        variable_id: "",
+        experiment: this.props.experiment,
+        ensemble_member: run.ensemble_member,
+        start_date: run.start_date,
+        end_date: run.end_date,
+        timescale: "monthly" };
+    
+    var variableMetadata = this.findMatchingMetadata(runMetadata, {variable_id: this.props.variable_id});
+    var comparandMetadata = this.findMatchingMetadata(runMetadata, {variable_id: this.props.comparand_id},
+        this.props.comparandMeta);
+    
+    var timeseriesPromises = [];
+    
+    var variableTimeseriesParams = {variable_id: this.props.variable_id, area: this.props.area};
+    timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id));
+    
+    //we can assume that annual cycle data in the requested run + period
+    //exists for the primary variable, because the list of available run + period
+    //combinations is generated from the primary variable, but it's possible that
+    //there is no data available for the comparison variable for this run + period,
+    //in which case fall back to showing only the main variable.
+    if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
+      var comparandTimeseriesParams = {variable_id: this.props.comparand_id, area: this.props.area};
+      timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
+    }
+    
+    Promise.all(timeseriesPromises).then(series => {
+      var data = _.map(series, function(s) {return s.data})
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data),
+        timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], ...data),
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
@@ -155,12 +212,15 @@ var DualDataController = React.createClass({
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+    //make a list of all the unique combinations of run + climatological period
+    //a user could decide to view.
+    //Not sure JSON is the right way to do this, though.
+    //TODO: see if there's a more elegant way to handle the callback
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
+        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
+            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
     });
+    ids = _.uniq(ids, false, function(item){return item[1]});
 
     return (
       <div>

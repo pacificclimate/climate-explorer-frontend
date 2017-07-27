@@ -30,7 +30,7 @@ var MapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      styles: 'boxfill/ferret',
+      styles: 'default-scalar/x-Rainbow',
       timeidx: 0,
       logscale: false,
     };
@@ -108,23 +108,15 @@ var MapController = React.createClass({
   },
 
   render: function () {
-    var pallettes = [['boxfill/ferret', 'ferret'],
-                     ['boxfill/rainbow', 'rainbow'],
-                     ['boxfill/occam', 'occam'],
-                     ['boxfill/occam_inv', 'inverted occam'],
+    var pallettes = [//['default-scalar/ferret', 'ferret'],
+                     ['default-scalar/x-Rainbow', 'rainbow'],
+                     ['default-scalar/x-Cccam', 'occam'],
+                     ['default-scalar/x-Occam-inv', 'inverted occam'],
                     ];
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
 
-    // Determine available datasets and display selector if multiple
-    //FIXME: Time period should be determined from the metadata API
-    // which currently doesn't give time bounds information. See here:
-    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-    // When that issue is fixed, this code needs to be updated
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
+      return [el.unique_id, `${el.ensemble_member} ${el.start_date}-${el.end_date} ${el.timescale}`];
     }).sort(function (a, b) {
       return a[1] > b[1] ? 1 : -1;
     });
@@ -155,19 +147,12 @@ var MapController = React.createClass({
           area={this.state.area}
         />
       );
-      var timestamp = new Date(Date.parse(this.state.times[0]));
-      var year = timestamp.getFullYear();
       var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
-      var run = runMetadata.ensemble_member;
 
-      // FIXME: Time period should be determined from the metadata API
-      // which currently doesn't give time bounds information. See here:
-      // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-      // When that issue is fixed, this code needs to be updated
       mapFooter = (
         <h5>
-          Dataset: {run} &nbsp;
-          {year - 15} - {year + 14} &nbsp;
+          Dataset: {runMetadata.ensemble_member} &nbsp;
+          {runMetadata.start_date} - {runMetadata.end_date} &nbsp;
           Time: {this.state.wmstime}
         </h5>
       );

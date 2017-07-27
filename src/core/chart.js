@@ -178,9 +178,10 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
   //datasets have unique unique_id's; it's not useful on a graph
   variation.splice(variation.indexOf("unique_id"), 1);
   
-  //Remove variable_name; it's redundant with variable_id (and takes
-  //up a lot of room.)
-  variation.splice(variation.indexOf("variable_name"), 1);
+  //Remove variable_name if variable_id is present; it's redundant
+  if(variation.indexOf("variable_name") != -1 && variation.indexOf("variable_id" != -1)) {
+    variation.splice(variation.indexOf("variable_name"), 1);
+  }
   
   return function (m) {
     name = "";

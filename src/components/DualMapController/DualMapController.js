@@ -27,8 +27,10 @@ var DualMapController = React.createClass({
   mixins: [ModalMixin],
 
   /*
-   * State items also set from meta object array Includes: - dataset - wmstime -
-   * variable
+   * State items also set from meta object array Includes: 
+   * - dataset 
+   * - wmstime 
+   * - variable
    */
   getInitialState: function () {
     return {
@@ -53,22 +55,29 @@ var DualMapController = React.createClass({
     });
   },
 
-  //FIXME:Update comparand time here too!
-  //will require ugly dataset name munging and a better test dataset
   updateDataset: function (uniqueId) {
     // Updates dataset in state. Updates time value to match new dataset
 
     this.selectedDataset = this.props.meta.filter(function (el) {
       return el.unique_id === uniqueId;
     })[0];
+    
+    this.secondaryDataset = _.findWhere(this.props.comparandMeta, {
+      variable_id: this.state.comparand,
+      timescale: this.selectedDataset.timescale,
+      ensemble_member: this.selectedDataset.ensemble_member,
+      start_date: this.selectedDataset.start_date,
+      end_date: this.selectedDataset.end_date
+    });
 
     this.requestTimeMetadata(uniqueId).then(response => {
       this.selectedDataset.times = response.data[uniqueId].times;
-
+      
       this.setState({
         times: response.data[uniqueId].times,
         timeidx: 0, // Time indices may not be equivalent across datasets
         dataset: this.selectedDataset.unique_id,
+        comparandDataset: this.secondaryDataset.unique_id,
         wmstime: response.data[uniqueId].times[0],
         variable: this.selectedDataset.variable_id,
       });
@@ -98,7 +107,11 @@ var DualMapController = React.createClass({
   componentWillReceiveProps: function (nextProps) {
 
     this.selectedDataset = nextProps.meta[0];
-    this.secondaryDataset = nextProps.comparandMeta[0];
+    this.secondaryDataset = _.findWhere(nextProps.comparandMeta, {
+      timescale: this.selectedDataset.timescale,
+      start_date: this.selectedDataset.start_date,
+      end_date: this.selectedDataset.end_date
+    });
 
     this.requestTimeMetadata(this.selectedDataset.unique_id).then(response => {
       this.setState({
@@ -119,7 +132,6 @@ var DualMapController = React.createClass({
   },
 
   render: function () {
-    console.log("MAPCONTROLLER RERENDERED!");
 
     var singleColourPalettes = [
       ['seq-Blues', 'light blues'],
@@ -140,10 +152,7 @@ var DualMapController = React.createClass({
 
     // Determine available datasets and display selector if multiple
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
+      return [el.unique_id, `${el.ensemble_member} ${el.start_date}-${el.end_date} ${el.timescale}`];
     }).sort(function (a, b) {
       return a[1] > b[1] ? 1 : -1;
     });
@@ -180,19 +189,11 @@ var DualMapController = React.createClass({
           area={this.state.area}
         />
       );
-      var timestamp = new Date(Date.parse(this.state.times[0]));
-      var year = timestamp.getFullYear();
       var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
-      var run = runMetadata.ensemble_member;
-
-      // FIXME: Time period should be determined from the metadata API
-      // which currently doesn't give time bounds information. See here:
-      // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-      // When that issue is fixed, this code needs to be updated
       mapFooter = (
         <h5>
-          Dataset: {run} &nbsp;
-          {year - 15} - {year + 14} &nbsp;
+          Dataset: {runMetadata.ensemble_member} &nbsp;
+          {runMetadata.start_date} - {runMetadata.end_date} &nbsp;
           Time: {this.state.wmstime}
         </h5>
       );
