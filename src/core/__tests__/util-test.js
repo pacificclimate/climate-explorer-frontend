@@ -208,18 +208,19 @@ const bootstrapTableTestData = {
     }
 };
 
-const bootstrapTableTestMeta = {
-    'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
+const bootstrapTableTestMeta = [
     {
       'start_date': '1961',
-      'end_date': '1990'
+      'end_date': '1990',
+      'unique_id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231'
+        
     },
-  'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
     {
       'start_date': '1971',
-      'end_date': '2000'
+      'end_date': '2000',
+      'unique_id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231'
     }
-};
+];
 
 const bootstrapTableTestExpected = [
   {

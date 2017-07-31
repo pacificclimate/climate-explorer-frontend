@@ -12,7 +12,9 @@ var sampleMetadata = {
         "model_name": null,
         "institution": "Australian",
         "timescale": "other",
-        "ensemble_member": "r1i1p1"
+        "ensemble_member": "r1i1p1",
+        "start_date": "1961",
+        "end_date": "1990"
       },
       {
         "unique_id": "txxETCCDI_aMon_CSIRO-Mk3-6-0_historical_r1i1p1_19710101-20001231",
@@ -23,7 +25,9 @@ var sampleMetadata = {
         "model_name": null,
         "institution": "Australian",
         "timescale": "other",
-        "ensemble_member": "r1i1p1"
+        "ensemble_member": "r1i1p1",
+        "start_date": "1961",
+        "end_date": "1990",
       }
     ]
   };
