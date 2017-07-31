@@ -1,3 +1,7 @@
+/***********************************************************
+ * util.js - a collection of data-parsing support functions 
+ ***********************************************************/
+
 var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
@@ -400,5 +404,23 @@ var mergeC3DataGraphs = function (mainGraph, mainGraphName, auxGraph, auxGraphNa
   return mergedGraph;
 };
 
+/*
+ * extendDateToBasicDate: converts an ISO8601 extended-formatted date 
+ * (like "1997-01-15T00:00:00Z") to an ISO8601 basic-formatted date 
+ * (like "1997-01-15")
+ */
+var extendedDateToBasicDate = function(timestamp) {
+  return moment(timestamp, moment.ISO_8601).utc().format('YYYY-MM-DD');
+};
+
+/*
+ * Returns a string with the first letter of each word capitalized
+ * "a 1st string" -> "A 1st String" 
+ */
+var capitalizeWords = function(s) {
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+};
+
+
 module.exports = { parseDataForC3, parseTimeSeriesForC3, dataApiToC3, parseBootstrapTableData,
-    mergeC3DataGraphs};
+    mergeC3DataGraphs, extendedDateToBasicDate, capitalizeWords};

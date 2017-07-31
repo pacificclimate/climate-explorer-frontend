@@ -7,10 +7,10 @@ import _ from 'underscore';
 import styles from './DataController.css';
 
 import {
-  dataApiToC3,
   parseTimeSeriesForC3,
   parseBootstrapTableData } from '../../core/util';
-import {timeseriesToAnnualCycleGraph} from '../../core/chart';
+import {timeseriesToAnnualCycleGraph,
+        dataToProjectedChangeGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -92,9 +92,9 @@ var DataController = React.createClass({
     var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeScale, 
         this.state.projChangeTimeOfYear);
 
-    myDataPromise.then(response => {
+    myDataPromise.then(response => {      
       this.setState({
-        climoSeriesData: dataApiToC3(response.data),
+        climoSeriesData: dataToProjectedChangeGraph([response.data]),
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
@@ -166,7 +166,7 @@ var DataController = React.createClass({
     });
     this.getDataPromise(this.props, scale, idx).then(response => {
       this.setState({
-        climoSeriesData: dataApiToC3(response.data),
+        climoSeriesData: dataToProjectedChangeGraph([response.data]),
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);

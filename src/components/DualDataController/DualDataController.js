@@ -6,11 +6,11 @@ import _ from 'underscore';
 
 
 import {
-  dataApiToC3,
   parseTimeSeriesForC3,
   parseBootstrapTableData,
   mergeC3DataGraphs} from '../../core/util';
-import{ timeseriesToAnnualCycleGraph} from '../../core/chart';
+import{ timeseriesToAnnualCycleGraph,
+        dataToProjectedChangeGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
@@ -53,17 +53,28 @@ var DualDataController = React.createClass({
     this.setClimoSeriesNoDataMessage("Loading Data");
 
     //fetch and graph projected change data
+    var dataPromises = [];
+    var dataParams = [];
     var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
-    var variableDataPromise = this.getDataPromise(props, 
-        this.state.projChangeTimeScale, this.state.projChangeTimeOfYear);
-    var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
-    comparandDataParams.variable_id = props.comparand_id;
-    var comparandDataPromise = this.getDataPromise(comparandDataParams, 
-        this.state.projChangeTimeScale, this.state.projChangeTimeOfYear);
-    Promise.all([variableDataPromise, comparandDataPromise]).then(values=> {
+    dataPromises.push(this.getDataPromise(props, this.state.projChangeTimeScale, 
+        this.state.projChangeTimeOfYear));
+    dataParams.push(variableDataParams);
+
+    //if the user has selected two seperate variables to examine, fetch data
+    //for the second variable. This query will always return a result, but
+    //the result may be an empty object {}.
+    if(props.comparand_id != props.variable_id) {
+      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
+      comparandDataParams.variable_id = props.comparand_id;
+      dataPromises.push(this.getDataPromise(comparandDataParams, 
+          this.state.projChangeTimeScale, this.state.projChangeTimeOfYear));
+      dataParams.push(comparandDataParams);
+    }
+    
+    Promise.all(dataPromises).then(values=> {
       this.setState({
-        climoSeriesData: mergeC3DataGraphs(dataApiToC3(values[0].data), props.variable_id,
-                                           dataApiToC3(values[1].data), props.comparand_id)
+        climoSeriesData: dataToProjectedChangeGraph(_.map(values, function(v){return v.data;}), 
+            dataParams), 
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
@@ -133,7 +144,6 @@ var DualDataController = React.createClass({
    * resolution (monthly, seasonal, yearly) in state, fetches the new 
    * data, and redraws the graph.
    */
-  //TODO: make sure things fail gracefully if some resolutions are missing.
   updateProjChangeTimeOfYear: function (timeidx) {
     var idx = JSON.parse(timeidx).timeidx;
     var scale = JSON.parse(timeidx).timescale;    
@@ -143,20 +153,31 @@ var DualDataController = React.createClass({
       projChangeTimeScale: scale
     });
 
-    var variableDataParams = _.pick(this.props, 'model_id', 'experiment', 'area', 'variable_id');
-    var variableDataPromise = this.getDataPromise(variableDataParams, scale, idx);
-    var comparandDataParams = _.pick(this.props, 'model_id', 'experiment', 'area');
-    comparandDataParams.variable_id = this.props.comparand_id;
-    var comparandDataPromise = this.getDataPromise(comparandDataParams, scale, idx); 
+    //fetch data for the newly selected time
+    var dataPromises = [];
+    var dataParams = [];
+    var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
+    dataPromises.push(this.getDataPromise(props, scale, idx));
+    dataParams.push(variableDataParams);
 
-    Promise.all([variableDataPromise, comparandDataPromise]).then(values=> {
+    //if the user has selected two seperate variables to examine, fetch data
+    //for the second variable. This query will always return a result, but
+    //the result may be an empty object {}.
+    if(props.comparand_id != props.variable_id) {
+      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
+      comparandDataParams.variable_id = props.comparand_id;
+      dataPromises.push(this.getDataPromise(comparandDataParams, scale, idx));
+      dataParams.push(comparandDataParams);
+    }
+    
+    Promise.all(dataPromises).then(values=> {
       this.setState({
-        climoSeriesData: mergeC3DataGraphs(dataApiToC3(values[0].data), this.props.variable_id,
-                                           dataApiToC3(values[1].data), this.props.comparand_id)
+        climoSeriesData: dataToProjectedChangeGraph(_.map(values, function(v){return v.data;}), 
+            dataParams), 
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
-    });
+    });    
   },
 
   /*
