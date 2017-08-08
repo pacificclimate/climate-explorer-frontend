@@ -1,8 +1,11 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
-import {parseTimeSeriesForC3} from '../../core/util';
-import {exportDataToWorksheet, generateDataCellsFromC3Graph} from '../../core/export';
+import {exportDataToWorksheet, 
+        generateDataCellsFromC3Graph} from '../../core/export';
+import {validateProjectedChangeData, 
+        validateStatsData, 
+        validateAnnualCycleData} from '../../core/util';
 
 var ModalMixin = {
 
@@ -62,7 +65,7 @@ var ModalMixin = {
         area: props.area || "",
         time: timeidx,
       }
-    }).then(this.validateAnnualData);
+    }).then(validateProjectedChangeData);
   },
 
   getStatsPromise: function (props, timeidx) {
@@ -76,7 +79,7 @@ var ModalMixin = {
         area: props.area || null,
         time: timeidx,
       }
-    }).then(this.validateStatsData);
+    }).then(validateStatsData);
   },
 
   getTimeseriesPromise: function (props, timeSeriesDatasetId) {
@@ -87,45 +90,8 @@ var ModalMixin = {
         variable: props.variable_id,
         area: props.area || "",
       }
-    }).then(this.validateTimeseriesData);
+    }).then(validateAnnualCycleData);
   },
-
-  validateStatsData: function (response) {
-    if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-      throw new Error("Error: statistical data unavailable for this model");
-    }
-    for(var file in response.data) {
-      if(_.some('mean stdev min max median ncells'.split(' '),
-          attr => !(attr in response.data[file]) || isNaN(response.data[file][attr])) ||
-          _.some('units time'.split(' '),
-              attr => !(attr in response.data[file]))) {
-        throw new Error("Error: statistical data for this model is incomplete");
-      }
-    }
-    return response;
-    },
-
-    validateTimeSeriesData: function(response) {
-      if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-        throw new Error("Error: timeseries data is unavailable for this model.");
-      }
-      if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
-        throw new Error("Error: timeseries data for this model is incomplete");
-      }
-      return response;
-    },
-
-    validateAnnualData : function(response){
-      if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-        throw new Error("Error: annual data unavailable for this model.");
-      }
-      for(var run in response.data) {
-        if(!('data' in response.data[run]) || !('units' in response.data[run])) {
-          throw new Error("Error: annual data for this model is incomplete.");
-        }
-      }
-      return response;
-    },
 
     /*
      * this function is called to display any error generated in the 

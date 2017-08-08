@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 
-import { parseTimeSeriesForC3,
-  parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData } from '../../core/util';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';

@@ -1,3 +1,15 @@
+/********************************************************
+ * util-test.js - tests for the functions in util.js
+ * 
+ * There is one test (sometimes multiple parts) for each
+ * function in ../util.js. The tests have the same names as
+ * the functions being tested, and are in the same order
+ * inside this file.
+ * 
+ * sample data from ./sample-API-results.js 
+ ********************************************************/
+
+
 jest.dontMock('../util');
 jest.dontMock('../export');
 jest.dontMock('underscore');
@@ -5,336 +17,173 @@ jest.dontMock('xlsx');
 
 var _ = require('underscore');
 var xlsx = require('xlsx');
+var util = require('../util');
+var mockAPI = require('./sample-API-results');
 
-const testData = {
-  model_id1: {
-    units: 'degC',
-    data: {
-      2050: 21.0,
-      2080: 35.0,
-      2020: 11.0
-    }
-  },
-  model_id2: {
-    units: 'mm',
-    data: {
-      2050: 240.0,
-      2020: 300.0
-    }
-  }
-};
+  //expected results for the parseBootstrapTableData test - the
+  // ./sample-API-Results.tasmaxStats data rendered into a table.
+  const bootstrapTableTestExpected = [ 
+    {
+      "max": 7.41,
+      "mean": -20.6,
+      "median": -21.79,
+      "min": -37.53,
+      "model_period": '1961 - 1990',
+      "run": 'r1i1p1',
+      "stdev": 8.59,
+      "units": 'degC'
+     },
+     {
+       "max": 7.91,
+       "mean": -19.53,
+       "median": -20.56,
+       "min": -36.13,
+       "model_period": '1981 - 2010',
+       "run": 'r1i1p1',
+       "stdev": 8.25,
+       "units": 'degC'
+     }
+    ];
 
-const outputC3Data = {
-  'xs': {
-    'model_id1': 'model_id1_xs',
-    'model_id2': 'model_id2_xs'
-  },
-  'columns':[
-    ['model_id1_xs', '2020', '2050', '2080'],
-    ['model_id1', 11.0, 21.0, 35.0],
-    ['model_id2_xs', '2020', '2050'],
-    ['model_id2', 300, 240]
-  ],
-  'axes':{
-    'model_id1': 'y1',
-    'model_id2': 'y2'
-  }
-};
-
-const outputC3DataAxisInfo = {
-  'y1': {
-    'label': {
-      'position': 'outer-middle',
-      'text': 'degC'
-    },
-    'show': true
-  },
-  'y2': {
-    'label': {
-      'position': 'outer-middle',
-      'text': 'mm'
-    },
-    'show': true
-  }
-};
-
-describe('parseDataForC3', function () {
-  var parseDataForC3 = require('../util').dataApiToC3;
-  // it('Correctly parses a JSON object with average data from multiple models for plotting with C3', function() {
-
-  //   var result = parseDataForC3(testData);
-  //   var expected = [outputC3Data, outputC3DataAxisInfo];
-
-  //   expect(result).toEqual(expected);
-
-  // });
-
-  xit('can handle a minimum data set', function () {
-    var input = {
-      'r1i1p1': {
-        'data': {
-          '2025-01-16T00:00:00Z': 275,
-          '2025-02-16T00:00:00Z': 280,
-        },
-        'units': 'K'
-      }
-    };
-    var expected = {
-      data: {
-        columns: [['x', '2025-01-16', '2025-02-16'],
-                   ['r1i1p1', 275, 280]],
-        x: 'x',
-        axes: {
-          r1i1p1: 'y'
-        }
-      },
-      axis: {
-        x: {
-          type: 'timeseries',
-          tick: {
-            format: '%Y-%m-%d'
-          }
-        },
-        y: {
-          label: {
-            position: 'outer-middle',
-            text: 'K'
-          }
-        }
-      }
-    };
-
-    var result = parseDataForC3(input);
-
-    expect(result).toEqual(expected);
-  });
-});
-
-const testTimeSeries = {
-  'id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',
-  'units': 'K',
-  'data': { '1986-01-16T00:00:00Z': 275.75720932904414,
-      '1986-02-15T00:00:00Z': 273.4294128417969,
-      '1986-03-16T00:00:00Z': 273.4919128417969,
-      '1986-04-16T00:00:00Z': 274.8638610839844,
-      '1986-05-16T00:00:00Z': 276.67352294921875,
-      '1986-06-16T00:00:00Z': 278.1564025878906,
-      '1986-07-16T00:00:00Z': 278.5601501464844,
-      '1986-08-16T00:00:00Z': 278.06195068359375,
-      '1986-09-16T00:00:00Z': 276.9363098144531,
-      '1986-10-16T00:00:00Z': 275.7844543457031,
-      '1986-11-16T00:00:00Z': 274.8958740234375,
-      '1986-12-16T00:00:00Z': 274.33758544921875,
-      '1986-04-17T00:00:00Z': 273.89501953125,
-      '1986-07-17T00:00:00Z': 275.0113525390625,
-      '1986-10-17T00:00:00Z': 278.2606201171875,
-      '1987-01-15T00:00:00Z': 275.8712158203125,
-      '1986-07-02T00:00:00Z': 275.76947021484375
-    }
-};
-
-const outputC3TimeSeries = {
-  columns:[
-    [
-      'Monthly Mean',
-      275.75720932904414, 273.4294128417969, 273.4919128417969, 274.8638610839844, 276.67352294921875, 278.1564025878906, 278.5601501464844,
-      278.06195068359375, 276.9363098144531, 275.7844543457031, 274.8958740234375, 274.33758544921875
-    ], [
-      'Seasonal Average',
-      273.89501953125, 273.89501953125, 275.0113525390625, 275.0113525390625, 275.0113525390625, 278.2606201171875,
-      278.2606201171875, 278.2606201171875, 275.8712158203125, 275.8712158203125, 275.8712158203125, 273.89501953125
-    ], [
-      'Annual Average',
-      275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375,
-      275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375, 275.76947021484375
-    ]
-  ],
-};
-
-const outputC3TimeSeriesAxisInfo = {
-  x: { type:'category',
-    categories:['January', 'February', 'March', 'April', 'May',
-          'June', 'July', 'August', 'September', 'October',
-          'November', 'December']
-  },
-  y: { label: { 'text': 'K', 'position':'outer-middle' } }
-};
-
-const outputC3TimeSeriesTooltipInfo = {
-  grouped: true,
-  format: {
-    value: function (value) { return value + ' ' + 'K'; }
-  }
-};
-
-describe('parseTimeSeriesForC3', function () {
-  it('parses a JSON object with time series data from one model for plotting with C3',
-    function () {
-      var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
-      var result = parseTimeSeriesForC3(testTimeSeries, true);
-      expect(result.data.columns).toEqual(outputC3TimeSeries.columns);
+  describe('parseBootstrapTableData', function () {
+    it('correctly flattens a stats object for passing to the DataTable component', function () {
+      var result = util.parseBootstrapTableData(mockAPI.addRunToStats(), 
+          mockAPI.metadataToArray());
+      expect(result).toEqual(bootstrapTableTestExpected);
     });
-
-  it('simplifies a JSON object with time series data for plotting on the MOTI data portal',
-    function () {
-      var parseTimeSeriesForC3 = require('../util').parseTimeSeriesForC3;
-      var result = parseTimeSeriesForC3(testTimeSeries, false);
-      expect(result.data.columns).toEqual(outputC3TimeSeries.columns.slice(0, 1));
+  });
+ 
+  describe('validateProjectedChangeData', function () {
+    it('rejects empty data sets', function () {
+      var func = function () {util.validateProjectedChangeData({data: {}});};
+      expect(func).toThrow();
     });
-});
-
-const bootstrapTableTestData = {
-  'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231':
-    {
-      'median': 278.34326171875,
-      'min': 225.05545043945312,
-      'units': 'K',
-      'mean': 273.56732177734375,
-      'max': 303.601318359375,
-      'ncells': 8192,
-      'stdev': 22.509726901403784,
-      'run': 'r1i1p1'
-    },
-  'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231':
-    {
-      'median': 278.4786682128906,
-      'min': 225.04750061035156,
-      'units': 'K',
-      'mean': 273.87298583984375,
-      'max': 303.7774963378906,
-      'ncells': 8192,
-      'stdev': 22.323802147796965,
-      'run': 'r1i1p1'
-    }
-};
-
-const bootstrapTableTestMeta = [
-    {
-      'start_date': '1961',
-      'end_date': '1990',
-      'unique_id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19610101-19901231'
-        
-    },
-    {
-      'start_date': '1971',
-      'end_date': '2000',
-      'unique_id': 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231'
-    }
-];
-
-const bootstrapTableTestExpected = [
-  {
-    'run': 'r1i1p1',
-    'min': 225.06,
-    'max': 303.60,
-    'mean': 273.57,
-    'median': 278.34,
-    'stdev': 22.51,
-    'units': 'K',
-    'model_period': '1961 - 1990'
-  },
-  {
-    'run': 'r1i1p1',
-    'min': 225.05,
-    'max': 303.78,
-    'mean': 273.87,
-    'median': 278.48,
-    'stdev': 22.32,
-    'units': 'K',
-    'model_period': '1971 - 2000'
-  }
-];
-
-describe('parseBootstrapTableData', function () {
-  it('Correctly flattens a stats object for passing to the DataTable component', function () {
-    var util = require('../util');
-    var result = util.parseBootstrapTableData(bootstrapTableTestData, bootstrapTableTestMeta);
-    expect(result).toEqual(bootstrapTableTestExpected);
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateProjectedChangeData( { data: 
+          `<html>
+           <head>
+           <title>IndexError // Werkzeug Debugger</title>`})};
+      expect(func).toThrow();
+    });
+    it('rejects data without units', function () {
+      var noUnits = {"data": {}};
+      noUnits.data["r1i1pi"] = _.omit(noUnits.data["r1i1p1"], 'units');
+      var func = function () {util.validateProjectedChangeData(noUnits);};
+      expect(func).toThrow();
+    });
+    it('accepts valid data', function () {
+      var valid = {};
+      valid.data = mockAPI.tasmaxData;
+      expect(util.validateProjectedChangeData(valid)).toBe(valid);
+    });
   });
-});
-
-const worksheetSummaryData = { model_id: 'CSIRO-Mk3-6-0', variable_id: 'pr', experiment: 'rcp26', variable_name: 'Precipitation',
-    meta: [{variable_name: 'Precipitation'}]};
-
-const worksheetTimeOfYear = 'Winter-DJF';
-const worksheetSummaryCellsExpected = {
-  0: {
-    0: 'Model',
-    1: 'Emissions Scenario',
-    2: 'Time of Year',
-    3: 'Variable ID',
-    4: 'Variable Name'
-  },
-  1: {
-    0: 'CSIRO-Mk3-6-0',
-    1: 'rcp26',
-    2: 'Winter-DJF',
-    3: 'pr',
-    4: 'Precipitation'
-  }
-};
-
-const worksheetTestData = [
-        { model_period: '2040 - 2069', run: 'r1i1p1', min: 0, max: 22.08, mean: 2.34, median: 1.34, stdev: 3.01, units: 'mm' },
-        { model_period: '2070 - 2099', run: 'r1i1p1', min: 0, max: 22.66, mean: 2.36, median: 1.39, stdev: 2.97, units: 'mm' },
-        { model_period: '2010 - 2039', run: 'r1i1p1', min: 0, max: 21.97, mean: 2.31, median: 1.35, stdev: 2.94, units: 'mm' }
-];
-const worksheetDataRowsExpected = [
-    ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'],
-    ['2040 - 2069', 'r1i1p1', 0, 22.08, 2.34, 1.34, 3.01, 'mm'],
-    ['2070 - 2099', 'r1i1p1', 0, 22.66, 2.36, 1.39, 2.97, 'mm'],
-    ['2010 - 2039', 'r1i1p1', 0, 21.97, 2.31, 1.35, 2.94, 'mm']
-];
-
-const worksheetRange = 'A1:H7';
-
-describe('createWorksheetSummaryCells', function () {
-  it('Generates summary cells for an exportable worksheet', function () {
-    var exportfiles = require('../export');
-    var result = exportfiles.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-    expect(result).toEqual(worksheetSummaryCellsExpected);
+  
+  describe('validateStatsData', function () {
+    var id = mockAPI.monthlyTasmaxTimeseries.id;
+    it('rejects empty data sets', function () {
+      var func = function () {util.validateStatsData({ data: {}});};
+      expect(func).toThrow();
+    });
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateStatsData({data: 
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects NaN values', function () {
+      var nan = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
+      nan[id].max = Number.NaN;
+      var func = function () {util.validateStatsData({data: nan});};
+      expect(func).toThrow();      
+    });
+    it('rejects missing statistical values', function () {
+      var missing = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
+      missing[id] = _.omit(missing[id], "mean");
+      var func = function() {util.validateStatsData({data: missing});};
+      expect(func).toThrow();
+    });
+    it('rejects datasets missing units', function () {
+      var noUnits = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
+      noUnits[id] = _.omit(noUnits[id], "units");
+      var func = function () {util.validateStatsData({data: noUnits});};
+      expect(func).toThrow();
+    });
+    it('accepts valid datasets', function () {
+      expect(util.validateStatsData({data: mockAPI.tasmaxStats})).toEqual({data: mockAPI.tasmaxStats});
+    });
   });
-});
+      
+  describe('validateAnnualCycleData', function () {
+    it('rejects empty data sets', function () {
+      var func = function () {util.validateAnnualCycleData({data: {}})};
+      expect(func).toThrow();
+    });
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateAnnualCycleData({data: 
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects data sets without units', function () {
+      var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
+      var func = function () {util.validateAnnualCycleData({data: noUnits});};
+      expect(func).toThrow();
+    });
+    it('rejects concatenanted chronology data', function () {
+      //construct a concatenated chronology of the type we no 
+      //longer support by combining monthly, seasonal, and annual data
+      var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
+      var func = function () {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries})};
+      expect(func).toThrow();
+    });
+    it('accepts valid monthly resolution data', function () {
+      expect(util.validateAnnualCycleData({data: mockAPI.monthlyTasmaxTimeseries})).toEqual({data: mockAPI.monthlyTasmaxTimeseries});
+    });
+    it('accepts valid seasonal resolution data', function () {
+      expect(util.validateAnnualCycleData({data: mockAPI.seasonalTasmaxTimeseries})).toEqual({data: mockAPI.seasonalTasmaxTimeseries});
+    });
+    it('accepts valid yearly resolution data', function () {
+      expect(util.validateAnnualCycleData({data: mockAPI.annualTasmaxTimeseries})).toEqual({data: mockAPI.annualTasmaxTimeseries});
+    });
+  });
 
-describe('generateDataCellsFromDataTable', function () {
-  it('Generates data cells for an exportable worksheet', function () {
-    var exportfiles = require('../export');
-    var result = exportfiles.generateDataCellsFromDataTable(worksheetTestData);
-    expect(result).toEqual(worksheetDataRowsExpected);
+  describe('timeIndexToTimeOfYear', function() {
+    it('converts a time index into human-readable string', function () {
+      expect(util.timeIndexToTimeOfYear(1)).toBe("February");
+      expect(util.timeIndexToTimeOfYear(16)).toBe("Annual");
+      expect(util.timeIndexToTimeOfYear(39)).toBe(undefined);
+    });
   });
-});
 
-describe('assembleWorksheet', function () {
-  it('Assembles an exportable worksheet from summary and data cells', function () {
-    var exportfiles = require('../export');
-    var summaryCells = exportfiles.createWorksheetSummaryCells(worksheetSummaryData, worksheetTimeOfYear);
-    var dataCells = exportfiles.generateDataCellsFromDataTable(worksheetTestData);
-    var ws = exportfiles.assembleWorksheet(summaryCells.concat([[]], dataCells));
-    expect(ws['!ref']).toEqual(worksheetRange);
+  describe('timeResolutionIndexToTimeOfYear', function () {
+    it('converts a time resolution + time index to a string', function () {
+      expect(util.timeResolutionIndexToTimeOfYear("monthly", 3)).toBe("April");
+      expect(util.timeResolutionIndexToTimeOfYear("seasonal", 0)).toBe("Winter-DJF");
+      expect(util.timeResolutionIndexToTimeOfYear("yearly", 0)).toBe("Annual");
+      expect(util.timeResolutionIndexToTimeOfYear("daily", 200)).toBe("daily 200");
+      expect(util.timeResolutionIndexToTimeOfYear("monthly", 45)).toBe("monthly 45");
+    });
   });
-});
+  
+  describe('extendedDateToBasicDate', function () {
+    it('converts an extended format date to a basic format date', function () {
+      expect(util.extendedDateToBasicDate("1997-01-15T00:00:00Z")).toBe("1997-01-15");
+      expect(util.extendedDateToBasicDate("2030-12-18T23:16:59Z")).toBe("2030-12-18");
+    });
+  });
 
-describe('generateDataCellsFromC3Graph', function () {
-  it('Generates data for export from an annual cycle graph', function (){
-    var exportfiles = require('../export');
-    var testdata = require('./export-data');
-    var data = exportfiles.generateDataCellsFromC3Graph(testdata.sampleAnnualCycleGraph, "Time Series");
-    expect(data).toEqual(testdata.expectedAnnualGraphData);
+  describe('timestampToTimeOfYear', function () {
+    
   });
-  it('Generates data for export from a projected change graph', function (){
-    var exportfiles = require('../export');
-    var testdata = require('./export-data');
-    var data = exportfiles.generateDataCellsFromC3Graph(testdata.sampleProjectedChangeGraph, "Run");
-    expect(data).toEqual(testdata.expectedProjectedChangeGraphData);
-  });
-});
 
-describe('createTimeSeriesWorksheetSummaryCells', function () {
-  it('Generates headers to export a time series', function () {
-    var exportfiles = require('../export');
-    var testdata = require('./export-data');
-    var headers = exportfiles.createTimeSeriesWorksheetSummaryCells(testdata.sampleMetadata,
-                                 testdata.sampleRun);
-    expect(headers).toEqual(testdata.expectedTimeSeriesHeaders);
+  describe('capitalizeWords', function () {
+    it('capitalizes the first letter of each word in a string', function () {
+      expect(util.capitalizeWords("initial lowercase string")).toBe("Initial Lowercase String");
+      expect(util.capitalizeWords("Initial uppercase")).toBe("Initial Uppercase");
+      expect(util.capitalizeWords("string number the 3rd")).toBe("String Number The 3rd");
+    });
   });
-});

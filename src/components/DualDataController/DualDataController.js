@@ -5,10 +5,7 @@ import Loader from 'react-loader';
 import _ from 'underscore';
 
 
-import {
-  parseTimeSeriesForC3,
-  parseBootstrapTableData,
-  mergeC3DataGraphs} from '../../core/util';
+import { parseBootstrapTableData} from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
         dataToProjectedChangeGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';

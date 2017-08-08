@@ -1,9 +1,22 @@
+/*******************************************************************
+ * export.js - functions for writing data to a CSV or XLSX file
+ * 
+ * The main function in this file is exportDataToWorksheet; the 
+ * other functions are helper functions that create pieces 
+ * (headers, data) of the exported file.
+ *******************************************************************/
+
 var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
+import { timeIndexToTimeOfYear } from './util';
+
+/************************************************************
+ * 0. exportDataToWorksheet() - the main export function
+ ************************************************************/
 
 /*
  * Takes current data displayed in the DataTable, Annual Cycle graph, or
@@ -79,6 +92,12 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   filesaver.saveAs(out_data, outputFilename);
 };
 
+/*********************************************************
+ * 1. summary-generating functions that create cells 
+ * containing the metadata needed to describe the exported 
+ * data
+ *********************************************************/
+
 /*
  * Helper function for exportDataToWorksheet, creates summary rows that appear
  * at the top of the exported worksheet for exported stats table or Projected
@@ -104,64 +123,6 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 };
 
 /*
- * Helper function for exportDataToWorksheet, creates data column headers and
- * data entries for exported worksheet Draws on example code from js-xlsx docs:
- * https://github.com/SheetJS/js-xlsx
- */
-var generateDataCellsFromDataTable = function (data) {
-
-  var rows = _.map(data, function (stats) {
-    return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
-  });
-
-  var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'];
-  rows.unshift(column_labels);
-
-  return rows;
-};
-
-/*
- * Helper function for exportDataToWorksheet, combines summary rows, data column
- * headers, and data into one worksheet Draws on example code from js-xlsx docs:
- * https://github.com/SheetJS/js-xlsx
- */
-var assembleWorksheet = function (cells) {
-  var cell_ref;
-  var ws = {};
-  var maxCols = 0;
-  cells.forEach(function (row, rowIndex) {
-    if (row.length > maxCols) {
-      maxCols = row.length;
-    }
-    row.forEach(function (cellValue, colIndex) {
-      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
-      ws[cell_ref] = { v: cellValue, t: 's' };
-    });
-  });
-
-    // set combined worksheet range bounds
-  var range = {
-    s: { c:0, r:0 },
-    e: {
-      c: maxCols - 1,
-      r: cells.length - 1
-    }
-  };
-  ws['!ref'] = XLSX.utils.encode_range(range);
-  return ws;
-};
-
-var timeIndexToTimeOfYear = function (timeidx) {
-    // convert timestep ID (0-16) to string format
-  var timesOfYear = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-    'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
-    'Fall-SON', 'Annual'
-  ];
-  return timesOfYear[timeidx];
-};
-
-/*
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
@@ -182,6 +143,29 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
     `${dataset.start_date}-${dataset.end_date}`,
     dataset.ensemble_member
   ]);
+
+  return rows;
+};
+
+/************************************************************
+ * 2. data-generating functions that create cells containing
+ * the requested data for export
+ ************************************************************/
+
+
+/*
+ * Helper function for exportDataToWorksheet, creates data column headers and
+ * data entries for exported worksheet Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
+ */
+var generateDataCellsFromDataTable = function (data) {
+
+  var rows = _.map(data, function (stats) {
+    return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
+  });
+
+  var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'];
+  rows.unshift(column_labels);
 
   return rows;
 };
@@ -227,7 +211,43 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
   rows.unshift(column_labels);
   return rows;
 
-}
+};
+
+/*****************************************************************
+ * 3. function that combines metadata and data (or any other two
+ * sets of cells) into a single file.
+ *****************************************************************/
+
+/*
+ * Helper function for exportDataToWorksheet, combines summary rows, data column
+ * headers, and data into one worksheet Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
+ */
+var assembleWorksheet = function (cells) {
+  var cell_ref;
+  var ws = {};
+  var maxCols = 0;
+  cells.forEach(function (row, rowIndex) {
+    if (row.length > maxCols) {
+      maxCols = row.length;
+    }
+    row.forEach(function (cellValue, colIndex) {
+      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
+      ws[cell_ref] = { v: cellValue, t: 's' };
+    });
+  });
+
+    // set combined worksheet range bounds
+  var range = {
+    s: { c:0, r:0 },
+    e: {
+      c: maxCols - 1,
+      r: cells.length - 1
+    }
+  };
+  ws['!ref'] = XLSX.utils.encode_range(range);
+  return ws;
+};
 
 module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
     createTimeSeriesWorksheetSummaryCells, generateDataCellsFromC3Graph};

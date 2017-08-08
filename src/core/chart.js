@@ -16,15 +16,13 @@
 
 import _ from 'underscore';
 import moment from 'moment';
-import {extendedDateToBasicDate,
+import {PRECISION,
+        extendedDateToBasicDate,
         capitalizeWords} from './util';
 
 /*****************************************************
  * 0. Helper functions used by both graph generators *
  *****************************************************/
-
-//decimal point precision for numbers displayed in graphs
-var PRECISION = 2;
 
 //Generates a typical y-axis configuration, given the text of the label.
 var formatYAxis = function (label) {
@@ -237,9 +235,6 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
       }
     }
   }
-  if(variation.length == 0) {
-    throw new Error("Error: cannot graph identical timeseries");
-  }
   
   //Remove unique_id from the list of possible variations. All
   //datasets have unique unique_id's; it's not useful on a graph
@@ -250,8 +245,12 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
     variation.splice(variation.indexOf("variable_name"), 1);
   }
   
+  if(variation.length == 0) {
+    throw new Error("Error: cannot graph identical timeseries");
+  }
+  
   return function (m) {
-    name = "";
+    var name = "";
     for(var j = 0; j < variation.length; j++) {
       name = name.concat(`${m[variation[j]]} `);
     }
@@ -318,7 +317,7 @@ var monthlyXAxis = {
  * with the same name ("r1i1p1") from different datasets.
  */
 var dataToProjectedChangeGraph = function(data, contexts = []){
-  console.log("dataToProjectedChangeGraph called!");
+
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
   var c3Data = {
@@ -426,6 +425,9 @@ var getAllTimestamps = function(data) {
       }
     } 
   }
+  if (allTimes.length == 0) {
+    throw new Error("Error: no time stamps in data");
+  }
   return allTimes;
 };
 
@@ -470,7 +472,7 @@ var nameAPICallParametersFunction = function(contexts) {
   }
   
   return function (run, context) {
-    name = "";
+    var name = "";
     for(var j = 0; j < variation.length; j++) {
       name = name.concat(`${context[variation[j]]} `);
     }
@@ -490,5 +492,8 @@ var timeseriesXAxis = {
     }
 };
 
-module.exports = { timeseriesToAnnualCycleGraph,
-    dataToProjectedChangeGraph};
+module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
+    //exported only for testing purposes:
+    formatYAxis, numberFormatFunction, tooltipDisplayNumbersWithUnitsFunction,
+    timeseriesToAnnualCycleGraph, getMonthlyData, shortestUniqueTimeseriesNamingFunction,
+    dataToProjectedChangeGraph, getAllTimestamps, nameAPICallParametersFunction};

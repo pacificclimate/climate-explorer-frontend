@@ -6,9 +6,7 @@ import _ from 'underscore';
 
 import styles from './DataController.css';
 
-import {
-  parseTimeSeriesForC3,
-  parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData } from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
         dataToProjectedChangeGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';

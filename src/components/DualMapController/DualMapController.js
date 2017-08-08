@@ -11,6 +11,7 @@ import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
+import { timestampToTimeOfYear } from '../../core/util';
 
 import styles from './DualMapController.css';
 
@@ -168,7 +169,7 @@ var DualMapController = React.createClass({
     }
 
     var timeOptions = _.map(this.state.times, function (v, k) {
-      return [k, v];
+      return [k, timestampToTimeOfYear(v)];
     }.bind(this));
 
     var map, mapFooter;
