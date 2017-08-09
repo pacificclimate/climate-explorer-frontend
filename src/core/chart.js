@@ -63,7 +63,7 @@ var tooltipDisplayNumbersWithUnitsFunction = function(axes, axis) {
   return function(value, ratio, id, index) {
     return `${numberFormatFunction(value)} ${unitsDictionary[id]}`;
   };
-}
+};
 
 /**************************************************************
  * 1. timeseriesToAnnualCycleGraph() and its helper functions *
@@ -220,14 +220,14 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
   
   //only one timeseries being graphed, simple label.
   if(data.length == 1) {
-    return function(m) { return capitalizeWords(`${m.timescale} mean`)};
+    return function(m) { return capitalizeWords(`${m.timescale} mean`);};
   }
   
   var variation = [];
   var exemplarMetadata = _.find(metadata, function(m) {return m.unique_id === data[0].id;});
   
   for(var i = 0; i < data.length; i++) {
-    var comparandMetadata = _.find(metadata, function(m) {return m.unique_id == data[i].id});
+    var comparandMetadata = _.find(metadata, function(m) {return m.unique_id == data[i].id;});
     
     for(var att in comparandMetadata) {
       if(exemplarMetadata[att] !== comparandMetadata[att] && variation.indexOf(att) == -1) {
@@ -245,7 +245,7 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
     variation.splice(variation.indexOf("variable_name"), 1);
   }
   
-  if(variation.length == 0) {
+  if(variation.length === 0) {
     throw new Error("Error: cannot graph identical timeseries");
   }
   
@@ -333,7 +333,7 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
   var nameSeries;
   
   if(data.length == 1) {
-    nameSeries = function(run, context) {return run};
+    nameSeries = function(run, context) {return run;};
   }
   else if(data.length == contexts.length) {
     nameSeries = nameAPICallParametersFunction(contexts);
@@ -425,7 +425,7 @@ var getAllTimestamps = function(data) {
       }
     } 
   }
-  if (allTimes.length == 0) {
+  if (allTimes.length === 0) {
     throw new Error("Error: no time stamps in data");
   }
   return allTimes;
@@ -457,7 +457,7 @@ var nameAPICallParametersFunction = function(contexts) {
   
   //"data" API was called more than once with the same arguments -
   // probably a mistake.
-  if(variation.length == 0) {
+  if(variation.length === 0) {
     throw new Error("Error: cannot graph two identical queries");
   }
   
@@ -495,5 +495,5 @@ var timeseriesXAxis = {
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     //exported only for testing purposes:
     formatYAxis, numberFormatFunction, tooltipDisplayNumbersWithUnitsFunction,
-    timeseriesToAnnualCycleGraph, getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    dataToProjectedChangeGraph, getAllTimestamps, nameAPICallParametersFunction};
+    getMonthlyData, shortestUniqueTimeseriesNamingFunction,
+    getAllTimestamps, nameAPICallParametersFunction};

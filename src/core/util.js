@@ -41,13 +41,13 @@ var parseBootstrapTableData = function (data, metadata) {
     var period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
     var modelInfo = {
       'model_period': period,
-      'run': stats['run'],
-      'min': +stats['min'].toFixed(PRECISION),
-      'max': +stats['max'].toFixed(PRECISION),
-      'mean': +stats['mean'].toFixed(PRECISION),
-      'median': +stats['median'].toFixed(PRECISION),
-      'stdev': +stats['stdev'].toFixed(PRECISION),
-      'units': stats['units']
+      'run': stats.run,
+      'min': +stats.min.toFixed(PRECISION),
+      'max': +stats.max.toFixed(PRECISION),
+      'mean': +stats.mean.toFixed(PRECISION),
+      'median': +stats.median.toFixed(PRECISION),
+      'stdev': +stats.stdev.toFixed(PRECISION),
+      'units': stats.units
     };
     return modelInfo;
   });
@@ -103,7 +103,7 @@ var validateAnnualCycleData = function(response) {
   if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
     throw new Error("Error: timeseries data for this model is incomplete");
   }
-  var resolution = Object.keys(response.data["data"]).length;
+  var resolution = Object.keys(response.data.data).length;
   if([1, 4, 12].indexOf(resolution) == -1) {
     throw new Error("Error: unrecognized time resolution for timeseries");
   }

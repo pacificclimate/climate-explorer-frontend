@@ -137,7 +137,7 @@ var ModalMixin = {
     
     //Returns the metadata object that corresponds to a unique_id
     getMetadata: function (id, meta = this.props.meta) {
-      return _.find(meta, function(m) {return m.unique_id === id} );
+      return _.find(meta, function(m) {return m.unique_id === id;} );
     },
     
     /*

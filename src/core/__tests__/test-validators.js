@@ -36,7 +36,7 @@ var allDefinedArray = function (array) {
   var width = array[0].length;
   for(var i = 0; i < height; i++) {
     for(var j = 0; j < height; j++) {
-      if(array[i][j] == undefined) {
+      if(array[i][j] === undefined) {
         return false;
       }
     }

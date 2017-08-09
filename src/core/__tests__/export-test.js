@@ -26,9 +26,9 @@ var chart = require('../chart');
 /*
  * It's not clear how to test exportDataToWorksheet, which would require
  * capturing and testing a file saved to the user. However, most of the 
- * work of creating the files is done by helper functions that are tested
- * seperately, so overall there's reasonable test coverage of export 
- * functionality.
+ * work of creating the files is done by helper functions that can be 
+ * tested seperately, so overall there's reasonable test coverage of 
+ * export functionality.
  */
 describe('exportDataToWorksheet', function () {
   xit('exports an annual cycle graph to file', function () {});
@@ -41,7 +41,7 @@ describe('createWorksheetSummaryCells', function() {
     var id = mockAPI.monthlyTasmaxTimeseries.id;
     var metadata = _.find(mockAPI.metadataToArray(), function(m) {return m.unique_id == id;});
     var options = _.pick(metadata, 'model_id', 'variable_id', 'experiment');
-    options["meta"] = mockAPI.metadataToArray();
+    options.meta = mockAPI.metadataToArray();
     var summary = exportdata.createWorksheetSummaryCells(options, "January");
     expect(validate.isRectangularArray(summary, 2, 5)).toBe(true);
     expect(validate.allDefinedArray(summary)).toBe(true);
@@ -54,7 +54,7 @@ describe('createWorksheetSummaryCells', function() {
 describe('createTimeSeriesWorksheetSummaryCells', function () {
   it('generates summary cells for an exported annual cycle graph', function () {
     var id = mockAPI.monthlyTasmaxTimeseries.id;
-    var metadata = _.find(mockAPI.metadataToArray(), function(m) {return m.unique_id = id;});
+    var metadata = _.find(mockAPI.metadataToArray(), function(m) {return m.unique_id == id;});
     var dataOptions = _.pick(metadata, 'model_id', 'variable_id', 'experiment', 'variable_id');
     dataOptions.meta = mockAPI.metadataToArray();
     var headers = exportdata.createTimeSeriesWorksheetSummaryCells(dataOptions, id);
@@ -129,7 +129,7 @@ describe('assembleWorksheet', function () {
     //build header cells
     var metadata = _.find(mockAPI.metadataToArray(), function(m) {return m.unique_id == id;});
     var headerOptions = _.pick(metadata, 'model_id', 'variable_id', 'experiment');
-    headerOptions["meta"] = mockAPI.metadataToArray();
+    headerOptions.meta = mockAPI.metadataToArray();
     var headers = exportdata.createWorksheetSummaryCells(headerOptions, "January");
     //build data cells
     var dataTable = util.parseBootstrapTableData(mockAPI.addRunToStats(), 

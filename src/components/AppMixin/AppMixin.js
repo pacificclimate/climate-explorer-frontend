@@ -79,8 +79,9 @@ var AppMixin = {
    * This function is a temporary stopgap until the backend API 
    * is modified to provide climatology period information on the
    * "multimeta" call. Currently that information is only available
-   * from the "metadata" call, which must be called individually. 
-   * The O(number of data files) API calls cause a noticable onetime 
+   * from the "metadata" call, which must be called individually for 
+   * each datafile. 
+   * The [number of data files] API calls cause a noticable onetime 
    * slowdown and rerender on initial page load.
    * TODO: remove this function (and the call to it) once the multimeta
    * call provides "start_date" and "end_date" for each dataset, making 
@@ -89,7 +90,7 @@ var AppMixin = {
   addClimatologyPeriods: function () {
     var promises = [];
     for(var i = 0; i < this.state.meta.length; i++) {
-      var sid = this.state.meta[i]["unique_id"];
+      var sid = this.state.meta[i].unique_id;
       var promise = axios({
         baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
         params: {
@@ -102,9 +103,9 @@ var AppMixin = {
       var withDates = [];
       for(var i = 0; i < responses.length; i++) {
         var pid = Object.keys(responses[i].data)[0];
-        var start = responses[i].data[pid]["start_date"];
+        var start = responses[i].data[pid].start_date;
         start = moment(start, moment.ISO_8601).utc().format('YYYY');
-        var end = responses[i].data[pid]["end_date"];
+        var end = responses[i].data[pid].end_date;
         end = moment(end, moment.ISO_8601).utc().format('YYYY');
         var dataset = _.find(this.state.meta, function (m) {return m.unique_id == pid;});
         dataset.start_date = start;

@@ -62,7 +62,7 @@ var mockAPI = require('./sample-API-results');
       var func = function () {util.validateProjectedChangeData( { data: 
           `<html>
            <head>
-           <title>IndexError // Werkzeug Debugger</title>`})};
+           <title>IndexError // Werkzeug Debugger</title>`});};
       expect(func).toThrow();
     });
     it('rejects data without units', function () {
@@ -116,7 +116,7 @@ var mockAPI = require('./sample-API-results');
       
   describe('validateAnnualCycleData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateAnnualCycleData({data: {}})};
+      var func = function () {util.validateAnnualCycleData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
@@ -137,7 +137,7 @@ var mockAPI = require('./sample-API-results');
       var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
-      var func = function () {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries})};
+      var func = function () {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries});};
       expect(func).toThrow();
     });
     it('accepts valid monthly resolution data', function () {

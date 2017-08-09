@@ -131,11 +131,11 @@ describe('getMonthlyData', function () {
     for(var i = 0; i < 17; i++){
       seventeen[Date(i)] = i * 3;
     }
-    var tooMany = function() {chart.getMonthlyData(seventeen)};
+    var tooMany = function() {chart.getMonthlyData(seventeen);};
     expect(tooMany).toThrow();
   });
   it('rejects data with inconsistent time resolution', function () {
-    var inconsistent = function () {chart.getMonthlyData(mockAPI.monthlyTasmaxTimeseries.data, "yearly")};
+    var inconsistent = function () {chart.getMonthlyData(mockAPI.monthlyTasmaxTimeseries.data, "yearly");};
     expect(inconsistent).toThrow();
   });
   it('processes a monthly timeseries', function () {
@@ -162,7 +162,7 @@ describe('shortestUniqueTimeSeriesNamingFunction', function () {
   it('rejects identical time series', function () {
     var minimalMetadata = [{unique_id: "foo", md: "bar"}, {unique_id: "baz", md: "bar"}];
     var minimalData = [{id: "foo"}, {id: "baz"}];
-    var func = function() {chart.shortestUniqueTimeseriesNamingFunction(minimalMetadata, minimalData)};
+    var func = function() {chart.shortestUniqueTimeseriesNamingFunction(minimalMetadata, minimalData);};
     expect(func).toThrow();
   });
   it('uses a a default naming scheme for a single data series', function () {
