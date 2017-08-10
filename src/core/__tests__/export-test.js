@@ -60,7 +60,7 @@ describe('createTimeSeriesWorksheetSummaryCells', function () {
     var headers = exportdata.createTimeSeriesWorksheetSummaryCells(dataOptions, id);
     expect(validate.isRectangularArray(headers, 2, 6)).toBe(true);
     expect(validate.allDefinedArray(headers)).toBe(true);
-    expect(headers[1][2]).toBe("tasmax");
+    expect(headers[1][2]).toBe("1961-1990");
     expect(headers[1][0]).toBe("bcc-csm1-1-m");
   });
 });
