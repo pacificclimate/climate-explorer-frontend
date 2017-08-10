@@ -12,7 +12,8 @@ import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
-import { timeIndexToTimeOfYear } from './util';
+import { timeIndexToTimeOfYear, 
+         timeResolutionIndexToTimeOfYear  } from './util';
 
 /************************************************************
  * 0. exportDataToWorksheet() - the main export function
@@ -23,14 +24,27 @@ import { timeIndexToTimeOfYear } from './util';
  * Projected Change graph, along with contextual data from user input, creates
  * an XLSX or CSV file, and serves it to the user for download. Draws on example
  * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
+ * 
+ * Arguments:
+ * datatype: a string, either "timeseries", "stats", or "climoseries"
+ * metadata: object with the attributes used to generate the data being 
+ *     exported: model, emissions scenario, variables(s)
+ * data: either a data table or a graph data object
+ * format: string indicating file format: "csv" or "xlsx"
+ * selection: object indicating which slice of data being exported, either 
+ *     1. a specific run or set of runs (for an annual cycle graph)  
+ *     2. time of year (for stats or change graph)
  */
 var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
+  
   // create workbook object containing one or more worksheets
   var wb = {
       Sheets: {},
       SheetNames: []
   };
 
+  var timeOfYear = "";
+  
   // prepare filename, metadata cells, and data cells according to type of export
   var summaryCells, dataCells, outputFilename;
   var filenamePrefix = "PCIC_CE_";
@@ -43,14 +57,16 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromDataTable(data);
-      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "climoseries":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Run");
-      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
   }
 
@@ -108,16 +124,27 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 
   var rows = [];
 
-  var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];
-  rows.push(header);
-
-  rows.push([
+  var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];  
+  
+  var values = [
     metadata.model_id,
     metadata.experiment,
     timeOfYear,
     metadata.variable_id,
     metadata.meta[0].variable_name
-  ]);
+  ];
+  
+  //provide metadata for a second variable, if one is in use.
+  if(metadata.comparand_id && 
+     metadata.comparand_id != metadata.variable_id) {
+    header.push('Comparand ID');
+    header.push('Comparand Name');
+    values.push(metadata.comparand_id);
+    values.push(metadata.comparandMeta[0].variable_name);
+  }
+  
+  rows.push(header);
+  rows.push(values);
 
   return rows;
 };
@@ -129,21 +156,32 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
 
   var rows = [];
-  var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name', 'Period', 'Run'];
-  rows.push(header);
+  var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
 
   var dataset = _.findWhere(metadata.meta, {unique_id: run});
 
 
-  rows.push([
+  var values = [
     metadata.model_id,
     metadata.experiment,
-    metadata.variable_id,
-    metadata.meta[0].variable_name,
     `${dataset.start_date}-${dataset.end_date}`,
-    dataset.ensemble_member
-  ]);
+    dataset.ensemble_member,
+    metadata.variable_id,
+    metadata.meta[0].variable_name
+  ];
+  
+  //provide metadata for a second variable, if one is in use.
+  if(metadata.comparand_id && 
+     metadata.comparand_id != metadata.variable_id) {
+    header.push('Comparand ID');
+    header.push('Comparand Name');
+    values.push(metadata.comparand_id);
+    values.push(metadata.comparandMeta[0].variable_name);
+  }
 
+  rows.push(header);
+  rows.push(values);
+  
   return rows;
 };
 

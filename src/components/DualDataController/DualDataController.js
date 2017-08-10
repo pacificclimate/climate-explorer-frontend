@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
 import _ from 'underscore';
 
@@ -12,6 +12,8 @@ import DataGraph from '../DataGraph/DataGraph';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
+
+import styles from './DualDataController.css';
 
 var DualDataController = React.createClass({
 
@@ -153,16 +155,16 @@ var DualDataController = React.createClass({
     //fetch data for the newly selected time
     var dataPromises = [];
     var dataParams = [];
-    var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
-    dataPromises.push(this.getDataPromise(props, scale, idx));
+    var variableDataParams = _.pick(this.props, 'model_id', 'experiment', 'area', 'variable_id');
+    dataPromises.push(this.getDataPromise(this.props, scale, idx));
     dataParams.push(variableDataParams);
 
     //if the user has selected two seperate variables to examine, fetch data
     //for the second variable. This query will always return a result, but
     //the result may be an empty object {}.
-    if(props.comparand_id != props.variable_id) {
-      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
-      comparandDataParams.variable_id = props.comparand_id;
+    if(this.props.comparand_id != this.props.variable_id) {
+      var comparandDataParams = _.pick(this.props, 'model_id', 'experiment', 'area');
+      comparandDataParams.variable_id = this.props.comparand_id;
       dataPromises.push(this.getDataPromise(comparandDataParams, scale, idx));
       dataParams.push(comparandDataParams);
     }
@@ -253,6 +255,13 @@ var DualDataController = React.createClass({
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
                 <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} />
               </Col>
+              <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+                <div>
+                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                  <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
+                </div>
+              </Col>                
             </Row>
             <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
           </TabPanel>
@@ -260,6 +269,13 @@ var DualDataController = React.createClass({
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
                 <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
+              </Col>
+              <Col>
+                <div>
+                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                  <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
+                </div>
               </Col>
             </Row>
             <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />

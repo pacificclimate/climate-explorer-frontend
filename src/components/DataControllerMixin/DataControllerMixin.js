@@ -31,15 +31,18 @@ var ModalMixin = {
   },
 
   exportDataTable: function (format) {
-    exportDataToWorksheet("stats", this.props, this.state.statsData, format, {timeidx: this.state.dataTableTimeOfYear});
+    exportDataToWorksheet("stats", this.props, this.state.statsData, format, 
+        {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
   },
 
   exportTimeSeries: function(format) {
-    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, {dataset: this.state.timeSeriesDatasetId});
+    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, 
+        {dataset: this.state.timeSeriesDatasetId});
   },
 
   exportClimoSeries: function(format) {
-    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, {timeidx: this.state.projChangeTimeOfYear});
+    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, 
+        {timeidx: this.state.projChangeTimeOfYear, timeres:this.state.projChangeTimeScale});
   },
 
   injectRunIntoStats: function (data) {
