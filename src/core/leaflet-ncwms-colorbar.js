@@ -123,7 +123,6 @@ var ncWMSColorbarControl = L.Control.extend({
       getLayerInfo.then(getMinMax).then(response => {
         this.min = response.data.min;
         this.max = response.data.max;
-        console.log("got everything!");
         this.redraw();
       });
     }

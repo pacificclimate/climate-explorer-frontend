@@ -184,7 +184,6 @@ var DualMap = React.createClass({
     }.bind(this);
 
     var onEdit = function (e) {
-      console.log("onEdit called");
       var layers = e.layers.getLayers();
       if (layers.length !== 1) {
         // Should never happen

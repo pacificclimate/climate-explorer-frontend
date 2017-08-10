@@ -46,7 +46,6 @@ var ncWMSAutoscaleControl = L.Control.extend({
      */
     for(var i = 0; i < this.layers.length; i++) {
       var layer = this.layers[i];
-      console.log("Starting layer " + i);
       axios(layer._url, {
         params: {
           request: 'GetMetadata',
