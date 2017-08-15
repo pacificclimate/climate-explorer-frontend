@@ -9,14 +9,35 @@ import NcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 import styles from './map.css';
 
+
+/*
+ * CanadaMap - displays a dataset on a map using ncWMS and Leaflet.
+ * Will display up to two map layers, one as shaded color blocks, 
+ * and one as isolines. 
+ * Props passed to configure shaded color map:
+ *  - scalarPalette (name of an ncWMS color palette)
+ *  - scalarLogscale (true for logarithmic color scale)
+ *  - scalarDataset (name of the netCDF datafile)
+ *  - scalarVariable (name of the variable)
+ *  
+ * All the same props are passed to configure isolines, except
+ * with "contour" instead of "scalar". And one additional prop, 
+ * numberOfContours.
+ * 
+ */
+
 var CanadaMap = React.createClass({
 
   propTypes: {
-    dataset: React.PropTypes.string,
-    variable: React.PropTypes.string,
-    crs: React.PropTypes.object,
-    // To keep things simple, areas within this component should only be
-    // passed around (or up to a higher component) as GeoJSON
+    scalarPalette: React.PropTypes.string,
+    scalarLogscale: React.PropTypes.bool,
+    contourPalette: React.PropTypes.string,
+    numberOfContours: React.PropTypes.number,
+    contourLogscale: React.PropTypes.bool,
+    scalarDataset: React.PropTypes.string,
+    contourDataset: React.PropTypes.string,
+    scalarVariable: React.PropTypes.string,
+    contourVariable: React.PropTypes.string,    
     onSetArea: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
     origin: React.PropTypes.object,
@@ -28,6 +49,7 @@ var CanadaMap = React.createClass({
     };
   },
 
+  //generates initial (and unchanging) map settings - origin, projection, etc. 
   getDefaultProps: function () {
     return {
       crs: new L.Proj.CRS.TMS(
@@ -38,38 +60,39 @@ var CanadaMap = React.createClass({
           resolutions: utils.generateResolutions(0.09765625, 10),
         }
       ),
-      noWrap: true,
-      format: 'image/png',
-      transparent: 'true',
-      opacity: 0.7,
-      styles: 'default-scalar/x-Occam',
-      time: '2000-01-01',
-      numcolorbands: 249,
       version: '1.1.1',
       srs: 'EPSG:4326',
-      logscale: false,
       origin: { lat: 60, lon: -100, zoom: 0 },
     };
   },
-
-  getWMSParams: function () {
-    var params = { layers: this.props.dataset + '/' + this.props.variable };
-    _.extend(params, _.pick(this.props,
-      'noWrap',
-      'format',
-      'transparent',
-      'opacity',
-      'styles',
-      'time',
-      'numcolorbands',
-      'version',
-      'srs',
-      'colorscalerange',
-      'logscale'
-    ));
-    return params;
+  
+  //get map formatting parameters for the scalar or contour layers.
+  getWMSParams: function (layer, props = this.props) {
+    var params = {
+        noWrap: true,
+        format: "image/png",
+        transparent: true,
+        opacity: 80,
+        time: props.time,
+        numcolorbands: 249,
+        version: "1.1.1",
+        srs: "EPSG:4326",
+    };
+    if(layer == "scalar") {
+      params.layers = `${props.scalarDataset}/${props.scalarVariable}`;
+      params.styles = `default-scalar/${props.scalarPalette}`;
+      params.logscale = props.scalarLogscale;
+    }
+    else if (layer == "contour") {
+      params.layers = `${props.contourDataset}/${props.contourVariable}`;
+      params.styles = `colored_contours/${props.contourPalette}`;
+      params.logscale = props.contourLogscale;
+      params.numContours = props.numberOfContours
+    }
+    return params;    
   },
-
+  
+  
   clearMapFeatures: function () {
     this.drawnItems.getLayers().map(function (layer) {
       this.drawnItems.removeLayer(layer);
@@ -99,7 +122,13 @@ var CanadaMap = React.createClass({
     }).getLayers()[0]);
   },
 
+  //initializes the map, loads data, and generates controls
+  //NOTE: the buttons that open the "Map Settings" menu are
+  //actually provided by MapController, *not* this component.
+  //CanadaMap draws colourbars, the autoscale button, and the
+  //area drawing and manipulation controls.
   componentDidMount: function () {
+
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
       minZoom: 0,
@@ -115,7 +144,13 @@ var CanadaMap = React.createClass({
       ],
     });
 
-    this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
+    if(this.props.scalarDataset) {
+      this.ncwmsScalarLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("scalar")).addTo(map);
+    }
+    if(this.props.contourDataset) {
+      this.ncwmsContourLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("contour")).addTo(map);
+    }
+    
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
     /*
@@ -221,29 +256,68 @@ var CanadaMap = React.createClass({
     });
 
     map.addControl(new PrintControl());
-
-    map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
-    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer, {
-      position: 'bottomright',
-    }));
+    
+    var autoscale;
+    //add colour legends and autoscale to the map
+    //if multiple colour legends are required (two layers), the
+    //autoscale button goes between them to indicate it affects 
+    //both layers
+    if(this.props.contourDataset && this.props.scalarDataset) {
+      map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
+        position: 'bottomright'
+      }));
+      autoscale = new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
+        position: 'bottomright'
+      });
+      autoscale.addLayer(this.ncwmsContourLayer);
+      map.addControl(autoscale);
+      map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer, {
+        position: 'bottomright'}));
+    }
+    else if(this.props.scalarDataset) {
+      map.addControl(new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
+        position: 'bottomright'
+      }));
+      map.addContolr(new NcWMSScolorbarControl(this.ncwmsScalarLayer, {
+        position: 'bottomright'
+      }));
+    }
+    else if(this.props.contourDataset) {
+      map.addControl(new NcWMSAutoscaleControl(this.ncwmsContourLayer, {
+        position: 'bottomright'
+      }));
+      map.addContolr(new NcWMSScolorbarControl(this.ncwmsContourLayer, {
+        position: 'bottomright'
+      }));
+    }    
   },
 
   componentWillUnmount: function () {
     this.map.off('click', this.onMapClick);
     this.map = null;
   },
+
   onMapClick: function () {
-    console.log('clicked on map');
+    //console.log('clicked on map');
   },
+
   componentWillReceiveProps: function (newProps) {
-    var params = { layers: newProps.dataset + '/' + newProps.variable };
-    _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
 
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
-    delete(this.ncwmsLayer.wmsParams.colorscalerange);
+    if(this.ncwmScalarLayer) {
+      delete(this.ncwmsScalarLayer.wmsParams.colorscalerange);
+    }
+    if(this.ncwmsContourLayer) {
+      delete(this.ncwmsContourLayer.wmsParams.colorscalerange);
+    }
 
-    this.ncwmsLayer.setParams(params);
+    if(newProps.scalarDataset) {
+      this.ncwmsScalarLayer.setParams(this.getWMSParams("scalar", newProps));
+    }
+    if(newProps.contourDataset) {
+      this.ncwmsContourLayer.setParams(this.getWMSParams("contour", newProps));
+    }
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
     }

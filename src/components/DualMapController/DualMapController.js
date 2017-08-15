@@ -5,7 +5,7 @@ import Loader from 'react-loader';
 import _ from 'underscore';
 import axios from 'axios';
 
-import { DualMap } from '../Map/DualMap';
+import { CanadaMap } from '../Map/CanadaMap';
 import Selector from '../Selector/Selector';
 import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
@@ -175,17 +175,17 @@ var DualMapController = React.createClass({
     var map, mapFooter;
     if (this.state.dataset) {
       map = (
-        <DualMap
+        <CanadaMap
           scalarPalette={this.state.scalarPalette}
           scalarLogscale={this.state.scalarLogscale}
           contourPalette={this.state.contourPalette}
           numberOfContours={parseInt(this.state.numberOfContours)}
           contourLogscale={this.state.contourLogscale}
           time={this.state.wmstime}
-          dataset={this.state.dataset}
-          comparandDataset={this.state.comparandDataset}
-          variable={this.state.variable}
-          comparand={this.state.comparand}
+          scalarDataset={this.state.dataset}
+          contourDataset={this.state.comparandDataset}
+          scalarVariable={this.state.variable}
+          contourVariable={this.state.comparand}
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />

@@ -31,7 +31,7 @@ var MapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      styles: 'default-scalar/x-Rainbow',
+      palette: 'x-Rainbow',
       timeidx: 0,
       logscale: false,
     };
@@ -139,11 +139,11 @@ var MapController = React.createClass({
     if (this.state.dataset) {
       map = (
         <CanadaMap
-          logscale={this.state.logscale}
-          styles={this.state.styles}
+          scalarLogscale={this.state.logscale}
+          scalarPalette={this.state.palette}
           time={this.state.wmstime}
-          dataset={this.state.dataset}
-          variable={this.state.variable}
+          scalarDataset={this.state.dataset}
+          scalarVariable={this.state.variable}
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />
@@ -200,9 +200,9 @@ var MapController = React.createClass({
             />
             <Selector
               label={"Colour Pallette"}
-              onChange={this.updateSelection.bind(this, 'styles')}
+              onChange={this.updateSelection.bind(this, 'palette')}
               items={pallettes}
-              value={this.state.styles}
+              value={this.state.palette}
             />
             <Selector
               label={"Color scale"}
