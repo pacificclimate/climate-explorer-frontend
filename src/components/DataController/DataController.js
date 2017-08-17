@@ -1,3 +1,19 @@
+/*******************************************************************
+ * DataController.js - controller component for in-depth numerical
+ * visualization
+ * 
+ * Receives a model, an experiment, and a variable from its parent,
+ * AppController. Presents the user with widgets to allow selection 
+ * of a particular slice of data (time of year or run) and download 
+ * of selected data. 
+ * 
+ * Queries the API to retrieve the selected data and controls three 
+ * viewing components: 
+ * - a DataTable with statistics about each qualifying run 
+ * - an annual cycle DataGraph with monthly, seasonal, and annual lines 
+ * - a projected change DataGraph with each run displayed separately
+ *******************************************************************/
+
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';

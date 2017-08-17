@@ -1,3 +1,14 @@
+/***************************************************************
+ * AppController.js 
+ * 
+ * This controller represent climate explorer's main portal. It
+ * has dropdowns to allow a user to select a model, emission
+ * scenario, and variable. It loads and filters metadata for 
+ * the selected datasets and passes them to its children:  
+ * - MapController (displays a variable as a colour-shaded map) 
+ * - DataController (displays graphs and a statistical table).
+ ***************************************************************/
+
 import React from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 

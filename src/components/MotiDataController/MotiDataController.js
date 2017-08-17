@@ -1,3 +1,21 @@
+/************************************************************************
+ * MotiDataController.js - controller to display summarized numerical data 
+ * 
+ * This DataController is intended to be used with an ensemble that 
+ * contains a small number of datasets, each of which is the average
+ * of many runs. It does not offer the user a way to select or 
+ * distinguish between individual runs or indicate a time of year
+ * they are interested in; it should be used with an ensemble that 
+ * features only one dataset for each combination of model, variable, 
+ * and emission scenario.
+ * 
+ * It receives a model, variable, and emissions scenario from its parent, 
+ * MotiApp. It loads the relevant data and passes them as props to its
+ * viewer component children:
+ * - an annual cycle DataGraph (with only monthly data)
+ * - a projected change DataGraph (with only one trendline)
+ * - a stats DataTable (with only one entry per climatology period)
+ ************************************************************************/
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 

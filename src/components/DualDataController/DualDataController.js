@@ -1,3 +1,23 @@
+/*********************************************************************
+ * DualDataController.js - controller component for numerical display
+ * of two variables at once.
+ * 
+ * Receives a model, experiment, and two variables from its parent,
+ * DualController. Provides widgets for users to select a specific slice
+ * of the data (time of year or run). Queries the API to fetch data on
+ * both variables for the viewers it manages, Annual Cycle Graph and 
+ * Projected Change Graph, both DataGraphs, to show comparisons of 
+ * the two variables.
+ * 
+ * The main variable is internally referred to as "variable" the 
+ * variable being compared to it is the "comparand." Available data
+ * is based on the main variable; it's possible to display a dataset with
+ * the main variable when the comparand is lacking matching data, 
+ * but not vice versa.
+ * 
+ * Also allows download the data displayed in the graphs.
+ *********************************************************************/
+
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';

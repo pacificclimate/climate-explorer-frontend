@@ -1,3 +1,26 @@
+/***************************************************************
+ * CanadaMap.js - display component using ncWMS and Leaflet.
+ * Will display up to two map layers, one as shaded color blocks, 
+ * and one as isolines, or either independently, over a tiled 
+ * background. Origin and bounds display all of Canada.
+ * 
+ * Child of (and viewer for) MapController.
+ * 
+ * Props passed to configure shaded color map:
+ *  - scalarPalette (name of an ncWMS color palette)
+ *  - scalarLogscale (true for logarithmic color scale)
+ *  - scalarDataset (name of the netCDF datafile)
+ *  - scalarVariable (name of the variable)
+ *  
+ * All the same props are passed to configure isolines, 
+ * prefixed "contour", plus an additional prop to describe 
+ * the isoline layer: numberOfContours.
+ * 
+ * other props: time (selects a time slice), 
+ *              area (configures an area to highlight).
+ * 
+ *****************************************************************/
+
 import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
@@ -8,23 +31,6 @@ import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import NcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 import styles from './map.css';
-
-
-/*
- * CanadaMap - displays a dataset on a map using ncWMS and Leaflet.
- * Will display up to two map layers, one as shaded color blocks, 
- * and one as isolines. 
- * Props passed to configure shaded color map:
- *  - scalarPalette (name of an ncWMS color palette)
- *  - scalarLogscale (true for logarithmic color scale)
- *  - scalarDataset (name of the netCDF datafile)
- *  - scalarVariable (name of the variable)
- *  
- * All the same props are passed to configure isolines, except
- * with "contour" instead of "scalar". And one additional prop, 
- * numberOfContours.
- * 
- */
 
 var CanadaMap = React.createClass({
 
@@ -278,7 +284,7 @@ var CanadaMap = React.createClass({
       map.addControl(new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
         position: 'bottomright'
       }));
-      map.addContolr(new NcWMSScolorbarControl(this.ncwmsScalarLayer, {
+      map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer, {
         position: 'bottomright'
       }));
     }
@@ -286,7 +292,7 @@ var CanadaMap = React.createClass({
       map.addControl(new NcWMSAutoscaleControl(this.ncwmsContourLayer, {
         position: 'bottomright'
       }));
-      map.addContolr(new NcWMSScolorbarControl(this.ncwmsContourLayer, {
+      map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
         position: 'bottomright'
       }));
     }    
@@ -302,10 +308,10 @@ var CanadaMap = React.createClass({
   },
 
   componentWillReceiveProps: function (newProps) {
-
+    
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
-    if(this.ncwmScalarLayer) {
+    if(this.ncwmsScalarLayer) {
       delete(this.ncwmsScalarLayer.wmsParams.colorscalerange);
     }
     if(this.ncwmsContourLayer) {
