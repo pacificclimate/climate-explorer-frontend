@@ -266,11 +266,17 @@ var MapController = React.createClass({
     ids = _.uniq(ids, false, function(item){return item[1]});
 
     var datasetSelector;
+    var selectedDataset = JSON.stringify({
+      start_date: this.state.start_date,
+      end_date: this.state.end_date,
+      ensemble_member: this.state.run
+    });
     if (ids.length > 1) {
       datasetSelector = (<Selector
         label={"Select Dataset"}
         onChange={this.updateDataset}
         items={ids} value={`${this.state.run} ${this.state.start_date}-${this.state.end_date}`}
+        value={selectedDataset}
       />);
     }
 
