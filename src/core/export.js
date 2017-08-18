@@ -3,7 +3,9 @@
  * 
  * The main function in this file is exportDataToWorksheet; the 
  * other functions are helper functions that create pieces 
- * (headers, data) of the exported file.
+ * (headers, data) of the exported file. 
+ * 
+ * Built around the js-xlsx library
  *******************************************************************/
 
 var moment = require('moment/moment');

@@ -255,10 +255,11 @@ var MapController = React.createClass({
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
 
     //run and period selector
-    //make a list of all the unique combinations of run + climatological period
+    //displays a list of all the unique combinations of run + climatological period
     //a user could decide to view.
     //Not sure JSON is the right way to do this, though.
-    //TODO: see if there's a more elegant way to handle the callback
+    //TODO: see if there's a more elegant way to handle the callback 
+    //(selector won't pass an object)
     var ids = this.props.meta.map(function (el) {
         return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
             `${el.ensemble_member} ${el.start_date}-${el.end_date}`];

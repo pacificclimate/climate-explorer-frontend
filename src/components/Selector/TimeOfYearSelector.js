@@ -1,3 +1,16 @@
+/******************************************************************
+ * TimeOfYearSelector.js - dropdown for user to select time of year
+ * 
+ * This selector offer a choice of 12 months, 4 seasons, and "annual" 
+ * to the user. When one is selected, it passes a stringified JSON
+ * object containing:
+ *  - timescale: "monthly", "seasonal", or "yearly"
+ *  - timeidx: 0 - 11
+ *  
+ *  January: {timescale: monthly, timeidx: 0}
+ *  Summer: {timescale: seasonal, timeidx: 2}
+ ******************************************************************/
+
 import React from 'react';
 import Selector from './Selector';
 

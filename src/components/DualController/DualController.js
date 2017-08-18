@@ -6,13 +6,14 @@
  * experiment, and two seperate variables. 
  * 
  * Its children are DualDataController, which coordinates graphs comparing
- * the two selected variables, and DualMapController, which coordinates a map
+ * the two selected variables, and MapController, which coordinates a map
  * displaying one variable as scalar colours and the other as isolines.
  * 
  * The main variable is internally referred to as "variable," the variable
  * being compared to it is internally referred to as "comparand." 
  * Timestamps and available datasets are based on what's available for 
- * the main variable.
+ * the main variable; if the user selects parameters for which the 
+ * comparand lacks data, it won't be displayed.
  ************************************************************************/
 
 import React from 'react';
@@ -58,7 +59,7 @@ var App = React.createClass({
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')} value={this.state.experiment}/>
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #1 (Color blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
+            <Selector label={"Variable #1 (Colour blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
           </Col>
           <Col lg={3} md={3}>
             <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={this.getVariableIdNameArray()} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>

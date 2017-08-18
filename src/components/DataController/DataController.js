@@ -63,72 +63,9 @@ var DataController = React.createClass({
    * Monthly time resolution, January, on the first run returned by the API.
    */
   getData: function (props) {
-    //load Annual Cycle graph - need monthly, seasonal, and yearly data
-    this.setTimeSeriesNoDataMessage("Loading Data");
-      
-    var monthlyMetadata = _.findWhere(props.meta, {
-      model_id: props.model_id,
-      variable_id: props.variable_id,
-      experiment: props.experiment,
-      timescale: "monthly"});
-
-    var seasonalMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "seasonal"}, props.meta);
-    var yearlyMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "yearly"}, props.meta);
-    
-    var timeseriesPromises = [];
-    
-    //fetch data from the API for each time resolution that has a dataset. 
-    //the "monthly" time resolution is guarenteed to exist, but
-    //matching seasonal and yearly ones may not be in the database.
-    _.each([monthlyMetadata, seasonalMetadata, yearlyMetadata], function(timeseries) {
-      if(timeseries) {
-        timeseriesPromises.push(this.getTimeseriesPromise(props, timeseries.unique_id));
-      }
-    }, this);
-
-    Promise.all(timeseriesPromises).then(series => {
-      var data = _.map(series, function(s) {return s.data});
-      this.setState({
-        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
-        timeSeriesRun: {
-          start_date: monthlyMetadata.start_date,
-          end_date: monthlyMetadata.end_date,
-          ensemble_member: monthlyMetadata.ensemble_member
-        },
-      });
-    }).catch(error => {
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
-    });
-    
-    
-    //load Projected Change graph
-    this.setClimoSeriesNoDataMessage("Loading Data");
-    var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeScale, 
-        this.state.projChangeTimeOfYear);
-
-    myDataPromise.then(response => {      
-      this.setState({
-        climoSeriesData: dataToProjectedChangeGraph([response.data]),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setClimoSeriesNoDataMessage);
-    });
-
-
-    //load stats table
-    this.setStatsTableNoDataMessage("Loading Data");
-    var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
-
-    myStatsPromise.then(response => {
-      //remove all results from datasets with the wrong timescale
-      var stats = this.filterAPIResults(response.data, 
-          {timescale: this.state.dataTableTimeScale}, props.meta);
-      this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setStatsTableNoDataMessage);
-    });
+    this.loadTimeSeries(props);
+    this.loadClimoSeries(props);
+    this.loadDataTable(props);
   },
 
   //Removes all data from the Annual Cycle graph and displays a message
@@ -171,20 +108,7 @@ var DataController = React.createClass({
    * in state, fetches new data, and redraws the Projected Change graph.
    */
   updateProjChangeTimeOfYear: function (timeidx) {
-    var idx = JSON.parse(timeidx).timeidx;
-    var scale = JSON.parse(timeidx).timescale;
-    this.setClimoSeriesNoDataMessage("Loading Data");
-    this.setState({
-      projChangeTimeOfYear: idx,
-      projChangeTimeScale: scale,
-    });
-    this.getDataPromise(this.props, scale, idx).then(response => {
-      this.setState({
-        climoSeriesData: dataToProjectedChangeGraph([response.data]),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setClimoSeriesNoDataMessage);
-    });
+    this.loadClimoSeries(this.props, JSON.parse(timeidx));
   },
 
   /* 
@@ -193,22 +117,8 @@ var DataController = React.createClass({
    * in state, and updates the table.
    */
   updateDataTableTimeOfYear: function (timeidx) {
-    var idx = JSON.parse(timeidx).timeidx;
-    var timescale = JSON.parse(timeidx).timescale;
-    this.setStatsTableNoDataMessage("Loading Data");
-    this.setState({
-      dataTableTimeOfYear: idx,
-      dataTableTimeScale: timescale,
-    });
-    this.getStatsPromise(this.props, idx).then(response => {
-      var stats = this.filterAPIResults(response.data, {"timescale": timescale}, this.props.meta);
-      this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), this.props.meta),
-      });      
-    }).catch(error => {
-      this.displayError(error, this.setStatsTableNoDataMessage);
-    });
-  },
+    this.loadDataTable(this.props, JSON.parse(timeidx));
+    },
 
   /*
    * Called when the user selects a specific run to view on the Annual Cycle
@@ -216,49 +126,110 @@ var DataController = React.createClass({
    * and updates the graph.
    */
   updateAnnCycleDataset: function (run) {
+    this.loadTimeSeries(this.props, JSON.parse(run));
+  },
+  
+  /*
+   * This function retrieves fetches monthly, seasonal, and yearly resolution
+   * annual cycle data and displays them on the graph. If run (an object with 
+   * start_date, end_date, and ensemble_member attributes) is provided, data
+   * matching those parameters will be selected; otherwise an arbitrary set 
+   * of data matching the other parameters.
+   */
+  loadTimeSeries: function (props, run) {
+    //load Annual Cycle graph - need monthly, seasonal, and yearly data
     this.setTimeSeriesNoDataMessage("Loading Data");
-    run = JSON.parse(run);
-    this.setState({
-      timeSeriesRun: run,
-    });
     
-    var runMetadata = {
-        model_id: this.props.model_id,
-        variable_id: this.props.variable_id,
-        experiment: this.props.experiment,
-        ensemble_member: run.ensemble_member,
-        start_date: run.start_date,
-        end_date: run.end_date,
-        timescale: "other" };
+    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+    params.timescale = "monthly";
     
-    var monthlyMetadata = this.findMatchingMetadata(runMetadata, {timescale: "monthly"});
+    if(run) {
+      _.extend(params, run);
+    }
     
-    var seasonalMetadata = this.findMatchingMetadata(runMetadata, {timescale:"seasonal"});
-    
-    var yearlyMetadata = this.findMatchingMetadata(runMetadata, {timescale: "yearly"});
-        
-    //fetch data from the API for each time resolution that has a dataset. 
-    //At least one dataset for this model + experiment + variable + period + ensemble member 
-    //combination must exist in the database (otherwise there wouldn't be an entry
-    //in the dropdown), but it may be monthly, seasonal, or yearly.
-    //(Ideally one of each, but not guarenteed.)
-    var timeseriesPromises = [];
+    var monthlyMetadata = _.findWhere(props.meta, params);
 
+    var seasonalMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "seasonal"}, props.meta);
+    var yearlyMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "yearly"}, props.meta);
+    
+    var timeseriesPromises = [];
+    
+    //fetch data from the API for each time resolution that has a dataset. 
+    //the "monthly" time resolution is guarenteed to exist, but
+    //matching seasonal and yearly ones may not be in the database.
     _.each([monthlyMetadata, seasonalMetadata, yearlyMetadata], function(timeseries) {
       if(timeseries) {
-        timeseriesPromises.push(this.getTimeseriesPromise(this.props, timeseries.unique_id));
+        timeseriesPromises.push(this.getTimeseriesPromise(props, timeseries.unique_id));
       }
     }, this);
-    
-    //fetch data and generate graph
+
     Promise.all(timeseriesPromises).then(series => {
-      var data = _.map(series, function(s) {return s.data});
+      var data = _.pluck(series, "data");
       this.setState({
-        timeSeriesData: timeseriesToAnnualCycleGraph([monthlyMetadata, seasonalMetadata, yearlyMetadata], ...data)
-        });
+        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        timeSeriesRun: {
+          start_date: monthlyMetadata.start_date,
+          end_date: monthlyMetadata.end_date,
+          ensemble_member: monthlyMetadata.ensemble_member
+        },
+      });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
     });    
+  },
+  
+  /*
+   * This function fetches and loads data  for the Projected Change graphs.
+   * If passed a time of year(resolution and index), it will load
+   * data for that time of year. Otherwise, it defaults to January 
+   * (resolution: "monthly", index 0).
+   */
+  loadClimoSeries: function (props, time) {
+    var timescale = time ? time.timescale : this.state.projChangeTimeScale;
+    var timeidx = time ? time.timeidx : this.state.projChangeTimeOfYear;
+    
+    this.setClimoSeriesNoDataMessage("Loading Data");
+    var myDataPromise = this.getDataPromise(props, timescale, timeidx);
+
+    myDataPromise.then(response => {      
+      this.setState({
+        projChangeTimeOfYear: timeidx,
+        projChangeTimeScale: timescale,
+        climoSeriesData: dataToProjectedChangeGraph([response.data]),
+      });
+    }).catch(error => {
+      this.displayError(error, this.setClimoSeriesNoDataMessage);
+    });
+  },
+  
+  /*
+   * This function fetches and loads data for the Stats Table. 
+   * If passed a time of year(resolution and index), it will load
+   * data for that time of year. Otherwise, it defaults to January 
+   * (resolution: "monthly", index 0). 
+   */
+  loadDataTable: function (props, time) {
+    
+    var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
+    var timeres = time ? time.timescale : this.state.dataTableTimeScale;
+        
+    //load stats table
+    this.setStatsTableNoDataMessage("Loading Data");
+    var myStatsPromise = this.getStatsPromise(props, timeidx);
+
+    myStatsPromise.then(response => {
+      //remove all results from datasets with the wrong timescale
+      var stats = this.filterAPIResults(response.data, 
+          {timescale: timeres}, props.meta);
+      this.setState({
+        dataTableTimeOfYear: timeidx,
+        dataTableTimeScale: timeres,
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+      });
+    }).catch(error => {
+      this.displayError(error, this.setStatsTableNoDataMessage);
+    });
+
   },
 
   render: function () {

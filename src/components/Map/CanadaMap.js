@@ -93,7 +93,7 @@ var CanadaMap = React.createClass({
       params.layers = `${props.contourDataset}/${props.contourVariable}`;
       params.styles = `colored_contours/${props.contourPalette}`;
       params.logscale = props.contourLogscale;
-      params.numContours = props.numberOfContours
+      params.numContours = props.numberOfContours;
     }
     return params;    
   },

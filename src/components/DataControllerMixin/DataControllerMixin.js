@@ -1,3 +1,19 @@
+/*********************************************************************
+ * DataControllerMixin.js - shared functionality for data controllers
+ * 
+ * This mixin is added to MotiDataController, DataController, and 
+ * DualDataController. Those three controller components have different
+ * viewers (graphs, tables) and UI elements (labels, selectors), 
+ * but similar back-end data handling. The back-end data handling is 
+ * provided by this mixin.
+ * 
+ * Provides functions to:
+ * - fetch data from the backend API
+ * - initialize data state on component loading
+ * - export data to csv or xls file
+ * - filter and manipulate data
+ *********************************************************************/
+
 import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
