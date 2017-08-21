@@ -97,10 +97,10 @@ var DualDataController = React.createClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
-     JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
-     JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
-     JSON.stringify(nextProps.comparandMeta) !== JSON.stringify(this.props.comparandMeta);
+     return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
+     _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     _.isEqual(nextProps.meta, this.props.meta) &&
+     _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
   },
 
   /*
