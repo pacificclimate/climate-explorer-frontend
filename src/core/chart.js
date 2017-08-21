@@ -32,14 +32,14 @@ var formatYAxis = function (label) {
       "position": "outer-middle"
     },
     "tick": {
-      "format": numberFormatFunction
+      "format": fixedPrecision
     },
     "show": true
   };
 };
 
 //Simple formatting function for numbers to be displayed on the graph.
-var numberFormatFunction = function (n) { return +n.toFixed(PRECISION);};
+var fixedPrecision = function (n) { return +n.toFixed(PRECISION);};
 
 /*
  * This function returns a number-formatting function for use by the C3
@@ -52,7 +52,7 @@ var numberFormatFunction = function (n) { return +n.toFixed(PRECISION);};
  * labels, then returns a function that uses the series id passed by 
  * C3 to append a units string to each value.
  */
-var tooltipDisplayNumbersWithUnitsFunction = function(axes, axis) {
+var makeTooltipDisplayNumbersWithUnits = function(axes, axis) {
   var unitsDictionary = {};
   
   //build a dictionary between timeseries names and units
@@ -61,7 +61,7 @@ var tooltipDisplayNumbersWithUnitsFunction = function(axes, axis) {
   }
  
   return function(value, ratio, id, index) {
-    return `${numberFormatFunction(value)} ${unitsDictionary[id]}`;
+    return `${fixedPrecision(value)} ${unitsDictionary[id]}`;
   };
 };
 
@@ -155,7 +155,7 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
     
   var c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
-  c3Tooltip.format.value = tooltipDisplayNumbersWithUnitsFunction(c3Data.axes, c3Axis);
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis);
   
   return {
     data: c3Data,
@@ -400,7 +400,7 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
     
   var c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
-  c3Tooltip.format.value = tooltipDisplayNumbersWithUnitsFunction(c3Data.axes, c3Axis);
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis);
   
   return {
     data: c3Data,
@@ -494,6 +494,6 @@ var timeseriesXAxis = {
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     //exported only for testing purposes:
-    formatYAxis, numberFormatFunction, tooltipDisplayNumbersWithUnitsFunction,
+    formatYAxis, fixedPrecision, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
     getAllTimestamps, nameAPICallParametersFunction};

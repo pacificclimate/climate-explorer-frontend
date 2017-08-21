@@ -25,26 +25,26 @@ describe ('formatYAxis', function () {
     expect(validate.allDefinedObject(axis)).toBe(true);
     expect(axis.label).toEqual({"text": "meters", "position": "outer-middle"});
     expect(axis.show).toEqual(true);
-    expect(axis.tick.format(6.993)).toEqual(chart.numberFormatFunction(6.993));
+    expect(axis.tick.format(6.993)).toEqual(chart.fixedPrecision(6.993));
   });
 });
 
-describe('numberFormatFunction', function () {
+describe('fixedPrecision', function () {
   it('formats a positive decimal number for user display', function () {
-    var formatted = chart.numberFormatFunction(6.22222);
+    var formatted = chart.fixedPrecision(6.22222);
     expect(formatted).toEqual(6.22);
   });
   it('formats a negative number for user display', function() {
-    var formatted = chart.numberFormatFunction(-6.3333);
+    var formatted = chart.fixedPrecision(-6.3333);
     expect(formatted).toEqual(-6.33);
   });
   it('rounds a number for user display', function () {
-    var formatted = chart.numberFormatFunction(6.9999);
+    var formatted = chart.fixedPrecision(6.9999);
     expect(formatted).toEqual(7);
   });
 });
 
-describe('tooltipDisplayNumbersWithUnitsFunction', function () {
+describe('makeTooltipDisplayNumbersWithUnits', function () {
   var axis = {};
   axis.y = chart.formatYAxis("meters");
   var axes = {};
@@ -53,12 +53,12 @@ describe('tooltipDisplayNumbersWithUnitsFunction', function () {
   axes[series1] = "y";
   var tooltipFunction;
   it('displays unit labels when there is a single data series', function () {
-    tooltipFunction = chart.tooltipDisplayNumbersWithUnitsFunction(axes, axis);
+    tooltipFunction = chart.makeTooltipDisplayNumbersWithUnits(axes, axis);
     expect(tooltipFunction(5, 0, series1, 0)).toEqual("5 meters");
   });
   it('displays unit labels when there are multiple data series', function () {
     axes[series2] = "y";
-    tooltipFunction = chart.tooltipDisplayNumbersWithUnitsFunction(axes, axis);
+    tooltipFunction = chart.makeTooltipDisplayNumbersWithUnits(axes, axis);
     expect(tooltipFunction(6.22, 0, series1, 0)).toEqual("6.22 meters");
     expect(tooltipFunction(7.8, 0, series2, 0)).toEqual("7.8 meters");
   });
@@ -66,7 +66,7 @@ describe('tooltipDisplayNumbersWithUnitsFunction', function () {
     var series3 = "weight";
     axis.y2 = chart.formatYAxis("kilograms");
     axes[series3] = "y2";
-    tooltipFunction = chart.tooltipDisplayNumbersWithUnitsFunction(axes, axis);
+    tooltipFunction = chart.makeTooltipDisplayNumbersWithUnits(axes, axis);
     expect(tooltipFunction(9.73, 0, series1, 0)).toEqual("9.73 meters");
     expect(tooltipFunction(-2.4, 0, series2, 0)).toEqual("-2.4 meters");
     expect(tooltipFunction(100000, 0, series3, 0)).toEqual("100000 kilograms");

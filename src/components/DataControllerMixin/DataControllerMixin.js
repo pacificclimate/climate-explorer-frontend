@@ -137,11 +137,14 @@ var ModalMixin = {
     },
     
     /*
-     * Given a dataset's metadata, returns metadata for a dataset that
-     * has the same values for all attributes except unique_id and any 
-     * attribute:value pairs listed in the "difference" argument.
+     * Given a dataset's metadata and a "difference" listing of attribute values pairs, 
+     * returns metadata for another dataset that:
+     * - matches all attribute/value pairs in the "difference object"
+     * - matches the original dataset for any attributes not in "difference"
+     * (Unique_id is ignore for purposes of matching datasets.)
+     * 
      * Example: findMatchingMetadata(monthlyDataset, {timescale: "annual"}) 
-     * would return the annual dataset that corresponds to a monthly one.
+     * would return the annual-resolution dataset that corresponds to a monthly one.
      * Returns only one dataset's metadata even if multiple qualify.
      */
     findMatchingMetadata: function(example, difference, meta = this.props.meta) {
