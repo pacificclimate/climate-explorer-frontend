@@ -72,7 +72,7 @@ var MapController = React.createClass({
   //timeidx is a stringified object with a resolution
   //(monthly, annual, seasonal) and an index (0-11). For example
   //{timeres: monthly, timeidx: 3} would represent April. 
-  //It's stringified because Selector won't take an object as a value.
+  //It's stringified because Selector won't pass an object.
   updateTime: function (timeidx) {
     this.setState({
       timeidx: timeidx,
@@ -227,7 +227,7 @@ var MapController = React.createClass({
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before we have required data
-    return JSON.stringify(nextState) !== JSON.stringify(this.state);
+    return !_.isEqual(nextState, this.state);
   },
 
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
@@ -296,7 +296,7 @@ var MapController = React.createClass({
           value={this.state.contourPalette}
         />
       );
-      
+      //TODO: 
       contourScaleSelector = (
         <Selector
           label={"Isoline Color scale"}
@@ -414,15 +414,7 @@ var MapController = React.createClass({
               items={palettes}
               value={this.state.scalarPalette}
             />
-            <Selector
-              label={"Block Colour scale"}
-              onChange={this.updateSelection.bind(this, 'scalarLogscale')}
-              items={colorScales}
-              value={this.state.scalarLogscale}
-            />
             {contourPaletteSelector}
-            {contourScaleSelector}
-            {numContoursSelector}
 
           </Modal.Body>
 
