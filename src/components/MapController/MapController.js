@@ -67,8 +67,7 @@ var MapController = React.createClass({
     this.setState(update);
   },
 
-  //this function updates the timestamp displayed on the map and triggers 
-  //a rerender.
+  //update the timestamp in state
   //timeidx is a stringified object with a resolution
   //(monthly, annual, seasonal) and an index (0-11). For example
   //{timeres: monthly, timeidx: 3} would represent April. 
@@ -80,58 +79,10 @@ var MapController = React.createClass({
     });
   },
 
-  //this function stores a dataset selected by the user to state, 
-  //triggering a rerender to show the new dataset.
-  //a "dataset" in this case is not a specific file. It is a
-  //variable + emissions + model + period + run combination. Timestamps for
-  //a "dataset" may be spread across up to three files (one annual, one 
-  //seasonal, one monthly). MapController stores the parameters of the dataset
-  //in state, but doesn't select (or store in state) a specific file with a 
-  //specific unique_id until rendering, when it needs to pass an exact file
-  //and timestamp to the viewer component CanadaMap.
+  //this function stores a dataset selected by the user and information
+  //needed to render it to state 
   updateDataset: function (dataset) {
-    dataset = JSON.parse(dataset);
-    var run = dataset.ensemble_member;
-    var start_date = dataset.start_date;
-    var end_date = dataset.end_date;
-    
-    //generate the list of available times for this variable+run+period
-    //which may include multiple files of different time resolutions 
-    //(annual, seasonal, or monthly).
-    var times = {};
-    var timesPromises = [];
-        
-    var datasets = _.filter(this.props.meta, 
-        {"ensemble_member": run, "start_date": start_date, "end_date": end_date });
-    
-    for(var i = 0; i < datasets.length; i++) {
-      timesPromises.push(this.requestTimeMetadata(datasets[i].unique_id));
-    }
-   
-    Promise.all(timesPromises).then(responses => {
-      for(var i = 0; i < responses.length; i++) {
-        var id = Object.keys(responses[i].data)[0];
-        for(var timeidx in responses[i].data[id].times) {
-          var idxString = JSON.stringify({
-            "timescale": responses[i].data[id].timescale,
-            "timeidx": timeidx,
-          });
-          times[idxString] = responses[i].data[id].times[timeidx];
-        }
-      }
-      //select an arbitrary index to display initially. It will be a
-      //0th index, but could be January, winter, or Annual.
-      var startingIndex = Object.keys(times)[0];
-
-      this.setState({
-        run: run,
-        start_date: start_date,
-        end_date: end_date,
-        times: times,
-        timeidx: startingIndex, 
-        wmstime: times[startingIndex],
-      });
-    });
+    this.loadMap(this.props, JSON.parse(dataset));
   },
 
   findUniqueId: function () {
@@ -156,18 +107,18 @@ var MapController = React.createClass({
     });
   },
 
+  //Load initial map, based on a list of available data files passed
+  //as props from its parent
+  //the 0th dataset in props.meta is displayed. This behaviour is shared by
+  //the DataControllers, so initially maps and graphs will show the 
+  //same data, though a user can choose to view different data with 
+  //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
     var defaultDataset = nextProps.meta[0];
-    var run = defaultDataset.ensemble_member;
-    var start_date = defaultDataset.start_date;
-    var end_date = defaultDataset.end_date;
     
-    var times = {};
-    var timesPromises = [];
-    
-    //set colours. In order of preference:
+    //set display colours. In order of preference:
     //1. colours received by prop
-    //2. colours set by the user or this function previously and held in state
+    //2. colours from state (set by the user or this function previously)
     //3. defaults (scalar rainbow if a single dataset, 
     //             scalar greyscale and contours rainbow for 2)
     var sPalette, cPalette;
@@ -179,14 +130,40 @@ var MapController = React.createClass({
       sPalette = this.state.scalarPalette;
       cPalette = this.state.contourPalette;
     }
-    else {
-      sPalette = nextProps.comparandMeta ? 'seq-Greys' : 'x-Occam';
-      cPalette = nextProps.comparandMeta ? 'x-Occam': undefined;
+    else if(nextProps.comparandMeta){
+      sPalette = 'seq-Greys';
+      cPalette = 'x-Occam';
     }
-   
-    //generate a list of timestamps available for the specified data
-    //by querying the metadata API.
-    var datasets = _.filter(nextProps.meta, 
+    else{
+      sPalette = 'x-Occam';
+    }
+    
+    this.loadMap(nextProps, defaultDataset, sPalette, cPalette);   
+  },
+  
+  //update state with all the information needed to display
+  //maps for specific datasets.
+  //a "dataset" in this case is not a specific file. It is a
+  //variable + emissions + model + period + run combination. Timestamps for
+  //a "dataset" may be spread across up to three files (one annual, one 
+  //seasonal, one monthly). MapController stores the parameters of the dataset
+  //in state, but doesn't select (or store in state) a specific file with a 
+  //specific unique_id until rendering, when it needs to pass an exact file
+  //and timestamp to the viewer component CanadaMap.
+  loadMap: function (props, dataset, sPalette = this.state.scalarPalette, 
+      cPalette = this.state.contourPalette) {
+    
+    var run = dataset.ensemble_member;
+    var start_date = dataset.start_date;
+    var end_date = dataset.end_date;
+    
+    //generate the list of available times for this variable+run+period
+    //which may include multiple files of different time resolutions 
+    //(annual, seasonal, or monthly).
+    var times = {};
+    var timesPromises = [];
+        
+    var datasets = _.filter(props.meta, 
         {"ensemble_member": run, "start_date": start_date, "end_date": end_date });
     
     for(var i = 0; i < datasets.length; i++) {
@@ -204,25 +181,31 @@ var MapController = React.createClass({
           times[idxString] = responses[i].data[id].times[timeidx];
         }
       }
-
-      //select a starting timestamp to display.
-      //should correspond to a 0th index, but might be annual, seasonal, or monthly
-      var startingTime = Object.keys(times)[0];
+      //select a 0th index to display initially. It could be January, 
+      //Winter, or Annual - there's no guarentee any given dataset 
+      //will have monthly, seasonal, or yearly data available, but it
+      //will have at least one of them.
+      var startingIndex = _.find(Object.keys(times), 
+          function (timestamp) {return JSON.parse(timestamp).timeidx == 0});
       
-      //store values and render
+      var variable_id = props.meta[0].variable_id;
+      var comparand_id = props.comparandMeta ? props.comparandMeta[0].variable_id : undefined;
+      
+      
       this.setState({
+        variable: variable_id,
+        comparand: comparand_id,
         run: run,
         start_date: start_date,
         end_date: end_date,
         times: times,
-        timeidx: startingTime, 
-        wmstime: times[startingTime],
-        variable: nextProps.meta[0].variable_id,
-        comparand: nextProps.comparandMeta ? nextProps.comparandMeta[0].variable_id: undefined,
+        timeidx: startingIndex, 
+        wmstime: times[startingIndex],
         scalarPalette: sPalette,
         contourPalette: cPalette
       });
-    });    
+    });
+    
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
@@ -276,7 +259,7 @@ var MapController = React.createClass({
       datasetSelector = (<Selector
         label={"Select Dataset"}
         onChange={this.updateDataset}
-        items={ids} value={`${this.state.run} ${this.state.start_date}-${this.state.end_date}`}
+        items={ids}
         value={selectedDataset}
       />);
     }
@@ -295,8 +278,7 @@ var MapController = React.createClass({
           items={palettes}
           value={this.state.contourPalette}
         />
-      );
-      //TODO: 
+      ); 
       contourScaleSelector = (
         <Selector
           label={"Isoline Color scale"}

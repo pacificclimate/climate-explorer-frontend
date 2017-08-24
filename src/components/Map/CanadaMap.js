@@ -263,39 +263,53 @@ var CanadaMap = React.createClass({
 
     map.addControl(new PrintControl());
     
-    var autoscale;
-    //add colour legends and autoscale to the map
-    //if multiple colour legends are required (two layers), the
-    //autoscale button goes between them to indicate it affects 
-    //both layers
+    var autoscale, scalarBar, contourBar;
+    //create controls for each map layer currently defined
+    if(this.props.scalarDataset) {
+      [autoscale, scalarBar] = this.makeColourControls(this.ncwmsScalarLayer);
+    }
+    if(this.props.contourDataset) {
+      [autoscale, contourBar] = this.makeColourControls(this.ncwmsContourLayer);
+    }
+    
+    //all controls are positioned at leaflet "bottomright" 
+    //(see http://leafletjs.com/reference-1.2.0.html#control )
+    //and stack vertically up the side of the map. The first-added 
+    //control ends up at the bottom, the most recently added on top.
+    //We want autoscale on top if there's only one colourbar, but
+    //between the bars if there's two (to indicate it affects both layers)
     if(this.props.contourDataset && this.props.scalarDataset) {
-      map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
-        position: 'bottomright'
-      }));
-      autoscale = new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
-        position: 'bottomright'
-      });
-      autoscale.addLayer(this.ncwmsContourLayer);
+      map.addControl(scalarBar);
       map.addControl(autoscale);
-      map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer, {
-        position: 'bottomright'}));
+      map.addControl(contourBar);
+    }
+    else if(this.props.contourDataset){
+      map.addControl(contourBar);
+      map.addControl(autoscale);
     }
     else if(this.props.scalarDataset) {
-      map.addControl(new NcWMSAutoscaleControl(this.ncwmsScalarLayer, {
-        position: 'bottomright'
-      }));
-      map.addControl(new NcWMSColorbarControl(this.ncwmsScalarLayer, {
-        position: 'bottomright'
-      }));
+      map.addControl(scalarBar);
+      map.addControl(autoscale);
     }
-    else if(this.props.contourDataset) {
-      map.addControl(new NcWMSAutoscaleControl(this.ncwmsContourLayer, {
+  },
+  
+  //returns an array of two controls registered to the layer:
+  //a coloured bar legend, and an autoscale button
+  //the autoscale button is registered to every layer this function 
+  //has been called on. (It is assumed that all layers autoscale together)
+  makeColourControls: function (layer) {
+    if(this.autoscaleControl) {
+      this.autoscaleControl.addLayer(layer);
+    }
+    else {
+      this.autoscaleControl = new NcWMSAutoscaleControl(layer, {
         position: 'bottomright'
-      }));
-      map.addControl(new NcWMSColorbarControl(this.ncwmsContourLayer, {
-        position: 'bottomright'
-      }));
-    }    
+      });
+    }
+    return [
+      this.autoscaleControl,
+      new NcWMSColorbarControl(layer, {position: 'bottomright'})
+    ];
   },
 
   componentWillUnmount: function () {
