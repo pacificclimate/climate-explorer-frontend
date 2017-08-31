@@ -29,7 +29,8 @@ import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
-import { timestampToTimeOfYear} from '../../core/util'; 
+import { timestampToTimeOfYear,
+         nestedAttributeIsDefined } from '../../core/util';
 
 import styles from './MapController.css';
 
@@ -54,9 +55,9 @@ var MapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      rasterLogscale: false,
+      rasterLogscale: "false",
       numberOfContours: 10,
-      isolineLogscale: false,
+      isolineLogscale: "false",
     };
   },
   
@@ -77,6 +78,14 @@ var MapController = React.createClass({
       timeidx: timeidx,
       wmstime: this.state.times[timeidx],
     });
+  },
+
+  //callback function for CanadaMap - is passed the results of a
+  //ncWMS GetMetadata call containing the minimum and maximum of
+  //a layer. Used to determine whether a layer can be viewed with
+  //logarithmic scaling.
+  updateLayerMinmax: function (layer, minmax) {
+    this.layerRange[layer] = minmax;
   },
 
   //this function stores a dataset selected by the user and information
@@ -115,6 +124,7 @@ var MapController = React.createClass({
   //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
     var defaultDataset = nextProps.meta[0];
+    this.layerRange = {};
     
     //set display colours. In order of preference:
     //1. colours received by prop
@@ -225,8 +235,61 @@ var MapController = React.createClass({
     return !_.isEqual(nextState, this.state);
   },
 
+  //This function returns JSX for a selector allowing the user to choose
+  //whether a map's colours are scaled logarithmically or linearly.
+  //If a given map cannot be displayed with logscaled colour, returns an
+  //empty string.
+  //A map supports logscale colouring if:
+  // 1) all its values are > 0, or
+  // 2) the variable is marked "overrideLogarithmicScale: true" in the
+  //    variable-options.yaml config file (but values will be clipped to > 0)
+  makeColourScaleSelector: function(layer) {
+
+    if(this.props.meta.length == 0) { //no data loaded (yet).
+      return '';
+    }
+
+    var override = false;
+    var variableOptions = require('../../../variable-options.yaml');
+    var variableName;
+
+    if(layer == "raster"){
+      variableName = this.props.meta[0].variable_id;
+    }
+    else {
+      variableName = this.props.comparandMeta[0].variable_id;
+    }
+
+    var override = nestedAttributeIsDefined(variableOptions, variableName,
+                                           "overrideLogarithmicScale")
+                   && variableOptions[variableName].overrideLogarithmicScale;
+    var min = -1;
+
+    if(nestedAttributeIsDefined(this.layerRange, layer, "min")) {
+      min = this.layerRange[layer].min;
+    }
+
+    if(min <= 0 && !override) {
+      return '';
+    }
+
+    var colourScales = [["false", 'Linear'], ["true", 'Logarithmic']];
+    var userLabelText = {"isoline": "Isoline", "raster": "Block Colour"}[layer];
+    userLabelText = `${userLabelText} Scale`;
+    var callbackText = `${layer}Logscale`;
+    return (
+        <Selector
+          label={userLabelText}
+          onChange={this.updateSelection.bind(this, callbackText)}
+          items={colourScales}
+          value={this.state[callbackText]}
+        />
+        );
+  },
+
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
-  render: function () {          
+  render: function () {
+
     //populate UI selectors: palette and scale for both isolines and blocks,
     //run and period dropdown, time of year selector, number of isolines
     
@@ -246,9 +309,6 @@ var MapController = React.createClass({
       ['psu-magma', 'sunset']
     ];
     
-    //logscale selectors
-    var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
-
     //run and period selector
     //displays a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -275,6 +335,7 @@ var MapController = React.createClass({
         value={selectedDataset}
       />);
     }
+    var rasterScaleSelector = this.makeColourScaleSelector("raster");
 
     var timeOptions = _.map(this.state.times, function (v, k) {
       return [k, timestampToTimeOfYear(v)];
@@ -290,15 +351,8 @@ var MapController = React.createClass({
           items={palettes}
           value={this.state.isolinePalette}
         />
-      ); 
-      isolineScaleSelector = (
-        <Selector
-          label={"Isoline Color scale"}
-          onChange={this.updateSelection.bind(this, 'isolineLogscale')}
-          items={colorScales}
-          value={this.state.isolineLogscale}
-        />
       );
+      isolineScaleSelector = this.makeColourScaleSelector("isoline");
       numContoursSelector = (
         <Selector
           label={"Number of Isolines"}
@@ -351,6 +405,7 @@ var MapController = React.createClass({
           time={this.state.wmstime}
           onSetArea={this.handleSetArea}
           area={this.state.area}
+          updateMinmax={this.updateLayerMinmax}
         />
       );
 
@@ -408,7 +463,9 @@ var MapController = React.createClass({
               items={palettes}
               value={this.state.rasterPalette}
             />
+            {rasterScaleSelector}
             {isolinePaletteSelector}
+            {isolineScaleSelector}
 
           </Modal.Body>
 

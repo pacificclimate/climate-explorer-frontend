@@ -177,7 +177,20 @@ var mockAPI = require('./sample-API-results');
   });
 
   describe('timestampToTimeOfYear', function () {
-    
+    it('converts customary timestamps into monthly values', function () {
+      expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z")).toBe("July");
+      expect(util.timestampToTimeOfYear("1977-04-15T00:00:00Z")).toBe("April");
+    });
+    it('converts customary timestamps into seasonal values', function () {
+      expect(util.timestampToTimeOfYear("1977-07-16T00:00:00Z")).toBe("Summer-JJA");
+      expect(util.timestampToTimeOfYear("1977-04-16T00:00:00Z")).toBe("Spring-MAM");
+    });
+    it('converts customary timestamps into annual values', function () {
+      expect(util.timestampToTimeOfYear("1977-07-02T00:00:00Z")).toBe("Annual");
+    });
+    it('does not convert unrecognized timestamps', function () {
+      expect(util.timestampToTimeOfYear("1977-07-01T00:00:00Z")).toBe("1977-07-01T00:00:00Z");
+    });
   });
 
   describe('capitalizeWords', function () {
@@ -185,5 +198,17 @@ var mockAPI = require('./sample-API-results');
       expect(util.capitalizeWords("initial lowercase string")).toBe("Initial Lowercase String");
       expect(util.capitalizeWords("Initial uppercase")).toBe("Initial Uppercase");
       expect(util.capitalizeWords("string number the 3rd")).toBe("String Number The 3rd");
+    });
+  });
+
+  describe('nestedAttributeIsDefined', function () {
+    it('returns true when an attribute is defined', function () {
+      expect(util.nestedAttributeIsDefined({attribute: 0}, "attribute")).toBe(true);
+      expect(util.nestedAttributeIsDefined({attribute: {nested: 0}}, "attribute", "nested")).toBe(true);
+    });
+    it('returns false when an attribute is undefined', function () {
+      expect(util.nestedAttributeIsDefined({}, "missing")).toBe(false);
+      expect(util.nestedAttributeIsDefined({attribute: 0}, "missing")).toBe(false);
+      expect(util.nestedAttributeIsDefined({attribute: {nested: 0}}, "attribute", "missing")).toBe(false);
     });
   });
