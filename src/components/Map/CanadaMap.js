@@ -25,6 +25,7 @@ import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
 import { saveAs } from 'filesaver.js';
+import axios from 'axios';
 
 import utils from './utils';
 import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
@@ -83,21 +84,82 @@ var CanadaMap = React.createClass({
         numcolorbands: 249,
         version: "1.1.1",
         srs: "EPSG:4326",
+        logscale: "false"
     };
     if(layer == "raster") {
       params.layers = `${props.rasterDataset}/${props.rasterVariable}`;
       params.styles = `default-scalar/${props.rasterPalette}`;
-      params.logscale = props.rasterLogscale;
+      if(props.rasterLogscale=="true" && !_.isUndefined(this.layerRange.raster)) {
+        //clip the dataset to > 0, values of 0 or less do not have a
+        //non-complex logarithm
+        params.logscale = props.rasterLogscale;
+        var min = Math.max(this.layerRange.raster.min, Number.EPSILON);
+        var max = Math.max(this.layerRange.raster.max, Number.EPSILON * 2);
+        params.colorscalerange = `${min},${max}`;
+        params.abovemaxcolor="0x000000";
+        params.belowmincolor="0x000000";
+      }
     }
     else if (layer == "isoline") {
       params.layers = `${props.isolineDataset}/${props.isolineVariable}`;
       params.styles = `colored_contours/${props.isolinePalette}`;
-      params.logscale = props.isolineLogscale;
       params.numContours = props.numberOfContours;
+      if(props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
+        //clip the dataset to > 0
+        params.logscale = props.isolineLogscale;
+        var min = Math.max(this.layerRange.isoline.min, Number.EPSILON);
+        var max = Math.max(this.layerRange.isoline.max, Number.EPSILON * 2);
+        params.colorscalerange = `${min},${max}`;
+        params.abovemaxcolor="0x000000";
+        params.belowmincolor="0x000000";
+      }
     }
     return params;    
   },
   
+  /*
+   * Queries WMS about the minimum and maximum values of a map.
+   * Used primarily to configure logarithmic shading, which
+   * requires either all values greater than zero, or clipping
+   * the data range.
+   * Updates itself and MapController with the results.
+   */
+  updateLayerMinmax: function (layer, props) {
+    try {
+      var bounds = this.map.getBounds();
+      var minmaxParams = _.pick(this.getWMSParams(layer, props),
+          "layers", "styles", "version", "srs", "time");
+      _.extend(minmaxParams, {
+        styles: 'default-scalar',
+        request: 'GetMetadata',
+        item: 'minmax',
+        crs: this.props.srs,
+        elevation: 0,
+        width: 100,
+        height: 100,
+        bbox: `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`
+      })
+      axios (NCWMS_URL,
+          {params: minmaxParams}).then(response => {
+            this.layerRange[layer] = response.data;
+            props.updateMinmax(layer, response.data);
+          });
+    }
+    catch (err) {
+      //Because the map loads data asynchronously, it may not be ready yet,
+      //throwing an error on this.map.getBounds(). This error can be safely
+      //ignored: the minmax data only needs to be available by the time the
+      //user opens the map options menu, and by then it should be, unless
+      //something is wrong with the ncWMS server and no map rasters are
+      //generated at all.
+      //Any other error should be rethrown so it can be noticed and debugged.
+      //NOTE: rethrowing errors loses stacktrace in Chrome, see
+      //https://bugs.chromium.org/p/chromium/issues/detail?id=60240
+      if(err.message != "Set map center and zoom first.") {
+        throw err;
+      }
+    }
+  },
   
   clearMapFeatures: function () {
     this.drawnItems.getLayers().map(function (layer) {
@@ -134,6 +196,7 @@ var CanadaMap = React.createClass({
   //CanadaMap draws colourbars, the autoscale button, and the
   //area drawing and manipulation controls.
   componentDidMount: function () {
+    this.layerRange = {};
 
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
@@ -152,9 +215,11 @@ var CanadaMap = React.createClass({
 
     if(this.props.rasterDataset) {
       this.ncwmsRasterLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("raster")).addTo(map);
+      this.updateLayerMinmax("raster", this.props);
     }
     if(this.props.isolineDataset) {
       this.ncwmsIsolineLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("isoline")).addTo(map);
+      this.updateLayerMinmax("isoline", this.props);
     }
     
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
@@ -334,14 +399,17 @@ var CanadaMap = React.createClass({
 
     if(newProps.rasterDataset) {
       this.ncwmsRasterLayer.setParams(this.getWMSParams("raster", newProps));
+      this.updateLayerMinmax("raster", newProps);
     }
     if(newProps.isolineDataset) {
       this.ncwmsIsolineLayer.setParams(this.getWMSParams("isoline", newProps));
+      this.updateLayerMinmax("isoline", newProps);
     }
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
     }
   },
+
   render: function () {
     return (
       <div className={styles.map}>

@@ -172,7 +172,7 @@ var timestampToTimeOfYear = function(timestamp) {
     return month;
   }
   if(day == 16) {
-    return {"January": "Winter-DJF", "April": "Sping-MAM",
+    return {"January": "Winter-DJF", "April": "Spring-MAM",
             "July": "Summer-JJA", "October": "Fall-SON"}[month];
   }
   else if (day == 2 && month == "July") {
@@ -194,8 +194,31 @@ var capitalizeWords = function(s) {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 };
 
+
+/**********************************************************
+ * Object-related helper function
+ **********************************************************/
+
+/*
+ * Given an object and any number of arguments arg1, arg2, arg3,
+ * et cetera, returns true if object.arg1.arg2.arg3 is defined
+ */
+var nestedAttributeIsDefined = function (o, ...attributes) {
+  if (_.isUndefined(o)) {
+    return false;
+  }
+  for(var i = 0; i < attributes.length; i++) {
+    if(_.isUndefined(o[attributes[i]])) {
+      return false
+    }
+    o = o[attributes[i]];
+  }
+  return true;
+}
+
 module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData, 
     validateStatsData, validateAnnualCycleData,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 
     timestampToTimeOfYear,
-    capitalizeWords};
+    capitalizeWords,
+    nestedAttributeIsDefined};
