@@ -38,11 +38,26 @@ var ModalMixin = {
 
 
   componentWillReceiveProps: function (nextProps) {
-    this.setState({
-      timeSeriesDatasetId: nextProps.meta[0].unique_id,
-    });
-    if (this.verifyParams(nextProps)) {
+    if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
+      this.setState({
+        timeSeriesDatasetId: nextProps.meta[0].unique_id,
+      });
       this.getData(nextProps);
+    }
+    else { //Didn't receive any valid data.
+      //Most likely cause in production would be the user selecting
+      //parameters (rcp, model, variable) for which no datasets have been
+      //added to the database yet.
+      //In development, could be API or ensemble misconfiguration, database down.
+      //Display an error message on each viewer in use by this datacontroller.
+      var text = "No data matching selected parameters available";
+      var viewers = ["StatsTable", "ClimoSeries", "TimeSeries"];
+      _.each(viewers, function(viewer) {
+        var viewerFunction = `set${viewer}NoDataMessage`;
+        if(typeof this[viewerFunction] == 'function'){
+          this[viewerFunction](text);
+        }
+      }, this);
     }
   },
 
