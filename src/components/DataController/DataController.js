@@ -98,7 +98,7 @@ var DataController = React.createClass({
      return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
      _.isEqual(nextState.statsData, this.state.statsData) &&
      _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
-     _.isEquald(nextProps.meta, this.props.meta) &&
+     _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
