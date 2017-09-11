@@ -31,3 +31,4 @@ tasmax:
 pr:
   decimalPrecision: 0
   overrideLogarithmicScale: true
+  defaultScalarPalette: seq-Greens

@@ -123,22 +123,33 @@ var MapController = React.createClass({
   //same data, though a user can choose to view different data with 
   //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
+    var variableOptions = require('../../../variable-options.yaml');
+    var newVariableId = nextProps.meta[0].variable_id;
+    var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
     var defaultDataset = nextProps.meta[0];
     this.layerRange = {};
     
     //set display colours. In order of preference:
     //1. colours received by prop
     //2. colours from state (set by the user or this function previously)
-    //3. defaults (raster rainbow if a single dataset, 
+    //3. colours specified in variables.yaml, if applicable (raster only)
+    //4. defaults (raster rainbow if a single dataset,
     //             raster greyscale and isolines rainbow for 2)
     var sPalette, cPalette;
     if(nextProps.rasterPalette) {
       sPalette = nextProps.rasterPalette;
       cPalette = nextProps.isolinePalette;
     }
-    else if(this.state.rasterPalette) {
+    else if(this.state.rasterPalette && _.isEqual(newVariableId, oldVariableId)) {
       sPalette = this.state.rasterPalette;
       cPalette = this.state.isolinePalette;
+    }
+    else if (nestedAttributeIsDefined(variableOptions, newVariableId, "defaultRasterPalette"))
+    {
+      sPalette = variableOptions[newVariableId].defaultRasterPalette;
+      if(nextProps.comparandMeta) {
+        cPalette = 'x-Occam';
+      }
     }
     else if(nextProps.comparandMeta){
       sPalette = 'seq-Greys';
@@ -147,7 +158,7 @@ var MapController = React.createClass({
     else{
       sPalette = 'x-Occam';
     }
-    
+
     this.loadMap(nextProps, defaultDataset, sPalette, cPalette);   
   },
   
