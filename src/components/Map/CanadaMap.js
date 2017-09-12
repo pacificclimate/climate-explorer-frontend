@@ -96,8 +96,8 @@ var CanadaMap = React.createClass({
         var min = Math.max(this.layerRange.raster.min, Number.EPSILON);
         var max = Math.max(this.layerRange.raster.max, Number.EPSILON * 2);
         params.colorscalerange = `${min},${max}`;
-        params.abovemaxcolor="0x000000";
-        params.belowmincolor="0x000000";
+        params.abovemaxcolor="transparent";
+        params.belowmincolor="transparent";
       }
     }
     else if (layer == "isoline") {
@@ -110,8 +110,8 @@ var CanadaMap = React.createClass({
         var min = Math.max(this.layerRange.isoline.min, Number.EPSILON);
         var max = Math.max(this.layerRange.isoline.max, Number.EPSILON * 2);
         params.colorscalerange = `${min},${max}`;
-        params.abovemaxcolor="0x000000";
-        params.belowmincolor="0x000000";
+        params.abovemaxcolor="transparent";
+        params.belowmincolor="transparent";
       }
     }
     return params;    
@@ -192,7 +192,7 @@ var CanadaMap = React.createClass({
 
   //initializes the map, loads data, and generates controls
   //NOTE: the buttons that open the "Map Settings" menu are
-  //actually provided by MapController, *not* this component.
+  //actually provided by MapController, not this component.
   //CanadaMap draws colourbars, the autoscale button, and the
   //area drawing and manipulation controls.
   componentDidMount: function () {

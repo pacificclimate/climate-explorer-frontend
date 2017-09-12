@@ -29,6 +29,8 @@ tasmax:
   decimalPrecision: 1
 
 pr:
-  decimalPrecision: 0
   overrideLogarithmicScale: true
   defaultScalarPalette: seq-Greens
+  #decimalPrecision: 0
+  #Note: in an ideal universe, pr would be measured in millimeters with 0
+  #decimal places, but right now our pr data is in kg m-2 d-1 instead.
