@@ -533,6 +533,6 @@ var timeseriesXAxis = {
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     //exported only for testing purposes:
-    formatYAxis, fixedPrecision, makeTooltipDisplayNumbersWithUnits,
+    formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
     getAllTimestamps, nameAPICallParametersFunction};
