@@ -141,7 +141,7 @@ var ModalMixin = {
      * returns metadata for another dataset that:
      * - matches all attribute/value pairs in the "difference object"
      * - matches the original dataset for any attributes not in "difference"
-     * (Unique_id is ignore for purposes of matching datasets.)
+     * (Unique_id is ignored for purposes of matching datasets.)
      * 
      * Example: findMatchingMetadata(monthlyDataset, {timescale: "annual"}) 
      * would return the annual-resolution dataset that corresponds to a monthly one.

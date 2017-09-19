@@ -8,8 +8,8 @@
  * display configuration to its child, CanadaMap.
  * 
  * If it only receives one set of metadata (variable), it will pass it to 
- * CanadaMap for a scalar colour map; a second set of metadata (comparand) will 
- * be additionally passed as isolines / contours.
+ * CanadaMap for a raster colour map; a second set of metadata (comparand) will 
+ * be additionally passed as isolines.
  * 
  * Also responsible for passing an area input by the user by drawing on the map
  * up to the AppController, to allow data for graphs to be calculated over
@@ -54,9 +54,9 @@ var MapController = React.createClass({
    */
   getInitialState: function () {
     return {
-      scalarLogscale: false,
+      rasterLogscale: false,
       numberOfContours: 10,
-      contourLogscale: false,
+      isolineLogscale: false,
     };
   },
   
@@ -119,16 +119,16 @@ var MapController = React.createClass({
     //set display colours. In order of preference:
     //1. colours received by prop
     //2. colours from state (set by the user or this function previously)
-    //3. defaults (scalar rainbow if a single dataset, 
-    //             scalar greyscale and contours rainbow for 2)
+    //3. defaults (raster rainbow if a single dataset, 
+    //             raster greyscale and isolines rainbow for 2)
     var sPalette, cPalette;
-    if(nextProps.scalarPalette) {
-      sPalette = nextProps.scalarPalette;
-      cPalette = nextProps.contourPalette;
+    if(nextProps.rasterPalette) {
+      sPalette = nextProps.rasterPalette;
+      cPalette = nextProps.isolinePalette;
     }
-    else if(this.state.scalarPalette) {
-      sPalette = this.state.scalarPalette;
-      cPalette = this.state.contourPalette;
+    else if(this.state.rasterPalette) {
+      sPalette = this.state.rasterPalette;
+      cPalette = this.state.isolinePalette;
     }
     else if(nextProps.comparandMeta){
       sPalette = 'seq-Greys';
@@ -150,8 +150,8 @@ var MapController = React.createClass({
   //in state, but doesn't select (or store in state) a specific file with a 
   //specific unique_id until rendering, when it needs to pass an exact file
   //and timestamp to the viewer component CanadaMap.
-  loadMap: function (props, dataset, sPalette = this.state.scalarPalette, 
-      cPalette = this.state.contourPalette) {
+  loadMap: function (props, dataset, sPalette = this.state.rasterPalette, 
+      cPalette = this.state.isolinePalette) {
     
     var run = dataset.ensemble_member;
     var start_date = dataset.start_date;
@@ -201,8 +201,8 @@ var MapController = React.createClass({
         times: times,
         timeidx: startingIndex, 
         wmstime: times[startingIndex],
-        scalarPalette: sPalette,
-        contourPalette: cPalette
+        rasterPalette: sPalette,
+        isolinePalette: cPalette
       });
     });
     
@@ -269,22 +269,22 @@ var MapController = React.createClass({
     });
  
     //configuration options for the second dataset, if it exists
-    var contourPaletteSelector, contourScaleSelector, numContoursSelector;
+    var isolinePaletteSelector, isolineScaleSelector, numContoursSelector;
     if(this.props.comparandMeta) {
-      contourPaletteSelector = (            
+      isolinePaletteSelector = (            
         <Selector
           label={"Isoline Colour Palette"}
-          onChange={this.updateSelection.bind(this, 'contourPalette')}
+          onChange={this.updateSelection.bind(this, 'isolinePalette')}
           items={palettes}
-          value={this.state.contourPalette}
+          value={this.state.isolinePalette}
         />
       ); 
-      contourScaleSelector = (
+      isolineScaleSelector = (
         <Selector
           label={"Isoline Color scale"}
-          onChange={this.updateSelection.bind(this, 'contourLogscale')}
+          onChange={this.updateSelection.bind(this, 'isolineLogscale')}
           items={colorScales}
-          value={this.state.contourLogscale}
+          value={this.state.isolineLogscale}
         />
       );
       numContoursSelector = (
@@ -300,13 +300,13 @@ var MapController = React.createClass({
     //generate the map
     //determine which files (annual, seasonal, monthly?) 
     //actually contain the requested timestamps.
-    var scalarDatasetID;
-    var contourDatasetID;
+    var rasterDatasetID;
+    var isolineDatasetID;
 
     if(this.state.timeidx) {
       var timeindex = JSON.parse(this.state.timeidx);
       
-      scalarDatasetID = _.findWhere(this.props.meta, {
+      rasterDatasetID = _.findWhere(this.props.meta, {
         ensemble_member: this.state.run,
         start_date: this.state.start_date,
         end_date: this.state.end_date,
@@ -314,7 +314,7 @@ var MapController = React.createClass({
       }).unique_id;
     
       if(this.props.comparandMeta) {
-        contourDatasetID = _.findWhere(this.props.comparandMeta, {
+        isolineDatasetID = _.findWhere(this.props.comparandMeta, {
           ensemble_member: this.state.run,
           start_date: this.state.start_date,
           end_date: this.state.end_date,
@@ -327,14 +327,14 @@ var MapController = React.createClass({
     if (this.state.times) {
       map = (
         <CanadaMap
-          scalarLogscale={this.state.scalarLogscale}
-          scalarPalette={this.state.scalarPalette}
-          scalarDataset={scalarDatasetID}
-          scalarVariable={this.state.variable}
-          contourLogscale={this.state.contourLogscale}
-          contourPalette={this.state.contourPalette}
-          contourDataset={contourDatasetID}
-          contourVariable={this.state.comparand}
+          rasterLogscale={this.state.rasterLogscale}
+          rasterPalette={this.state.rasterPalette}
+          rasterDataset={rasterDatasetID}
+          rasterVariable={this.state.variable}
+          isolineLogscale={this.state.isolineLogscale}
+          isolinePalette={this.state.isolinePalette}
+          isolineDataset={isolineDatasetID}
+          isolineVariable={this.state.comparand}
           numberOfContours={this.state.numberOfContours}
           time={this.state.wmstime}
           onSetArea={this.handleSetArea}
@@ -392,11 +392,11 @@ var MapController = React.createClass({
             />
             <Selector
               label={"Block Colour Palette"}
-              onChange={this.updateSelection.bind(this, 'scalarPalette')}
+              onChange={this.updateSelection.bind(this, 'rasterPalette')}
               items={palettes}
-              value={this.state.scalarPalette}
+              value={this.state.rasterPalette}
             />
-            {contourPaletteSelector}
+            {isolinePaletteSelector}
 
           </Modal.Body>
 

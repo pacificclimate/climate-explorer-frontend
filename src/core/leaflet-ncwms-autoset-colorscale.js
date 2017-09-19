@@ -44,8 +44,7 @@ var ncWMSAutoscaleControl = L.Control.extend({
     /*
      * Get min/max for current view then update layer params
      */
-    for(var i = 0; i < this.layers.length; i++) {
-      var layer = this.layers[i];
+    this.layers.forEach(layer => {
       axios(layer._url, {
         params: {
           request: 'GetMetadata',
@@ -62,13 +61,13 @@ var ncWMSAutoscaleControl = L.Control.extend({
           height: 100,
         },
       }).then(response => {
-        this.layers.forEach(function(layer){
+        this.layers.forEach(layer => {
           if(layer.wmsParams.layers == response.config.params.layers) {
             layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
           }
         });
       });
-    }
+    });
   },
 });
 
