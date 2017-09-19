@@ -1,23 +1,52 @@
+/*******************************************************************
+ * export.js - functions for writing data to a CSV or XLSX file
+ * 
+ * The main function in this file is exportDataToWorksheet; the 
+ * other functions are helper functions that create pieces 
+ * (headers, data) of the exported file. 
+ * 
+ * Built around the js-xlsx library
+ *******************************************************************/
+
 var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
+import { timeIndexToTimeOfYear, 
+         timeResolutionIndexToTimeOfYear  } from './util';
+
+/************************************************************
+ * 0. exportDataToWorksheet() - the main export function
+ ************************************************************/
 
 /*
  * Takes current data displayed in the DataTable, Annual Cycle graph, or
  * Projected Change graph, along with contextual data from user input, creates
  * an XLSX or CSV file, and serves it to the user for download. Draws on example
  * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
+ * 
+ * Arguments:
+ * datatype: a string, either "timeseries", "stats", or "climoseries"
+ * metadata: object with the attributes used to generate the data being 
+ *     exported: model, emissions scenario, variables(s)
+ * data: either a data table or a graph data object
+ * format: string indicating file format: "csv" or "xlsx"
+ * selection: object indicating which slice of data being exported, either 
+ *     1. a specific run or set of runs (for an annual cycle graph)  
+ *     2. time of year (for stats or change graph)
  */
 var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
+  
   // create workbook object containing one or more worksheets
   var wb = {
       Sheets: {},
       SheetNames: []
   };
 
+  var timeOfYear = "";
+  
   // prepare filename, metadata cells, and data cells according to type of export
   var summaryCells, dataCells, outputFilename;
   var filenamePrefix = "PCIC_CE_";
@@ -30,14 +59,16 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromDataTable(data);
-      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "climoseries":
-      summaryCells = createWorksheetSummaryCells(metadata, timeIndexToTimeOfYear(selection.timeidx));
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Run");
-      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeIndexToTimeOfYear(selection.timeidx)}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
   }
 
@@ -79,6 +110,12 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   filesaver.saveAs(out_data, outputFilename);
 };
 
+/*********************************************************
+ * 1. summary-generating functions that create cells 
+ * containing the metadata needed to describe the exported 
+ * data
+ *********************************************************/
+
 /*
  * Helper function for exportDataToWorksheet, creates summary rows that appear
  * at the top of the exported worksheet for exported stats table or Projected
@@ -89,19 +126,72 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
 
   var rows = [];
 
-  var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];
-  rows.push(header);
-
-  rows.push([
+  var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];  
+  
+  var values = [
     metadata.model_id,
     metadata.experiment,
     timeOfYear,
     metadata.variable_id,
     metadata.meta[0].variable_name
-  ]);
+  ];
+  
+  //provide metadata for a second variable, if one is in use.
+  if(metadata.comparand_id && 
+     metadata.comparand_id != metadata.variable_id) {
+    header.push('Comparand ID');
+    header.push('Comparand Name');
+    values.push(metadata.comparand_id);
+    values.push(metadata.comparandMeta[0].variable_name);
+  }
+  
+  rows.push(header);
+  rows.push(values);
 
   return rows;
 };
+
+/*
+ * Helper function for exportDataToWorksheet that generates metadata / summary
+ * cells for export of Annual Cycle data.
+ */
+var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
+
+  var rows = [];
+  var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
+
+  var dataset = _.findWhere(metadata.meta, {unique_id: run});
+
+
+  var values = [
+    metadata.model_id,
+    metadata.experiment,
+    `${dataset.start_date}-${dataset.end_date}`,
+    dataset.ensemble_member,
+    metadata.variable_id,
+    metadata.meta[0].variable_name
+  ];
+  
+  //provide metadata for a second variable, if one is in use.
+  if(metadata.comparand_id && 
+     metadata.comparand_id != metadata.variable_id) {
+    header.push('Comparand ID');
+    header.push('Comparand Name');
+    values.push(metadata.comparand_id);
+    values.push(metadata.comparandMeta[0].variable_name);
+  }
+
+  rows.push(header);
+  rows.push(values);
+  
+  return rows;
+};
+
+/************************************************************
+ * 2. data-generating functions that create cells containing
+ * the requested data for export
+ ************************************************************/
+
 
 /*
  * Helper function for exportDataToWorksheet, creates data column headers and
@@ -116,79 +206,6 @@ var generateDataCellsFromDataTable = function (data) {
 
   var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'];
   rows.unshift(column_labels);
-
-  return rows;
-};
-
-/*
- * Helper function for exportDataToWorksheet, combines summary rows, data column
- * headers, and data into one worksheet Draws on example code from js-xlsx docs:
- * https://github.com/SheetJS/js-xlsx
- */
-var assembleWorksheet = function (cells) {
-  var cell_ref;
-  var ws = {};
-  var maxCols = 0;
-  cells.forEach(function (row, rowIndex) {
-    if (row.length > maxCols) {
-      maxCols = row.length;
-    }
-    row.forEach(function (cellValue, colIndex) {
-      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
-      ws[cell_ref] = { v: cellValue, t: 's' };
-    });
-  });
-
-    // set combined worksheet range bounds
-  var range = {
-    s: { c:0, r:0 },
-    e: {
-      c: maxCols - 1,
-      r: cells.length - 1
-    }
-  };
-  ws['!ref'] = XLSX.utils.encode_range(range);
-  return ws;
-};
-
-var timeIndexToTimeOfYear = function (timeidx) {
-    // convert timestep ID (0-16) to string format
-  var timesOfYear = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-    'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
-    'Fall-SON', 'Annual'
-  ];
-  return timesOfYear[timeidx];
-};
-
-/*
- * Helper function for exportDataToWorksheet that generates metadata / summary
- * cells for export of Annual Cycle data.
- */
-var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
-
-  var rows = [];
-  var header = ['Model', 'Emissions Scenario', 'Variable ID', 'Variable Name', 'Period', 'Run'];
-  rows.push(header);
-
-  //FIXME: Time period should be determined from the metadata API
-  // which currently doesn't give time bounds information. See here:
-  // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-  // When that issue is fixed, this code needs to be updated
-  var dataset = _.findWhere(metadata.meta, {unique_id: run});
-  var params = dataset.unique_id.split("_");
-  var sdate = params[params.length - 1].slice(0,4);
-  var edate = params[params.length - 1].slice(9, 13);
-
-
-  rows.push([
-    metadata.model_id,
-    metadata.experiment,
-    metadata.variable_id,
-    metadata.meta[0].variable_name,
-    `${sdate}-${edate}`,
-    dataset.ensemble_member
-  ]);
 
   return rows;
 };
@@ -234,21 +251,42 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
   rows.unshift(column_labels);
   return rows;
 
-}
+};
 
-/* Helper function that returns period info (IE, 2010 - 2039)
- * based on the time stamp of associated data. Stopgap until the
- * API provides a safer version of this information.
- * Assumes all values are associated with the fifteenth year of
- * a thirty-year simulation period.
+/*****************************************************************
+ * 3. function that combines metadata and data (or any other two
+ * sets of cells) into a single file.
+ *****************************************************************/
+
+/*
+ * Helper function for exportDataToWorksheet, combines summary rows, data column
+ * headers, and data into one worksheet Draws on example code from js-xlsx docs:
+ * https://github.com/SheetJS/js-xlsx
  */
-//FIXME: Time period should be determined from the metadata API
-// which currently doesn't give time bounds information. See here:
-// https://github.com/pacificclimate/climate-explorer-backend/issues/44
-// When that issue is fixed, this code needs to be updated
-var inferPeriodFromTimeStamp = function (timestamp) {
-  var year = parseInt(timestamp.slice(0, 4));
-  return `${year - 15}-${year + 14}`;
+var assembleWorksheet = function (cells) {
+  var cell_ref;
+  var ws = {};
+  var maxCols = 0;
+  cells.forEach(function (row, rowIndex) {
+    if (row.length > maxCols) {
+      maxCols = row.length;
+    }
+    row.forEach(function (cellValue, colIndex) {
+      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
+      ws[cell_ref] = { v: cellValue, t: 's' };
+    });
+  });
+
+    // set combined worksheet range bounds
+  var range = {
+    s: { c:0, r:0 },
+    e: {
+      c: maxCols - 1,
+      r: cells.length - 1
+    }
+  };
+  ws['!ref'] = XLSX.utils.encode_range(range);
+  return ws;
 };
 
 module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,

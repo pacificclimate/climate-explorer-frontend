@@ -4,6 +4,7 @@ import { Router, Route, browserHistory } from 'react-router';
 
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
+import DualController from './components/DualController';
 
 import Header from './components/Header';
 
@@ -32,6 +33,7 @@ render((
     <Route path='/' component={App}>
       <Route path='moti' component={MotiController} />
       <Route path='climo' component={AppController} />
+      <Route path='compare' component={DualController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));

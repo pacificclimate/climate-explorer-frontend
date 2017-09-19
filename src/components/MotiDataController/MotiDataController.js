@@ -1,11 +1,30 @@
+/************************************************************************
+ * MotiDataController.js - controller to display summarized numerical data 
+ * 
+ * This DataController is intended to be used with an ensemble that 
+ * contains a small number of datasets, each of which is the average
+ * of many runs. It does not offer the user a way to select or 
+ * distinguish between individual runs or indicate a time of year
+ * they are interested in; it should be used with an ensemble that 
+ * features only one dataset for each combination of model, variable, 
+ * and emission scenario.
+ * 
+ * It receives a model, variable, and emissions scenario from its parent, 
+ * MotiApp. It loads the relevant data and passes them as props to its
+ * viewer component children:
+ * - an annual cycle DataGraph (with only monthly data)
+ * - a projected change DataGraph (with only one trendline)
+ * - a stats DataTable (with only one entry per climatology period)
+ ************************************************************************/
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 
-import { parseTimeSeriesForC3,
-  parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData } from '../../core/util';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
+import {timeseriesToAnnualCycleGraph} from '../../core/chart';
+import _ from 'underscore';
 
 import styles from './MotiDataController.css';
 
@@ -27,20 +46,35 @@ var MotiDataController = React.createClass({
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined,
+      dataTableTimeOfYear: 0,
     };
   },
 
+  /*
+   * Called when MotiController is first loaded. Selects and fetches an initial
+   * dataset to display in the stats table and annual cycle graph.
+   */
   getData: function (props) {
     this.setTimeSeriesNoDataMessage("Loading Data");
-    this.setStatsTableNoDataMessage("Loading Data");
 
+    this.setStatsTableNoDataMessage("Loading Data");  
+    
+    var monthlyMetadata = _.findWhere(props.meta,{
+      model_id: props.model_id,
+      variable_id: props.variable_id,
+      experiment: props.experiment,
+      timescale: "monthly" });
+          
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
-    var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-
+    var myTimeseriesPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
+   
     myStatsPromise.then(response => {
+      //This portal doesn't offer users a choice of what time of year to display
+      //stats for. It always shows annual stats.
+      var stats = this.filterAPIResults(response.data, {timescale: "yearly"}, props.meta);
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
@@ -48,13 +82,15 @@ var MotiDataController = React.createClass({
 
     myTimeseriesPromise.then(response => {
       this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data, false),
+        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, response.data),
       });
+      
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesNoDataMessage);
     });
   },
 
+  //Remove data from the Annual Cycle graph and display a message
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
       timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -62,6 +98,7 @@ var MotiDataController = React.createClass({
       });
   },
 
+  //Remove data from the Stats Table and display a message
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
@@ -72,10 +109,10 @@ var MotiDataController = React.createClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data server alter
     // the state
-    return JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
-           JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
-           JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
-           nextState.statsTableOptions !== this.state.statsTableOptions;
+    return !(_.isEqual(nextState.statsData, this.state.statsData) &&
+           _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+           _.isEqual(nextProps.meta, this.props.meta) &&
+           _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
   render: function () {

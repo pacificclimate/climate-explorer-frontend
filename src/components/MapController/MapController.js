@@ -1,3 +1,21 @@
+/******************************************************************************
+ * MapController.js - a controller component to coordinate data and UI for a map.
+ * 
+ * Receives 1-2 arrays of netCDF dataset metadata from its parent, an AppController.
+ * 
+ * Collects display information (time slice, colours, scale, etc) from the user
+ * via a modal menu, then passes one or two single datasets with corresponding
+ * display configuration to its child, CanadaMap.
+ * 
+ * If it only receives one set of metadata (variable), it will pass it to 
+ * CanadaMap for a raster colour map; a second set of metadata (comparand) will 
+ * be additionally passed as isolines.
+ * 
+ * Also responsible for passing an area input by the user by drawing on the map
+ * up to the AppController, to allow data for graphs to be calculated over
+ * a specific area.
+ *******************************************************************************/
+
 import React from 'react';
 import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap';
 import urljoin from 'url-join';
@@ -11,6 +29,7 @@ import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
+import { timestampToTimeOfYear} from '../../core/util'; 
 
 import styles from './MapController.css';
 
@@ -19,28 +38,40 @@ var MapController = React.createClass({
   propTypes: {
     variable: React.PropTypes.string,
     meta: React.PropTypes.array,
+    comparand: React.PropTypes.string,
+    comparandMeta: React.PropTypes.array,
     onSetArea: React.PropTypes.func.isRequired,
   },
 
   mixins: [ModalMixin],
 
   /*
-   * State items also set from meta object array Includes: - dataset - wmstime -
-   * variable
+   * State items also set from meta object array 
+   * Includes:
+   *  - dataset
+   *  - wmstime
+   *  - variable
    */
   getInitialState: function () {
     return {
-      styles: 'boxfill/ferret',
-      timeidx: 0,
-      logscale: false,
+      rasterLogscale: false,
+      numberOfContours: 10,
+      isolineLogscale: false,
     };
   },
-
+  
+  //this function handles user selection of all the straightforward
+  //parameters like logscale or palette.
   updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
   },
 
+  //update the timestamp in state
+  //timeidx is a stringified object with a resolution
+  //(monthly, annual, seasonal) and an index (0-11). For example
+  //{timeres: monthly, timeidx: 3} would represent April. 
+  //It's stringified because Selector won't pass an object.
   updateTime: function (timeidx) {
     this.setState({
       timeidx: timeidx,
@@ -48,24 +79,10 @@ var MapController = React.createClass({
     });
   },
 
-  updateDataset: function (uniqueId) {
-    // Updates dataset in state. Updates time value to match new dataset
-
-    this.selectedDataset = this.props.meta.filter(function (el) {
-      return el.unique_id === uniqueId;
-    })[0];
-
-    this.requestTimeMetadata(uniqueId).then(response => {
-      this.selectedDataset.times = response.data[uniqueId].times;
-
-      this.setState({
-        times: response.data[uniqueId].times,
-        timeidx: 0, // Time indices may not be equivalent across datasets
-        dataset: this.selectedDataset.unique_id,
-        wmstime: response.data[uniqueId].times[0],
-        variable: this.selectedDataset.variable_id,
-      });
-    });
+  //this function stores a dataset selected by the user and information
+  //needed to render it to state 
+  updateDataset: function (dataset) {
+    this.loadMap(this.props, JSON.parse(dataset));
   },
 
   findUniqueId: function () {
@@ -79,6 +96,8 @@ var MapController = React.createClass({
     this.props.onSetArea(geojson ? g.geojson(geojson).toWKT() : undefined);
   },
 
+  //returns a promise for metadata containing a "times" attribute
+  //with an array of timestamps.
   requestTimeMetadata: function (uniqueId) {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
@@ -88,94 +107,252 @@ var MapController = React.createClass({
     });
   },
 
+  //Load initial map, based on a list of available data files passed
+  //as props from its parent
+  //the 0th dataset in props.meta is displayed. This behaviour is shared by
+  //the DataControllers, so initially maps and graphs will show the 
+  //same data, though a user can choose to view different data with 
+  //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
-    this.selectedDataset = nextProps.meta[0];
-
-    this.requestTimeMetadata(this.selectedDataset.unique_id).then(response => {
+    var defaultDataset = nextProps.meta[0];
+    
+    //set display colours. In order of preference:
+    //1. colours received by prop
+    //2. colours from state (set by the user or this function previously)
+    //3. defaults (raster rainbow if a single dataset, 
+    //             raster greyscale and isolines rainbow for 2)
+    var sPalette, cPalette;
+    if(nextProps.rasterPalette) {
+      sPalette = nextProps.rasterPalette;
+      cPalette = nextProps.isolinePalette;
+    }
+    else if(this.state.rasterPalette) {
+      sPalette = this.state.rasterPalette;
+      cPalette = this.state.isolinePalette;
+    }
+    else if(nextProps.comparandMeta){
+      sPalette = 'seq-Greys';
+      cPalette = 'x-Occam';
+    }
+    else{
+      sPalette = 'x-Occam';
+    }
+    
+    this.loadMap(nextProps, defaultDataset, sPalette, cPalette);   
+  },
+  
+  //update state with all the information needed to display
+  //maps for specific datasets.
+  //a "dataset" in this case is not a specific file. It is a
+  //variable + emissions + model + period + run combination. Timestamps for
+  //a "dataset" may be spread across up to three files (one annual, one 
+  //seasonal, one monthly). MapController stores the parameters of the dataset
+  //in state, but doesn't select (or store in state) a specific file with a 
+  //specific unique_id until rendering, when it needs to pass an exact file
+  //and timestamp to the viewer component CanadaMap.
+  loadMap: function (props, dataset, sPalette = this.state.rasterPalette, 
+      cPalette = this.state.isolinePalette) {
+    
+    var run = dataset.ensemble_member;
+    var start_date = dataset.start_date;
+    var end_date = dataset.end_date;
+    
+    //generate the list of available times for this variable+run+period
+    //which may include multiple files of different time resolutions 
+    //(annual, seasonal, or monthly).
+    var times = {};
+    var timesPromises = [];
+        
+    var datasets = _.filter(props.meta, 
+        {"ensemble_member": run, "start_date": start_date, "end_date": end_date });
+    
+    for(var i = 0; i < datasets.length; i++) {
+      timesPromises.push(this.requestTimeMetadata(datasets[i].unique_id));
+    }
+   
+    Promise.all(timesPromises).then(responses => {
+      for(var i = 0; i < responses.length; i++) {
+        var id = Object.keys(responses[i].data)[0];
+        for(var timeidx in responses[i].data[id].times) {
+          var idxString = JSON.stringify({
+            "timescale": responses[i].data[id].timescale,
+            "timeidx": timeidx,
+          });
+          times[idxString] = responses[i].data[id].times[timeidx];
+        }
+      }
+      //select a 0th index to display initially. It could be January, 
+      //Winter, or Annual - there's no guarentee any given dataset 
+      //will have monthly, seasonal, or yearly data available, but it
+      //will have at least one of them.
+      var startingIndex = _.find(Object.keys(times), 
+          function (timestamp) {return JSON.parse(timestamp).timeidx == 0});
+      
+      var variable_id = props.meta[0].variable_id;
+      var comparand_id = props.comparandMeta ? props.comparandMeta[0].variable_id : undefined;
+      
+      
       this.setState({
-        times: response.data[this.selectedDataset.unique_id].times,
-        timeidx: 0,
-        dataset: this.selectedDataset.unique_id,
-        wmstime: response.data[this.selectedDataset.unique_id].times[0],
-        variable: this.selectedDataset.variable_id,
+        variable: variable_id,
+        comparand: comparand_id,
+        run: run,
+        start_date: start_date,
+        end_date: end_date,
+        times: times,
+        timeidx: startingIndex, 
+        wmstime: times[startingIndex],
+        rasterPalette: sPalette,
+        isolinePalette: cPalette
       });
     });
+    
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before we have required data
-    return JSON.stringify(nextState) !== JSON.stringify(this.state);
+    return !_.isEqual(nextState, this.state);
   },
 
-  render: function () {
-    var pallettes = [['boxfill/ferret', 'ferret'],
-                     ['boxfill/rainbow', 'rainbow'],
-                     ['boxfill/occam', 'occam'],
-                     ['boxfill/occam_inv', 'inverted occam'],
-                    ];
+  //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
+  render: function () {          
+    //populate UI selectors: palette and scale for both isolines and blocks,
+    //run and period dropdown, time of year selector, number of isolines
+    
+    //colour selector
+    var palettes = [
+      ['seq-Blues', 'light blues'],
+      ['seq-BkBu', 'dark blues'],
+      ['seq-Greens', 'light greens'],
+      ['seq-BkGn', 'dark greens'],
+      ['seq-Oranges', 'oranges'],
+      ['seq-BuPu', 'purples'],
+      ['seq-Greys', 'greys'],
+      ['seq-BkYl', 'yellows'],
+      ['x-Occam', 'rainbow'],
+      ['default', 'ocean'],
+      ['seq-cubeYF', 'cube'],
+      ['psu-magma', 'sunset']
+    ];
+    
+    //logscale selectors
     var colorScales = [['false', 'Linear'], ['true', 'Logarithmic']];
 
-    // Determine available datasets and display selector if multiple
-    //FIXME: Time period should be determined from the metadata API
-    // which currently doesn't give time bounds information. See here:
-    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-    // When that issue is fixed, this code needs to be updated
+    //run and period selector
+    //displays a list of all the unique combinations of run + climatological period
+    //a user could decide to view.
+    //Not sure JSON is the right way to do this, though.
+    //TODO: see if there's a more elegant way to handle the callback 
+    //(selector won't pass an object)
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
-    }).sort(function (a, b) {
-      return a[1] > b[1] ? 1 : -1;
+        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
+            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
     });
+    ids = _.uniq(ids, false, function(item){return item[1]});
 
     var datasetSelector;
+    var selectedDataset = JSON.stringify({
+      start_date: this.state.start_date,
+      end_date: this.state.end_date,
+      ensemble_member: this.state.run
+    });
     if (ids.length > 1) {
       datasetSelector = (<Selector
         label={"Select Dataset"}
         onChange={this.updateDataset}
-        items={ids} value={this.state.dataset}
+        items={ids}
+        value={selectedDataset}
       />);
     }
 
     var timeOptions = _.map(this.state.times, function (v, k) {
-      return [k, v];
+      return [k, timestampToTimeOfYear(v)];
     });
+ 
+    //configuration options for the second dataset, if it exists
+    var isolinePaletteSelector, isolineScaleSelector, numContoursSelector;
+    if(this.props.comparandMeta) {
+      isolinePaletteSelector = (            
+        <Selector
+          label={"Isoline Colour Palette"}
+          onChange={this.updateSelection.bind(this, 'isolinePalette')}
+          items={palettes}
+          value={this.state.isolinePalette}
+        />
+      ); 
+      isolineScaleSelector = (
+        <Selector
+          label={"Isoline Color scale"}
+          onChange={this.updateSelection.bind(this, 'isolineLogscale')}
+          items={colorScales}
+          value={this.state.isolineLogscale}
+        />
+      );
+      numContoursSelector = (
+        <Selector
+          label={"Number of Isolines"}
+          onChange={this.updateSelection.bind(this, 'numberOfContours')}
+          items={[4, 6, 8, 10, 12]}
+          value={this.state.numberOfContours}
+        />
+      );
+    }
+   
+    //generate the map
+    //determine which files (annual, seasonal, monthly?) 
+    //actually contain the requested timestamps.
+    var rasterDatasetID;
+    var isolineDatasetID;
+
+    if(this.state.timeidx) {
+      var timeindex = JSON.parse(this.state.timeidx);
+      
+      rasterDatasetID = _.findWhere(this.props.meta, {
+        ensemble_member: this.state.run,
+        start_date: this.state.start_date,
+        end_date: this.state.end_date,
+        timescale: timeindex.timescale      
+      }).unique_id;
+    
+      if(this.props.comparandMeta) {
+        isolineDatasetID = _.findWhere(this.props.comparandMeta, {
+          ensemble_member: this.state.run,
+          start_date: this.state.start_date,
+          end_date: this.state.end_date,
+          timescale: timeindex.timescale      
+        }).unique_id;
+      }
+    }    
 
     var map, mapFooter;
-    if (this.state.dataset) {
+    if (this.state.times) {
       map = (
         <CanadaMap
-          logscale={this.state.logscale}
-          styles={this.state.styles}
+          rasterLogscale={this.state.rasterLogscale}
+          rasterPalette={this.state.rasterPalette}
+          rasterDataset={rasterDatasetID}
+          rasterVariable={this.state.variable}
+          isolineLogscale={this.state.isolineLogscale}
+          isolinePalette={this.state.isolinePalette}
+          isolineDataset={isolineDatasetID}
+          isolineVariable={this.state.comparand}
+          numberOfContours={this.state.numberOfContours}
           time={this.state.wmstime}
-          dataset={this.state.dataset}
-          variable={this.state.variable}
           onSetArea={this.handleSetArea}
           area={this.state.area}
         />
       );
-      var timestamp = new Date(Date.parse(this.state.times[0]));
-      var year = timestamp.getFullYear();
-      var runMetadata = this.props.meta.find(match => {return match.unique_id === this.state.dataset})
-      var run = runMetadata.ensemble_member;
 
-      // FIXME: Time period should be determined from the metadata API
-      // which currently doesn't give time bounds information. See here:
-      // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-      // When that issue is fixed, this code needs to be updated
       mapFooter = (
         <h5>
-          Dataset: {run} &nbsp;
-          {year - 15} - {year + 14} &nbsp;
-          Time: {this.state.wmstime}
+          Dataset: {this.state.start_date}-{this.state.end_date} &nbsp;
+          {timestampToTimeOfYear(this.state.wmstime)} {this.state.run} 
         </h5>
-      );
+          );
 
     } else {
       map = <Loader />;
       mapFooter = "";
-    }
+    }    
 
     return (
       <div>
@@ -208,22 +385,18 @@ var MapController = React.createClass({
           <Modal.Body>
             { datasetSelector }
             <Selector
-              label={"Time Selection"}
+              label={"Time of Year"}
               onChange={this.updateTime}
               items={timeOptions}
+              value={this.state.timeidx}
             />
             <Selector
-              label={"Colour Pallette"}
-              onChange={this.updateSelection.bind(this, 'styles')}
-              items={pallettes}
-              value={this.state.styles}
+              label={"Block Colour Palette"}
+              onChange={this.updateSelection.bind(this, 'rasterPalette')}
+              items={palettes}
+              value={this.state.rasterPalette}
             />
-            <Selector
-              label={"Color scale"}
-              onChange={this.updateSelection.bind(this, 'logscale')}
-              items={colorScales}
-              value={this.state.logscale}
-            />
+            {isolinePaletteSelector}
 
           </Modal.Body>
 

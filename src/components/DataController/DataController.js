@@ -1,14 +1,30 @@
+/*******************************************************************
+ * DataController.js - controller component for in-depth numerical
+ * visualization
+ * 
+ * Receives a model, an experiment, and a variable from its parent,
+ * AppController. Presents the user with widgets to allow selection 
+ * of a particular slice of data (time of year or run) and download 
+ * of selected data. 
+ * 
+ * Queries the API to retrieve the selected data and controls three 
+ * viewing components: 
+ * - a DataTable with statistics about each qualifying run 
+ * - an annual cycle DataGraph with monthly, seasonal, and annual lines 
+ * - a projected change DataGraph with each run displayed separately
+ *******************************************************************/
+
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
+import _ from 'underscore';
 
 import styles from './DataController.css';
 
-import {
-  dataApiToC3,
-  parseTimeSeriesForC3,
-  parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData } from '../../core/util';
+import {timeseriesToAnnualCycleGraph,
+        dataToProjectedChangeGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -30,53 +46,29 @@ var DataController = React.createClass({
   getInitialState: function () {
     return {
       projChangeTimeOfYear: 0,
+      projChangeTimeScale: "monthly",
       dataTableTimeOfYear: 0,
-      timeSeriesDatasetId: '',
+      dataTableTimeScale: "monthly",
+      timeSeriesRun: undefined,
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined,
     };
   },
 
+  /*
+   * Called when DataController is first loaded. Selects and fetches 
+   * arbitrary initial data to display in the Projected Change graph, 
+   * Annual Cycle Graph, and stats table. 
+   * Monthly time resolution, January, on the first run returned by the API.
+   */
   getData: function (props) {
-
-    this.setTimeSeriesNoDataMessage("Loading Data");
-    this.setClimoSeriesNoDataMessage("Loading Data");
-    this.setStatsTableNoDataMessage("Loading Data");
-
-    var myDataPromise = this.getDataPromise(props, this.state.projChangeTimeOfYear);
-
-    var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
-
-    var myTimeseriesPromise = this.getTimeseriesPromise(props, props.meta[0].unique_id);
-
-
-    myDataPromise.then(response => {
-      this.setState({
-        climoSeriesData: dataApiToC3(response.data),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setClimoSeriesNoDataMessage);
-    });
-
-    myStatsPromise.then(response => {
-      this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setStatsTableNoDataMessage);
-    });
-
-    myTimeseriesPromise.then(response => {
-      this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data, true),
-        timeSeriesDatasetId: props.meta[0].unique_id
-      });
-    }).catch(error => {
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
-    });
+    this.loadTimeSeries(props);
+    this.loadClimoSeries(props);
+    this.loadDataTable(props);
   },
 
+  //Removes all data from the Annual Cycle graph and displays a message
   setTimeSeriesNoDataMessage: function(message) {
     this.setState({
       timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -84,6 +76,7 @@ var DataController = React.createClass({
       });
   },
 
+  //Removes all data from the Projected Change graph and displays a message
   setClimoSeriesNoDataMessage: function(message) {
     this.setState({
       climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
@@ -91,6 +84,7 @@ var DataController = React.createClass({
       });
   },
 
+  //Removes all data from the Stats Table and displays a message
   setStatsTableNoDataMessage: function(message) {
     this.setState({
       statsTableOptions: { noDataText: message },
@@ -101,69 +95,157 @@ var DataController = React.createClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return JSON.stringify(nextState.climoSeriesData) !== JSON.stringify(this.state.climoSeriesData) ||
-     JSON.stringify(nextState.statsData) !== JSON.stringify(this.state.statsData) ||
-     JSON.stringify(nextState.timeSeriesData) !== JSON.stringify(this.state.timeSeriesData) ||
-     JSON.stringify(nextProps.meta) !== JSON.stringify(this.props.meta) ||
-     nextState.statsTableOptions !== this.state.statsTableOptions;
+     return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
+     _.isEqual(nextState.statsData, this.state.statsData) &&
+     _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     _.isEqual(nextProps.meta, this.props.meta) &&
+     _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
+  /*
+   * Called when the user selects a time of year to display on the
+   * Projected Change graph. Records the new time index and resolution
+   * in state, fetches new data, and redraws the Projected Change graph.
+   */
   updateProjChangeTimeOfYear: function (timeidx) {
-    this.setClimoSeriesNoDataMessage("Loading Data");
-    this.setState({
-      projChangeTimeOfYear: timeidx,
-    });
-    this.getDataPromise(this.props, timeidx).then(response => {
+    this.loadClimoSeries(this.props, JSON.parse(timeidx));
+  },
+
+  /* 
+   * Called when the user selects a time of year to display on the stats
+   * table. Fetches new data, records the new time index and resolution
+   * in state, and updates the table.
+   */
+  updateDataTableTimeOfYear: function (timeidx) {
+    this.loadDataTable(this.props, JSON.parse(timeidx));
+    },
+
+  /*
+   * Called when the user selects a specific run to view on the Annual Cycle
+   * graph. Stores the selected run and period in state, fetches new data,
+   * and updates the graph.
+   */
+  updateAnnCycleDataset: function (run) {
+    this.loadTimeSeries(this.props, JSON.parse(run));
+  },
+  
+  /*
+   * This function retrieves fetches monthly, seasonal, and yearly resolution
+   * annual cycle data and displays them on the graph. If run (an object with 
+   * start_date, end_date, and ensemble_member attributes) is provided, data
+   * matching those parameters will be selected; otherwise an arbitrary set 
+   * of data matching the other parameters.
+   */
+  loadTimeSeries: function (props, run) {
+    //load Annual Cycle graph - need monthly, seasonal, and yearly data
+    this.setTimeSeriesNoDataMessage("Loading Data");
+    
+    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+    params.timescale = "monthly";
+    
+    if(run) {
+      _.extend(params, run);
+    }
+    
+    var monthlyMetadata = _.findWhere(props.meta, params);
+
+    var seasonalMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "seasonal"}, props.meta);
+    var yearlyMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "yearly"}, props.meta);
+    
+    var timeseriesPromises = [];
+    
+    //fetch data from the API for each time resolution that has a dataset. 
+    //the "monthly" time resolution is guarenteed to exist, but
+    //matching seasonal and yearly ones may not be in the database.
+    _.each([monthlyMetadata, seasonalMetadata, yearlyMetadata], function(timeseries) {
+      if(timeseries) {
+        timeseriesPromises.push(this.getTimeseriesPromise(props, timeseries.unique_id));
+      }
+    }, this);
+
+    Promise.all(timeseriesPromises).then(series => {
+      var data = _.pluck(series, "data");
       this.setState({
-        climoSeriesData: dataApiToC3(response.data),
+        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        timeSeriesRun: {
+          start_date: monthlyMetadata.start_date,
+          end_date: monthlyMetadata.end_date,
+          ensemble_member: monthlyMetadata.ensemble_member
+        },
+      });
+    }).catch(error => {
+      this.displayError(error, this.setTimeSeriesNoDataMessage);
+    });    
+  },
+  
+  /*
+   * This function fetches and loads data  for the Projected Change graphs.
+   * If passed a time of year(resolution and index), it will load
+   * data for that time of year. Otherwise, it defaults to January 
+   * (resolution: "monthly", index 0).
+   */
+  loadClimoSeries: function (props, time) {
+    var timescale = time ? time.timescale : this.state.projChangeTimeScale;
+    var timeidx = time ? time.timeidx : this.state.projChangeTimeOfYear;
+    
+    this.setClimoSeriesNoDataMessage("Loading Data");
+    var myDataPromise = this.getDataPromise(props, timescale, timeidx);
+
+    myDataPromise.then(response => {      
+      this.setState({
+        projChangeTimeOfYear: timeidx,
+        projChangeTimeScale: timescale,
+        climoSeriesData: dataToProjectedChangeGraph([response.data]),
       });
     }).catch(error => {
       this.displayError(error, this.setClimoSeriesNoDataMessage);
     });
   },
-
-  updateDataTableTimeOfYear: function (timeidx) {
+  
+  /*
+   * This function fetches and loads data for the Stats Table. 
+   * If passed a time of year(resolution and index), it will load
+   * data for that time of year. Otherwise, it defaults to January 
+   * (resolution: "monthly", index 0). 
+   */
+  loadDataTable: function (props, time) {
+    
+    var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
+    var timeres = time ? time.timescale : this.state.dataTableTimeScale;
+        
+    //load stats table
     this.setStatsTableNoDataMessage("Loading Data");
-    this.setState({
-      dataTableTimeOfYear: timeidx,
-    });
-    this.getStatsPromise(this.props, timeidx).then(response => {
+    var myStatsPromise = this.getStatsPromise(props, timeidx);
+
+    myStatsPromise.then(response => {
+      //remove all results from datasets with the wrong timescale
+      var stats = this.filterAPIResults(response.data, 
+          {timescale: timeres}, props.meta);
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data)),
+        dataTableTimeOfYear: timeidx,
+        dataTableTimeScale: timeres,
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
-  },
 
-  updateAnnCycleDataset: function (dataset) {
-    this.setTimeSeriesNoDataMessage("Loading Data");
-    this.setState({
-      timeSeriesDatasetId: dataset,
-    });
-    this.getTimeseriesPromise(this.props, dataset).then(response => {
-      this.setState({
-        timeSeriesData: parseTimeSeriesForC3(response.data, true),
-      });
-    }).catch(error => {
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
-    });
   },
 
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
-    //FIXME: Time period should be determined from the metadata API
-    // which currently doesn't give time bounds information. See here:
-    // https://github.com/pacificclimate/climate-explorer-backend/issues/44
-    // When that issue is fixed, this code needs to be updated
+    
+    //make a list of all the unique combinations of run + climatological period
+    //a user could decide to view.
+    //Not sure JSON is the right way to do this, though.
+    //TODO: see if there's a more elegant way to handle the callback
     var ids = this.props.meta.map(function (el) {
-      var period = el.unique_id.split('_').slice(5)[0];
-      period = period.split('-').map(function (datestring) {return datestring.slice(0, 4);}).join('-');
-      var l = [el.unique_id, el.unique_id.split('_').slice(4, 5) + ' ' + period];
-      return l;
+        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
+            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
     });
+    ids = _.uniq(ids, false, function(item){return item[1]});
 
     return (
       <div>

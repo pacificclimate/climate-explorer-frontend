@@ -1,6 +1,20 @@
+/****************************************************************************
+ * AppMixin.js - shared functionality for top-level App Controller Components
+ * 
+ * This class contains data retrieval and parsing methods used to initialize
+ * Climate Explorer. It is mixed in to all three of the top level controllers, 
+ * each of which represents a portal accessible from a separate URL:
+ * 
+ * - MotiController (simplified interface and UI)
+ * - AppController (displays lots of detail, the default)
+ * - DualController (displays two variables at once for comparison)
+ * 
+ ****************************************************************************/
+
 import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
+import moment from 'moment';
 
 var AppMixin = {
   getInitialState: function () {
@@ -12,7 +26,7 @@ var AppMixin = {
   componentDidMount: function () {
     var models = [];
     var vars;
-       
+
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: CE_ENSEMBLE_NAME },
@@ -21,14 +35,21 @@ var AppMixin = {
           vars = Object.keys(response.data[key].variables);
 
           for (var v in vars) {
+            var start = response.data[key].start_date;
+            start = moment(start, moment.ISO_8601).utc().format('YYYY');
+            var end = response.data[key].end_date;
+            end = moment(end, moment.ISO_8601).utc().format('YYYY');
+
             models.push(_.extend({
               unique_id: key,
               variable_id: vars[v],
+              start_date: start,
+              end_date: end,
               variable_name: response.data[key].variables[vars[v]],
-              }, _.omit(response.data[key], 'variables')));
+              }, _.omit(response.data[key], 'variables', 'start_date', 'end_date')));
             }
           }
-        
+
          this.setState({
          meta: models,
          model_id: models[0].model_id,
@@ -42,9 +63,9 @@ var AppMixin = {
     this.setState({ area: wkt });
   },
 
-  getfilteredMeta: function () {
+  getfilteredMeta: function (variableFilter = this.state.variable_id) {
     var l = this.state.meta.filter(function (x) {
-      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === this.state.variable_id;
+      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === variableFilter;
     }, this);
     l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
@@ -68,7 +89,7 @@ var AppMixin = {
 
   getMetadataItems: function (name) {
     return _.unique(this.state.meta.map(function (el) {return el[name];}));
-  },
+  },  
 };
 
 export default AppMixin;

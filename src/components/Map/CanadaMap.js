@@ -1,3 +1,26 @@
+/***************************************************************
+ * CanadaMap.js - display component using ncWMS and Leaflet.
+ * Will display up to two map layers, one as shaded color blocks, 
+ * and one as isolines, or either independently, over a tiled 
+ * background. Origin and bounds display all of Canada.
+ * 
+ * Child of (and viewer for) MapController.
+ * 
+ * Props passed to configure shaded color map:
+ *  - rasterPalette (name of an ncWMS color palette)
+ *  - rasterLogscale (true for logarithmic color scale)
+ *  - rasterDataset (name of the netCDF datafile)
+ *  - rasterVariable (name of the variable)
+ *  
+ * All the same props are passed to configure isolines, 
+ * prefixed "isoline", plus an additional prop to describe 
+ * the isoline layer: numberOfContours.
+ * 
+ * other props: time (selects a time slice), 
+ *              area (configures an area to highlight).
+ * 
+ *****************************************************************/
+
 import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
@@ -12,11 +35,15 @@ import styles from './map.css';
 var CanadaMap = React.createClass({
 
   propTypes: {
-    dataset: React.PropTypes.string,
-    variable: React.PropTypes.string,
-    crs: React.PropTypes.object,
-    // To keep things simple, areas within this component should only be
-    // passed around (or up to a higher component) as GeoJSON
+    rasterPalette: React.PropTypes.string,
+    rasterLogscale: React.PropTypes.bool,
+    isolinePalette: React.PropTypes.string,
+    numberOfContours: React.PropTypes.number,
+    isolineLogscale: React.PropTypes.bool,
+    rasterDataset: React.PropTypes.string,
+    isolineDataset: React.PropTypes.string,
+    rasterVariable: React.PropTypes.string,
+    isolineVariable: React.PropTypes.string,    
     onSetArea: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
     origin: React.PropTypes.object,
@@ -28,6 +55,7 @@ var CanadaMap = React.createClass({
     };
   },
 
+  //generates initial (and unchanging) map settings - origin, projection, etc. 
   getDefaultProps: function () {
     return {
       crs: new L.Proj.CRS.TMS(
@@ -38,38 +66,39 @@ var CanadaMap = React.createClass({
           resolutions: utils.generateResolutions(0.09765625, 10),
         }
       ),
-      noWrap: true,
-      format: 'image/png',
-      transparent: 'true',
-      opacity: 0.7,
-      styles: 'boxfill/ferret',
-      time: '2000-01-01',
-      numcolorbands: 254,
       version: '1.1.1',
       srs: 'EPSG:4326',
-      logscale: false,
       origin: { lat: 60, lon: -100, zoom: 0 },
     };
   },
-
-  getWMSParams: function () {
-    var params = { layers: this.props.dataset + '/' + this.props.variable };
-    _.extend(params, _.pick(this.props,
-      'noWrap',
-      'format',
-      'transparent',
-      'opacity',
-      'styles',
-      'time',
-      'numcolorbands',
-      'version',
-      'srs',
-      'colorscalerange',
-      'logscale'
-    ));
-    return params;
+  
+  //get map formatting parameters for the raster or isoline layers.
+  getWMSParams: function (layer, props = this.props) {
+    var params = {
+        noWrap: true,
+        format: "image/png",
+        transparent: true,
+        opacity: 80,
+        time: props.time,
+        numcolorbands: 249,
+        version: "1.1.1",
+        srs: "EPSG:4326",
+    };
+    if(layer == "raster") {
+      params.layers = `${props.rasterDataset}/${props.rasterVariable}`;
+      params.styles = `default-scalar/${props.rasterPalette}`;
+      params.logscale = props.rasterLogscale;
+    }
+    else if (layer == "isoline") {
+      params.layers = `${props.isolineDataset}/${props.isolineVariable}`;
+      params.styles = `colored_contours/${props.isolinePalette}`;
+      params.logscale = props.isolineLogscale;
+      params.numContours = props.numberOfContours;
+    }
+    return params;    
   },
-
+  
+  
   clearMapFeatures: function () {
     this.drawnItems.getLayers().map(function (layer) {
       this.drawnItems.removeLayer(layer);
@@ -99,7 +128,13 @@ var CanadaMap = React.createClass({
     }).getLayers()[0]);
   },
 
+  //initializes the map, loads data, and generates controls
+  //NOTE: the buttons that open the "Map Settings" menu are
+  //actually provided by MapController, *not* this component.
+  //CanadaMap draws colourbars, the autoscale button, and the
+  //area drawing and manipulation controls.
   componentDidMount: function () {
+
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
       minZoom: 0,
@@ -115,7 +150,13 @@ var CanadaMap = React.createClass({
       ],
     });
 
-    this.ncwmsLayer = L.tileLayer.wms(NCWMS_URL, this.getWMSParams()).addTo(map);
+    if(this.props.rasterDataset) {
+      this.ncwmsRasterLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("raster")).addTo(map);
+    }
+    if(this.props.isolineDataset) {
+      this.ncwmsIsolineLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("isoline")).addTo(map);
+    }
+    
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
     /*
@@ -221,29 +262,82 @@ var CanadaMap = React.createClass({
     });
 
     map.addControl(new PrintControl());
-
-    map.addControl(new NcWMSColorbarControl(this.ncwmsLayer));
-    map.addControl(new NcWMSAutoscaleControl(this.ncwmsLayer, {
-      position: 'bottomright',
-    }));
+    
+    var autoscale, rasterBar, isolineBar;
+    //create controls for each map layer currently defined
+    if(this.props.rasterDataset) {
+      [autoscale, rasterBar] = this.makeColourControls(this.ncwmsRasterLayer);
+    }
+    if(this.props.isolineDataset) {
+      [autoscale, isolineBar] = this.makeColourControls(this.ncwmsIsolineLayer);
+    }
+    
+    //all controls are positioned at leaflet "bottomright" 
+    //(see http://leafletjs.com/reference-1.2.0.html#control )
+    //and stack vertically up the side of the map. The first-added 
+    //control ends up at the bottom, the most recently added on top.
+    //We want autoscale on top if there's only one colourbar, but
+    //between the bars if there's two (to indicate it affects both layers)
+    if(this.props.isolineDataset && this.props.rasterDataset) {
+      map.addControl(rasterBar);
+      map.addControl(autoscale);
+      map.addControl(isolineBar);
+    }
+    else if(this.props.isolineDataset){
+      map.addControl(isolineBar);
+      map.addControl(autoscale);
+    }
+    else if(this.props.rasterDataset) {
+      map.addControl(rasterBar);
+      map.addControl(autoscale);
+    }
+  },
+  
+  //returns an array of two controls registered to the layer:
+  //a coloured bar legend, and an autoscale button
+  //the autoscale button is registered to every layer this function 
+  //has been called on. (It is assumed that all layers autoscale together)
+  makeColourControls: function (layer) {
+    if(this.autoscaleControl) {
+      this.autoscaleControl.addLayer(layer);
+    }
+    else {
+      this.autoscaleControl = new NcWMSAutoscaleControl(layer, {
+        position: 'bottomright'
+      });
+    }
+    return [
+      this.autoscaleControl,
+      new NcWMSColorbarControl(layer, {position: 'bottomright'})
+    ];
   },
 
   componentWillUnmount: function () {
     this.map.off('click', this.onMapClick);
     this.map = null;
   },
-  onMapClick: function () {
-    console.log('clicked on map');
-  },
-  componentWillReceiveProps: function (newProps) {
-    var params = { layers: newProps.dataset + '/' + newProps.variable };
-    _.extend(params, _.pick(newProps, 'logscale', 'styles', 'time'));
 
+  onMapClick: function () {
+    //console.log('clicked on map');
+  },
+
+  componentWillReceiveProps: function (newProps) {
+    
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
-    delete(this.ncwmsLayer.wmsParams.colorscalerange);
+    if(this.ncwmsRasterLayer) {
+      delete(this.ncwmsRasterLayer.wmsParams.colorscalerange);
+    }
+    if(this.ncwmsIsolineLayer) {
+      delete(this.ncwmsIsolineLayer.wmsParams.colorscalerange);
+    }
 
-    this.ncwmsLayer.setParams(params);
+    if(newProps.rasterDataset) {
+      this.ncwmsRasterLayer.setParams(this.getWMSParams("raster", newProps));
+    }
+    if(newProps.isolineDataset) {
+      this.ncwmsIsolineLayer.setParams(this.getWMSParams("isoline", newProps));
+    }
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
     }
