@@ -126,9 +126,21 @@ var MapController = React.createClass({
   componentWillReceiveProps: function (nextProps) {
     var newVariableId = nextProps.meta[0].variable_id;
     var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
+    var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
+    var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
     var defaultDataset = nextProps.meta[0];
     this.layerRange = {};
     
+    //clear stored layer value ranges.
+    _.each(["raster", "isoline"], layer => {
+      this.layerRange[layer] = undefined;
+    });
+
+    //check to see whether the variables displayed have been switched.
+    //if so, unset logarithmic display.
+    var switchVariable = !_.isEqual(newVariableId, oldVariableId);
+    var switchComparand = !_.isEqual(newComparandId, oldComparandId);
+
     //set display colours. In order of preference:
     //1. colours received by prop
     //2. colours from state (set by the user or this function previously)
@@ -140,7 +152,7 @@ var MapController = React.createClass({
       sPalette = nextProps.rasterPalette;
       cPalette = nextProps.isolinePalette;
     }
-    else if(this.state.rasterPalette && _.isEqual(newVariableId, oldVariableId)) {
+    else if(this.state.rasterPalette && !switchVariable) {
       sPalette = this.state.rasterPalette;
       cPalette = this.state.isolinePalette;
     }
@@ -160,7 +172,7 @@ var MapController = React.createClass({
     }
     
     if(nextProps.meta.length > 0) {
-      this.loadMap(nextProps, defaultDataset, sPalette, cPalette);
+      this.loadMap(nextProps, defaultDataset, sPalette, cPalette, switchVariable, switchComparand);
     }
     else {
       //haven't received any displayable data. Probably means user has selected
@@ -184,7 +196,7 @@ var MapController = React.createClass({
   //specific unique_id until rendering, when it needs to pass an exact file
   //and timestamp to the viewer component CanadaMap.
   loadMap: function (props, dataset, sPalette = this.state.rasterPalette, 
-      cPalette = this.state.isolinePalette) {
+      cPalette = this.state.isolinePalette, newVariable = false, newComparand = false) {
     
     var run = dataset.ensemble_member;
     var start_date = dataset.start_date;
@@ -235,7 +247,9 @@ var MapController = React.createClass({
         timeidx: startingIndex, 
         wmstime: times[startingIndex],
         rasterPalette: sPalette,
-        isolinePalette: cPalette
+        isolinePalette: cPalette,
+        rasterLogscale: newVariable ? "false" : this.state.rasterLogscale,
+        isolineLogscale: newComparand ? "false" : this.state.isolineLogscale
       });
     });
     
@@ -297,7 +311,6 @@ var MapController = React.createClass({
 
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
   render: function () {
-
     //populate UI selectors: palette and scale for both isolines and blocks,
     //run and period dropdown, time of year selector, number of isolines
     

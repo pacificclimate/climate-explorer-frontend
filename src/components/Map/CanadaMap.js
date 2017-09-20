@@ -37,10 +37,10 @@ var CanadaMap = React.createClass({
 
   propTypes: {
     rasterPalette: React.PropTypes.string,
-    rasterLogscale: React.PropTypes.bool,
+    rasterLogscale: React.PropTypes.string,
     isolinePalette: React.PropTypes.string,
     numberOfContours: React.PropTypes.number,
-    isolineLogscale: React.PropTypes.bool,
+    isolineLogscale: React.PropTypes.string,
     rasterDataset: React.PropTypes.string,
     isolineDataset: React.PropTypes.string,
     rasterVariable: React.PropTypes.string,

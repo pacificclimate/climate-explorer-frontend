@@ -26,7 +26,6 @@ var ncWMSColorbarControl = L.Control.extend({
   initialize: function (layer, options) {
     this.layer = layer;
     options.decimalPlaces = this.getDecimalPrecision(layer);
-
     L.Util.setOptions(this, options);
   },
 
