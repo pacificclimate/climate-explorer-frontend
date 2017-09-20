@@ -1,0 +1,36 @@
+################################################################
+# variable-options.yaml - variable-specific configuration file
+#
+# This file supplies default display options about climate
+# variables. Each variable is referred to using the name that 
+# appears in the netcdf variables listing.
+#
+# Available options are:
+#   - decimalPrecision
+#        INTEGER
+#        number of digits after the decimal point to display on
+#        graphs and map legends (default: 2)
+#   - overrideLogarithmicScale 
+#        BOOLEAN
+#        if true, allows clipping this variable to a positive 
+#        range and displaying with a logarithmic scale on map 
+#        views, even when the range of the variable contains 
+#        negative values (default: false)
+#   - defaultRasterPalette
+#        NCWMS PALETTE (see options here: http://goo.gl/J4Q5PD )
+#        the default colour scheme used to show this variable
+#        on a map. (default: seq-Greys)
+################################################################
+
+tasmin:
+  decimalPrecision: 1
+  
+tasmax:
+  decimalPrecision: 1
+
+pr:
+  overrideLogarithmicScale: true
+  defaultRasterPalette: seq-Greens
+  #decimalPrecision: 0
+  #Note: in an ideal universe, pr would be measured in millimeters with 0
+  #decimal places, but right now our pr data is in kg m-2 d-1 instead.

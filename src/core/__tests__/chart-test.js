@@ -30,7 +30,7 @@ describe ('formatYAxis', function () {
 });
 
 describe('fixedPrecision', function () {
-  it('formats a positive decimal number for user display', function () {
+  it('formats a positive number for user display', function () {
     var formatted = chart.fixedPrecision(6.22222);
     expect(formatted).toEqual(6.22);
   });
@@ -41,6 +41,20 @@ describe('fixedPrecision', function () {
   it('rounds a number for user display', function () {
     var formatted = chart.fixedPrecision(6.9999);
     expect(formatted).toEqual(7);
+  });
+});
+
+describe('makePrecisionBySeries', function () {
+  //this test fails and is skipped because it relies on an external 
+  //.yaml config file that isn't easily available during jest testing. 
+  //In non-test usage the file is transformed and made available by webpack.
+  xit('reads the config file and applies its settings', function() {
+    var precision = chart.makePrecisionBySeries({"testseries": "tasmin"});
+    expect(precision(4.777, "testseries")).toEqual(4.8);
+  });
+  it('uses a default precision for unspecified variables', function () {
+    var precision = chart.makePrecisionBySeries({"testseries": "tasmin"});
+    expect(precision(4.777, "testseries")).toEqual(4.78);
   });
 });
 

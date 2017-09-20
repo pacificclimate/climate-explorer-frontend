@@ -47,6 +47,9 @@ module.exports = {
         }, {
           test : /\.woff$/,
           loader : 'file-loader?name=fonts/[name].[ext]',
+        }, {
+          test : /\.(yaml|yml)$/,
+          loader : 'yml'
         }, ],
   },
 

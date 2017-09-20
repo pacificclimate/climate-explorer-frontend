@@ -110,6 +110,30 @@ var validateAnnualCycleData = function(response) {
   return response;
 };
 
+/*
+ * Get an option defined in the variable-options.yaml config file.
+ * This file is used to set formatting options (default map colours,
+ * decimal precision, logarithmic scales, etc) at an individual
+ * variable level. 
+ * variable-options.yaml is guarenteed to exist as a file; webpack 
+ * is configured to creates it during pre-startip if it doesn't 
+ * already exist, but if webpack creates it, it will be blank.
+ * Returns the option value, or "undefined" if the variable or option
+ * is not listed. 
+ * NOTE: A variable option can legitimately have a value of "false", 
+ * so callers of this function need to distinguish between "false" 
+ * and "undefined" when acting on its results.
+ */
+var getVariableOptions = function(variable, option) {
+  var vOptions = require('../../variable-options.yaml');
+  if(nestedAttributeIsDefined(vOptions, variable, option)){
+    return vOptions[variable][option];
+  }
+  else {
+    return undefined;
+  }
+};
+
 /************************************************************
  * Date and calendar helper functions
  ************************************************************/
@@ -172,7 +196,7 @@ var timestampToTimeOfYear = function(timestamp) {
     return month;
   }
   if(day == 16) {
-    return {"January": "Winter-DJF", "April": "Sping-MAM",
+    return {"January": "Winter-DJF", "April": "Spring-MAM",
             "July": "Summer-JJA", "October": "Fall-SON"}[month];
   }
   else if (day == 2 && month == "July") {
@@ -194,8 +218,31 @@ var capitalizeWords = function(s) {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 };
 
+
+/**********************************************************
+ * Object-related helper function
+ **********************************************************/
+
+/*
+ * Given an object and any number of arguments arg1, arg2, arg3,
+ * et cetera, returns true if object.arg1.arg2.arg3 is defined
+ */
+var nestedAttributeIsDefined = function (o, ...attributes) {
+  if (_.isUndefined(o)) {
+    return false;
+  }
+  for(var i = 0; i < attributes.length; i++) {
+    if(_.isUndefined(o[attributes[i]])) {
+      return false
+    }
+    o = o[attributes[i]];
+  }
+  return true;
+}
+
 module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData, 
-    validateStatsData, validateAnnualCycleData,
+    validateStatsData, validateAnnualCycleData, getVariableOptions,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 
     timestampToTimeOfYear,
-    capitalizeWords};
+    capitalizeWords,
+    nestedAttributeIsDefined};
