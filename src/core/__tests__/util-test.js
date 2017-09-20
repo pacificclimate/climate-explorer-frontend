@@ -150,6 +150,18 @@ var mockAPI = require('./sample-API-results');
       expect(util.validateAnnualCycleData({data: mockAPI.annualTasmaxTimeseries})).toEqual({data: mockAPI.annualTasmaxTimeseries});
     });
   });
+  
+  //Depends on an external .yml file, variable-options.yaml. 
+  //Under normal circumstances, webpack transforms the file and makes it
+  //accessible. It is theoretically possible to have jest run similar 
+  //transforms for testing, but I haven't gotten that working yet.
+  //Info about configuring jest to test webpack-dependent functionality:
+  //https://facebook.github.io/jest/docs/en/webpack.html
+  describe('getVariableOptions', function() {
+    xit('returns undefined for nonexistant variables', function () {});
+    xit('returns undefined for nonexistent options', function () {});
+    xit('returns the requested option', function () {});
+  });
 
   describe('timeIndexToTimeOfYear', function() {
     it('converts a time index into human-readable string', function () {

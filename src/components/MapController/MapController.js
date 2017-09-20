@@ -30,7 +30,8 @@ import GeoLoader from '../GeoLoader';
 import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
 import { timestampToTimeOfYear,
-         nestedAttributeIsDefined } from '../../core/util';
+         nestedAttributeIsDefined,
+         getVariableOptions} from '../../core/util';
 
 import styles from './MapController.css';
 
@@ -123,7 +124,6 @@ var MapController = React.createClass({
   //same data, though a user can choose to view different data with 
   //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
-    var variableOptions = require('../../../variable-options.yaml');
     var newVariableId = nextProps.meta[0].variable_id;
     var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
     var defaultDataset = nextProps.meta[0];
@@ -144,9 +144,9 @@ var MapController = React.createClass({
       sPalette = this.state.rasterPalette;
       cPalette = this.state.isolinePalette;
     }
-    else if (nestedAttributeIsDefined(variableOptions, newVariableId, "defaultRasterPalette"))
+    else if (!_.isUndefined(getVariableOptions(newVariableId, "defaultRasterPalette")))
     {
-      sPalette = variableOptions[newVariableId].defaultRasterPalette;
+      sPalette = getVariableOptions(newVariableId, "defaultRasterPalette");
       if(nextProps.comparandMeta) {
         cPalette = 'x-Occam';
       }
@@ -249,7 +249,6 @@ var MapController = React.createClass({
     }
 
     var override = false;
-    var variableOptions = require('../../../variable-options.yaml');
     var variableName;
 
     if(layer == "raster"){
@@ -259,9 +258,7 @@ var MapController = React.createClass({
       variableName = this.props.comparandMeta[0].variable_id;
     }
 
-    var override = nestedAttributeIsDefined(variableOptions, variableName,
-                                           "overrideLogarithmicScale")
-                   && variableOptions[variableName].overrideLogarithmicScale;
+    var override = getVariableOptions(variableName, "overrideLogarithmicScale");
     var min = -1;
 
     if(nestedAttributeIsDefined(this.layerRange, layer, "min")) {

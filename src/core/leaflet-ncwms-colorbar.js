@@ -4,7 +4,7 @@
  * `layerDetails` `GetMetadata` requests.
 */
 import axios from 'axios';
-import {nestedAttributeIsDefined, PRECISION} from './util';
+import {getVariableOptions, PRECISION} from './util';
 
 var round = function (number, places) {
   return Math.round(number * Math.pow(10, places)) / Math.pow(10, places);
@@ -157,11 +157,10 @@ var ncWMSColorbarControl = L.Control.extend({
   //config file to determine decimal precision. Defaults to util.PRECISION
   getDecimalPrecision: function (layer = this.layer) {
     var places = PRECISION;
-    var variableOptions = require('../../variable-options.yaml');
     var variableName = layer.wmsParams.layers.split("/")[1];
 
-    if (nestedAttributeIsDefined(variableOptions, variableName, "decimalPrecision")) {
-      places = variableOptions[variableName].decimalPrecision;
+    if (getVariableOptions(variableName, "decimalPrecision") !== undefined) {
+      places = getVariableOptions(variableName, "decimalPrecision");
     }
     return places;
   },
