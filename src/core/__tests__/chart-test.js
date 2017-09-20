@@ -45,9 +45,9 @@ describe('fixedPrecision', function () {
 });
 
 describe('makePrecisionBySeries', function () {
-  //this test fails because it relies on an external .yaml config file
-  //that isn't easily available during jest testing. In non-test usage
-  //the file is transformed and made available by webpack.
+  //this test fails and is skipped because it relies on an external 
+  //.yaml config file that isn't easily available during jest testing. 
+  //In non-test usage the file is transformed and made available by webpack.
   xit('reads the config file and applies its settings', function() {
     var precision = chart.makePrecisionBySeries({"testseries": "tasmin"});
     expect(precision(4.777, "testseries")).toEqual(4.8);

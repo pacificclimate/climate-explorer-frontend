@@ -110,6 +110,30 @@ var validateAnnualCycleData = function(response) {
   return response;
 };
 
+/*
+ * Get an option defined in the variable-options.yaml config file.
+ * This file is used to set formatting options (default map colours,
+ * decimal precision, logarithmic scales, etc) at an individual
+ * variable level. 
+ * variable-options.yaml is guarenteed to exist as a file; webpack 
+ * is configured to creates it during pre-startip if it doesn't 
+ * already exist, but if webpack creates it, it will be blank.
+ * Returns the option value, or "undefined" if the variable or option
+ * is not listed. 
+ * NOTE: A variable option can legitimately have a value of "false", 
+ * so callers of this function need to distinguish between "false" 
+ * and "undefined" when acting on its results.
+ */
+var getVariableOptions = function(variable, option) {
+  var vOptions = require('../../variable-options.yaml');
+  if(nestedAttributeIsDefined(vOptions, variable, option)){
+    return vOptions[variable][option];
+  }
+  else {
+    return undefined;
+  }
+};
+
 /************************************************************
  * Date and calendar helper functions
  ************************************************************/
@@ -217,7 +241,7 @@ var nestedAttributeIsDefined = function (o, ...attributes) {
 }
 
 module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData, 
-    validateStatsData, validateAnnualCycleData,
+    validateStatsData, validateAnnualCycleData, getVariableOptions,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 
     timestampToTimeOfYear,
     capitalizeWords,

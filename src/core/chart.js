@@ -19,7 +19,8 @@ import moment from 'moment';
 import {PRECISION,
         extendedDateToBasicDate,
         capitalizeWords,
-        nestedAttributeIsDefined} from './util';
+        nestedAttributeIsDefined,
+        getVariableOptions} from './util';
 
 /*****************************************************
  * 0. Helper functions used by both graph generators *
@@ -54,11 +55,10 @@ var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
  * util.PRECISION for variables with no precision options in the file.
  */
 var makePrecisionBySeries = function (series) {
-  const variableOptions = require('../../variable-options.yaml');
   var dictionary = {};
   for(var s in series) {
-    var inConfig = nestedAttributeIsDefined(variableOptions, series[s], "decimalPrecision");
-    dictionary[s] = inConfig ? variableOptions[series[s]].decimalPrecision : PRECISION;
+    var fromConfig = getVariableOptions(series[s], "decimalPrecision");
+    dictionary[s] = _.isUndefined(fromConfig) ? PRECISION : fromConfig;
   }
 
   return function(n, series) {return +n.toFixed(dictionary[series])};
