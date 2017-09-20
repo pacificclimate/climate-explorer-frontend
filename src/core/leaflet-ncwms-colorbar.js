@@ -4,6 +4,7 @@
  * `layerDetails` `GetMetadata` requests.
 */
 import axios from 'axios';
+import {nestedAttributeIsDefined, PRECISION} from './util';
 
 var round = function (number, places) {
   return Math.round(number * Math.pow(10, places)) / Math.pow(10, places);
@@ -24,6 +25,8 @@ var ncWMSColorbarControl = L.Control.extend({
 
   initialize: function (layer, options) {
     this.layer = layer;
+    options.decimalPlaces = this.getDecimalPrecision(layer);
+
     L.Util.setOptions(this, options);
   },
 
@@ -150,11 +153,24 @@ var ncWMSColorbarControl = L.Control.extend({
       '&NUMCOLORBANDS=' + this.layer.wmsParams.numcolorbands;
   },
 
+  //uses the variable defined in the layer and the variable-options.yaml
+  //config file to determine decimal precision. Defaults to util.PRECISION
+  getDecimalPrecision: function (layer = this.layer) {
+    var places = PRECISION;
+    var variableOptions = require('../../variable-options.yaml');
+    var variableName = layer.wmsParams.layers.split("/")[1];
+
+    if (nestedAttributeIsDefined(variableOptions, variableName, "decimalPrecision")) {
+      places = variableOptions[variableName].decimalPrecision;
+    }
+    return places;
+  },
+
   redraw: function () {
     this.container.style.backgroundImage = 'url("' + this.graphicUrl() + '")';
-    this.maxContainer.innerHTML = round(this.max, this.options.decimalPlaces);
-    this.midContainer.innerHTML = round(this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale), this.options.decimalPlaces);
-    this.minContainer.innerHTML = round(this.min, this.options.decimalPlaces);
+    this.maxContainer.innerHTML = round(this.max, this.getDecimalPrecision());
+    this.midContainer.innerHTML = round(this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale), this.getDecimalPrecision());
+    this.minContainer.innerHTML = round(this.min, this.getDecimalPrecision());
   },
 });
 
