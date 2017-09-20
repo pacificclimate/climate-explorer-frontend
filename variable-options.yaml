@@ -16,7 +16,7 @@
 #        range and displaying with a logarithmic scale on map 
 #        views, even when the range of the variable contains 
 #        negative values (default: false)
-#   - defaultScalarPalette
+#   - defaultRasterPalette
 #        NCWMS PALETTE (see options here: http://goo.gl/J4Q5PD )
 #        the default colour scheme used to show this variable
 #        on a map. (default: seq-Greys)
@@ -30,7 +30,7 @@ tasmax:
 
 pr:
   overrideLogarithmicScale: true
-  defaultScalarPalette: seq-Greens
+  defaultRasterPalette: seq-Greens
   #decimalPrecision: 0
   #Note: in an ideal universe, pr would be measured in millimeters with 0
   #decimal places, but right now our pr data is in kg m-2 d-1 instead.
