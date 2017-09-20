@@ -51,13 +51,14 @@ var ModalMixin = {
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
-      var viewers = ["StatsTable", "ClimoSeries", "TimeSeries"];
-      _.each(viewers, function(viewer) {
-        var viewerFunction = `set${viewer}NoDataMessage`;
-        if(typeof this[viewerFunction] == 'function'){
-          this[viewerFunction](text);
+      var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
+                                   this.setClimoSeriesNoDataMessage,
+                                   this.setTimeSeriesNoDataMessage];
+      _.each(viewerMessageDisplays, function(display) {
+        if(typeof display == 'function') {
+          display(text);
         }
-      }, this);
+      });
     }
   },
 
