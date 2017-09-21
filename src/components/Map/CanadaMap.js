@@ -30,6 +30,7 @@ import axios from 'axios';
 import utils from './utils';
 import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import NcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
+import {addStationMarkerLayer} from '../../core/leaflet-station-markers';
 
 import styles from './map.css';
 
@@ -219,6 +220,8 @@ var CanadaMap = React.createClass({
   //area drawing and manipulation controls.
   componentDidMount: function () {
     this.layerRange = {};
+    
+    this.selectedStations = [];
 
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
@@ -385,6 +388,9 @@ var CanadaMap = React.createClass({
     if(this.props.area && !this.state.area) {
       this.handleNewArea(this.props.area);
     }
+    
+    //add station markers if displaying hydrological information.
+    addStationMarkerLayer(map, this.onStationClick);
   },
   
   //returns an array of two controls registered to the layer:
@@ -411,6 +417,22 @@ var CanadaMap = React.createClass({
     this.map = null;
   },
 
+  onStationClick: function (stationJSON) {
+    //add or remove a station to the list of selected stations when a user
+    //clicks on it.
+    if(stationJSON.properties.selected) {
+      this.selectedStations.push(stationJSON);
+    }
+    else {
+      this.selectedStations = _.reject(this.selectedStations, station => {
+        return _.isEqual(station.geometry.coordinates, stationJSON.geometry.coordinates);
+      });  
+    }
+    
+    //for now, just print out list of selected stations by name.
+    console.log(_.map(this.selectedStations, station => {return station.properties.name;}));
+  },
+  
   onMapClick: function () {
     //console.log('clicked on map');
   },

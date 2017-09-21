@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="24">
+    <g transform="matrix(1.2,0,0,1.2,-5.4,-1.2)" color="#000">
+        <path d="m12 2c-3.229 0-6.5 3-6.5 6.5s5 9.5 6.5 11.5c1.5-2 6.5-8 6.5-11.5s-3.271-6.5-6.5-6.5z" fill="#de2d26" stroke="#fff" stroke-width="2" overflow="visible" enable-background="accumulate" opacity=".3" stroke-linejoin="round"/>
+        <path d="m12 2c-3.229 0-6.5 3-6.5 6.5s5 9.5 6.5 11.5c1.5-2 6.5-8 6.5-11.5s-3.271-6.5-6.5-6.5zm0 2c2.511 0 4.5 1.778 4.5 4.5s-3.333 6.944-4.5 8.5c-1.167-1.556-4.5-5.778-4.5-8.5 0-2.722 1.989-4.5 4.5-4.5z" fill="#de2d26" overflow="visible" enable-background="accumulate"/>
+    </g>
+</svg>
