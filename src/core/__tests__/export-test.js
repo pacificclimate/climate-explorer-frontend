@@ -93,8 +93,8 @@ describe('generateDataCellsFromC3Graph', function () {
     expect(cells[1][0]).toBe("Monthly Mean");
     //spot check representative values
     expect(cells[1][13]).toBe("degC");
-    expect(cells[1][1]).toBe(-20.599000150601793);
-    expect(cells[1][12]).toBe(-16.96361296358877);
+    expect(cells[1][1]).toBe('-20.60');
+    expect(cells[1][12]).toBe('-16.96');
     //make sure nothing is undefined
     expect(validate.allDefinedArray(cells)).toBe(true);
   });
@@ -108,9 +108,9 @@ describe('generateDataCellsFromC3Graph', function () {
     expect(cells[2][0]).toBe("Seasonal Mean");
     expect(cells[3][0]).toBe("Yearly Mean");
     //spot check a couple representative values
-    expect(cells[3][6]).toBe(-2.671051067797724);
-    expect(cells[2][10]).toBe(-1.3596123480139706);
-    expect(cells[1][3]).toBe( -13.699929389799847);
+    expect(cells[3][6]).toBe('-2.67');
+    expect(cells[2][10]).toBe('-1.36');
+    expect(cells[1][3]).toBe('-13.70');
     //make sure nothing is undefined
     expect(validate.allDefinedArray(cells)).toBe(true);
   });
@@ -118,7 +118,7 @@ describe('generateDataCellsFromC3Graph', function () {
     var toExport = chart.dataToProjectedChangeGraph([mockAPI.tasmaxData]);
     var cells = exportdata.generateDataCellsFromC3Graph(toExport, "Run");
     expect(validate.isRectangularArray(cells, 2, 8)).toBe(true);
-    expect(cells[1][2]).toBe(-17.825752320828578);
+    expect(cells[1][2]).toBe('-17.83');
     expect(cells[1][7]).toBe('degC');
     expect(validate.allDefinedArray(cells)).toBe(true);
   });
