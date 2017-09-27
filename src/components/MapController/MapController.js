@@ -138,7 +138,19 @@ var MapController = React.createClass({
       sPalette = 'x-Occam';
     }
     
-    this.loadMap(nextProps, defaultDataset, sPalette, cPalette);   
+    if(nextProps.meta.length > 0) {
+      this.loadMap(nextProps, defaultDataset, sPalette, cPalette);
+    }
+    else {
+      //haven't received any displayable data. Probably means user has selected
+      //parameters for a dataset that isn't in the database.
+      //Clear the map to prevent the previously-generated map causing confusion
+      //if the user doesn't notice the footer.
+      this.setState({
+        times: undefined,
+        timeidx: undefined
+      });
+    }
   },
   
   //update state with all the information needed to display
