@@ -52,8 +52,17 @@ var ModalMixin = {
   },
 
   exportTimeSeries: function(format) {
-    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, 
-        {dataset: this.state.timeSeriesDatasetId});
+   //determine period and run to export. They may be stored in state as
+   //this.state.timeSeriesRun; if not, extract from active dataset's metadata.
+   var runInfo;
+   if(this.state.timeSeriesRun) {
+     runInfo = this.state.timeSeriesRun;
+   }
+   else {
+     runInfo = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
+         "start_date", "end_date", "ensemble_member");
+   }
+   exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, runInfo);
   },
 
   exportClimoSeries: function(format) {

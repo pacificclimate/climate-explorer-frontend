@@ -38,7 +38,6 @@ import { timeIndexToTimeOfYear,
  *     2. time of year (for stats or change graph)
  */
 var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
-  
   // create workbook object containing one or more worksheets
   var wb = {
       Sheets: {},
@@ -54,7 +53,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   var filenameSuffix = "." + format;
   switch(datatype) {
     case "timeseries":
-      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, selection.dataset);
+      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, selection);
       dataCells = generateDataCellsFromC3Graph(data, "Time Series");
       outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
       break;
@@ -160,14 +159,11 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
   var rows = [];
   var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
 
-  var dataset = _.findWhere(metadata.meta, {unique_id: run});
-
-
   var values = [
     metadata.model_id,
     metadata.experiment,
-    `${dataset.start_date}-${dataset.end_date}`,
-    dataset.ensemble_member,
+    `${run.start_date}-${run.end_date}`,
+    run.ensemble_member,
     metadata.variable_id,
     metadata.meta[0].variable_name
   ];

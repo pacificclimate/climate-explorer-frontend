@@ -187,6 +187,10 @@ var DualDataController = React.createClass({
     var comparandMetadata = this.findMatchingMetadata(variableMetadata, 
         {variable_id: props.comparand_id}, props.comparandMeta);
 
+    if(_.isEmpty(run)) {
+      run = _.pick(variableMetadata, "start_date", "end_date", "ensemble_member");
+    }
+
     var timeseriesPromises = [];
     
     var variableTimeseriesParams = {variable_id: props.variable_id, area: props.area};
