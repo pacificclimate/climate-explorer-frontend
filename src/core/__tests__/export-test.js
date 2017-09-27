@@ -55,9 +55,10 @@ describe('createTimeSeriesWorksheetSummaryCells', function () {
   it('generates summary cells for an exported annual cycle graph', function () {
     var id = mockAPI.monthlyTasmaxTimeseries.id;
     var metadata = _.find(mockAPI.metadataToArray(), function(m) {return m.unique_id == id;});
+    var run = _.pick(metadata, "start_date", "end_date", "ensemble_member");
     var dataOptions = _.pick(metadata, 'model_id', 'variable_id', 'experiment', 'variable_id');
     dataOptions.meta = mockAPI.metadataToArray();
-    var headers = exportdata.createTimeSeriesWorksheetSummaryCells(dataOptions, id);
+    var headers = exportdata.createTimeSeriesWorksheetSummaryCells(dataOptions, run);
     expect(validate.isRectangularArray(headers, 2, 6)).toBe(true);
     expect(validate.allDefinedArray(headers)).toBe(true);
     expect(headers[1][2]).toBe("1961-1990");

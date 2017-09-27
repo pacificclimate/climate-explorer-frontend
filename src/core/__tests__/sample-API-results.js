@@ -15,12 +15,8 @@
  *  - metadataToArray() transforms the results of the multimeta call from an
  * object keyed by unique_id to an array that contains all the results.
  * 
- *  - addRunToStats() copies the "run" attribute to stats data objects from the
- *  associated metadata.
- * 
- * NOTE: the sample multimeta call includes climatology start
- * and end dates in the expectation that these will be added to the 
- * API very soon. 
+ *  - addRunToStats() copies the "run" attribute to stats data objects
+ *  from the associated metadata.
  *********************************************************************/
 
 /**************************************************************
