@@ -126,8 +126,11 @@ var MapController = React.createClass({
   componentWillReceiveProps: function (nextProps) {
     var newVariableId = nextProps.meta[0].variable_id;
     var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
-    var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
-    var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+    var hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+    if(hasComparand){
+      var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
+      var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+    }
     var defaultDataset = nextProps.meta[0];
     this.layerRange = {};
     
@@ -137,9 +140,9 @@ var MapController = React.createClass({
     });
 
     //check to see whether the variables displayed have been switched.
-    //if so, unset logarithmic display.
+    //if so, unset logarithmic display; default is linear.
     var switchVariable = !_.isEqual(newVariableId, oldVariableId);
-    var switchComparand = !_.isEqual(newComparandId, oldComparandId);
+    var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
 
     //set display colours. In order of preference:
     //1. colours received by prop
