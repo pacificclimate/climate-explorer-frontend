@@ -34,7 +34,7 @@ import { timeIndexToTimeOfYear,
  * data: either a data table or a graph data object
  * format: string indicating file format: "csv" or "xlsx"
  * selection: object indicating which slice of data being exported, either 
- *     1. a specific run or set of runs (for an annual cycle graph)  
+ *     1. a specific climatology and run (for an annual cycle graph)  
  *     2. time of year (for stats or change graph)
  */
 var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
@@ -154,7 +154,7 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
-var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
+var createTimeSeriesWorksheetSummaryCells = function (metadata, instance) {
 
   var rows = [];
   var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
@@ -162,8 +162,8 @@ var createTimeSeriesWorksheetSummaryCells = function (metadata, run) {
   var values = [
     metadata.model_id,
     metadata.experiment,
-    `${run.start_date}-${run.end_date}`,
-    run.ensemble_member,
+    `${instance.start_date}-${instance.end_date}`,
+    instance.ensemble_member,
     metadata.variable_id,
     metadata.meta[0].variable_name
   ];

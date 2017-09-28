@@ -115,12 +115,12 @@ var DualDataController = React.createClass({
   },
 
   /*
-   * Called when the user selects a specific run to view on the Annual Cycle
-   * graph. Stores the selected run and period in state, fetches new data,
-   * and updates the graph.
+   * Called when the user selects a specific instance (run + period) to 
+   * view on the Annual Cycle graph. Stores the selected run and period 
+   * in state, fetches new data, and updates the graph.
    */
-  updateAnnCycleDataset: function (run) {
-    this.loadDualTimeseries(this.props, JSON.parse(run));
+  updateAnnCycleDataset: function (instance) {
+    this.loadDualTimeseries(this.props, JSON.parse(instance));
   },
   
   /*
@@ -165,7 +165,7 @@ var DualDataController = React.createClass({
    * two variables if props.variable_id and props.comparand_id are both
    * set and different.
    */
-  loadDualTimeseries: function (props, run = {}) {
+  loadDualTimeseries: function (props, instance = {}) {
     this.setTimeSeriesNoDataMessage("Loading Data");
     
     var params = {
@@ -175,20 +175,20 @@ var DualDataController = React.createClass({
         timescale: "monthly"
     };
     
-    //If this functions is supplied with run parameters
+    //If this functions is supplied with instance parameters
     //(an object with ensemble_member, start_date, and end_date attributes), 
     //it will select the matching dataset, otherwise (ie on initial load),
-    //a dataset belonging to an arbitrary run will be selected.
-    if(run) {
-      _.extend(params, run);
+    //a dataset belonging to an arbitrary instance will be selected.
+    if(instance) {
+      _.extend(params, instance);
     }
     
     var variableMetadata = _.findWhere(props.meta, params);    
     var comparandMetadata = this.findMatchingMetadata(variableMetadata, 
         {variable_id: props.comparand_id}, props.comparandMeta);
 
-    if(_.isEmpty(run)) {
-      run = _.pick(variableMetadata, "start_date", "end_date", "ensemble_member");
+    if(_.isEmpty(instance)) {
+      instance = _.pick(variableMetadata, "start_date", "end_date", "ensemble_member");
     }
 
     var timeseriesPromises = [];
@@ -207,7 +207,7 @@ var DualDataController = React.createClass({
     Promise.all(timeseriesPromises).then(series=> {
       var data = _.pluck(series, "data");
       this.setState({
-        timeSeriesRun: run,
+        timeSeriesInstance: instance,
         timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], ...data)
         });      
     }).catch(error=>{
@@ -228,7 +228,10 @@ var DualDataController = React.createClass({
     });
     ids = _.uniq(ids, false, function(item){return item[1]});
 
-    var currentDataset = JSON.stringify(this.state.timeseriesRun);
+    var instance = this.state.timeSeriesInstance;
+    if(instance) {
+      instance = `${instance.ensemble_member} ${instance.start_date}-${instance.end_date}`;
+    }
     
     return (
       <div>
@@ -241,7 +244,7 @@ var DualDataController = React.createClass({
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={currentDataset}/>
+                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={instance}/>
               </Col>
               <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
                 <div>

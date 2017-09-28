@@ -52,17 +52,21 @@ var ModalMixin = {
   },
 
   exportTimeSeries: function(format) {
-   //determine period and run to export. They may be stored in state as
-   //this.state.timeSeriesRun; if not, extract from active dataset's metadata.
-   var runInfo;
-   if(this.state.timeSeriesRun) {
-     runInfo = this.state.timeSeriesRun;
+   //Determine period and run to export. Location varies depending on the portal and whether
+   //it displays a single datafile or multiple datafiles at once. 
+   //Period and run parameters describing a set of multiple displayed datafiles files are 
+   //stored as this.state.timeSeriesInstance. 
+   //If the portal has only one active dataset at a time, run and period are 
+   //extracted from that dataset's metadata.
+   var instance;
+   if(this.state.timeSeriesInstance) {
+     instance = this.state.timeSeriesInstance;
    }
    else {
-     runInfo = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
+     instance = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
          "start_date", "end_date", "ensemble_member");
    }
-   exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, runInfo);
+   exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, instance);
   },
 
   exportClimoSeries: function(format) {
