@@ -68,22 +68,6 @@ git clone https://github.com/pacificclimate/climate-explorer-frontend
 cd climate-explorer-frontend
 ```
 
-Due to security concerns about DNS rebinding attacks, webpack validates the Host header of requests made to it. If the request's Host doesn't match what webpack thinks its own host is, webpack returns an Invalid Host Header error. While run in docker, webpack's internal IP is 0.0.0.0, so any requests it receives made to any other address, such as the docker node's public address, will fail. [Here's a good article about it.](https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a)
-
-The solution is to add a "public" argument with the docker node's public domain or ip address to the startup command for webpack in the `scripts` attribute of climate-explorer-frontend's `package.json`. 
-
-```json
-"scripts": {
-    "start": "webpack-dev-server --host 0.0.0.0 --public docker.node.address.here",
-    "build": "webpack --progress --colors",
-    "test": "jest --verbose",
-    "lint": "eslint .",
-    "lint:glob": "eslint"
-  },
-```
-
-Only addresses are validated, not ports, so it doesn't matter what port you assign the docker container when it is running.
-
 Then build a docker image:
 
 ```bash

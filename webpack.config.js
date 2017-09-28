@@ -66,6 +66,7 @@ module.exports = {
   },
   devtool : (process.env.NODE_ENV !== 'production') ? 'source-map' : '',
   devServer : {
+    disableHostCheck: true,
     historyApiFallback : true,
     hot : true,
     inline : true,
