@@ -2,7 +2,7 @@
  * Relies upon global Leaflet variable 'L'
  * Compatible with any ncWMS server which fulfills the `minmax`
  * `GetMetadata` requests.
-*/
+ */
 import axios from 'axios';
 
 var ncWMSAutoscaleControl = L.Control.extend({

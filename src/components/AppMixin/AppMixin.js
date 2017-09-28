@@ -2,12 +2,13 @@
  * AppMixin.js - shared functionality for top-level App Controller Components
  * 
  * This class contains data retrieval and parsing methods used to initialize
- * Climate Explorer. It is mixed in to all three of the top level controllers, 
+ * Climate Explorer. It is mixed in to all four of the top level controllers, 
  * each of which represents a portal accessible from a separate URL:
  * 
  * - MotiController (simplified interface and UI)
  * - AppController (displays lots of detail, the default)
  * - DualController (displays two variables at once for comparison)
+ * - StreamflowController (Displays streamflow at user-selected points)
  * 
  ****************************************************************************/
 
@@ -47,8 +48,14 @@ var AppMixin = {
     var models = [];
     var vars;
 
+    //Initializes the app with summary metadata. 
+    //Usually uses the "multimeta" API endpoint (the default)
+    //but the streamflow portal's summary metadata comes from 
+    //"streamflow/multistation" instead.
+    var query = this.state.metadataQuery ? this.state.metadataQuery : 'multimeta';
+    
     axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
+      baseURL: urljoin(CE_BACKEND_URL, query),
       params: { ensemble_name: this.state.ensemble_name },
       }).then(response => {
         for (var key in response.data) {
@@ -88,11 +95,16 @@ var AppMixin = {
           variable_id,
           experiment,
         });
+<<<<<<< 31e02bbb373f7c9200ddf5f1cae1f9eaafe89e25
     });
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
     return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
+=======
+    
+    console.log(this.state);
+>>>>>>> Skeleton of hydro portal functionality
   },
 
   componentDidUpdate: function(nextProps, nextState) {

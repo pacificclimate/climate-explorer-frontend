@@ -2,7 +2,7 @@
  * Requires global Leaflet variable `L`
  * Compatible with any ncWMS server which fulfills `minmax` and
  * `layerDetails` `GetMetadata` requests.
-*/
+ */
 import axios from 'axios';
 import {getVariableOptions, PRECISION} from './util';
 

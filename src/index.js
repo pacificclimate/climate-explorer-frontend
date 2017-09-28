@@ -5,6 +5,7 @@ import { Router, Route, hashHistory } from 'react-router';
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
 import DualController from './components/DualController';
+import StreamflowController from './components/StreamflowController';
 
 import Header from './components/Header';
 
@@ -34,6 +35,7 @@ render((
       <Route path='/moti' component={MotiController} />
       <Route path='/climo/:ensemble_name' component={AppController} />
       <Route path='/compare/:ensemble_name' component={DualController} />
+      <Route path='streamflow/:ensemble_name' component={StreamflowController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));

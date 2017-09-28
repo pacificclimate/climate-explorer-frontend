@@ -81,6 +81,4 @@ var addStationMarkerLayer = function (map, onClick) {
   });
 };
 
-
-
 module.exports = {addStationMarkerLayer};

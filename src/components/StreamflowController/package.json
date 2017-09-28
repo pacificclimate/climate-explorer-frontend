@@ -1,0 +1,6 @@
+{
+  "name": "Streamflow Controller",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./StreamflowController.js"
+}
