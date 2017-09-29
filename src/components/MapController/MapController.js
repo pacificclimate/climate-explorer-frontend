@@ -17,7 +17,9 @@
  *******************************************************************************/
 
 import React from 'react';
-import { Row, Col, Button, ButtonGroup, Glyphicon, Modal } from 'react-bootstrap';
+import { Row, Col, Button,
+         ButtonGroup, Glyphicon,
+         Modal, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import urljoin from 'url-join';
 import Loader from 'react-loader';
 import _ from 'underscore';
@@ -263,6 +265,24 @@ var MapController = React.createClass({
     return !_.isEqual(nextState, this.state);
   },
 
+  //This function wraps a React component in a React OverlayTrigger that
+  //displays the supplied text as a tooltip when hovered over.
+  addTooltipWrapper: function (component, text, direction="left") {
+    var tooltip = (
+        <Tooltip id="tooltip">
+          {text}
+        </Tooltip>
+        );
+
+    return (
+        <OverlayTrigger placement={direction} overlay={tooltip} container={this}>
+          <div>
+            {component}
+          </div>
+        </OverlayTrigger>
+    );
+  },
+
   //This function returns JSX for a selector allowing the user to choose
   //whether a map's colours are scaled logarithmically or linearly.
   //If a given map cannot be displayed with logscaled colour, returns an
@@ -294,22 +314,27 @@ var MapController = React.createClass({
       min = this.layerRange[layer].min;
     }
 
-    if(min <= 0 && !override) {
-      return '';
-    }
-
     var colourScales = [["false", 'Linear'], ["true", 'Logarithmic']];
     var userLabelText = {"isoline": "Isoline", "raster": "Block Colour"}[layer];
     userLabelText = `${userLabelText} Scale`;
     var callbackText = `${layer}Logscale`;
-    return (
+    var disabled = min <= 0 && !override;
+
+    var dropdown = (
         <Selector
           label={userLabelText}
-          onChange={this.updateSelection.bind(this, callbackText)}
+          disabled={disabled}
           items={colourScales}
           value={this.state[callbackText]}
+          onChange={this.updateSelection.bind(this, callbackText)}
         />
         );
+
+    if (disabled) {
+      dropdown = this.addTooltipWrapper(dropdown,
+          "Logarithmic scale only possible for positive datasets");
+    }
+    return dropdown;
   },
 
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
