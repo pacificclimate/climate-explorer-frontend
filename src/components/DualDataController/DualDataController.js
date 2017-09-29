@@ -218,6 +218,7 @@ var DualDataController = React.createClass({
   render: function () {
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
     //Not sure JSON is the right way to do this, though.
@@ -228,10 +229,12 @@ var DualDataController = React.createClass({
     });
     ids = _.uniq(ids, false, function(item){return item[1]});
 
-    var instance = this.state.timeSeriesInstance;
-    if(instance) {
-      instance = `${instance.ensemble_member} ${instance.start_date}-${instance.end_date}`;
-    }
+    var selectedInstance;
+    _.each(ids, id => {
+      if(_.isEqual(JSON.parse(id[0]), this.state.timeSeriesInstance)) {
+        selectedInstance = id[0];
+      }
+    });
     
     return (
       <div>
@@ -244,7 +247,7 @@ var DualDataController = React.createClass({
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={instance}/>
+                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={selectedInstance}/>
               </Col>
               <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
                 <div>
