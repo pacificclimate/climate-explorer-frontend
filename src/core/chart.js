@@ -206,7 +206,7 @@ var getMonthlyData = function(data, timescale = "monthly") {
  * timeseries from all others being shown on the same chart.
  * 
  * For example, when graphing monthly, seasonal, and yearly means for 
- * otherwise identical data run, only "monthly", "seasonal," and "yearly"
+ * otherwise identical data files, only "monthly", "seasonal," and "yearly"
  * need to appear in the graph legend. But if graphing multiple variables,
  * the graph legend will need to display variable names as well.
  * 

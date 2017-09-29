@@ -49,7 +49,7 @@ var DataController = React.createClass({
       projChangeTimeScale: "monthly",
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      timeSeriesRun: undefined,
+      timeSeriesInstance: undefined,
       climoSeriesData: undefined,
       timeSeriesData: undefined,
       statsData: undefined,
@@ -121,30 +121,30 @@ var DataController = React.createClass({
     },
 
   /*
-   * Called when the user selects a specific run to view on the Annual Cycle
-   * graph. Stores the selected run and period in state, fetches new data,
-   * and updates the graph.
+   * Called when the user selects a specific instance (period & run) to 
+   * view on the Annual Cycle graph. Stores the selected run and period in state, 
+   * fetches new data, and updates the graph.
    */
-  updateAnnCycleDataset: function (run) {
-    this.loadTimeSeries(this.props, JSON.parse(run));
+  updateAnnCycleDataset: function (instance) {
+    this.loadTimeSeries(this.props, JSON.parse(instance));
   },
   
   /*
    * This function retrieves fetches monthly, seasonal, and yearly resolution
-   * annual cycle data and displays them on the graph. If run (an object with 
-   * start_date, end_date, and ensemble_member attributes) is provided, data
+   * annual cycle data and displays them on the graph. If instance (an object 
+   * with start_date, end_date, and ensemble_member attributes) is provided, data
    * matching those parameters will be selected; otherwise an arbitrary set 
    * of data matching the other parameters.
    */
-  loadTimeSeries: function (props, run) {
+  loadTimeSeries: function (props, instance) {
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
     this.setTimeSeriesNoDataMessage("Loading Data");
     
     var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
     params.timescale = "monthly";
     
-    if(run) {
-      _.extend(params, run);
+    if(instance) {
+      _.extend(params, instance);
     }
     
     var monthlyMetadata = _.findWhere(props.meta, params);
@@ -167,7 +167,7 @@ var DataController = React.createClass({
       var data = _.pluck(series, "data");
       this.setState({
         timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
-        timeSeriesRun: {
+        timeSeriesInstance: {
           start_date: monthlyMetadata.start_date,
           end_date: monthlyMetadata.end_date,
           ensemble_member: monthlyMetadata.ensemble_member
