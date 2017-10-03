@@ -15,7 +15,9 @@ import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
 import { timeIndexToTimeOfYear, 
-         timeResolutionIndexToTimeOfYear  } from './util';
+         timeResolutionIndexToTimeOfYear,
+         PRECISION,
+         getVariableOptions} from './util';
 
 /************************************************************
  * 0. exportDataToWorksheet() - the main export function
@@ -45,28 +47,29 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   };
 
   var timeOfYear = "";
+  var variable = metadata.variable_id;
   
   // prepare filename, metadata cells, and data cells according to type of export
   var summaryCells, dataCells, outputFilename;
   var filenamePrefix = "PCIC_CE_";
-  var filenameInfix = `Export_${metadata.model_id}_${metadata.experiment}_${metadata.variable_id}`;
+  var filenameInfix = `Export_${metadata.model_id}_${metadata.experiment}_${variable}`;
   var filenameSuffix = "." + format;
   switch(datatype) {
     case "timeseries":
       summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, selection);
-      dataCells = generateDataCellsFromC3Graph(data, "Time Series");
+      dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
       timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
-      dataCells = generateDataCellsFromDataTable(data);
+      dataCells = generateDataCellsFromDataTable(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "climoseries":
       timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
-      dataCells = generateDataCellsFromC3Graph(data, "Run");
+      dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
       outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
   }
@@ -75,7 +78,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   // Note: sheetName will be truncated to 31 chars in
   // XLSX export to meet Excel limitation
   var ws = assembleWorksheet(summaryCells.concat([[]], dataCells));
-  var sheetName = `${datatype}_${metadata.variable_id}`;
+  var sheetName = `${datatype}_${variable}`;
   wb.SheetNames.push(sheetName);
   wb.Sheets[sheetName] = ws;
 
@@ -210,7 +213,7 @@ var generateDataCellsFromDataTable = function (data) {
  * Helper function for exportDataToWorksheet that generates data table cells from
  * a C3 graph configuration object.
  */
-var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
+var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series", variable="") {
   var headers = [];
   var rows = [];
   var column_labels = [seriesLabel];
@@ -237,6 +240,39 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series") {
       var seriesName = column[0];
       var row = [];
       row = row.concat(column);
+
+      // Determine the appropriate decimal precision to display this data's values.
+      // In order of specificity (and preference):
+      //
+      // 1. The decimal precision associated with a variable given in the
+      // series name. If no individual word in the series name is a variable with
+      // an assigned decimal precision, fall back to:
+      //
+      // 2. The decimal precision assigned to the variable associated with the entire
+      // graph (ie, the primary variable). If no decimal precision is available for
+      // this variable, fall back to:
+      //
+      // 3. the default util.PRECISION.
+
+      var precision = _.reduce(seriesName.split(" "), function(prec, word) {
+        return !_.isUndefined(prec) ? prec
+            : getVariableOptions(word.toLowerCase(), "decimalPrecision");
+      }, undefined);
+
+      if(_.isUndefined(precision)) {
+        precision = getVariableOptions(variable, "decimalPrecision");
+      }
+
+      if(_.isUndefined(precision)) {
+        precision = PRECISION;
+      }
+
+      row = _.map(row, function (entry) {
+        if (_.isNumber(entry)) {
+          return entry.toFixed(precision);
+        }
+        return entry;
+      });
 
       //get the corresponding units (or name of axis) - default to "y" if axis not listed
       var seriesAxis = graph.data.axes[seriesName] ? graph.data.axes[seriesName] : "y";

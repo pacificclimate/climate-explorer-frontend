@@ -4,6 +4,7 @@
   "description": "PCIC Climate Explorer front end application",
   "main": "index.js",
   "scripts": {
+    "prestart": "if [ ! -f ./variable-options.yaml ]; then touch ./variable-options.yaml; fi",
     "start": "webpack-dev-server --host 0.0.0.0",
     "build": "webpack --progress --colors",
     "test": "jest --verbose --runInBand",
@@ -14,10 +15,12 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pacificclimate/climate-explorer"
+    "url": "https://github.com/pacificclimate/climate-explorer-frontend"
   },
+  "bugs": "https://github.com/pacificclimate/climate-explorer-frontend/issues",
   "//": [
-    "fbjs mocked due to https://github.com/facebook/jest/issues/554"
+    "fbjs mocked due to https://github.com/facebook/jest/issues/554",
+    "config file variable-options.yaml created by prestart if not present"
   ],
   "jest": {
     "rootDir": "./src",
@@ -82,6 +85,7 @@
     "underscore": "^1.8.3",
     "url-join": "0.0.1",
     "url-loader": "^0.5.6",
+    "yml-loader": ">=2.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1",
     "wellknown": "^0.4.1"

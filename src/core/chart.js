@@ -18,7 +18,9 @@ import _ from 'underscore';
 import moment from 'moment';
 import {PRECISION,
         extendedDateToBasicDate,
-        capitalizeWords} from './util';
+        capitalizeWords,
+        nestedAttributeIsDefined,
+        getVariableOptions} from './util';
 
 /*****************************************************
  * 0. Helper functions used by both graph generators *
@@ -38,8 +40,29 @@ var formatYAxis = function (label) {
   };
 };
 
-//Simple formatting function for numbers to be displayed on the graph.
-var fixedPrecision = function (n) { return +n.toFixed(PRECISION);};
+/*
+ * Simple formatting function for numbers to be displayed on the graph.
+ * Used as a default when a more specialized formatting function isn't
+ * available; ignores all its inputs except the number to be formatted.
+ */
+var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
+
+/*
+ * Accepts a object with seriesname:variable pairs.
+ * Returns a function that accepts a number and a series name, and formats
+ * the number according to precision set in the variable-options.yaml config
+ * file for the associated variable, or a default precision with
+ * util.PRECISION for variables with no precision options in the file.
+ */
+var makePrecisionBySeries = function (series) {
+  var dictionary = {};
+  for(var s in series) {
+    var fromConfig = getVariableOptions(series[s], "decimalPrecision");
+    dictionary[s] = _.isUndefined(fromConfig) ? PRECISION : fromConfig;
+  }
+
+  return function(n, series) {return +n.toFixed(dictionary[series])};
+};
 
 /*
  * This function returns a number-formatting function for use by the C3
@@ -51,17 +74,24 @@ var fixedPrecision = function (n) { return +n.toFixed(PRECISION);};
  * This function extracts unit names for each data series from the axis
  * labels, then returns a function that uses the series id passed by 
  * C3 to append a units string to each value.
+ *
+ * It optionally accepts a precisionFunction for more exact formatting of
+ * numbers. precisionFunction will be passed the number to format and the
+ * series id it belongs to.
  */
-var makeTooltipDisplayNumbersWithUnits = function(axes, axis) {
+var makeTooltipDisplayNumbersWithUnits = function(axes, axis, precisionFunction) {
   var unitsDictionary = {};
+  if(_.isUndefined(precisionFunction)) { //use a default.
+    precisionFunction = fixedPrecision;
+  }
   
   //build a dictionary between timeseries names and units
   for(var series in axes) {
     unitsDictionary[series] = axis[axes[series]].label.text;
   }
- 
+
   return function(value, ratio, id, index) {
-    return `${fixedPrecision(value)} ${unitsDictionary[id]}`;
+    return `${precisionFunction(value, id)} ${unitsDictionary[id]}`;
   };
 };
 
@@ -106,6 +136,7 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
 
   var yUnits = "";
   var y2Units = "";
+  var seriesVariables = {};
   
   var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
   
@@ -116,6 +147,7 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
     var timeseries = data[i];
     var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
     var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
        
     //add the actual data to the graph
     c3Data.columns.push([timeseriesName].concat(getMonthlyData(timeseries.data, timeseriesMetadata.timescale)));
@@ -152,10 +184,11 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
   if(y2Units) { 
     c3Axis.y2 = formatYAxis(y2Units);
     }
-    
+
+  var precision = makePrecisionBySeries(seriesVariables);
   var c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis);
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
   return {
     data: c3Data,
@@ -330,6 +363,7 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
   var yUnits = "";
   var y2Units = "";
   
+  var seriesVariables = {};
   var nameSeries;
   
   if(data.length == 1) {
@@ -357,6 +391,7 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
     //add each individual dataset from the API to the chart
     for(let run in call) {
       var runName = nameSeries(run, context);
+      seriesVariables[runName] = _.isEmpty(context) ? undefined : context.variable_id;
       var series = [runName];
       
       //if a given timestamp is present in some, but not all
@@ -397,10 +432,14 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
   if(y2Units) { 
     c3Axis.y2 = formatYAxis(y2Units);
     }
-    
+
+  //Note: if context is empty (dataToProjectedChangeGraph was called with only
+  //one time series), variable-determined precision will not be available and
+  //numbers will be formatted with default precision.
+  var precision = makePrecisionBySeries(seriesVariables);
   var c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis);
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
   return {
     data: c3Data,
@@ -494,6 +533,6 @@ var timeseriesXAxis = {
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     //exported only for testing purposes:
-    formatYAxis, fixedPrecision, makeTooltipDisplayNumbersWithUnits,
+    formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
     getAllTimestamps, nameAPICallParametersFunction};
