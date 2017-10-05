@@ -27,7 +27,9 @@ import _ from 'underscore';
 
 import { parseBootstrapTableData} from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
-        dataToProjectedChangeGraph} from '../../core/chart';
+        dataToProjectedChangeGraph,
+        assignColoursByGroup,
+        fadeSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
@@ -196,19 +198,82 @@ var DualDataController = React.createClass({
     var variableTimeseriesParams = {variable_id: props.variable_id, area: props.area};
     timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id));
     
+    //determine whether seasonal and annual resolution data are available for
+    //the variable; if so, load them as well.
+    _.each(["seasonal", "yearly"], resolution => {
+      var resolutionMetadata = this.findMatchingMetadata(variableMetadata, {"timescale": resolution}, props.meta);
+      if(resolutionMetadata) {
+        timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, resolutionMetadata.unique_id));
+      }
+    });
+
     //we are assured that the required data exists for the primary variable + model + experiment, 
     //but it is not guarenteed to exist for the comparison variable, so fall back to only
     //showing one variable in that case.
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
       var comparandTimeseriesParams = {variable_id: props.comparand_id, area: props.area};
       timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
+
+      //check availability of seasonal and annual data on the comparand,
+      //get data promises for them if they exist.
+      _.each(["seasonal", "yearly"], resolution => {
+        var resolutionMetadata = this.findMatchingMetadata(comparandMetadata, {"timescale": resolution}, props.comparandMeta);
+        if(resolutionMetadata) {
+          timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, resolutionMetadata.unique_id));
+        }
+      });
+
     }
-    
+
     Promise.all(timeseriesPromises).then(series=> {
       var data = _.pluck(series, "data");
+
+      //generate the graph, then post process it to be a little easier to read.
+      var graphMetadata = _.union(props.comparandMeta, props.meta);
+      var graph = timeseriesToAnnualCycleGraph(graphMetadata, ...data);
+
+      //function that assigns each data series to one of two groups based on 
+      //which variable it represents. Passed to assignColoursByGroup to assign
+      //graph line colors.
+      var sortByVariable = function (dataSeries) {
+        var seriesName = dataSeries[0].toLowerCase();
+        if(seriesName.search(props.variable_id) != -1) {
+          return 0;
+        }
+        else if (seriesName.search(props.comparand_id) != -1) {
+          return 1;
+        }
+        else { //if only one variable is selected,
+          //it won't be in any series names.
+          return seriesName;
+        }
+      };
+
+      graph = assignColoursByGroup(graph, sortByVariable);
+
+      //function that assigns seasonal and annual timeseries lower "rank"
+      //then monthly timeseries. Passed to fadeSeries to make higher-resolution
+      //data stand out more.
+      var rankByTimeResolution = function(dataSeries) {
+        var seriesName = dataSeries[0].toLowerCase();
+        if(seriesName.search("monthly") != -1) {
+          return 1;
+        }
+        else if(seriesName.search("seasonal") != -1) {
+          return .6;
+        }
+        else if(seriesName.search("yearly") != -1) {
+          return .3;
+        }
+        //no time resolution indicated in timeseries. default to full rank.
+        return 1;
+      };
+
+      graph = fadeSeriesByRank(graph, rankByTimeResolution);
+
       this.setState({
         timeSeriesInstance: instance,
-        timeSeriesData: timeseriesToAnnualCycleGraph([variableMetadata, comparandMetadata], ...data)
+        timeSeriesData: graph
         });      
     }).catch(error=>{
       this.displayError(error, this.setTimeSeriesNoDataMessage);
