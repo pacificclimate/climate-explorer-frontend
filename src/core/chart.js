@@ -673,4 +673,4 @@ module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction};
+    getAllTimestamps, nameAPICallParametersFunction, lightenHexColour};

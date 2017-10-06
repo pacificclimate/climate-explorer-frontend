@@ -18,7 +18,6 @@ var chart = require('../chart');
 var validate = require('./test-validators');
 var mockAPI = require('./sample-API-results');
 
-
 describe ('formatYAxis', function () {
   it('formats a c3 y axis with units label', function () {
     var axis = chart.formatYAxis("meters");
@@ -286,4 +285,100 @@ describe('nameAPICallParametersFunction', function () {
     expect(nameFunction("r1i1p1", tasminQuery)).toBe("tasmin r1i1p1");
   });
   
+});
+
+describe('assignColoursByGroup', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  it('assigns the same color to each series in a group', function () {
+    var segmentFunc = function (col) {return "group"};
+    var newChart = chart.assignColoursByGroup(graph, segmentFunc);
+    expect(validate.allDefinedObject(newChart)).toBe(true);
+    var colourAssignments = newChart.data.colors;
+    var seriesKeys = Object.keys(colourAssignments);
+    expect(seriesKeys.length).toBe(3);
+    for(var i = 0; i < seriesKeys.length; i++) {
+      expect(colourAssignments[seriesKeys[i]]).toMatch(colourAssignments[seriesKeys[0]]);
+    }
+  });
+  it('assigns different colours to different groups', function () {
+    var segmentFunc = function(col) {return col[0]};
+    var newChart = chart.assignColoursByGroup(graph, segmentFunc);
+    expect(validate.allDefinedObject(newChart)).toBe(true);
+    var assignments = newChart.data.colors;
+    var seriesKeys = Object.keys(assignments);
+    for(var i = 1; i < seriesKeys.length; i++) {
+      for(var j = 0; j < i; j++) {
+        expect(assignments[seriesKeys[i]]).not.toBe(assignments[seriesKeys[j]]);
+      }
+    }
+  });  
+});
+
+describe('fadeSeriesByRank', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var segmentFunc = function (col) {return col[0];};
+  graph = chart.assignColoursByGroup(graph, segmentFunc);
+  it('does not affect tier-1 series', function () {
+    var ranker = function(series) {return 1};
+    graph = chart.fadeSeriesByRank(graph, ranker);
+    var fader = graph.data.color;
+    var series = graph.data.columns;
+    for(var i = 0; i < series.length; i++) {
+      var faded = fader("#000000", series[i][0]);
+      expect(faded).toMatch("#000000");
+    }
+  });
+  it('fades low-ranked series', function () {});
+  var ranker = function (series) {return .5};
+  graph = chart.fadeSeriesByRank(graph, ranker);
+  var fader = graph.data.color;
+  var series = graph.data.columns;
+  for(var i = 0; i < series.length; i++) {
+    var faded = fader("#000000", series[i][0]);
+    expect(faded).not.toMatch("#000000");
+  }
+});
+
+describe('lightenHexColour', function () {
+  var blue = "#0000dd";
+  var grey = "#212121";
+  var orangey = "#f9b164";
+  var black = "#000000";
+  var white = "#ffffff";
+  var colours = [blue, grey, orangey, black, white];
+  it('returns unchanged colours when scaled to 1', function () {
+    for(var i = 0; i < colours.length; i++) {
+      expect(chart.lightenHexColour(colours[i], 1)).toMatch(colours[i]);
+    }
+  });
+  it('returns white for any colour when scaled to 0', function () {
+    for(var i = 0; i < colours.length; i++) {
+      expect(chart.lightenHexColour(colours[i], 0)).toMatch("#ffffff");
+    }
+  });
+  it('returns lightened colours', function () {
+    var decompose = function (hex) {
+      return [parseInt(hex.substr(1, 2), 16),
+              parseInt(hex.substr(3, 2), 16),
+              parseInt(hex.substr(5, 2), 16)];
+    };
+    for(var i = 0; i < colours.length - 1; i++) { //skip white, which doesn't change when lightened.
+      var lightened = chart.lightenHexColour(colours[i], .5);
+      for(var j = 0; j < 3; j++){
+        expect(decompose(lightened)[j] > decompose(colours[i])[j]).toBeTruthy();
+        expect(decompose(lightened)[j] < decompose(white)[j]).toBeTruthy();        
+      }
+    }
+  });
+  it('rejects non-hex colours', function () {
+    var nonHexColours = ["hsl(120, 100%, 50%)", "steelblue", "ffffff"];
+    for(var i = 0; i < nonHexColours.length; i++) {
+      var func = function () {chart.lightenHexColour(nonHexColours[i], .5)};
+      expect(func).toThrow();
+    }
+  });
 });
