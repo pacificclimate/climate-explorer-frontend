@@ -21,6 +21,7 @@ import {PRECISION,
         capitalizeWords,
         nestedAttributeIsDefined,
         getVariableOptions} from './util';
+import chroma from 'chroma-js';
 
 /*****************************************************
  * 0. Helper functions used by both graph generators *
@@ -629,12 +630,13 @@ var fadeSeriesByRank = function (graph, ranker) {
   //c3 will pass the function the assigned colour, and either:
   //     * a string with the name of the time series (drawing legend)
   //     * an object with attributes about the time series (drawing a point or line)
-  var fader = function(color, d) {
+  var fader = function(colour, d) {
+    var scale = chroma.scale(['white', colour]);
     if(_.isObject(d)) { //d = data attributes
-      return lightenHexColour(color, rankDictionary[d.id]);
+      return scale(rankDictionary[d.id]).hex();
     }
     else { //d = series name only
-      return lightenHexColour(color, rankDictionary[d]);
+      return scale(rankDictionary[d]).hex();
     }
   };
 
@@ -642,35 +644,9 @@ var fadeSeriesByRank = function (graph, ranker) {
   return graph;
 };
 
-/*
- * Colour manipulation function. Accepts a hex colour, and rescales its
- * values according to the second argument. Scale should be between 0 and 1.
- * 1 corresponds to the original colour; 0 is white, other values are in
- * between.
- */
-var lightenHexColour = function (colour, scale) {
-  if(colour[0] != "#") {
-    throw new Error("Error: invalid colour format");
-  }
-
-  var red = parseInt(colour.substr(1, 2), 16);
-  var green = parseInt(colour.substr(3, 2), 16);
-  var blue = parseInt(colour.substr(5, 2), 16);
-
-  var scaleChannel = function (startvalue, scale) {
-    var scaled = Math.round(255 - scale * (255-startvalue));
-    scaled = scaled.toString(16);
-    //add initial zero for hex color, if needed
-    scaled = scaled.length == 1 ? "0" + scaled : scaled;
-    return scaled;
-  };
-
-  return `#${scaleChannel(red, scale)}${scaleChannel(green, scale)}${scaleChannel(blue, scale)}`;
-};
-
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
     assignColoursByGroup, fadeSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction, lightenHexColour};
+    getAllTimestamps, nameAPICallParametersFunction};
