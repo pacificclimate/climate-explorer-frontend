@@ -21,6 +21,7 @@ import {PRECISION,
         capitalizeWords,
         nestedAttributeIsDefined,
         getVariableOptions} from './util';
+import chroma from 'chroma-js';
 
 /*****************************************************
  * 0. Helper functions used by both graph generators *
@@ -261,7 +262,7 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
   
   for(var i = 0; i < data.length; i++) {
     var comparandMetadata = _.find(metadata, function(m) {return m.unique_id == data[i].id;});
-    
+
     for(var att in comparandMetadata) {
       if(exemplarMetadata[att] !== comparandMetadata[att] && variation.indexOf(att) == -1) {
         variation.push(att);
@@ -531,7 +532,120 @@ var timeseriesXAxis = {
     }
 };
 
+/**************************************************************
+ * 3. Post-processing functions to refine generated graphs
+ **************************************************************/
+
+/*
+ * Reiteration of D3's "category10" colors. They underlie c3's default
+ * colours but are not directly accessible. Allows creating custom
+ * colour palettes that use the same colors as the default assignments.
+ */
+
+var category10Colours = ["#1f77b4",
+                         "#ff7f03",
+                         "#2ca02c",
+                         "#d62728",
+                         "#9467bd",
+                         "#8c564b",
+                         "#e377c2",
+                         "#7f7f7f",
+                         "#bcbd22",
+                         "#17becf"];
+
+
+/*
+ * Post-processing graph function that assigns shared colours to
+ * related data series.
+ *
+ * Accepts a C3 graph object and a segmentation function. Applies the
+ * segmentation function to each data column in the graph object. All
+ * data columns that evaluate to the same result are grouped together
+ * and assigned the same display colour.
+ *
+ * Returns a modified graph object with colours assigned in graph.data.colors
+ * accordingly.
+ *
+ * _.isEqual() is used to evaluate whether two segmentation results are equal.
+ * Each data column is an array with the series name in the 0th location, example:
+ *
+ * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
+ *
+ */
+var assignColoursByGroup = function (graph, segmentor, colourList = category10Colours) {
+  var categories = [];
+  var colors = {};
+
+  _.each(graph.data.columns, column => {
+    var seriesName = column[0];
+    if(!_.isEqual(seriesName, "x")) { //"x" series used to provide categories, not data.
+      var category = segmentor(column);
+      var index = _.indexOf(categories, category);
+      if(index == -1) {
+        //first time we've encountered this category,
+        //add it to the list.
+        categories.push(category);
+        if(categories.length > colourList.length) {
+          throw new Error("Error: too many data categories for colour palette");
+        }
+        index = categories.length - 1;
+      }
+      colors[seriesName] = colourList[index];
+    }
+  });
+  graph.data.colors = colors;
+  return graph;
+};
+
+/*
+ * Post-processing graph function that visually de-emphasizes certain
+ * data series by lightening their assigned colour. (Assumes the graph
+ * has a white background, otherwise lightening isn't de-emphasizing.)
+ *
+ * Accepts a C3 graph object and a ranking function. The ranking function
+ * will be applied to each data column in the graph object, and should
+ * output a number between 0 and 1, which will be used to determine the
+ * visual prominence of the associated data series. Series ranked 1 will
+ * be drawn normally with their assigned colour, values less than one and
+ * greater than zero will be lightened proportionately. A data series ranked
+ * 0 by the ranking function will be drawn in white.
+ *
+ * Returns the graph object, modified by the addition of a data.color
+ * function to operate on assigned series colours.
+ * Each data column passed to the ranking function is an array like this:
+ *
+ * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
+ */
+var fadeSeriesByRank = function (graph, ranker) {
+
+  var rankDictionary = {};
+
+  _.each(graph.data.columns, column => {
+    var seriesName = column[0];
+    if(!_.isEqual(seriesName, "x")) {
+      rankDictionary[seriesName] = ranker(column);
+    }
+  });
+
+  //c3 will pass the function the assigned colour, and either:
+  //     * a string with the name of the time series (drawing legend)
+  //     * an object with attributes about the time series (drawing a point or line)
+  var fader = function(colour, d) {
+    var scale = chroma.scale(['white', colour]);
+    if(_.isObject(d)) { //d = data attributes
+      return scale(rankDictionary[d.id]).hex();
+    }
+    else { //d = series name only
+      return scale(rankDictionary[d]).hex();
+    }
+  };
+
+  graph.data.color = fader;
+  return graph;
+};
+
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
+    assignColoursByGroup, fadeSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

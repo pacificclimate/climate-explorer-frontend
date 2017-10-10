@@ -18,7 +18,6 @@ var chart = require('../chart');
 var validate = require('./test-validators');
 var mockAPI = require('./sample-API-results');
 
-
 describe ('formatYAxis', function () {
   it('formats a c3 y axis with units label', function () {
     var axis = chart.formatYAxis("meters");
@@ -286,4 +285,60 @@ describe('nameAPICallParametersFunction', function () {
     expect(nameFunction("r1i1p1", tasminQuery)).toBe("tasmin r1i1p1");
   });
   
+});
+
+describe('assignColoursByGroup', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  it('assigns the same color to each series in a group', function () {
+    var segmentFunc = function (col) {return "group"};
+    var newChart = chart.assignColoursByGroup(graph, segmentFunc);
+    expect(validate.allDefinedObject(newChart)).toBe(true);
+    var colourAssignments = newChart.data.colors;
+    var seriesKeys = Object.keys(colourAssignments);
+    expect(seriesKeys.length).toBe(3);
+    for(var i = 0; i < seriesKeys.length; i++) {
+      expect(colourAssignments[seriesKeys[i]]).toMatch(colourAssignments[seriesKeys[0]]);
+    }
+  });
+  it('assigns different colours to different groups', function () {
+    var segmentFunc = function(col) {return col[0]};
+    var newChart = chart.assignColoursByGroup(graph, segmentFunc);
+    expect(validate.allDefinedObject(newChart)).toBe(true);
+    var assignments = newChart.data.colors;
+    var seriesKeys = Object.keys(assignments);
+    for(var i = 1; i < seriesKeys.length; i++) {
+      for(var j = 0; j < i; j++) {
+        expect(assignments[seriesKeys[i]]).not.toBe(assignments[seriesKeys[j]]);
+      }
+    }
+  });  
+});
+
+describe('fadeSeriesByRank', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var segmentFunc = function (col) {return col[0];};
+  graph = chart.assignColoursByGroup(graph, segmentFunc);
+  it('does not affect tier-1 series', function () {
+    var ranker = function(series) {return 1};
+    graph = chart.fadeSeriesByRank(graph, ranker);
+    var fader = graph.data.color;
+    var series = graph.data.columns;
+    for(var i = 0; i < series.length; i++) {
+      var faded = fader("#000000", series[i][0]);
+      expect(faded).toMatch("#000000");
+    }
+  });
+  it('fades low-ranked series', function () {});
+  var ranker = function (series) {return .5};
+  graph = chart.fadeSeriesByRank(graph, ranker);
+  var fader = graph.data.color;
+  var series = graph.data.columns;
+  for(var i = 0; i < series.length; i++) {
+    var faded = fader("#000000", series[i][0]);
+    expect(faded).not.toMatch("#000000");
+  }
 });
