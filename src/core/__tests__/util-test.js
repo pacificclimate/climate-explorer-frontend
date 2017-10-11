@@ -190,18 +190,25 @@ var mockAPI = require('./sample-API-results');
 
   describe('timestampToTimeOfYear', function () {
     it('converts customary timestamps into monthly values', function () {
-      expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z")).toBe("July");
-      expect(util.timestampToTimeOfYear("1977-04-15T00:00:00Z")).toBe("April");
+      expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z", false)).toBe("July");
+      expect(util.timestampToTimeOfYear("1977-04-15T00:00:00Z", false)).toBe("April");
     });
     it('converts customary timestamps into seasonal values', function () {
-      expect(util.timestampToTimeOfYear("1977-07-16T00:00:00Z")).toBe("Summer-JJA");
-      expect(util.timestampToTimeOfYear("1977-04-16T00:00:00Z")).toBe("Spring-MAM");
+      expect(util.timestampToTimeOfYear("1977-07-16T00:00:00Z", false)).toBe("Summer-JJA");
+      expect(util.timestampToTimeOfYear("1977-04-16T00:00:00Z", false)).toBe("Spring-MAM");
     });
     it('converts customary timestamps into annual values', function () {
-      expect(util.timestampToTimeOfYear("1977-07-02T00:00:00Z")).toBe("Annual");
+      expect(util.timestampToTimeOfYear("1977-07-02T00:00:00Z", true)).toBe("Annual 1977");
     });
     it('does not convert unrecognized timestamps', function () {
-      expect(util.timestampToTimeOfYear("1977-07-01T00:00:00Z")).toBe("1977-07-01T00:00:00Z");
+      expect(util.timestampToTimeOfYear("1977-07-05T00:00:00Z")).toBe("1977-07-05T00:00:00Z");
+    });
+  });
+
+  describe('sameYear', function () {
+    it('checks if dates happen during the same celandar year', function () {
+      expect(util.sameYear("1977-01-01T00:00:00Z", "1977-12-31T00:00:00Z")).toBeTruthy();
+      expect(util.sameYear("1977-12-31T00:00:00Z", "1978-01-01T00:00:00Z")).not.toBeTruthy();
     });
   });
 
