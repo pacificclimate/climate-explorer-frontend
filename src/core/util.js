@@ -180,30 +180,46 @@ var extendedDateToBasicDate = function(timestamp) {
 };
 
 /*
- * Infers the time index and time resolution represented by a particular
- * timestamp and returns a human-friendly string. Used by map controllers, 
- * as the WMS API doesn't provide any useful time metadata.
- * Assumes that data for a particular resolution is associated with the median
- * day of that time period: the 15th day of each month for monthly resolutions,
- * July 2 for yearly resolutions, and the 16th day of the central month for 
- * seasonal resolutions. 
+ * Produces a human-readable string describing the time of year of displayed data.
+ * Used by MapController, since ncWMS doesn't provide any human-friendly time info.
  */
-var timestampToTimeOfYear = function(timestamp, disambiguateYear = true) {
-  var month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
-  var day = moment(timestamp, moment.ISO_8601).utc().format('D');
+var timestampToTimeOfYear = function (timestamp, resolution="monthly", disambiguateYear = true) {
   var year = disambiguateYear ? moment(timestamp, moment.ISO_8601).utc().format(' YYYY') : "";
+  var month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
   
-  if(day == 15) {
-    return `${month}${year}`;
-  }
-  if(day == 16) {
-    return `${{"January": "Winter-DJF", "April": "Spring-MAM",
-            "July": "Summer-JJA", "October": "Fall-SON"}[month]}${year}`;
-  }
-  else if ((day == 2 || day == 1) && month == "July") { //some datasets use July 1 for annual data.
+  if(resolution == "yearly") {
     return `Annual${year}`;
   }
-  return timestamp;
+  else if(resolution == "monthly") {
+    return `${month}${year}`;
+  }
+  else if(resolution == "seasonal") {
+    switch(month) {
+      case "December":
+      case "January":
+      case "February":
+        return `Winter-DJF${year}`;
+        break;
+      case "March":
+      case "April":
+      case "May":
+        return `Spring-MAM${year}`;
+        break;
+      case "June":
+      case "July":
+      case "August":
+        return `Summer-JJA${year}`;
+        break;
+      case "September":
+      case "October":
+      case "December":
+        return `Winter-SON${year}`;
+        break;
+    }
+  }
+  else {
+    return timestamp;
+  }
 };
 
 /*

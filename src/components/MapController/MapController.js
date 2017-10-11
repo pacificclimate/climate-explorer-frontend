@@ -74,9 +74,8 @@ var MapController = React.createClass({
 
   //update the timestamp in state
   //timeidx is a stringified object with a resolution
-  //(monthly, annual, seasonal) and an index (0-11). For example
-  //{timeres: monthly, timeidx: 3} would represent April. 
-  //It's stringified because Selector won't pass an object.
+  //(monthly, annual, seasonal) and an index. It's stringified 
+  //because Selector won't pass an object.
   updateTime: function (timeidx) {
     this.setState({
       timeidx: timeidx,
@@ -302,9 +301,9 @@ var MapController = React.createClass({
           );
     }
     var times = _.values(this.state.times);
-    var disambiguateYears = !sameYear(times[0], times[times.length - 1]);
+    var disambiguateYears = !sameYear(_.first(times), _.last(times));
     var timeOptions = _.map(this.state.times, function (v, k) {
-      return [k, timestampToTimeOfYear(v, disambiguateYears)];
+      return [k, timestampToTimeOfYear(v, JSON.parse(k).timescale, disambiguateYears)];
     });
 
     var labelText = disambiguateYears ? "Year and Time of Year" : "Time of Year";
@@ -406,6 +405,23 @@ var MapController = React.createClass({
     return dropdown;
   },
 
+  //This function returns JSX for a map footer displaying information about the
+  //dataset and the selected display time.
+  makeMapFooter: function () {
+    var dataset = `${this.state.start_date}-${this.state.end_date}`;
+    var resolution = _.invert(this.state.times)[this.state.wmstime];
+    var times = _.values(this.state.times);
+    resolution = JSON.parse(resolution).timescale;
+    var disambiguateYears = !sameYear(_.first(times), _.last(times));
+    var time = timestampToTimeOfYear(this.state.wmstime, resolution, disambiguateYears);
+
+    return (
+        <h5>
+          {dataset} {time} {this.state.run}
+        </h5>
+        );    
+  },
+
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
   render: function () {
     //generate UI selectors: palette and scale for both isolines and blocks,
@@ -505,13 +521,7 @@ var MapController = React.createClass({
           updateMinmax={this.updateLayerMinmax}
         />
       );
-
-      mapFooter = (
-        <h5>
-          Dataset: {this.state.start_date}-{this.state.end_date} &nbsp;
-          {timestampToTimeOfYear(this.state.wmstime)} {this.state.run} 
-        </h5>
-          );
+      mapFooter = this.makeMapFooter();
 
     } else {
       map = <Loader />;
