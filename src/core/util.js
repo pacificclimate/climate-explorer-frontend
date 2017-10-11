@@ -188,23 +188,32 @@ var extendedDateToBasicDate = function(timestamp) {
  * July 2 for yearly resolutions, and the 16th day of the central month for 
  * seasonal resolutions. 
  */
-var timestampToTimeOfYear = function(timestamp) {
+var timestampToTimeOfYear = function(timestamp, disambiguateYear = true) {
   var month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
   var day = moment(timestamp, moment.ISO_8601).utc().format('D');
+  var year = disambiguateYear ? moment(timestamp, moment.ISO_8601).utc().format(' YYYY') : "";
   
   if(day == 15) {
-    return month;
+    return `${month}${year}`;
   }
   if(day == 16) {
-    return {"January": "Winter-DJF", "April": "Spring-MAM",
-            "July": "Summer-JJA", "October": "Fall-SON"}[month];
+    return `${{"January": "Winter-DJF", "April": "Spring-MAM",
+            "July": "Summer-JJA", "October": "Fall-SON"}[month]}${year}`;
   }
-  else if (day == 2 && month == "July") {
-    return "Annual";
+  else if ((day == 2 || day == 1) && month == "July") { //some datasets use July 1 for annual data.
+    return `Annual${year}`;
   }
   return timestamp;
 };
 
+/*
+ * Predicate that calculates whether two dates are the same calendar year. 
+ * (Not whether they're 365 days apart.)
+ */
+var sameYear = function(date1, date2) {
+  return moment(date1, moment.ISO_8601).utc().format('YYYY') ===
+    moment(date2, moment.ISO_8601).utc().format('YYYY');
+}
 
 /*****************************************************
  * String-related helper function
@@ -243,6 +252,6 @@ var nestedAttributeIsDefined = function (o, ...attributes) {
 module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData, 
     validateStatsData, validateAnnualCycleData, getVariableOptions,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 
-    timestampToTimeOfYear,
+    timestampToTimeOfYear, sameYear,
     capitalizeWords,
     nestedAttributeIsDefined};

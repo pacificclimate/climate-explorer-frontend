@@ -33,6 +33,7 @@ import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
 import { timestampToTimeOfYear,
          nestedAttributeIsDefined,
+         sameYear,
          getVariableOptions} from '../../core/util';
 
 import styles from './MapController.css';
@@ -283,6 +284,74 @@ var MapController = React.createClass({
     );
   },
 
+  //This function returns JSX for a dropdown menu that allows a user to select a time of year
+  //(month, season, or annual) to display. If the data spans more than one year, the
+  //user can also select a year.
+  //in cases where multiple variables are displayed on the map, only times when the main
+  //variable is defined are available.
+  makeTimeSelector: function () {
+    if(_.isUndefined(this.state.times)) {
+      //metadata API call hasn't finished loading yet; return disabled selector. 
+      //(user shouldn't see this unless something is off with backend - 
+      // metadata query should be loaded by the time the user opens this menu.)
+      return (
+          <Selector
+            label={"Year and Time of Year"}
+            disabled={true}
+          />
+          );
+    }
+    var times = _.values(this.state.times);
+    var disambiguateYears = !sameYear(times[0], times[times.length - 1]);
+    var timeOptions = _.map(this.state.times, function (v, k) {
+      return [k, timestampToTimeOfYear(v, disambiguateYears)];
+    });
+
+    var labelText = disambiguateYears ? "Year and Time of Year" : "Time of Year";
+
+    return (
+        <Selector
+          label={labelText}
+          onChange={this.updateTime}
+          items={timeOptions}
+          value={this.state.timeidx}
+        />
+        );
+  },
+
+  //This function returns JSX for a colour palette selector.
+  makeColourPaletteSelector: function(layer) {
+    var palettes = [
+      ['seq-Blues', 'light blues'],
+      ['seq-BkBu', 'dark blues'],
+      ['seq-Greens', 'light greens'],
+      ['seq-BkGn', 'dark greens'],
+      ['seq-Oranges', 'oranges'],
+      ['seq-BuPu', 'purples'],
+      ['seq-Greys', 'greys'],
+      ['seq-BkYl', 'yellows'],
+      ['x-Occam', 'rainbow'],
+      ['default', 'ocean'],
+      ['seq-cubeYF', 'cube'],
+      ['psu-magma', 'sunset']
+    ];
+    //available palette list: http://goo.gl/J4Q5PD
+
+    var userLabelText = {"isoline": "Isoline", "raster": "Block Colour"}[layer];
+    userLabelText = `${userLabelText} Palette`;
+
+    var changeItem = `${layer}Palette`;
+
+    return (
+        <Selector
+          label={userLabelText}
+          onChange={this.updateSelection.bind(this, changeItem)}
+          items={palettes}
+          value={this.state[changeItem]}
+        />
+        );
+  },
+
   //This function returns JSX for a selector allowing the user to choose
   //whether a map's colours are scaled logarithmically or linearly.
   //If a given map cannot be displayed with logscaled colour, returns an
@@ -339,24 +408,11 @@ var MapController = React.createClass({
 
   //renders a CanadaMap, menu buttons, and a dialog box with a lot of view options
   render: function () {
-    //populate UI selectors: palette and scale for both isolines and blocks,
+    //generate UI selectors: palette and scale for both isolines and blocks,
     //run and period dropdown, time of year selector, number of isolines
-    
-    //colour selector
-    var palettes = [
-      ['seq-Blues', 'light blues'],
-      ['seq-BkBu', 'dark blues'],
-      ['seq-Greens', 'light greens'],
-      ['seq-BkGn', 'dark greens'],
-      ['seq-Oranges', 'oranges'],
-      ['seq-BuPu', 'purples'],
-      ['seq-Greys', 'greys'],
-      ['seq-BkYl', 'yellows'],
-      ['x-Occam', 'rainbow'],
-      ['default', 'ocean'],
-      ['seq-cubeYF', 'cube'],
-      ['psu-magma', 'sunset']
-    ];
+
+    var datasetSelector, rasterScaleSelector, rasterPaletteSelector, timeSelector;
+    var isolineScaleSelector, isolinePaletteSelector, numContoursSelector;
     
     //run and period selector
     //displays a list of all the unique combinations of run + climatological period
@@ -384,24 +440,16 @@ var MapController = React.createClass({
         value={selectedDataset}
       />);
     }
-    var rasterScaleSelector = this.makeColourScaleSelector("raster");
 
-    var timeOptions = _.map(this.state.times, function (v, k) {
-      return [k, timestampToTimeOfYear(v)];
-    });
- 
-    //configuration options for the second dataset, if it exists
-    var isolinePaletteSelector, isolineScaleSelector, numContoursSelector;
+    timeSelector = this.makeTimeSelector();
+    rasterScaleSelector = this.makeColourScaleSelector("raster");
+    rasterPaletteSelector = this.makeColourPaletteSelector("raster");
+
+    //configuration options and selectors for the second dataset, if it exists
     if(this.props.comparandMeta) {
-      isolinePaletteSelector = (            
-        <Selector
-          label={"Isoline Colour Palette"}
-          onChange={this.updateSelection.bind(this, 'isolinePalette')}
-          items={palettes}
-          value={this.state.isolinePalette}
-        />
-      );
+      isolinePaletteSelector = this.makeColourPaletteSelector("isoline");
       isolineScaleSelector = this.makeColourScaleSelector("isoline");
+
       numContoursSelector = (
         <Selector
           label={"Number of Isolines"}
@@ -412,7 +460,7 @@ var MapController = React.createClass({
       );
     }
    
-    //generate the map
+    //generate the map and footer
     //determine which files (annual, seasonal, monthly?) 
     //actually contain the requested timestamps.
     var rasterDatasetID;
@@ -500,22 +548,11 @@ var MapController = React.createClass({
 
           <Modal.Body>
             { datasetSelector }
-            <Selector
-              label={"Time of Year"}
-              onChange={this.updateTime}
-              items={timeOptions}
-              value={this.state.timeidx}
-            />
-            <Selector
-              label={"Block Colour Palette"}
-              onChange={this.updateSelection.bind(this, 'rasterPalette')}
-              items={palettes}
-              value={this.state.rasterPalette}
-            />
-            {rasterScaleSelector}
-            {isolinePaletteSelector}
-            {isolineScaleSelector}
-
+            { timeSelector }
+            { rasterPaletteSelector }
+            { rasterScaleSelector }
+            { isolinePaletteSelector }
+            { isolineScaleSelector }
           </Modal.Body>
 
           <Modal.Footer>
