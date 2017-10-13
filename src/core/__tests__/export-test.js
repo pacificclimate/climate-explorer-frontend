@@ -114,8 +114,8 @@ describe('generateDataCellsFromC3Graph', function () {
     //make sure nothing is undefined
     expect(validate.allDefinedArray(cells)).toBe(true);
   });
-  it('generates data for export from a projected change graph', function () {
-    var toExport = chart.dataToProjectedChangeGraph([mockAPI.tasmaxData]);
+  it('generates data for export from a long term average graph', function () {
+    var toExport = chart.dataToLongTermAverageGraph([mockAPI.tasmaxData]);
     var cells = exportdata.generateDataCellsFromC3Graph(toExport, "Run");
     expect(validate.isRectangularArray(cells, 2, 8)).toBe(true);
     expect(cells[1][2]).toBe('-17.83');

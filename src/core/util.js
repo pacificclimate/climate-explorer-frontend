@@ -97,7 +97,6 @@ var validateStatsData = function (response) {
  * seasonal, or yearly. Otherwise returns the axios response object unaltered.
  */
 var validateAnnualCycleData = function(response) {
-  console.log("inside validate annual cycle data");
   if(_.isEmpty(response.data) || (typeof response.data == "string")) {
     throw new Error("Error: timeseries data is unavailable for this model.");
   }

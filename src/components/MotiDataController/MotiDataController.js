@@ -42,9 +42,9 @@ var MotiDataController = React.createClass({
 
   getInitialState: function () {
     return {
-      timeSeriesDatasetId: '',
-      climoSeriesData: undefined,
-      timeSeriesData: undefined,
+      annualCycleDatasetId: '',
+      longTermAverageData: undefined,
+      annualCycleData: undefined,
       statsData: undefined,
       dataTableTimeOfYear: 0,
     };
@@ -55,7 +55,7 @@ var MotiDataController = React.createClass({
    * dataset to display in the stats table and annual cycle graph.
    */
   getData: function (props) {
-    this.setTimeSeriesNoDataMessage("Loading Data");
+    this.setAnnualCycleGraphNoDataMessage("Loading Data");
 
     this.setStatsTableNoDataMessage("Loading Data");  
     
@@ -82,18 +82,18 @@ var MotiDataController = React.createClass({
 
     myTimeseriesPromise.then(response => {
       this.setState({
-        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, response.data),
+        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, response.data),
       });
       
     }).catch(error => {
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
+      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });
   },
 
   //Remove data from the Annual Cycle graph and display a message
-  setTimeSeriesNoDataMessage: function(message) {
+  setAnnualCycleGraphNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
                         axis: {} },
       });
   },
@@ -110,13 +110,13 @@ var MotiDataController = React.createClass({
     // This guards against re-rendering before calls to the data server alter
     // the state
     return !(_.isEqual(nextState.statsData, this.state.statsData) &&
-           _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+           _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
            _.isEqual(nextProps.meta, this.props.meta) &&
            _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
   render: function () {
-    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
 
     return (
@@ -124,10 +124,10 @@ var MotiDataController = React.createClass({
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <div>
           <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-          <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
-          <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
+          <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
+          <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
         </div>
-        <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
+        <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
 
         <DataTable data={statsData} options={this.state.statsTableOptions} />
         <div style={{ marginTop: '10px' }}>

@@ -53,8 +53,9 @@ var ModalMixin = {
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
       var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
-                                   this.setClimoSeriesNoDataMessage,
-                                   this.setTimeSeriesNoDataMessage];
+                                   this.setLongTermAverageGraphNoDataMessage,
+                                   this.setAnnualCycleGraphNoDataMessage,
+                                   this.setTimeSeriesGraphNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
@@ -68,7 +69,7 @@ var ModalMixin = {
         {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
   },
 
-  exportTimeSeries: function(format) {
+  exportAnnualCycle: function(format) {
    //Determine period and run to export. Location varies depending on the portal and whether
    //it displays a single datafile or multiple datafiles at once. 
    //Period and run parameters describing a set of multiple displayed datafiles files are 
@@ -76,8 +77,8 @@ var ModalMixin = {
    //If the portal has only one active dataset at a time, run and period are 
    //extracted from that dataset's metadata.
    var instance;
-   if(this.state.timeSeriesInstance) {
-     instance = this.state.timeSeriesInstance;
+   if(this.state.annualCycleInstance) {
+     instance = this.state.annualCycleInstance;
    }
    else {
      instance = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
@@ -86,9 +87,9 @@ var ModalMixin = {
    exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, instance);
   },
 
-  exportClimoSeries: function(format) {
-    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, 
-        {timeidx: this.state.projChangeTimeOfYear, timeres:this.state.projChangeTimeScale});
+  exportLongTermAverage: function(format) {
+    exportDataToWorksheet("climoseries", this.props, this.state.longTermAverageData, format, 
+        {timeidx: this.state.longTermAverageTimeOfYear, timeres:this.state.longTermAverageTimeScale});
   },
 
   injectRunIntoStats: function (data) {
@@ -102,6 +103,8 @@ var ModalMixin = {
     return data;
   },
 
+  //Fetches and validates data from a call to the backend's
+  //"data" API endpoint
   getDataPromise: function (props, timeres, timeidx) {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'data'),
@@ -117,6 +120,8 @@ var ModalMixin = {
     }).then(validateProjectedChangeData);
   },
 
+  //Fetches and validates data from a call to the backend's
+  //"multistat" API endpoint
   getStatsPromise: function (props, timeidx) {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
@@ -131,10 +136,10 @@ var ModalMixin = {
     }).then(validateStatsData);
   },
 
+  //Fetches and validates data from a call to the backend's
+  //"timeseries" endpoint
   getTimeseriesPromise: function (props, timeSeriesDatasetId) {
-
-    var metadata = this.getMetadata(timeSeriesDatasetId, props.meta);
-    var validate = metadata.multi_year_mean ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
+    var validate = this.multiYearMeanSelected ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
       params: {
@@ -195,6 +200,17 @@ var ModalMixin = {
       return _.find(meta, function(m) {return m.unique_id === id;} );
     },
     
+    //Indicates whether or not the currently selected dataset is
+    //a multi-year-mean
+    multiYearMeanSelected: function(props = this.props) {
+      if(_.isUndefined(props)) {
+        return undefined;
+      }
+      var params = _.pick(props, "model_id", 'variable_id', 'experiment');
+      var selectedMetadata = _.findWhere(props.meta, params);
+      return selectedMetadata.multi_year_mean;
+    },
+
     /*
      * Filters data from any call to the API that returns an object with 
      * individual values keyed to unique_ids. It returns a new object 

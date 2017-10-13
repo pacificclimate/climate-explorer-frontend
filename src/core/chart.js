@@ -6,16 +6,16 @@
  * - timeseriesToAnnualCycleGraph, which creates graphs to display data 
  *   from the "timeseries" API call with monthly resolution
  * 
- * - dataToProjectedChangeGraph, which creates graphs to display data
+ * - dataToLongTermAverageGraph, which creates graphs to display data
  *   from the "data" API call with arbitrary resolution
- *
- * - timeseriesToTimeSeriesGraph, which creates a continuous line to show
- *   a series of point-in-time values,
  * 
  * This file also contains helper functions used by the primary functions
  * to generate pieces of the C3 graph-describing data structure, which is
- * specified here: http://c3js.org/reference.html, and post-processing
- * functions to fine-tune display parameters on an already-existant graph.
+ * specified here: http://c3js.org/reference.html.
+ *
+ * timeseriesToTimeSeriesGraph() generates a graph that has things in common
+ * with each of the primary graphs, and post-processing functions to
+ * fine-tune display parameters on an already-existant graph.
  **************************************************************************/
 
 import _ from 'underscore';
@@ -308,10 +308,10 @@ var monthlyXAxis = {
 };
 
 /************************************************************
- * 2. dataToProjectedChangeGraph() and its helper functions *
+ * 2. dataToLongTermAverageGraph() and its helper functions *
  ************************************************************/
 
-/* dataToProjectedChangeGraph()
+/* dataToLongTermAverageGraph()
  * This function takes an array containins one or more JSON objects 
  * from the "data" API call with this format:
  * 
@@ -354,7 +354,7 @@ var monthlyXAxis = {
  * The context objects are used in the graph legend, to distinguish runs
  * with the same name ("r1i1p1") from different datasets.
  */
-var dataToProjectedChangeGraph = function(data, contexts = []){
+var dataToLongTermAverageGraph = function(data, contexts = []){
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
@@ -454,7 +454,7 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
 };
 
 /*
- * Helper function for dataToProjectedChangeGraph. Extracts the
+ * Helper function for dataToLongTermAverageGraph. Extracts the
  * list of all unique timestamps found in the data.
  */
 var getAllTimestamps = function(data) {
@@ -473,7 +473,9 @@ var getAllTimestamps = function(data) {
       addSeries(data[i].data);
     }
     else { //data is from "data" API
-      addSeries(data[i][run].data);
+      for(let run in data[i]) {
+        addSeries(data[i][run].data);
+      }
     }
   }
   if (allTimes.length === 0) {
@@ -483,7 +485,7 @@ var getAllTimestamps = function(data) {
 };
 
 /* 
- * Helper function for dataToProjectedChangeGraph. Examines
+ * Helper function for dataToLongTermAverageGraph. Examines
  * the query context for multiple API calls to the "data" 
  * API and determines which possible query parameters 
  * (model, variable, emission, or timescale) vary by query.
@@ -533,7 +535,7 @@ var nameAPICallParametersFunction = function(contexts) {
 };
 
 /*
- * Helper constant for dataToProjectedChangeGraph: Format object 
+ * Helper constant for dataToLongTermAverageGraph: Format object 
  * for a timeseries X axis.
  */
 var timeseriesXAxis = {
@@ -779,7 +781,7 @@ var fadeSeriesByRank = function (graph, ranker) {
   return graph;
 };
 
-module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
+module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeSeriesGraph, assignColoursByGroup, fadeSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,

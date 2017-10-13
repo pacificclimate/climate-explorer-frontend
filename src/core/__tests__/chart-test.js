@@ -199,14 +199,14 @@ describe('shortestUniqueTimeSeriesNamingFunction', function () {
 });
 
 
-describe('dataToProjectedChangeGraph', function() {
+describe('dataToLongTermAverageGraph', function() {
   it('rejects datasets with missing metadata', function () {
-    var func = function () {chart.dataToProjectedChangeGraph(
+    var func = function () {chart.dataToLongTermAverageGraph(
         [mockAPI.tasmaxData, mockAPI.tasminData]);};
     expect(func).toThrow();      
   });
   it('graphs a single data series', function() {
-    var c = chart.dataToProjectedChangeGraph([mockAPI.tasmaxData]);
+    var c = chart.dataToLongTermAverageGraph([mockAPI.tasmaxData]);
     expect(validate.allDefinedObject(c)).toBe(true);
     expect(c.data.columns.length).toEqual(2);
     expect(c.data.columns[0].length).toEqual(7);
@@ -217,7 +217,7 @@ describe('dataToProjectedChangeGraph', function() {
   it('graphs multiple data series', function () {
     var tasmaxQuery = {"variable_id": "tasmax", "model_id": "bcc-csm1-1-m"};
     var tasminQuery = {"variable_id": "tasmin", "model_id": "bcc-csm1-1-m"};
-    var c = chart.dataToProjectedChangeGraph(
+    var c = chart.dataToLongTermAverageGraph(
         [mockAPI.tasmaxData, mockAPI.tasminData],
         [tasmaxQuery, tasminQuery]);
     expect(validate.allDefinedObject(c)).toBe(true);
@@ -231,7 +231,7 @@ describe('dataToProjectedChangeGraph', function() {
     var tasmaxQuery = {"variable_id": "tasmax", "model_id": "bcc-csm1-1-m"};
     var tasminQuery = {"variable_id": "tasmin", "model_id": "bcc-csm1-1-m"};
     var prQuery = {"variable_id": "pr", "model_id": "bcc-csm1-1-m"};
-    var c = chart.dataToProjectedChangeGraph(
+    var c = chart.dataToLongTermAverageGraph(
         [mockAPI.tasmaxData, mockAPI.tasminData, mockAPI.prData],
         [tasmaxQuery, tasminQuery, prQuery]);
     expect(validate.allDefinedObject(c)).toBe(true);

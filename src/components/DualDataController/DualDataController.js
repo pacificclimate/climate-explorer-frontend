@@ -25,9 +25,10 @@ import Loader from 'react-loader';
 import _ from 'underscore';
 
 
-import { parseBootstrapTableData} from '../../core/util';
+import { parseBootstrapTableData } from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
-        dataToProjectedChangeGraph,
+        dataToLongTermAverageGraph,
+        timeseriesToTimeseriesGraph,
         assignColoursByGroup,
         fadeSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
@@ -53,19 +54,20 @@ var DualDataController = React.createClass({
 
   getInitialState: function () {
     return {
-      projChangeTimeOfYear: 0,
-      projChangeTimeScale: "monthly",
-      timeSeriesDatasetId: '',
-      climoSeriesData: undefined,
-      timeSeriesData: undefined,
+      longTermAverageTimeOfYear: 0,
+      longTermAverageTimeScale: "monthly",
+      annualCycleDatasetId: '',
+      longTermAverageData: undefined,
+      annualCycleData: undefined,
+      timeseriesData: undefined,
       statsData: undefined,
     };
   },
 
   /*
    * Called when Dual Data Controller is loaded. Loads initial data to 
-   * display in the Projected Change graph and the Annual Cycle graph. 
-   * Defaults to monthly resolution and January time index.
+   * display in the Long Term Average graph, Timeseries graph, and the 
+   * Annual Cycle graph. Defaults to monthly resolution and January time index.
    * 
    * There's no default for start date, end date, or ensemble member
    * because there's no guarentee specific ones appear in any given
@@ -73,25 +75,36 @@ var DualDataController = React.createClass({
    * in the first qualifying dataset.
    */
   getData: function (props) {
-    
-    this.loadDualClimoSeries(props, this.state.projChangeTimeScale, 
-        this.state.projChangeTimeOfYear);
-
-    this.loadDualTimeseries(props);    
+    if(this.multiYearMeanSelected(props)) {
+      this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
+          this.state.longTermAverageTimeOfYear);
+      this.loadDualAnnualCycleGraph(props);
+    }
+    else {
+      //this.loadDualTimeseriesGraph(props);
+    }
   },
 
   //Clear data from the Annual Cycle graph and display a message
-  setTimeSeriesNoDataMessage: function(message) {
+  setAnnualCycleGraphNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
                         axis: {} },
       });
   },
 
-  //Clear data from the Projected Change graph and display a message
-  setClimoSeriesNoDataMessage: function(message) {
+  //Clear data from the Long Term Average graph and display a message
+  setLongTermAverageGraphNoDataMessage: function(message) {
     this.setState({
-      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      longTermAverageData: { data: { columns: [], empty: { label: { text: message }, }, },
+                         axis: {} },
+      });
+  },
+
+  //Removes all data from the Timeseries Graph and displays a message
+  setTimeSeriesGraphNoDataMessage: function(message) {
+    this.setState({
+      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                          axis: {} },
       });
   },
@@ -107,13 +120,13 @@ var DualDataController = React.createClass({
 
   /*
    * Called when the user selects a time of year to display on the 
-   * Projected Change graph. Redraw the Projected Change graph and
+   * Long Term Average graph. Redraw the Long Term Average graph and
    * store the selected time scale and index in state.
    */
-  updateProjChangeTimeOfYear: function (timeidx) {
+  updateLongTermAverageTimeOfYear: function (timeidx) {
     var idx = JSON.parse(timeidx).timeidx;
     var scale = JSON.parse(timeidx).timescale;     
-    this.loadDualClimoSeries(this.props, scale, idx);
+    this.loadDualLongTermAverageGraph(this.props, scale, idx);
   },
 
   /*
@@ -121,8 +134,8 @@ var DualDataController = React.createClass({
    * view on the Annual Cycle graph. Stores the selected run and period 
    * in state, fetches new data, and updates the graph.
    */
-  updateAnnCycleDataset: function (instance) {
-    this.loadDualTimeseries(this.props, JSON.parse(instance));
+  updateAnnuaCycleDataset: function (instance) {
+    this.loadDualAnnualCycleGraph(this.props, JSON.parse(instance));
   },
   
   /*
@@ -130,8 +143,8 @@ var DualDataController = React.createClass({
    * Loads data for two variables if both props.variable_id and 
    * props.comparand_id are set, else only props.variable_id.  
    */
-  loadDualClimoSeries: function (props, timeres, timeidx ) {
-    this.setClimoSeriesNoDataMessage("Loading Data");
+  loadDualLongTermAverageGraph: function (props, timeres, timeidx ) {
+    this.setLongTermAverageGraphNoDataMessage("Loading Data");
 
     //fetch and graph projected change data
     var dataPromises = [];
@@ -152,13 +165,13 @@ var DualDataController = React.createClass({
     
     Promise.all(dataPromises).then(values=> {
       this.setState({
-        projChangeTimeScale: timeres,
-        projChangeTimeOfYear: timeidx,
-        climoSeriesData: dataToProjectedChangeGraph(_.map(values, function(v){return v.data;}), 
+        longTermAverageTimeScale: timeres,
+        longTermAverageTimeOfYear: timeidx,
+        longTermAverageData: dataToLongTermAverageGraph(_.map(values, function(v){return v.data;}), 
             dataParams), 
       });
     }).catch(error => {
-      this.displayError(error, this.setClimoSeriesNoDataMessage);
+      this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
   
@@ -167,8 +180,8 @@ var DualDataController = React.createClass({
    * two variables if props.variable_id and props.comparand_id are both
    * set and different.
    */
-  loadDualTimeseries: function (props, instance = {}) {
-    this.setTimeSeriesNoDataMessage("Loading Data");
+  loadAnnualCycleGraph: function (props, instance = {}) {
+    this.setAnnualCycleGraphNoDataMessage("Loading Data");
     
     var params = {
         model_id: props.model_id,
@@ -272,17 +285,17 @@ var DualDataController = React.createClass({
       graph = fadeSeriesByRank(graph, rankByTimeResolution);
 
       this.setState({
-        timeSeriesInstance: instance,
-        timeSeriesData: graph
+        annualCycleInstance: instance,
+        annualCycleData: graph
         });      
     }).catch(error=>{
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
+      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });    
   },
 
   render: function () {
-    var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
-    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : { data: { columns: [] }, axis: {} };
+    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -307,22 +320,22 @@ var DualDataController = React.createClass({
         <Tabs>
           <TabList>
             <Tab>Annual Cycle</Tab>
-            <Tab>Projected Change</Tab>
+            <Tab>Long Term Average</Tab>
           </TabList>
           <TabPanel>
             <Row>
               <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={selectedInstance}/>
+                <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
               </Col>
               <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
                 <div>
                   <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
+                  <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
                 </div>
               </Col>                
             </Row>
-            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
+            <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
           </TabPanel>
           <TabPanel>
             <Row>
@@ -332,12 +345,12 @@ var DualDataController = React.createClass({
               <Col>
                 <div>
                   <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
+                  <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
+                  <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
                 </div>
               </Col>
             </Row>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
+            <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
           </TabPanel>
         </Tabs>
       </div>
