@@ -21,7 +21,8 @@ import {exportDataToWorksheet,
         generateDataCellsFromC3Graph} from '../../core/export';
 import {validateProjectedChangeData, 
         validateStatsData, 
-        validateAnnualCycleData} from '../../core/util';
+        validateAnnualCycleData,
+        validateUnstructuredTimeseriesData} from '../../core/util';
 
 var ModalMixin = {
 
@@ -131,6 +132,9 @@ var ModalMixin = {
   },
 
   getTimeseriesPromise: function (props, timeSeriesDatasetId) {
+
+    var metadata = this.getMetadata(timeSeriesDatasetId, props.meta);
+    var validate = metadata.multi_year_mean ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
       params: {
@@ -138,7 +142,7 @@ var ModalMixin = {
         variable: props.variable_id,
         area: props.area || "",
       }
-    }).then(validateAnnualCycleData);
+    }).then(validate);
   },
 
     /*

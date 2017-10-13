@@ -8,10 +8,14 @@
  * 
  * - dataToProjectedChangeGraph, which creates graphs to display data
  *   from the "data" API call with arbitrary resolution
+ *
+ * - timeseriesToTimeSeriesGraph, which creates a continuous line to show
+ *   a series of point-in-time values,
  * 
  * This file also contains helper functions used by the primary functions
  * to generate pieces of the C3 graph-describing data structure, which is
- * specified here: http://c3js.org/reference.html
+ * specified here: http://c3js.org/reference.html, and post-processing
+ * functions to fine-tune display parameters on an already-existant graph.
  **************************************************************************/
 
 import _ from 'underscore';
@@ -24,7 +28,7 @@ import {PRECISION,
 import chroma from 'chroma-js';
 
 /*****************************************************
- * 0. Helper functions used by both graph generators *
+ * 0. Helper functions used by all graph generators *
  *****************************************************/
 
 //Generates a typical y-axis configuration, given the text of the label.
@@ -455,15 +459,22 @@ var dataToProjectedChangeGraph = function(data, contexts = []){
  */
 var getAllTimestamps = function(data) {
   var allTimes = [];
-  
-  for(var i = 0; i < data.length; i++) {
-    for(let run in data[i]) {
-      for(let timestamp in data[i][run].data) {
-        if(!_.find(allTimes, function(t){return t == timestamp;})) {
-          allTimes.push(timestamp);
-        }
+
+  var addSeries = function(seriesData) {
+    for(let timestamp in seriesData) {
+      if(!_.find(allTimes, function(t){return t== timestamp;})) {
+        allTimes.push(timestamp);
       }
-    } 
+    }
+  };
+
+  for(var i in _.keys(data)) {
+    if(!_.isUndefined(data[i].data)) { //data is from "timeseries" API
+      addSeries(data[i].data);
+    }
+    else { //data is from "data" API
+      addSeries(data[i][run].data);
+    }
   }
   if (allTimes.length === 0) {
     throw new Error("Error: no time stamps in data");
@@ -533,7 +544,131 @@ var timeseriesXAxis = {
 };
 
 /**************************************************************
- * 3. Post-processing functions to refine generated graphs
+ * 3. timeseriesToTimeSeriesGraph
+ **************************************************************/
+
+/* 
+ * timeseriesToTimeSeriesGraph()
+ * This function takes one or more JSON objects from the
+ * "timeseries" API call with this format:
+ *
+ * {
+ * "id": "tasmax_mClim_BCCAQv2_bcc-csm1-1-m_historical-rcp45_r1i1p1_20700101-20991231_Canada",
+ * "units": "degC",
+ * "data": {
+ *   "2085-01-15T00:00:00Z": -17.498223073165622,
+ *   "2085-02-15T00:00:00Z": -15.54878007851129,
+ *   "2085-03-15T00:00:00Z": -11.671093808333737,
+ *                    ...
+ *    }
+ * }
+ *
+ * along with an array of dataset metadata entries that includes each
+ * dataset referenced by the "id" field in the API results. It returns
+ * a C3 graph object displaying each data object as a series.
+ *
+ * The graph produced by this function is intermediate between the
+ * Annual Cycle graph and the Projected Change graph, and uses a mixed
+ * set of helper functions. It builds a chart from the same query and
+ * data format as the Annual Cycle data, but produces an open-ended
+ * timeseries with an arbitrary number of points and dates along the X
+ * axis instead of a yearly cycle.
+ *
+ * Features a selectable "subchart" to let users zoom in to a smaller
+ * scale, since data on this chart can consists of a very large
+ * number of points. (monthly data 1950-2100 = 1800 points).
+ *
+ * Accepts an arbitrary number of data objects, but no more than
+ * two separate unit types.
+ */
+var timeseriesToTimeSeriesGraph = function(metadata, ...data) {
+  //blank graph data object to be populated - holds data values
+  //and individual-timeseries-level display options.
+  var c3Data = {
+      columns: [],
+      types: {},
+      labels: {},
+      axes: {}
+  };
+
+  var yUnits = "";
+  var y2Units = "";
+  var seriesVariables = {};
+
+  var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+
+  //get list of all timestamps
+  var timestamps = getAllTimestamps(data);
+  c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
+  c3Data.x = "x";
+
+  //Add each timeseries to the graph
+  for(var i = 0; i < data.length; i++) {
+    //get metadata for this timeseries
+    var timeseries = data[i];
+    var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
+    var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
+
+    //add the actual data to the graph
+    var column = [timeseriesName];
+
+    for(var t = 0; t < timestamps.length; t++ ) {
+      //assigns "undefined" for any timestamps missing from this series.
+      //C3 disconnects the line for undefined values.
+      column.push(timeseries.data[timestamps[t]]);
+    }
+
+    c3Data.columns.push(column);
+    c3Data.types[timeseriesName] = "spline";
+
+    //Each timeseries needs to be associated with a y-axis.
+    //Two different variables measured with the same units,
+    //like tasmin (degrees C) and tasmax (degrees C)
+    //can share a y-axis.
+    //Variables with different units require seperate axes.
+    //C3 can theoretically support indefinite numbers of y-axes,
+    //but that would be hard for a user to make sense of,
+    //so it's capped at two here.
+    if((!yUnits) || timeseries.units == yUnits) {
+      yUnits = timeseries.units;
+      c3Data.axes[timeseriesName] = "y";
+    }
+    else if((!y2Units) || timeseries.units == y2Units) {
+      y2Units = timeseries.units;
+      c3Data.axes[timeseriesName] = "y2";
+    }
+    else {
+      throw new Error("Error: too many data axes required for graph");
+    }
+  }
+
+  //whole-graph display options: axis formatting and tooltip behaviour
+  var c3Axis = {};
+  c3Axis.x = timeseriesXAxis;
+  c3Axis.y = formatYAxis(yUnits);
+  if(y2Units) {
+    c3Axis.y2 = formatYAxis(y2Units);
+    }
+
+  var c3Subchart = {show: true,
+      size: {height: 20} };
+
+  var precision = makePrecisionBySeries(seriesVariables);
+  var c3Tooltip = {format: {}};
+  c3Tooltip.grouped = "true";
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
+
+  return {
+    data: c3Data,
+    subchart: c3Subchart,
+    tooltip: c3Tooltip,
+    axis: c3Axis
+  }; 
+};
+
+/**************************************************************
+ * 4. Post-processing functions to refine generated graphs
  **************************************************************/
 
 /*
@@ -645,7 +780,7 @@ var fadeSeriesByRank = function (graph, ranker) {
 };
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToProjectedChangeGraph,
-    assignColoursByGroup, fadeSeriesByRank,
+    timeseriesToTimeSeriesGraph, assignColoursByGroup, fadeSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

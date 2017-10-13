@@ -97,6 +97,7 @@ var validateStatsData = function (response) {
  * seasonal, or yearly. Otherwise returns the axios response object unaltered.
  */
 var validateAnnualCycleData = function(response) {
+  console.log("inside validate annual cycle data");
   if(_.isEmpty(response.data) || (typeof response.data == "string")) {
     throw new Error("Error: timeseries data is unavailable for this model.");
   }
@@ -109,6 +110,25 @@ var validateAnnualCycleData = function(response) {
   }
   return response;
 };
+
+/*
+ * Very basic validation of data fetched from a "timeseries" call to the
+ * climate explorer API. Accepts an axios response object and checks to make
+ * sure it has id, units, and at least one timestamp.
+ */
+var validateUnstructuredTimeseriesData = function(response) {
+  if(_.isEmpty(response.data) || (typeof response.data == "string")) {
+    throw new Error("Error: timeseries data is unavailable for this model.");
+  }
+  if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
+    throw new Error("Error: timeseries data for this model is incomplete");
+  }
+  if(_.isEmpty(response.data.data)) {
+    throw new Error("Error: no timestamps available for time series");
+  }
+  return response;
+};
+
 
 /*
  * Get an option defined in the variable-options.yaml config file.
@@ -265,8 +285,9 @@ var nestedAttributeIsDefined = function (o, ...attributes) {
   return true;
 }
 
-module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData, 
-    validateStatsData, validateAnnualCycleData, getVariableOptions,
+module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData,
+    validateStatsData, validateAnnualCycleData, validateUnstructuredTimeseriesData,
+    getVariableOptions,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 
     timestampToTimeOfYear, sameYear,
     capitalizeWords,

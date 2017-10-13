@@ -24,7 +24,8 @@ import styles from './DataController.css';
 
 import { parseBootstrapTableData } from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
-        dataToProjectedChangeGraph} from '../../core/chart';
+        dataToProjectedChangeGraph,
+        timeseriesToTimeSeriesGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -63,8 +64,18 @@ var DataController = React.createClass({
    * Monthly time resolution, January, on the first run returned by the API.
    */
   getData: function (props) {
-    this.loadTimeSeries(props);
-    this.loadClimoSeries(props);
+    var params = _.pick(props, "model_id", 'variable_id', 'experiment');
+    var selectedMetadata = _.findWhere(props.meta, params);
+
+    //if the selected dataset is a multi-year mean, load annual cycle
+    //and projected change graphs, otherwise load the timeseries graph
+    if(selectedMetadata.multi_year_mean) {
+      this.loadTimeSeries(props);
+      this.loadClimoSeries(props);
+    }
+    else {
+      this.loadNewSeries(props);
+    }
     this.loadDataTable(props);
   },
 
@@ -92,12 +103,21 @@ var DataController = React.createClass({
     });
   },
 
+  //Removes all data from the New Graph and displays a message
+  setNewSeriesNoDataMessage: function(message) {
+    this.setState({
+      newSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+                         axis: {} },
+      });
+  },
+
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
      return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
      _.isEqual(nextState.statsData, this.state.statsData) &&
      _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     _.isEqual(nextState.newSeriesData, this.state.newSeriesData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
@@ -203,6 +223,28 @@ var DataController = React.createClass({
   },
   
   /*
+   * This function fetches and loads data for the Time Series graph.
+   * TODO: Needs more description.
+   */
+  loadNewSeries: function(props) {
+    //load Annual Cycle graph - need monthly, seasonal, and yearly data
+    this.setNewSeriesNoDataMessage("Loading Data");
+
+    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+
+    var metadata = _.findWhere(props.meta, params);
+
+    var newSeriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+    newSeriesPromise.then(response => {
+      this.setState({
+        newSeriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
+      });
+    }).catch(error => {
+      this.displayError(error, this.setNewSeriesNoDataMessage);
+    });
+  },
+
+  /*
    * This function fetches and loads data for the Stats Table. 
    * If passed a time of year(resolution and index), it will load
    * data for that time of year. Otherwise, it defaults to January 
@@ -233,9 +275,14 @@ var DataController = React.createClass({
   },
 
   render: function () {
+    var params = _.pick(this.props, "model_id", 'variable_id', 'experiment');
+    var selectedMetadata = _.findWhere(this.props.meta, params);
+    var multi_year_mean = selectedMetadata ? selectedMetadata.multi_year_mean: true;
+
     var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
     var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
+    var newSeriesData = this.state.newSeriesData ? this.state.newSeriesData : { data: { columns: [] }, axis: {} };
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -254,44 +301,71 @@ var DataController = React.createClass({
       }
     });
 
+    var annualTab, projectedTab, seriesTab, annualTabPanel, projectedTabPanel, seriesTabPanel;
+    if(multi_year_mean) {
+      //Annual Cycle Graph
+      annualTab = (<Tab>Annual Cycle</Tab>);
+      annualTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={selectedInstance}/>
+            </Col>
+            <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
+        </TabPanel>
+        );
+
+      //Projected Change Graph
+      projectedTab = (<Tab>Projected Change</Tab>);
+      projectedTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
+            </Col>
+            <Col>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
+        </TabPanel>
+        );
+    }
+    else {
+      //time series graph
+      seriesTab = (<Tab>Time Series</Tab>);
+      seriesTabPanel = (
+        <TabPanel>
+          <DataGraph data={newSeriesData.data} axis={newSeriesData.axis} tooltip={newSeriesData.tooltip} subchart={newSeriesData.subchart} />
+          <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
+        </TabPanel>  
+      );
+    }
+
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <Tabs>
           <TabList>
-            <Tab>Annual Cycle</Tab>
-            <Tab>Projected Change</Tab>
+            {annualTab}
+            {projectedTab}
+            {seriesTab}
           </TabList>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={selectedInstance}/>
-              </Col>
-              <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>
-            </Row>
-            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
-          </TabPanel>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
-              </Col>
-              <Col>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>
-            </Row>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
-          </TabPanel>
+          {annualTabPanel}
+          {projectedTabPanel}
+          {seriesTabPanel}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
