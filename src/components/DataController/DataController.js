@@ -322,7 +322,7 @@ var DataController = React.createClass({
         </TabPanel>
         );
 
-      //Projected Change Graph
+      //Long Term Average Graph
       longTermTab = (<Tab>Long Term Averages</Tab>);
       longTermTabPanel = (
           <TabPanel>

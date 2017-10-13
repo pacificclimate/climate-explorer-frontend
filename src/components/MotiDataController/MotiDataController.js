@@ -23,7 +23,8 @@ import { parseBootstrapTableData } from '../../core/util';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
-import {timeseriesToAnnualCycleGraph} from '../../core/chart';
+import {timeseriesToAnnualCycleGraph,
+        timeseriesToTimeSeriesGraph} from '../../core/chart';
 import _ from 'underscore';
 
 import styles from './MotiDataController.css';
@@ -55,20 +56,46 @@ var MotiDataController = React.createClass({
    * dataset to display in the stats table and annual cycle graph.
    */
   getData: function (props) {
-    this.setAnnualCycleGraphNoDataMessage("Loading Data");
+    if(this.multiYearMeanSelected(props)) { //load Annual Cycle graph
+      this.setAnnualCycleGraphNoDataMessage("Loading Data");
 
-    this.setStatsTableNoDataMessage("Loading Data");  
+      var monthlyMetadata = _.findWhere(props.meta,{
+        model_id: props.model_id,
+        variable_id: props.variable_id,
+        experiment: props.experiment,
+        timescale: "monthly" });
+
+      var myTimeseriesPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
+
+      myTimeseriesPromise.then(response => {
+        this.setState({
+          annualCycleData: timeseriesToAnnualCycleGraph(props.meta, response.data),
+        });
+      }).catch(error => {
+        this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
+      });
+    }
+    else { //load Timeseries graph
+      this.setTimeseriesGraphNoDataMessage("Loading Data");
+
+      var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+
+      var metadata = _.findWhere(props.meta, params);
+
+      var myTimeSeriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+      myTimeSeriesPromise.then(response => {
+        this.setState({
+          timeseriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
+        });
+      }).catch(error => {
+        this.displayError(error, this.setTimeseriesGraphNoDataMessage);
+      });
+    }
     
-    var monthlyMetadata = _.findWhere(props.meta,{
-      model_id: props.model_id,
-      variable_id: props.variable_id,
-      experiment: props.experiment,
-      timescale: "monthly" });
-          
+    //Load stats table
+    this.setStatsTableNoDataMessage("Loading Data");
     var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
 
-    var myTimeseriesPromise = this.getTimeseriesPromise(props, monthlyMetadata.unique_id);
-   
     myStatsPromise.then(response => {
       //This portal doesn't offer users a choice of what time of year to display
       //stats for. It always shows annual stats.
@@ -78,15 +105,6 @@ var MotiDataController = React.createClass({
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
-    });
-
-    myTimeseriesPromise.then(response => {
-      this.setState({
-        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, response.data),
-      });
-      
-    }).catch(error => {
-      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });
   },
 
@@ -106,29 +124,54 @@ var MotiDataController = React.createClass({
     });
   },
 
+  //Remove data from the Timeseries Graph and display a message
+  setTimeseriesGraphNoDataMessage: function(message) {
+    this.setState({
+      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+                        axis: {} },
+      });
+  },
+
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data server alter
     // the state
     return !(_.isEqual(nextState.statsData, this.state.statsData) &&
            _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
            _.isEqual(nextProps.meta, this.props.meta) &&
+           _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
            _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
   render: function () {
-    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
+
+    var graph;
+    if(this.multiYearMeanSelected(this.props)) {
+      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
+      graph = (
+          <div>
+            <div>
+              <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+              <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
+              <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
+            </div>
+            <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
+          </div>
+          );
+    }
+    else {
+      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
+      graph = (
+          <div>
+            <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
+            <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
+          </div>);
+    }
 
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
-        <div>
-          <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-          <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
-          <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
-        </div>
-        <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
-
+        {graph}
         <DataTable data={statsData} options={this.state.statsTableOptions} />
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
