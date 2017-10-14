@@ -76,7 +76,7 @@ var DataController = React.createClass({
       this.loadLongTermAverageGraph(props);
     }
     else {
-      this.loadTimeSeriesGraph(props);
+      this.loadTimeseriesGraph(props);
     }
     this.loadDataTable(props);
   },
@@ -106,9 +106,9 @@ var DataController = React.createClass({
   },
 
   //Removes all data from the Timeseries Graph and displays a message
-  setTimeSeriesGraphNoDataMessage: function(message) {
+  setTimeseriesGraphNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                          axis: {} },
       });
   },
@@ -119,7 +119,7 @@ var DataController = React.createClass({
      return !(_.isEqual(nextState.longTermAverageData, this.state.longTermAverageData) &&
      _.isEqual(nextState.statsData, this.state.statsData) &&
      _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
-     _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
@@ -188,8 +188,8 @@ var DataController = React.createClass({
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, "data");
       this.setState({
-        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
-        timeSeriesInstance: {
+        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        annualCycleInstance: {
           start_date: monthlyMetadata.start_date,
           end_date: monthlyMetadata.end_date,
           ensemble_member: monthlyMetadata.ensemble_member
@@ -229,9 +229,9 @@ var DataController = React.createClass({
    * As the Timeseries graph shows all data points at once, there's no
    * filtering or selection done by this function.
    */
-  loadTimeSeries: function(props) {
+  loadTimeseriesGraph: function(props) {
 
-    this.setTimeSeriesGraphNoDataMessage("Loading Data");
+    this.setTimeseriesGraphNoDataMessage("Loading Data");
 
     var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
 
@@ -240,7 +240,7 @@ var DataController = React.createClass({
     var timeSeriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
     timeSeriesPromise.then(response => {
       this.setState({
-        timeSeriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
+        timeseriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
       });
     }).catch(error => {
       this.displayError(error, this.setTimeSeriesGraphNoDataMessage);
@@ -281,7 +281,7 @@ var DataController = React.createClass({
     var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : { data: { columns: [] }, axis: {} };
     var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
     var statsData = this.state.statsData ? this.state.statsData : [];
-    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
