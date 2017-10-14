@@ -28,7 +28,7 @@ import _ from 'underscore';
 import { parseBootstrapTableData } from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
-        timeseriesToTimeseriesGraph,
+        timeseriesToTimeSeriesGraph,
         assignColoursByGroup,
         fadeSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
@@ -81,7 +81,7 @@ var DualDataController = React.createClass({
       this.loadDualAnnualCycleGraph(props);
     }
     else {
-      //this.loadDualTimeseriesGraph(props);
+      this.loadDualTimeseriesGraph(props);
     }
   },
 
@@ -112,8 +112,9 @@ var DualDataController = React.createClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
-     _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     return !(_.isEqual(nextState.longTermAverageData, this.state.longTermAverageData) &&
+     _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
+     _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
   },
@@ -139,7 +140,7 @@ var DualDataController = React.createClass({
   },
   
   /*
-   * Fetches and loads data for the Projected Change climoseries graph.
+   * Fetches and loads data for the Long Term Average graph.
    * Loads data for two variables if both props.variable_id and 
    * props.comparand_id are set, else only props.variable_id.  
    */
@@ -293,9 +294,45 @@ var DualDataController = React.createClass({
     });    
   },
 
+  /*
+   * This function fetches and loads data for the Timeseries graph. Will
+   * load data for two variables if variable_id and comparand_id are different.
+   */
+  loadDualTimeseriesGraph: function(props) {
+
+    this.setTimeSeriesGraphNoDataMessage("Loading Data");
+    var timeseriesPromises = [];
+
+    //primary variable
+    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+    var variableMetadata = _.findWhere(props.meta, params);
+
+    timeseriesPromises.push(this.getTimeseriesPromise(props, variableMetadata.unique_id));
+
+    params.variable_id = props.comparand_id;
+    var comparandMetadata = _.findWhere(props.comparandMeta, params);
+
+    //add data from the comparand, if it exists
+    if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
+      timeseriesPromises.push(this.getTimeseriesPromise(params, comparandMetadata.unique_id));
+    }
+
+    Promise.all(timeseriesPromises).then(responses => {
+      var data = _.pluck(responses, "data");
+      var graphMetadata = _.union(props.comparandMeta, props.meta);
+
+      this.setState({
+        timeseriesData: timeseriesToTimeSeriesGraph(graphMetadata, ...data)
+      });
+    }).catch(error => {
+      this.displayError(error, this.setTimeSeriesGraphNoDataMessage);
+    });
+  },
+
   render: function () {
     var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : { data: { columns: [] }, axis: {} };
     var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -314,44 +351,71 @@ var DualDataController = React.createClass({
       }
     });
     
+    var annualTab, longTermTab, timeseriesTab, annualTabPanel, longTermTabPanel, timeseriesTabPanel;
+    if(this.multiYearMeanSelected()) {
+      //Annual Cycle Graph
+      annualTab = (<Tab>Annual Cycle</Tab>);
+      annualTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
+            </Col>
+            <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
+        </TabPanel>
+        );
+
+      //Long Term Average Graph
+      longTermTab = (<Tab>Long Term Averages</Tab>);
+      longTermTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
+            </Col>
+            <Col>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
+        </TabPanel>
+        );
+    }
+    else {
+      //Time Series Graph
+      timeseriesTab = (<Tab>Time Series</Tab>);
+      timeseriesTabPanel = (
+        <TabPanel>
+          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
+          <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
+        </TabPanel>
+      );
+    }
+
     return (
       <div>
         <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
         <Tabs>
           <TabList>
-            <Tab>Annual Cycle</Tab>
-            <Tab>Long Term Average</Tab>
+            {annualTab}
+            {longTermTab}
+            {timeseriesTab}
           </TabList>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
-              </Col>
-              <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>                
-            </Row>
-            <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-          </TabPanel>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
-              </Col>
-              <Col>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>
-            </Row>
-            <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-          </TabPanel>
+            {annualTabPanel}
+            {longTermTabPanel}
+            {timeseriesTabPanel}
         </Tabs>
       </div>
     );
