@@ -181,7 +181,7 @@ var DualDataController = React.createClass({
    * two variables if props.variable_id and props.comparand_id are both
    * set and different.
    */
-  loadAnnualCycleGraph: function (props, instance = {}) {
+  loadDualAnnualCycleGraph: function (props, instance = {}) {
     this.setAnnualCycleGraphNoDataMessage("Loading Data");
     
     var params = {
