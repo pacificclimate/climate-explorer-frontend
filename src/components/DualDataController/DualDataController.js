@@ -91,7 +91,7 @@ var DualDataController = React.createClass({
     var variableMYM = this.multiYearMeanSelected(props);
     var comparandParams = _.pick(props, 'model_id', 'experiment');
     comparandParams.variable_id = props.comparand_id;
-    var comparandMYM = _.findWhere(props.comparandMeta, params).multi_year_mean;
+    var comparandMYM = _.findWhere(props.comparandMeta, comparandParams).multi_year_mean;
 
     if(variableMYM && comparandMYM) {
       this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
