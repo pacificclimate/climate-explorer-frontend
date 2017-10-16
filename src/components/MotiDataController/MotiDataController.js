@@ -1,6 +1,6 @@
 /************************************************************************
  * MotiDataController.js - controller to display summarized numerical data 
- * 
+ *
  * This DataController is intended to be used with an ensemble that 
  * contains a small number of datasets, each of which is the average
  * of many runs. It does not offer the user a way to select or 
@@ -8,13 +8,20 @@
  * they are interested in; it should be used with an ensemble that 
  * features only one dataset for each combination of model, variable, 
  * and emission scenario.
- * 
+ *
  * It receives a model, variable, and emissions scenario from its parent, 
- * MotiApp. It loads the relevant data and passes them as props to its
- * viewer component children:
- * - an annual cycle DataGraph (with only monthly data)
- * - a projected change DataGraph (with only one trendline)
- * - a stats DataTable (with only one entry per climatology period)
+ * MotiApp. Based on the type of variable, it loads relevant data and passes
+ * it to viewer component children:
+ *
+ * Multi-year mean:
+ *  - Annual cycle DataGraph (monthly resolution only)
+ *
+ * Non multi-year mean:
+ *  - A freeform timeseries Datagraph showing data at whateber resolution
+ *    is available.
+ *
+ * In both cases, a stats DataTable summarizing the dataset is also
+ * generated.
  ************************************************************************/
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
@@ -24,7 +31,7 @@ import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,
-        timeseriesToTimeSeriesGraph} from '../../core/chart';
+        timeseriesToTimeseriesGraph} from '../../core/chart';
 import _ from 'underscore';
 
 import styles from './MotiDataController.css';
@@ -82,10 +89,10 @@ var MotiDataController = React.createClass({
 
       var metadata = _.findWhere(props.meta, params);
 
-      var myTimeSeriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
-      myTimeSeriesPromise.then(response => {
+      var myTimeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+      myTimeseriesPromise.then(response => {
         this.setState({
-          timeseriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
+          timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
         });
       }).catch(error => {
         this.displayError(error, this.setTimeseriesGraphNoDataMessage);
@@ -160,7 +167,7 @@ var MotiDataController = React.createClass({
           );
     }
     else {
-      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
+      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
       graph = (
           <div>
             <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />

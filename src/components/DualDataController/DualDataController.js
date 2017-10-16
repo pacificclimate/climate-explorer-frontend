@@ -1,20 +1,29 @@
 /*********************************************************************
  * DualDataController.js - controller component for numerical display
  * of two variables at once.
- * 
+ *
  * Receives a model, experiment, and two variables from its parent,
  * DualController. Provides widgets for users to select a specific slice
- * of the data (time of year or run). Queries the API to fetch data on
- * both variables for the viewers it manages, Annual Cycle Graph and 
- * Projected Change Graph, both DataGraphs, to show comparisons of 
+ * of the data (timespan or run). Queries the API to fetch data on
+ * both variables for the DataGraph viewers it manages, Annual Cycle Graph,
+ * Long Term Average Graph, and Timeseries Graph, to show comparisons of
  * the two variables.
- * 
- * The main variable is internally referred to as "variable" the 
+ *
+ * If a user selects two variables that come from multi year mean datasets,
+ * an Annual Graph and a Long Term Average Graph will be displayed. If a
+ * user selects two variables that are not multi year means, the less
+ * structured Timeseries Graph will be displayed.
+ *
+ * Selecting one multi year mean dataset and one nominal time dataset
+ * displays an error message, as comparing these is not as simple as
+ * plotting them on the same graph.
+ *
+ * The main variable is internally referred to as "variable" the
  * variable being compared to it is the "comparand." Available data
  * is based on the main variable; it's possible to display a dataset with
- * the main variable when the comparand is lacking matching data, 
+ * the main variable when the comparand is lacking matching data,
  * but not vice versa.
- * 
+ *
  * Also allows downloading of the data displayed in the graphs.
  *********************************************************************/
 
@@ -28,7 +37,7 @@ import _ from 'underscore';
 import { parseBootstrapTableData } from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
-        timeseriesToTimeSeriesGraph,
+        timeseriesToTimeseriesGraph,
         assignColoursByGroup,
         fadeSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
@@ -66,8 +75,12 @@ var DualDataController = React.createClass({
 
   /*
    * Called when Dual Data Controller is loaded. Loads initial data to 
-   * display in the Long Term Average graph, Timeseries graph, and the 
+   * display in the Long Term Average graph, Timeseries graph, or the 
    * Annual Cycle graph. Defaults to monthly resolution and January time index.
+   * 
+   * If both datasets are multi year means, the annual cycle graph and
+   * long-term average graph will be displayed. If neither dataset is
+   * a multi year mean, the timeseries graph will be displayed instead.
    * 
    * There's no default for start date, end date, or ensemble member
    * because there's no guarentee specific ones appear in any given
@@ -102,9 +115,9 @@ var DualDataController = React.createClass({
   },
 
   //Removes all data from the Timeseries Graph and displays a message
-  setTimeSeriesGraphNoDataMessage: function(message) {
+  setTimeseriesGraphNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
                          axis: {} },
       });
   },
@@ -147,7 +160,7 @@ var DualDataController = React.createClass({
   loadDualLongTermAverageGraph: function (props, timeres, timeidx ) {
     this.setLongTermAverageGraphNoDataMessage("Loading Data");
 
-    //fetch and graph projected change data
+    //fetch and graph Long Term Average data
     var dataPromises = [];
     var dataParams = [];
     var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
@@ -300,7 +313,7 @@ var DualDataController = React.createClass({
    */
   loadDualTimeseriesGraph: function(props) {
 
-    this.setTimeSeriesGraphNoDataMessage("Loading Data");
+    this.setTimeseriesGraphNoDataMessage("Loading Data");
     var timeseriesPromises = [];
 
     //primary variable
@@ -322,17 +335,17 @@ var DualDataController = React.createClass({
       var graphMetadata = _.union(props.comparandMeta, props.meta);
 
       this.setState({
-        timeseriesData: timeseriesToTimeSeriesGraph(graphMetadata, ...data)
+        timeseriesData: timeseriesToTimeseriesGraph(graphMetadata, ...data)
       });
     }).catch(error => {
-      this.displayError(error, this.setTimeSeriesGraphNoDataMessage);
+      this.displayError(error, this.setTimeseriesGraphNoDataMessage);
     });
   },
 
   render: function () {
-    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : { data: { columns: [] }, axis: {} };
-    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
+    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
+    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -346,7 +359,7 @@ var DualDataController = React.createClass({
 
     var selectedInstance;
     _.each(ids, id => {
-      if(_.isEqual(JSON.parse(id[0]), this.state.timeSeriesInstance)) {
+      if(_.isEqual(JSON.parse(id[0]), this.state.timeseriesInstance)) {
         selectedInstance = id[0];
       }
     });

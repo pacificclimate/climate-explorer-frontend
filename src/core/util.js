@@ -58,13 +58,13 @@ var parseBootstrapTableData = function (data, metadata) {
  * explorer backend. Accepts an axios response object, throws an error if
  * anything is missing, otherwise returns the object unaltered.
  */
-var validateProjectedChangeData = function(response){
+var validateLongTermAverageData = function(response){
   if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-    throw new Error("Error: annual data unavailable for this model.");
+    throw new Error("Error: long term data unavailable for this model.");
   }
   for(var run in response.data) {
     if(!('data' in response.data[run]) || !('units' in response.data[run])) {
-      throw new Error("Error: annual data for this model is incomplete.");
+      throw new Error("Error: long term data for this model is incomplete.");
     }
   }
   return response;
@@ -284,7 +284,7 @@ var nestedAttributeIsDefined = function (o, ...attributes) {
   return true;
 }
 
-module.exports = { PRECISION, parseBootstrapTableData, validateProjectedChangeData,
+module.exports = { PRECISION, parseBootstrapTableData, validateLongTermAverageData,
     validateStatsData, validateAnnualCycleData, validateUnstructuredTimeseriesData,
     getVariableOptions,
     timeIndexToTimeOfYear, timeResolutionIndexToTimeOfYear, extendedDateToBasicDate, 

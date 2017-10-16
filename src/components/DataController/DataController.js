@@ -1,21 +1,27 @@
 /*******************************************************************
  * DataController.js - controller component for in-depth numerical
  * visualization
- * 
+ *
  * Receives a model, an experiment, and a variable from its parent,
  * AppController. Presents the user with widgets to allow selection 
  * of a particular slice of data (time of year or run) and download 
  * of selected data. 
- * 
+ *
  * Queries the API to retrieve the selected data generates graphs and
- * tables from it as viewing components:
- * - a DataTable with statistics about each qualifying run 
- * - an annual cycle DataGraph with monthly, seasonal, and annual lines
- *   (climatologies only)
- * - a long term average DataGraph with each run displayed separately
- *   (climatologies only)
- * - a time series Datagraph that shows every point
- *   (point in time datasets only)
+ * tables from it as viewing components. 
+ *
+ * If the selected dataset is a multi year mean climatology:
+ *  - an Annual Cycle Datagraph with monthly, seasonal, and annual
+ *    resolution (if available)
+ * 
+ *  - a Long Term Average Datagraph showing the mean of each climatology
+ *    period as a seperate data point.
+ *
+ * If the selected dataset is not a multi year mean:
+ *  - a Time Series Datagraph showing each time point available.
+ *
+ * A Data Table viewer component showing statistical information for each
+ * climatology period or timeseries is also generated. 
  *******************************************************************/
 
 import React from 'react';
@@ -29,7 +35,7 @@ import styles from './DataController.css';
 import { parseBootstrapTableData } from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
-        timeseriesToTimeSeriesGraph} from '../../core/chart';
+        timeseriesToTimeseriesGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -64,13 +70,12 @@ var DataController = React.createClass({
 
   /*
    * Called when DataController is first loaded. Selects and fetches 
-   * arbitrary initial data to display in the Projected Change graph, 
-   * Annual Cycle Graph, and stats table. 
+   * arbitrary initial data to display in the graphs and stats table. 
    * Monthly time resolution, January, on the first run returned by the API.
    */
   getData: function (props) {
     //if the selected dataset is a multi-year mean, load annual cycle
-    //and projected change graphs, otherwise load the timeseries graph
+    //and long term average graphs, otherwise load a timeseries graph
     if(this.multiYearMeanSelected(props)) {
       this.loadAnnualCycleGraph(props);
       this.loadLongTermAverageGraph(props);
@@ -127,7 +132,7 @@ var DataController = React.createClass({
   /*
    * Called when the user selects a time of year to display on the
    * Long Term Average graph. Records the new time index and resolution
-   * in state, fetches new data, and redraws the Projected Change graph.
+   * in state, fetches new data, and redraws the Long Term Average graph.
    */
   updateLongTermAverageTimeOfYear: function (timeidx) {
     this.loadLongTermAverageGraph(this.props, JSON.parse(timeidx));
@@ -237,13 +242,13 @@ var DataController = React.createClass({
 
     var metadata = _.findWhere(props.meta, params);
 
-    var timeSeriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
-    timeSeriesPromise.then(response => {
+    var timeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+    timeseriesPromise.then(response => {
       this.setState({
-        timeseriesData: timeseriesToTimeSeriesGraph(props.meta, response.data)
+        timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
       });
     }).catch(error => {
-      this.displayError(error, this.setTimeSeriesGraphNoDataMessage);
+      this.displayError(error, this.setTimeseriesGraphNoDataMessage);
     });
   },
 
@@ -278,10 +283,10 @@ var DataController = React.createClass({
   },
 
   render: function () {
-    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : { data: { columns: [] }, axis: {} };
-    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
+    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
+    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
     var statsData = this.state.statsData ? this.state.statsData : [];
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : { data: { columns: [] }, axis: {} };
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.

@@ -170,7 +170,7 @@ describe('getMonthlyData', function () {
   });
 });
 
-describe('shortestUniqueTimeSeriesNamingFunction', function () {
+describe('shortestUniqueTimeseriesNamingFunction', function () {
   var metadata = mockAPI.metadataToArray();
   it('rejects identical time series', function () {
     var minimalMetadata = [{unique_id: "foo", md: "bar"}, {unique_id: "baz", md: "bar"}];

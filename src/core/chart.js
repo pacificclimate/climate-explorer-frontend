@@ -13,7 +13,7 @@
  * to generate pieces of the C3 graph-describing data structure, which is
  * specified here: http://c3js.org/reference.html.
  *
- * timeseriesToTimeSeriesGraph() generates a graph that has things in common
+ * timeseriesToTimeseriesGraph() generates a graph that has things in common
  * with each of the primary graphs, and post-processing functions to
  * fine-tune display parameters on an already-existant graph.
  **************************************************************************/
@@ -438,7 +438,7 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
-  //Note: if context is empty (dataToProjectedChangeGraph was called with only
+  //Note: if context is empty (dataToLongTermAverageGraph was called with only
   //one time series), variable-determined precision will not be available and
   //numbers will be formatted with default precision.
   var precision = makePrecisionBySeries(seriesVariables);
@@ -546,11 +546,11 @@ var timeseriesXAxis = {
 };
 
 /**************************************************************
- * 3. timeseriesToTimeSeriesGraph
+ * 3. timeseriesToTimeseriesGraph
  **************************************************************/
 
 /* 
- * timeseriesToTimeSeriesGraph()
+ * timeseriesToTimeseriesGraph()
  * This function takes one or more JSON objects from the
  * "timeseries" API call with this format:
  *
@@ -570,7 +570,7 @@ var timeseriesXAxis = {
  * a C3 graph object displaying each data object as a series.
  *
  * The graph produced by this function is intermediate between the
- * Annual Cycle graph and the Projected Change graph, and uses a mixed
+ * Annual Cycle graph and the Long Term Average graph, and uses a mixed
  * set of helper functions. It builds a chart from the same query and
  * data format as the Annual Cycle data, but produces an open-ended
  * timeseries with an arbitrary number of points and dates along the X
@@ -583,7 +583,7 @@ var timeseriesXAxis = {
  * Accepts an arbitrary number of data objects, but no more than
  * two separate unit types.
  */
-var timeseriesToTimeSeriesGraph = function(metadata, ...data) {
+var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
   var c3Data = {
@@ -782,7 +782,7 @@ var fadeSeriesByRank = function (graph, ranker) {
 };
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
-    timeseriesToTimeSeriesGraph, assignColoursByGroup, fadeSeriesByRank,
+    timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

@@ -53,13 +53,13 @@ var mockAPI = require('./sample-API-results');
     });
   });
  
-  describe('validateProjectedChangeData', function () {
+  describe('validateLongTermAverageData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateProjectedChangeData({data: {}});};
+      var func = function () {util.validateLongTermAverageData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateProjectedChangeData( { data: 
+      var func = function () {util.validateLongTermAverageData( { data: 
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -68,13 +68,13 @@ var mockAPI = require('./sample-API-results');
     it('rejects data without units', function () {
       var noUnits = {"data": {}};
       noUnits.data["r1i1pi"] = _.omit(noUnits.data["r1i1p1"], 'units');
-      var func = function () {util.validateProjectedChangeData(noUnits);};
+      var func = function () {util.validateLongTermAverageData(noUnits);};
       expect(func).toThrow();
     });
     it('accepts valid data', function () {
       var valid = {};
       valid.data = mockAPI.tasmaxData;
-      expect(util.validateProjectedChangeData(valid)).toBe(valid);
+      expect(util.validateLongTermAverageData(valid)).toBe(valid);
     });
   });
   

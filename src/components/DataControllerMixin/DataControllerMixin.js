@@ -19,7 +19,7 @@ import urljoin from 'url-join';
 import axios from 'axios';
 import {exportDataToWorksheet, 
         generateDataCellsFromC3Graph} from '../../core/export';
-import {validateProjectedChangeData, 
+import {validateLongTermAverageData,
         validateStatsData, 
         validateAnnualCycleData,
         validateUnstructuredTimeseriesData} from '../../core/util';
@@ -41,7 +41,7 @@ var ModalMixin = {
   componentWillReceiveProps: function (nextProps) {
     if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
       this.setState({
-        timeSeriesDatasetId: nextProps.meta[0].unique_id,
+        timeseriesDatasetId: nextProps.meta[0].unique_id,
       });
       this.getData(nextProps);
     }
@@ -55,7 +55,7 @@ var ModalMixin = {
       var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
                                    this.setLongTermAverageGraphNoDataMessage,
                                    this.setAnnualCycleGraphNoDataMessage,
-                                   this.setTimeSeriesGraphNoDataMessage];
+                                   this.setTimeseriesGraphNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
@@ -73,7 +73,7 @@ var ModalMixin = {
    //Determine period and run to export. Location varies depending on the portal and whether
    //it displays a single datafile or multiple datafiles at once. 
    //Period and run parameters describing a set of multiple displayed datafiles files are 
-   //stored as this.state.timeSeriesInstance. 
+   //stored as this.state.timeseriesInstance. 
    //If the portal has only one active dataset at a time, run and period are 
    //extracted from that dataset's metadata.
    var instance;
@@ -81,10 +81,10 @@ var ModalMixin = {
      instance = this.state.annualCycleInstance;
    }
    else {
-     instance = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
+     instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
          "start_date", "end_date", "ensemble_member");
    }
-   exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, instance);
+   exportDataToWorksheet("timeseries", this.props, this.state.timeseriesData, format, instance);
   },
 
   exportLongTermAverage: function(format) {
@@ -117,7 +117,7 @@ var ModalMixin = {
         area: props.area || "",
         time: timeidx,
       }
-    }).then(validateProjectedChangeData);
+    }).then(validateLongTermAverageData);
   },
 
   //Fetches and validates data from a call to the backend's
@@ -138,12 +138,12 @@ var ModalMixin = {
 
   //Fetches and validates data from a call to the backend's
   //"timeseries" endpoint
-  getTimeseriesPromise: function (props, timeSeriesDatasetId) {
+  getTimeseriesPromise: function (props, timeseriesDatasetId) {
     var validate = this.multiYearMeanSelected() ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
       params: {
-        id_: timeSeriesDatasetId || null,
+        id_: timeseriesDatasetId || null,
         variable: props.variable_id,
         area: props.area || "",
       }
@@ -236,6 +236,14 @@ var ModalMixin = {
       }
       return filtered;
     },
+
+    //Used to render uninitialized C3 graphs.
+    blankGraph: {
+      data: {
+        columns: []
+      },
+      axis: {}
+    }
 };
 
 export default ModalMixin;
