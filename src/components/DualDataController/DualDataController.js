@@ -88,13 +88,24 @@ var DualDataController = React.createClass({
    * in the first qualifying dataset.
    */
   getData: function (props) {
-    if(this.multiYearMeanSelected(props)) {
+    var variableMYM = this.multiYearMeanSelected(props);
+    var comparandParams = _.pick(props, 'model_id', 'experiment');
+    comparandParams.variable_id = props.comparand_id;
+    var comparandMYM = _.findWhere(props.comparandMeta, params).multi_year_mean;
+
+    if(variableMYM && comparandMYM) {
       this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
           this.state.longTermAverageTimeOfYear);
       this.loadDualAnnualCycleGraph(props);
     }
-    else {
+    else if(!variableMYM && !comparandMYM){
       this.loadDualTimeseriesGraph(props);
+    }
+    else { //can't compare a multi year mean to a regular timeseries.
+      var errorMessage = "Error: this plot cannot compare climatologies to nominal time value datasets.";
+      this.setAnnualCycleGraphNoDataMessage(errorMessage);
+      this.setLongTermAverageGraphNoDataMessage(errorMessage);
+      this.setTimeseriesGraphNoDataMessage(errorMessage);
     }
   },
 
