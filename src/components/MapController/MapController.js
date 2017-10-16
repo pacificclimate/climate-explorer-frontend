@@ -126,57 +126,58 @@ var MapController = React.createClass({
   //same data, though a user can choose to view different data with 
   //each viewer if they like.
   componentWillReceiveProps: function (nextProps) {
-    var newVariableId = nextProps.meta[0].variable_id;
-    var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
-    var hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
-    if(hasComparand){
-      var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
-      var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
-    }
-    var defaultDataset = nextProps.meta[0];
-    this.layerRange = {};
-    
-    //clear stored layer value ranges.
-    _.each(["raster", "isoline"], layer => {
-      this.layerRange[layer] = undefined;
-    });
-
-    //check to see whether the variables displayed have been switched.
-    //if so, unset logarithmic display; default is linear.
-    var switchVariable = !_.isEqual(newVariableId, oldVariableId);
-    var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
-
-    //set display colours. In order of preference:
-    //1. colours received by prop
-    //2. colours from state (set by the user or this function previously)
-    //3. colours specified in variables.yaml, if applicable (raster only)
-    //4. defaults (raster rainbow if a single dataset,
-    //             raster greyscale and isolines rainbow for 2)
-    var sPalette, cPalette;
-    if(nextProps.rasterPalette) {
-      sPalette = nextProps.rasterPalette;
-      cPalette = nextProps.isolinePalette;
-    }
-    else if(this.state.rasterPalette && !switchVariable) {
-      sPalette = this.state.rasterPalette;
-      cPalette = this.state.isolinePalette;
-    }
-    else if (!_.isUndefined(getVariableOptions(newVariableId, "defaultRasterPalette")))
-    {
-      sPalette = getVariableOptions(newVariableId, "defaultRasterPalette");
-      if(nextProps.comparandMeta) {
-        cPalette = 'x-Occam';
-      }
-    }
-    else if(nextProps.comparandMeta){
-      sPalette = 'seq-Greys';
-      cPalette = 'x-Occam';
-    }
-    else{
-      sPalette = 'x-Occam';
-    }
     
     if(nextProps.meta.length > 0) {
+      var newVariableId = nextProps.meta[0].variable_id;
+      var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
+      var hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+      if(hasComparand){
+        var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
+        var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+      }
+      var defaultDataset = nextProps.meta[0];
+      this.layerRange = {};
+
+      //clear stored layer value ranges.
+      _.each(["raster", "isoline"], layer => {
+        this.layerRange[layer] = undefined;
+      });
+
+      //check to see whether the variables displayed have been switched.
+      //if so, unset logarithmic display; default is linear.
+      var switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
+
+      //set display colours. In order of preference:
+      //1. colours received by prop
+      //2. colours from state (set by the user or this function previously)
+      //3. colours specified in variables.yaml, if applicable (raster only)
+      //4. defaults (raster rainbow if a single dataset,
+      //             raster greyscale and isolines rainbow for 2)
+      var sPalette, cPalette;
+      if(nextProps.rasterPalette) {
+        sPalette = nextProps.rasterPalette;
+        cPalette = nextProps.isolinePalette;
+      }
+      else if(this.state.rasterPalette && !switchVariable) {
+        sPalette = this.state.rasterPalette;
+        cPalette = this.state.isolinePalette;
+      }
+      else if (!_.isUndefined(getVariableOptions(newVariableId, "defaultRasterPalette")))
+      {
+        sPalette = getVariableOptions(newVariableId, "defaultRasterPalette");
+        if(nextProps.comparandMeta) {
+          cPalette = 'x-Occam';
+        }
+      }
+      else if(nextProps.comparandMeta){
+        sPalette = 'seq-Greys';
+        cPalette = 'x-Occam';
+      }
+      else{
+        sPalette = 'x-Occam';
+      }
+
       this.loadMap(nextProps, defaultDataset, sPalette, cPalette, switchVariable, switchComparand);
     }
     else {
