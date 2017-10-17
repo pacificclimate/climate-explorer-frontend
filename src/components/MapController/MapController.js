@@ -494,12 +494,20 @@ var MapController = React.createClass({
       }).unique_id;
     
       if(this.props.comparandMeta) {
-        isolineDatasetID = _.findWhere(this.props.comparandMeta, {
+        var isolineDataset = _.findWhere(this.props.comparandMeta, {
           ensemble_member: this.state.run,
           start_date: this.state.start_date,
           end_date: this.state.end_date,
           timescale: timeindex.timescale      
-        }).unique_id;
+        });
+
+        //isolineDataset may not exist, typically in cases where
+        //the timescales between the variable differ.
+        //In this case, the isoline dataset isn't shown.
+        isolineDatasetID = isolineDataset ? isolineDataset.unique_id : undefined;
+
+        //TODO: fall back to showing the "closest matching" isoline dataset?
+        //have footer display exactly what is shown?
       }
     }    
 
