@@ -400,11 +400,11 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
       var series = [runName];
       
       //if a given timestamp is present in some, but not all
-      //datasets, that timestamp's value will be "undefined"
+      //datasets, set the timestamp's value to "null"
       //in the C3 data object. This will cause C3 to render the
       //line with a break where the missing timestamp is.
       for(var t = 0; t < timestamps.length; t++ ) {
-        series.push(call[run].data[timestamps[t]]);
+        series.push(call[run].data[timestamps[t]] ? call[run].data[timestamps[t]] : null);
       }
       c3Data.columns.push(series);
       c3Data.types[runName] = "line";
@@ -616,13 +616,13 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
     var column = [timeseriesName];
 
     for(var t = 0; t < timestamps.length; t++ ) {
-      //assigns "undefined" for any timestamps missing from this series.
-      //C3 disconnects the line for undefined values.
-      column.push(timeseries.data[timestamps[t]]);
+      //assigns "null" for any timestamps missing from this series.
+      //C3's behaviour toward null values is set by the line.connectNull attribute
+      column.push(timeseries.data[timestamps[t]] ? timeseries.data[timestamps[t]] : null);
     }
 
     c3Data.columns.push(column);
-    c3Data.types[timeseriesName] = "spline";
+    c3Data.types[timeseriesName] = "line";
 
     //Each timeseries needs to be associated with a y-axis.
     //Two different variables measured with the same units,
@@ -656,6 +656,15 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   var c3Subchart = {show: true,
       size: {height: 20} };
 
+  //instructs c3 to connect series across gaps where a timeseries is missing
+  //a timestamp. While this could be confusing in cases where a datapoint
+  //is actually missing from a series, it's helpful in cases where
+  //series are at different time resolutions (monthly/yearly), so it's
+  //included by default.
+  var c3Line = {
+      connectNull: true
+  };
+
   var precision = makePrecisionBySeries(seriesVariables);
   var c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
@@ -665,7 +674,8 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
     data: c3Data,
     subchart: c3Subchart,
     tooltip: c3Tooltip,
-    axis: c3Axis
+    axis: c3Axis,
+    line: c3Line
   }; 
 };
 

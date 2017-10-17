@@ -422,7 +422,7 @@ var DualDataController = React.createClass({
       timeseriesTab = (<Tab>Time Series</Tab>);
       timeseriesTabPanel = (
         <TabPanel>
-          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
+          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} line={timeseriesData.line} />
           <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
         </TabPanel>
       );
