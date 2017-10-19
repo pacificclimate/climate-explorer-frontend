@@ -75,19 +75,21 @@ var CanadaMap = React.createClass({
   
   //get map formatting parameters for the raster or isoline layers.
   getWMSParams: function (layer, props = this.props) {
+    var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
+
     var params = {
+        layers: layerName,
         noWrap: true,
         format: "image/png",
         transparent: true,
         opacity: 80,
-        time: props.time,
+        time: props[`${layer}Time`],
         numcolorbands: 249,
         version: "1.1.1",
         srs: "EPSG:4326",
         logscale: "false"
     };
     if(layer == "raster") {
-      params.layers = `${props.rasterDataset}/${props.rasterVariable}`;
       params.styles = `default-scalar/${props.rasterPalette}`;
       if(props.rasterLogscale=="true" && !_.isUndefined(this.layerRange.raster)) {
         //clip the dataset to > 0, values of 0 or less do not have a
@@ -101,7 +103,6 @@ var CanadaMap = React.createClass({
       }
     }
     else if (layer == "isoline") {
-      params.layers = `${props.isolineDataset}/${props.isolineVariable}`;
       params.styles = `colored_contours/${props.isolinePalette}`;
       params.numContours = props.numberOfContours;
       if(props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
@@ -392,9 +393,11 @@ var CanadaMap = React.createClass({
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
     if(this.ncwmsRasterLayer) {
       delete(this.ncwmsRasterLayer.wmsParams.colorscalerange);
+      delete(this.ncwmsRasterLayer.wmsParams.layers);
     }
     if(this.ncwmsIsolineLayer) {
       delete(this.ncwmsIsolineLayer.wmsParams.colorscalerange);
+      delete(this.ncwmsIsolineLayer.wmsParams.layers);
     }
 
     if(newProps.rasterDataset) {
