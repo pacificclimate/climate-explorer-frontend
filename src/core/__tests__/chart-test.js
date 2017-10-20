@@ -198,7 +198,6 @@ describe('shortestUniqueTimeseriesNamingFunction', function () {
   });
 });
 
-
 describe('dataToLongTermAverageGraph', function() {
   it('rejects datasets with missing metadata', function () {
     var func = function () {chart.dataToLongTermAverageGraph(
@@ -253,15 +252,19 @@ describe('getAllTimestamps', function() {
     var func = function () {chart.getAllTimestamps([{"r1p1i1": {"data": {}}}]);};
     expect(func).toThrow();
   });
-  it('returns timestamps associated with a single data set', function () {
+  it('returns timestamps associated with a data API call', function () {
     var stamps = chart.getAllTimestamps([mockAPI.tasmaxData]);
     expect(stamps.length).toBe(6);
   });
-  it('combines timestamps from multiple data sets', function () {
+  it('combines timestamps from multiple data API calls', function () {
     var fakeData = JSON.parse(JSON.stringify(mockAPI.tasminData));
     fakeData["r1i1p1"].data = {"1990-04-01T00:00:00Z": 20, "1997-01-15T00:00:00Z": 0};
     var stamps = chart.getAllTimestamps([mockAPI.tasmaxData, fakeData]);
     expect(stamps.length).toBe(7);
+  });
+  it('extracts timestamps from timeseries API calls', function () {
+    var stamps = chart.getAllTimestamps([mockAPI.monthlyTasmaxTimeseries, mockAPI.seasonalTasmaxTimeseries]);
+    expect(stamps.length).toBe(16);
   });
 });
 
@@ -284,7 +287,40 @@ describe('nameAPICallParametersFunction', function () {
     expect(nameFunction("r1i1p1", tasmaxQuery)).toBe("tasmax r1i1p1");
     expect(nameFunction("r1i1p1", tasminQuery)).toBe("tasmin r1i1p1");
   });
-  
+});
+
+describe('timeseriesToTimeSeriesGraph', function () {
+  var metadata = mockAPI.metadataToArray();
+  it('rejects data sets with too many units', function () {
+    var fakeData = JSON.parse(JSON.stringify(mockAPI.monthlyTasminTimeseries));
+    fakeData.units = "meters";
+    var func = function () {
+      chart.timeseriesToTimeseriesGraph(metadata, fakeData,
+          mockAPI.monthlyTasmaxTimeseries, mockAPI.monthlyPrTimeseries);
+      };
+    expect(func).toThrow();
+  });
+  it('displays a single timeseries', function () {
+    var c = chart.timeseriesToTimeseriesGraph(metadata, mockAPI.monthlyTasmaxTimeseries);
+    expect(validate.allDefinedObject(c)).toBe(true);
+    expect(c.data.columns[0][0]).toMatch('x');
+    expect(c.data.columns.length).toEqual(2);
+    expect(c.data.columns[0].length).toEqual(13);
+    expect(c.axis.x).toBeDefined();
+    expect(c.axis.y).toBeDefined();
+    expect(c.axis.y2).not.toBeDefined();
+  });
+  it('displays two timeseries with different units', function() {
+    var c = chart.timeseriesToTimeseriesGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.monthlyPrTimeseries);
+    expect(validate.allDefinedObject(c)).toBe(true);
+    expect(c.data.columns[0][0]).toMatch('x');
+    expect(validate.isRectangularArray(c.data.columns, 3, 13)).toBe(true);
+    expect(validate.allDefinedArray(c.data.columns)).toBe(true);
+    expect(c.axis.x).toBeDefined();
+    expect(c.axis.y).toBeDefined();
+    expect(c.axis.y2).toBeDefined();
+  });
 });
 
 describe('assignColoursByGroup', function () {

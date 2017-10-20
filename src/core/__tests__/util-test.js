@@ -151,6 +151,37 @@ var mockAPI = require('./sample-API-results');
     });
   });
   
+  describe('validateUnstructureTimeseriesData', function () {
+    it('rejects empty data sets', function () {
+      var func = function () {util.validateUnstructuredTimeseriesData({data: {}});};
+      expect(func).toThrow();
+    });
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateUnstructuredTimeseriesData({data: 
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects data sets without units', function () {
+      var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
+      var func = function () {util.validateUnstructuredTimeseriesData({data: noUnits});};
+      expect(func).toThrow();
+    });
+    it('rejects an empty timeseries', function () {
+      var noTimestamps = _.omit(mockAPI.monthlyTazmarTimeseries, "times");
+      noTimestamps.times = {};
+      var func = function () {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
+      expect(func).toThrow();
+    });
+    it('accepts a valid timeseries', function () {
+      var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
+      expect(util.validateUnstructuredTimeseriesData({data: concatenatedTasmaxTimeseries})).toEqual({data: concatenatedTasmaxTimeseries});
+    });
+  });
+
   //Depends on an external .yml file, variable-options.yaml. 
   //Under normal circumstances, webpack transforms the file and makes it
   //accessible. It is theoretically possible to have jest run similar 
