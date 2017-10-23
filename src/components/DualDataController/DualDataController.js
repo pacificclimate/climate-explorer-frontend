@@ -159,7 +159,7 @@ var DualDataController = React.createClass({
    * view on the Annual Cycle graph. Stores the selected run and period 
    * in state, fetches new data, and updates the graph.
    */
-  updateAnnuaCycleDataset: function (instance) {
+  updateAnnualCycleDataset: function (instance) {
     this.loadDualAnnualCycleGraph(this.props, JSON.parse(instance));
   },
   
