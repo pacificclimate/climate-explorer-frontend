@@ -104,6 +104,19 @@ var ncWMSColorbarControl = L.Control.extend({
       });
 
       var getMinMax = layerInfo => {
+        var bbox = layerInfo.data.bbox;
+        if(bbox[0] == bbox[2] || bbox[1] == bbox[3]) {
+          //This netcdf file does not have a valid bounding box, or ncWMS
+          //cannot generate a valid bounding box for it. This is likely due to
+          //processing by a latitude normalization script.
+          //See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
+          //In this case, longitudes in the file run from 0 to 180, then from -180
+          //to zero, which results in the eastmost and westmost points of the file
+          //both being 0, giving the entire file a null bounding box.
+          //Supply a Canada-centered bounding box, ignoring the worldwide extent
+          //of this file.
+          bbox = [-150, 40, -50, 90];
+        }
         return axios(this.layer._url, {
           params: {
             request: 'GetMetadata',
@@ -111,7 +124,7 @@ var ncWMSColorbarControl = L.Control.extend({
             layers: escape(this.layer.wmsParams.layers),
             styles: 'default-scalar',
             version: '1.1.1',
-            bbox: layerInfo.data.bbox.join(),
+            bbox: bbox.join(),
             srs: this.layer.wmsParams.srs,
             crs: this.layer.wmsParams.srs,
             time: this.layer.wmsParams.time,

@@ -128,6 +128,21 @@ var CanadaMap = React.createClass({
   updateLayerMinmax: function (layer, props) {
     try {
       var bounds = this.map.getBounds();
+      if(bounds.getWest() == bounds.getEast()) {
+        //This netCDF file has an invalid bounding box, presumably because it has been
+        //through a longitude normalization process.
+        //See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
+        //As a result, longitudes in the file go from 0 to 180, then -180 to
+        //0. This means the westmost boundary and the eastmost boundary
+        //are both zero (actually -.5675 or something like that, the center of a cell
+        //with one edge at 0.)
+        //Passing a bounding box with identical eastmost and westmost bounds to
+        //ncWMS results in an error, so create a new Canada-only bounding box and
+        //ignore the worldwide extent of this map.
+        var corner1 = L.latLng(90, -50);
+        var corner2 = L.latLng(40, -150);
+        bounds = L.latLngBounds(corner1, corner2);
+      }
       var minmaxParams = _.pick(this.getWMSParams(layer, props),
           "layers", "styles", "version", "srs", "time");
       _.extend(minmaxParams, {

@@ -301,11 +301,10 @@ var MapController = React.createClass({
     //update the comparand too
     if(this.hasValidData("comparand") &&
         this.state.linkTimes &&
-        dataset == "variabls") {
+        symbol == "variable") {
       update.comparandTimeIdx = timeidx;
       update.comparandWmsTime = this.state.comparandTimes[timeidx];
     }
-
     this.setState(update);
   },
 
@@ -405,12 +404,14 @@ var MapController = React.createClass({
     //user has chosen to link up times across the two variables, so
     //disable the comparand time selector.
     if(this.state.linkTimes && symbol == "comparand") {
-      return (
+      var selector = (
           <Selector
             label={labelText}
             disabled={true}
           />
       );
+      selector = this.addTooltipWrapper(selector, "Timestamp matching is activated", "right");
+      return selector;
     }
 
     var timeOptions = _.map(times, function (v, k) {
@@ -531,10 +532,13 @@ var MapController = React.createClass({
         );
 
     if(disabled) {
-      button = this.addTooltipWrapper(button, "Available timestamps in data do not match", bottom);
+      button = this.addTooltipWrapper(button, "Available timestamps in data do not match", "bottom");
+    }
+    else if (this.state.linkTimes) {
+      button = this.addTooltipWrapper(button, "Turn off timestamp matching", "bottom");
     }
     else {
-      button = this.addTooltipWrapper(button, "Match time selection across variables");
+      button = this.addTooltipWrapper(button, "Activate timestamp matching", "bottom");
     }
 
     var panel = (
