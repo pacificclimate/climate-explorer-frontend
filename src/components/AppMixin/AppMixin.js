@@ -72,7 +72,14 @@ var AppMixin = {
   },
 
   getVariableIdNameArray: function () {
-    var varArray = _.zip(this.getMetadataItems('variable_id'), this.getMetadataItems('variable_name'));
+    var descriptions = {};
+    _.each(this.state.meta, m => {
+      var variable = m.variable_id;
+      descriptions[variable] = this.getMergedVariableDescription(variable) ?
+          this.getMergedVariableDescription(variable) : m.variable_name;
+    });
+
+    var varArray = _.zip(_.keys(descriptions), _.values(descriptions));
     var varNames = _.map(varArray, function (v) {
       return v[0] + ' - ' + v[1];
     });
@@ -80,6 +87,40 @@ var AppMixin = {
       return a[0] > b[0] ? 1 : -1;
     });
     return varOptions;
+
+  /*****************************************************************
+   * This is the old functionality of getVariableIdNameAray, which
+   * is more straightforward and efficient. It should be restored
+   * when the metadata is fixed to remove variable_ids with
+   * conflicting descriptions.
+   *****************************************************************
+   * var varArray = _.zip(this.getMetadataItems('variable_id'), this.getMetadataItems('variable_name'));
+   * var varNames = _.map(varArray, function (v) {
+   *   return v[0] + ' - ' + v[1];
+   * });
+   * var varOptions = _.zip(this.getMetadataItems('variable_id'), varNames).sort(function (a, b) {
+   *   return a[0] > b[0] ? 1 : -1;
+   * });
+   * return varOptions;
+   *******************************************************************/
+  },
+
+  //This function is a kludge to resolve variable_ids associated with more 
+  //than one description. It provides a canonical description for
+  //cases where multiple descriptions are associated with a single variable.
+  //Typically this applies to indices calculated seperately over differnt
+  //timescales, but accidentally assigned the same variable_id.
+  //This function should be removed when it is no longer necessary.
+  getMergedVariableDescription: function (variable) {
+    var descriptions = {
+        "rx1dayETCCDI":  "Maximum 1-day Precipitation",
+        "txxETCCDI": "Maximum of Daily Maximum Temperature",
+        "tnxETCCDI": "Maximum of Daily Minimum Temperature",
+        "rx5dayETCCDI": "Maximum Consecutive 5-day Precipitation",
+        "txnETCCDI": "Minimum of Daily Maximum Temperature",
+        "tnnETCCDI": "Minimum of Daily Minimum Temperature"
+    };
+    return descriptions[variable];
   },
 
   updateSelection: function (param, selection) {
