@@ -53,13 +53,13 @@ var mockAPI = require('./sample-API-results');
     });
   });
  
-  describe('validateProjectedChangeData', function () {
+  describe('validateLongTermAverageData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateProjectedChangeData({data: {}});};
+      var func = function () {util.validateLongTermAverageData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateProjectedChangeData( { data: 
+      var func = function () {util.validateLongTermAverageData( { data: 
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -68,13 +68,13 @@ var mockAPI = require('./sample-API-results');
     it('rejects data without units', function () {
       var noUnits = {"data": {}};
       noUnits.data["r1i1pi"] = _.omit(noUnits.data["r1i1p1"], 'units');
-      var func = function () {util.validateProjectedChangeData(noUnits);};
+      var func = function () {util.validateLongTermAverageData(noUnits);};
       expect(func).toThrow();
     });
     it('accepts valid data', function () {
       var valid = {};
       valid.data = mockAPI.tasmaxData;
-      expect(util.validateProjectedChangeData(valid)).toBe(valid);
+      expect(util.validateLongTermAverageData(valid)).toBe(valid);
     });
   });
   
@@ -151,6 +151,37 @@ var mockAPI = require('./sample-API-results');
     });
   });
   
+  describe('validateUnstructureTimeseriesData', function () {
+    it('rejects empty data sets', function () {
+      var func = function () {util.validateUnstructuredTimeseriesData({data: {}});};
+      expect(func).toThrow();
+    });
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateUnstructuredTimeseriesData({data: 
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects data sets without units', function () {
+      var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
+      var func = function () {util.validateUnstructuredTimeseriesData({data: noUnits});};
+      expect(func).toThrow();
+    });
+    it('rejects an empty timeseries', function () {
+      var noTimestamps = _.omit(mockAPI.monthlyTazmarTimeseries, "times");
+      noTimestamps.times = {};
+      var func = function () {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
+      expect(func).toThrow();
+    });
+    it('accepts a valid timeseries', function () {
+      var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
+      _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
+      expect(util.validateUnstructuredTimeseriesData({data: concatenatedTasmaxTimeseries})).toEqual({data: concatenatedTasmaxTimeseries});
+    });
+  });
+
   //Depends on an external .yml file, variable-options.yaml. 
   //Under normal circumstances, webpack transforms the file and makes it
   //accessible. It is theoretically possible to have jest run similar 
@@ -163,11 +194,28 @@ var mockAPI = require('./sample-API-results');
     xit('returns the requested option', function () {});
   });
 
-  describe('timeIndexToTimeOfYear', function() {
+  describe('timeKeyToTimeOfYear', function() {
     it('converts a time index into human-readable string', function () {
-      expect(util.timeIndexToTimeOfYear(1)).toBe("February");
-      expect(util.timeIndexToTimeOfYear(16)).toBe("Annual");
-      expect(util.timeIndexToTimeOfYear(39)).toBe(undefined);
+      expect(util.timeKeyToTimeOfYear(1)).toBe("February");
+      expect(util.timeKeyToTimeOfYear(16)).toBe("Annual");
+      expect(util.timeKeyToTimeOfYear(39)).toBe(undefined);
+    });
+  });
+
+  describe('timeKeyToResolutionIndex', function () {
+    it('converts a time index into a resolution / index pairing', function () {
+      expect(util.timeKeyToResolutionIndex(0)).toEqual({timescale: "monthly", timeidx: 0});
+      expect(util.timeKeyToResolutionIndex(16)).toEqual({timescale: "yearly", timeidx: 0});
+      expect(util.timeKeyToResolutionIndex(13)).toEqual({timescale: "seasonal", timeidx: 1});
+      expect(util.timeKeyToResolutionIndex(30)).toBe(undefined);
+    });
+  });
+
+  describe('resolutionIndexToTimeKey', function () {
+    it('converts a resolution/index pairing into a time index', function () {
+      expect(util.resolutionIndexToTimeKey("monthly", 0)).toBe(0);
+      expect(util.resolutionIndexToTimeKey("yearly", 0)).toBe(16);
+      expect(util.resolutionIndexToTimeKey("seasonal", 1)).toBe(13);
     });
   });
 
@@ -203,6 +251,13 @@ var mockAPI = require('./sample-API-results');
     });
     it('does not convert unrecognized resolutions', function () {
       expect(util.timestampToTimeOfYear("1977-07-05T00:00:00Z", "daily", true)).toBe("1977-07-05T00:00:00Z");
+    });
+  });
+
+  describe('timestampToYear', function () {
+    it('extracts the year from ISO 8601 timestamps', function () {
+      expect(util.timestampToYear("1977-01-01T11:32:12Z")).toBe("1977");
+      expect(util.timestampToYear("2020-03-24")).toBe("2020");
     });
   });
 

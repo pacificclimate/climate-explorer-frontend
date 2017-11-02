@@ -37,6 +37,13 @@ var App = React.createClass({
 
   mixins: [AppMixin],
   
+  //This function filters out datasets inappropriate for this portal. A dataset
+  //the filter returns "false" on will be removed.
+  //Filters out multi-year monthly datasets; too noisy to be useful.
+  datasetFilter: function (datafile) {
+    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+  },
+
   //because componentDidMount() is shared by all three App Controllers via a 
   //mixin, it doesn't set the initial state of the comparison variable 
   //(comparand_id), so needs to be initialized seperately here.

@@ -14,3 +14,9 @@
 	bottom: 0px;
 	left: 10px;
 }
+
+.linkbutton {
+	position: relative;
+	top: 25px;
+	left: -10px;
+}

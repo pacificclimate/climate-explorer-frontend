@@ -19,9 +19,10 @@ import urljoin from 'url-join';
 import axios from 'axios';
 import {exportDataToWorksheet, 
         generateDataCellsFromC3Graph} from '../../core/export';
-import {validateProjectedChangeData, 
+import {validateLongTermAverageData,
         validateStatsData, 
-        validateAnnualCycleData} from '../../core/util';
+        validateAnnualCycleData,
+        validateUnstructuredTimeseriesData} from '../../core/util';
 
 var ModalMixin = {
 
@@ -40,7 +41,7 @@ var ModalMixin = {
   componentWillReceiveProps: function (nextProps) {
     if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
       this.setState({
-        timeSeriesDatasetId: nextProps.meta[0].unique_id,
+        timeseriesDatasetId: nextProps.meta[0].unique_id,
       });
       this.getData(nextProps);
     }
@@ -52,8 +53,9 @@ var ModalMixin = {
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
       var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
-                                   this.setClimoSeriesNoDataMessage,
-                                   this.setTimeSeriesNoDataMessage];
+                                   this.setLongTermAverageGraphNoDataMessage,
+                                   this.setAnnualCycleGraphNoDataMessage,
+                                   this.setTimeseriesGraphNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
@@ -67,27 +69,27 @@ var ModalMixin = {
         {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
   },
 
-  exportTimeSeries: function(format) {
+  exportAnnualCycle: function(format) {
    //Determine period and run to export. Location varies depending on the portal and whether
    //it displays a single datafile or multiple datafiles at once. 
    //Period and run parameters describing a set of multiple displayed datafiles files are 
-   //stored as this.state.timeSeriesInstance. 
+   //stored as this.state.timeseriesInstance. 
    //If the portal has only one active dataset at a time, run and period are 
    //extracted from that dataset's metadata.
    var instance;
-   if(this.state.timeSeriesInstance) {
-     instance = this.state.timeSeriesInstance;
+   if(this.state.annualCycleInstance) {
+     instance = this.state.annualCycleInstance;
    }
    else {
-     instance = _.pick(this.getMetadata(this.state.timeSeriesDatasetId),
+     instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
          "start_date", "end_date", "ensemble_member");
    }
-   exportDataToWorksheet("timeseries", this.props, this.state.timeSeriesData, format, instance);
+   exportDataToWorksheet("timeseries", this.props, this.state.timeseriesData, format, instance);
   },
 
-  exportClimoSeries: function(format) {
-    exportDataToWorksheet("climoseries", this.props, this.state.climoSeriesData, format, 
-        {timeidx: this.state.projChangeTimeOfYear, timeres:this.state.projChangeTimeScale});
+  exportLongTermAverage: function(format) {
+    exportDataToWorksheet("climoseries", this.props, this.state.longTermAverageData, format, 
+        {timeidx: this.state.longTermAverageTimeOfYear, timeres:this.state.longTermAverageTimeScale});
   },
 
   injectRunIntoStats: function (data) {
@@ -101,6 +103,8 @@ var ModalMixin = {
     return data;
   },
 
+  //Fetches and validates data from a call to the backend's
+  //"data" API endpoint
   getDataPromise: function (props, timeres, timeidx) {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'data'),
@@ -113,9 +117,11 @@ var ModalMixin = {
         area: props.area || "",
         time: timeidx,
       }
-    }).then(validateProjectedChangeData);
+    }).then(validateLongTermAverageData);
   },
 
+  //Fetches and validates data from a call to the backend's
+  //"multistat" API endpoint
   getStatsPromise: function (props, timeidx) {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
@@ -130,15 +136,18 @@ var ModalMixin = {
     }).then(validateStatsData);
   },
 
-  getTimeseriesPromise: function (props, timeSeriesDatasetId) {
+  //Fetches and validates data from a call to the backend's
+  //"timeseries" endpoint
+  getTimeseriesPromise: function (props, timeseriesDatasetId) {
+    var validate = this.multiYearMeanSelected() ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
       params: {
-        id_: timeSeriesDatasetId || null,
+        id_: timeseriesDatasetId || null,
         variable: props.variable_id,
         area: props.area || "",
       }
-    }).then(validateAnnualCycleData);
+    }).then(validate);
   },
 
     /*
@@ -191,6 +200,17 @@ var ModalMixin = {
       return _.find(meta, function(m) {return m.unique_id === id;} );
     },
     
+    //Indicates whether or not the currently selected dataset is
+    //a multi-year-mean
+    multiYearMeanSelected: function(props = this.props) {
+      if(_.isUndefined(props) || props.meta.length == 0) {
+        return undefined;
+      }
+      var params = _.pick(props, "model_id", 'variable_id', 'experiment');
+      var selectedMetadata = _.findWhere(props.meta, params);
+      return selectedMetadata.multi_year_mean;
+    },
+
     /*
      * Filters data from any call to the API that returns an object with 
      * individual values keyed to unique_ids. It returns a new object 
@@ -216,6 +236,14 @@ var ModalMixin = {
       }
       return filtered;
     },
+
+    //Used to render uninitialized C3 graphs.
+    blankGraph: {
+      data: {
+        columns: []
+      },
+      axis: {}
+    }
 };
 
 export default ModalMixin;

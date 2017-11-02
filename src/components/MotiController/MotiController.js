@@ -16,6 +16,13 @@ var App = React.createClass({
 
   mixins: [AppMixin],
 
+  //This function is used to filter which datasets will be used by this
+  //portal. Datasets the filter returns "false" on will not be added to
+  //the set of available datasets. Filters out noisy monthly non-mean datasets.
+  datasetFilter: function (datafile) {
+    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+  },
+
   render: function () {
     return (
       <Grid fluid>

@@ -1,3 +1,8 @@
 .exportlabel {
 	display: block;
 }
+
+.graphlabel {
+	display: block;
+	text-align: center;
+}

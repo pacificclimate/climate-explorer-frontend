@@ -14,7 +14,7 @@
 import _ from 'underscore';
 import urljoin from 'url-join';
 import axios from 'axios';
-import moment from 'moment';
+import {timestampToYear} from '../../core/util';
 
 var AppMixin = {
   getInitialState: function () {
@@ -35,18 +35,20 @@ var AppMixin = {
           vars = Object.keys(response.data[key].variables);
 
           for (var v in vars) {
-            var start = response.data[key].start_date;
-            start = moment(start, moment.ISO_8601).utc().format('YYYY');
-            var end = response.data[key].end_date;
-            end = moment(end, moment.ISO_8601).utc().format('YYYY');
+            var start = timestampToYear(response.data[key].start_date);
+            var end = timestampToYear(response.data[key].end_date);
 
-            models.push(_.extend({
-              unique_id: key,
-              variable_id: vars[v],
-              start_date: start,
-              end_date: end,
-              variable_name: response.data[key].variables[vars[v]],
-              }, _.omit(response.data[key], 'variables', 'start_date', 'end_date')));
+            //If this app has a dataset filter defined, filter the data
+            if(typeof this.datasetFilter == "undefined" ||
+                this.datasetFilter(response.data[key])) {
+              models.push(_.extend({
+                unique_id: key,
+                variable_id: vars[v],
+                start_date: start,
+                end_date: end,
+                variable_name: response.data[key].variables[vars[v]],
+                }, _.omit(response.data[key], 'variables', 'start_date', 'end_date')));
+              }
             }
           }
 
@@ -81,7 +83,7 @@ var AppMixin = {
     });
     return varOptions;
   },
-
+  
   updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);

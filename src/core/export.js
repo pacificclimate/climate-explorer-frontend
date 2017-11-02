@@ -8,14 +8,12 @@
  * Built around the js-xlsx library
  *******************************************************************/
 
-var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
-import { timeIndexToTimeOfYear, 
-         timeResolutionIndexToTimeOfYear,
+import { timeResolutionIndexToTimeOfYear,
          PRECISION,
          getVariableOptions} from './util';
 
@@ -25,7 +23,7 @@ import { timeIndexToTimeOfYear,
 
 /*
  * Takes current data displayed in the DataTable, Annual Cycle graph, or
- * Projected Change graph, along with contextual data from user input, creates
+ * Long Term Average graph, along with contextual data from user input, creates
  * an XLSX or CSV file, and serves it to the user for download. Draws on example
  * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
  * 
@@ -56,9 +54,9 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   var filenameSuffix = "." + format;
   switch(datatype) {
     case "timeseries":
-      summaryCells = createTimeSeriesWorksheetSummaryCells(metadata, selection);
+      summaryCells = createTimeseriesWorksheetSummaryCells(metadata, selection);
       dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
-      outputFilename = `${filenamePrefix}TimeSeries${filenameInfix}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}Timeseries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
       timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
@@ -70,7 +68,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
-      outputFilename = `${filenamePrefix}ProjectedChange${filenameInfix}_${timeOfYear}${filenameSuffix}`;
+      outputFilename = `${filenamePrefix}LongTermAverage${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
   }
 
@@ -120,8 +118,8 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
 
 /*
  * Helper function for exportDataToWorksheet, creates summary rows that appear
- * at the top of the exported worksheet for exported stats table or Projected
- * Change data. Draws on example code from js-xlsx docs:
+ * at the top of the exported worksheet for exported stats table or Long Term
+ * Average data. Draws on example code from js-xlsx docs:
  * https://github.com/SheetJS/js-xlsx
  */
 var createWorksheetSummaryCells = function (metadata, timeOfYear) {
@@ -157,7 +155,7 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
-var createTimeSeriesWorksheetSummaryCells = function (metadata, instance) {
+var createTimeseriesWorksheetSummaryCells = function (metadata, instance) {
 
   var rows = [];
   var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
@@ -322,4 +320,4 @@ var assembleWorksheet = function (cells) {
 };
 
 module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
-    createTimeSeriesWorksheetSummaryCells, generateDataCellsFromC3Graph};
+    createTimeseriesWorksheetSummaryCells, generateDataCellsFromC3Graph};

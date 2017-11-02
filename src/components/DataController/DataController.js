@@ -1,17 +1,27 @@
 /*******************************************************************
  * DataController.js - controller component for in-depth numerical
  * visualization
- * 
+ *
  * Receives a model, an experiment, and a variable from its parent,
  * AppController. Presents the user with widgets to allow selection 
  * of a particular slice of data (time of year or run) and download 
  * of selected data. 
+ *
+ * Queries the API to retrieve the selected data generates graphs and
+ * tables from it as viewing components. 
+ *
+ * If the selected dataset is a multi year mean climatology:
+ *  - an Annual Cycle Datagraph with monthly, seasonal, and annual
+ *    resolution (if available)
  * 
- * Queries the API to retrieve the selected data and controls three 
- * viewing components: 
- * - a DataTable with statistics about each qualifying run 
- * - an annual cycle DataGraph with monthly, seasonal, and annual lines 
- * - a projected change DataGraph with each run displayed separately
+ *  - a Long Term Average Datagraph showing the mean of each climatology
+ *    period as a seperate data point.
+ *
+ * If the selected dataset is not a multi year mean:
+ *  - a Time Series Datagraph showing each time point available.
+ *
+ * A Data Table viewer component showing statistical information for each
+ * climatology period or timeseries is also generated. 
  *******************************************************************/
 
 import React from 'react';
@@ -22,9 +32,13 @@ import _ from 'underscore';
 
 import styles from './DataController.css';
 
-import { parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData,
+         timeResolutionIndexToTimeOfYear,
+         timeKeyToResolutionIndex,
+         resolutionIndexToTimeKey} from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
-        dataToProjectedChangeGraph} from '../../core/chart';
+        dataToLongTermAverageGraph,
+        timeseriesToTimeseriesGraph} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -45,41 +59,49 @@ var DataController = React.createClass({
 
   getInitialState: function () {
     return {
-      projChangeTimeOfYear: 0,
-      projChangeTimeScale: "monthly",
+      longTermAverageTimeOfYear: 0,
+      longTermAverageTimeScale: "monthly",
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      timeSeriesInstance: undefined,
-      climoSeriesData: undefined,
-      timeSeriesData: undefined,
+      annualCycleInstance: undefined,
+      longTermAverageData: undefined,
+      annualCycleData: undefined,
+      timeseriesData: undefined,
       statsData: undefined,
     };
   },
 
   /*
    * Called when DataController is first loaded. Selects and fetches 
-   * arbitrary initial data to display in the Projected Change graph, 
-   * Annual Cycle Graph, and stats table. 
+   * arbitrary initial data to display in the graphs and stats table. 
    * Monthly time resolution, January, on the first run returned by the API.
    */
   getData: function (props) {
-    this.loadTimeSeries(props);
-    this.loadClimoSeries(props);
-    this.loadDataTable(props);
+    //if the selected dataset is a multi-year mean, load annual cycle
+    //and long term average graphs, otherwise load a timeseries graph
+    if(this.multiYearMeanSelected(props)) {
+      this.loadAnnualCycleGraph(props);
+      this.loadLongTermAverageGraph(props);
+      this.loadDataTable(props);
+    }
+    else {
+      this.loadTimeseriesGraph(props);
+      this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
+    }
   },
 
   //Removes all data from the Annual Cycle graph and displays a message
-  setTimeSeriesNoDataMessage: function(message) {
+  setAnnualCycleGraphNoDataMessage: function(message) {
     this.setState({
-      timeSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
                         axis: {} },
       });
   },
 
-  //Removes all data from the Projected Change graph and displays a message
-  setClimoSeriesNoDataMessage: function(message) {
+  //Removes all data from the Long Term Average graph and displays a message
+  setLongTermAverageGraphNoDataMessage: function(message) {
     this.setState({
-      climoSeriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+      longTermAverageData: { data: { columns: [], empty: { label: { text: message }, }, },
                          axis: {} },
       });
   },
@@ -92,23 +114,32 @@ var DataController = React.createClass({
     });
   },
 
+  //Removes all data from the Timeseries Graph and displays a message
+  setTimeseriesGraphNoDataMessage: function(message) {
+    this.setState({
+      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+                         axis: {} },
+      });
+  },
+
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return !(_.isEqual(nextState.climoSeriesData, this.state.climoSeriesData) &&
+     return !(_.isEqual(nextState.longTermAverageData, this.state.longTermAverageData) &&
      _.isEqual(nextState.statsData, this.state.statsData) &&
-     _.isEqual(nextState.timeSeriesData, this.state.timeSeriesData) &&
+     _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
+     _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
 
   /*
    * Called when the user selects a time of year to display on the
-   * Projected Change graph. Records the new time index and resolution
-   * in state, fetches new data, and redraws the Projected Change graph.
+   * Long Term Average graph. Records the new time index and resolution
+   * in state, fetches new data, and redraws the Long Term Average graph.
    */
-  updateProjChangeTimeOfYear: function (timeidx) {
-    this.loadClimoSeries(this.props, JSON.parse(timeidx));
+  updateLongTermAverageTimeOfYear: function (timeidx) {
+    this.loadLongTermAverageGraph(this.props, timeKeyToResolutionIndex(timeidx));
   },
 
   /* 
@@ -117,7 +148,7 @@ var DataController = React.createClass({
    * in state, and updates the table.
    */
   updateDataTableTimeOfYear: function (timeidx) {
-    this.loadDataTable(this.props, JSON.parse(timeidx));
+    this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
     },
 
   /*
@@ -125,8 +156,8 @@ var DataController = React.createClass({
    * view on the Annual Cycle graph. Stores the selected run and period in state, 
    * fetches new data, and updates the graph.
    */
-  updateAnnCycleDataset: function (instance) {
-    this.loadTimeSeries(this.props, JSON.parse(instance));
+  updateAnnualCycleDataset: function (instance) {
+    this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
   },
   
   /*
@@ -136,9 +167,9 @@ var DataController = React.createClass({
    * matching those parameters will be selected; otherwise an arbitrary set 
    * of data matching the other parameters.
    */
-  loadTimeSeries: function (props, instance) {
+  loadAnnualCycleGraph: function (props, instance) {
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
-    this.setTimeSeriesNoDataMessage("Loading Data");
+    this.setAnnualCycleGraphNoDataMessage("Loading Data");
     
     var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
     params.timescale = "monthly";
@@ -166,42 +197,65 @@ var DataController = React.createClass({
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, "data");
       this.setState({
-        timeSeriesData: timeseriesToAnnualCycleGraph(props.meta, ...data),
-        timeSeriesInstance: {
+        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        annualCycleInstance: {
           start_date: monthlyMetadata.start_date,
           end_date: monthlyMetadata.end_date,
           ensemble_member: monthlyMetadata.ensemble_member
         },
       });
     }).catch(error => {
-      this.displayError(error, this.setTimeSeriesNoDataMessage);
+      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });    
   },
   
   /*
-   * This function fetches and loads data  for the Projected Change graphs.
+   * This function fetches and loads data  for the Long Term Average graphs.
    * If passed a time of year(resolution and index), it will load
    * data for that time of year. Otherwise, it defaults to January 
    * (resolution: "monthly", index 0).
    */
-  loadClimoSeries: function (props, time) {
-    var timescale = time ? time.timescale : this.state.projChangeTimeScale;
-    var timeidx = time ? time.timeidx : this.state.projChangeTimeOfYear;
+  loadLongTermAverageGraph: function (props, time) {
+    var timescale = time ? time.timescale : this.state.longTermAverageTimeScale;
+    var timeidx = time ? time.timeidx : this.state.longTermAverageTimeOfYear;
     
-    this.setClimoSeriesNoDataMessage("Loading Data");
+    this.setLongTermAverageGraphNoDataMessage("Loading Data");
     var myDataPromise = this.getDataPromise(props, timescale, timeidx);
 
     myDataPromise.then(response => {      
       this.setState({
-        projChangeTimeOfYear: timeidx,
-        projChangeTimeScale: timescale,
-        climoSeriesData: dataToProjectedChangeGraph([response.data]),
+        longTermAverageTimeOfYear: timeidx,
+        longTermAverageTimeScale: timescale,
+        longTermAverageData: dataToLongTermAverageGraph([response.data]),
       });
     }).catch(error => {
-      this.displayError(error, this.setClimoSeriesNoDataMessage);
+      this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
   
+  /*
+   * This function fetches and loads data for the Timeseries graph.
+   * As the Timeseries graph shows all data points at once, there's no
+   * filtering or selection done by this function.
+   */
+  loadTimeseriesGraph: function(props) {
+
+    this.setTimeseriesGraphNoDataMessage("Loading Data");
+
+    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+
+    var metadata = _.findWhere(props.meta, params);
+
+    var timeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+    timeseriesPromise.then(response => {
+      this.setState({
+        timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
+      });
+    }).catch(error => {
+      this.displayError(error, this.setTimeseriesGraphNoDataMessage);
+    });
+  },
+
   /*
    * This function fetches and loads data for the Stats Table. 
    * If passed a time of year(resolution and index), it will load
@@ -212,7 +266,7 @@ var DataController = React.createClass({
     
     var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
     var timeres = time ? time.timescale : this.state.dataTableTimeScale;
-        
+
     //load stats table
     this.setStatsTableNoDataMessage("Loading Data");
     var myStatsPromise = this.getStatsPromise(props, timeidx);
@@ -221,11 +275,20 @@ var DataController = React.createClass({
       //remove all results from datasets with the wrong timescale
       var stats = this.filterAPIResults(response.data, 
           {timescale: timeres}, props.meta);
-      this.setState({
-        dataTableTimeOfYear: timeidx,
-        dataTableTimeScale: timeres,
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
-      });
+      if(_.allKeys(stats).length > 0) {
+        this.setState({
+          dataTableTimeOfYear: timeidx,
+          dataTableTimeScale: timeres,
+          statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+        });
+      }
+      else {
+        this.setState({
+          dataTableTimeOfYear: timeidx,
+          dataTableTimeScale: timeres,
+        });
+        this.setStatsTableNoDataMessage("Statistics unavailable for this time period.");
+      }
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
@@ -233,9 +296,10 @@ var DataController = React.createClass({
   },
 
   render: function () {
-    var climoSeriesData = this.state.climoSeriesData ? this.state.climoSeriesData : { data: { columns: [] }, axis: {} };
-    var timeSeriesData = this.state.timeSeriesData ? this.state.timeSeriesData : { data: { columns: [] }, axis: {} };
+    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
+    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
     var statsData = this.state.statsData ? this.state.statsData : [];
+    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -249,53 +313,83 @@ var DataController = React.createClass({
 
     var selectedInstance;
     _.each(ids, id => {
-      if(_.isEqual(JSON.parse(id[0]), this.state.timeSeriesInstance)) {
+      if(_.isEqual(JSON.parse(id[0]), this.state.annualCycleInstance)) {
         selectedInstance = id[0];
       }
     });
+
+    var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
+      this.state.dataTableTimeOfYear);
+
+    var annualTab, longTermTab, timeseriesTab, annualTabPanel, longTermTabPanel, timeseriesTabPanel;
+    if(this.multiYearMeanSelected()) {
+      //Annual Cycle Graph
+      annualTab = (<Tab>Annual Cycle</Tab>);
+      annualTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
+            </Col>
+            <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
+        </TabPanel>
+        );
+
+      //Long Term Average Graph
+      longTermTab = (<Tab>Long Term Averages</Tab>);
+      longTermTabPanel = (
+          <TabPanel>
+          <Row>
+            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
+            </Col>
+            <Col>
+              <div>
+                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
+                <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
+                <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
+              </div>
+            </Col>
+          </Row>
+          <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
+        </TabPanel>
+        );
+    }
+    else {
+      //Time Series Graph
+      timeseriesTab = (<Tab>Time Series</Tab>);
+      timeseriesTabPanel = (
+        <TabPanel>
+          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
+          <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
+        </TabPanel>  
+      );
+    }
 
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <Tabs>
           <TabList>
-            <Tab>Annual Cycle</Tab>
-            <Tab>Projected Change</Tab>
+            {annualTab}
+            {longTermTab}
+            {timeseriesTab}
           </TabList>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <Selector label={"Dataset"} onChange={this.updateAnnCycleDataset} items={ids} value={selectedInstance}/>
-              </Col>
-              <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportTimeSeries.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>
-            </Row>
-            <DataGraph data={timeSeriesData.data} axis={timeSeriesData.axis} tooltip={timeSeriesData.tooltip} />
-          </TabPanel>
-          <TabPanel>
-            <Row>
-              <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-                <TimeOfYearSelector onChange={this.updateProjChangeTimeOfYear} />
-              </Col>
-              <Col>
-                <div>
-                  <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'xlsx')}>XLSX</Button>
-                  <Button onClick={this.exportClimoSeries.bind(this, 'csv')}>CSV</Button>
-                </div>
-              </Col>
-            </Row>
-            <DataGraph data={climoSeriesData.data} axis={climoSeriesData.axis} tooltip={climoSeriesData.tooltip} />
-          </TabPanel>
+          {annualTabPanel}
+          {longTermTabPanel}
+          {timeseriesTabPanel}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
+            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
           </Col>
         </Row>
         <DataTable data={statsData}  options={this.state.statsTableOptions}/>

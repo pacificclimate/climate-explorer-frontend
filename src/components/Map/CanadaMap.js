@@ -75,19 +75,21 @@ var CanadaMap = React.createClass({
   
   //get map formatting parameters for the raster or isoline layers.
   getWMSParams: function (layer, props = this.props) {
+    var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
+
     var params = {
+        layers: layerName,
         noWrap: true,
         format: "image/png",
         transparent: true,
         opacity: 80,
-        time: props.time,
+        time: props[`${layer}Time`],
         numcolorbands: 249,
         version: "1.1.1",
         srs: "EPSG:4326",
         logscale: "false"
     };
     if(layer == "raster") {
-      params.layers = `${props.rasterDataset}/${props.rasterVariable}`;
       params.styles = `default-scalar/${props.rasterPalette}`;
       if(props.rasterLogscale=="true" && !_.isUndefined(this.layerRange.raster)) {
         //clip the dataset to > 0, values of 0 or less do not have a
@@ -101,7 +103,6 @@ var CanadaMap = React.createClass({
       }
     }
     else if (layer == "isoline") {
-      params.layers = `${props.isolineDataset}/${props.isolineVariable}`;
       params.styles = `colored_contours/${props.isolinePalette}`;
       params.numContours = props.numberOfContours;
       if(props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
@@ -127,6 +128,21 @@ var CanadaMap = React.createClass({
   updateLayerMinmax: function (layer, props) {
     try {
       var bounds = this.map.getBounds();
+      if(bounds.getWest() == bounds.getEast()) {
+        //This netCDF file has an invalid bounding box, presumably because it has been
+        //through a longitude normalization process.
+        //See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
+        //As a result, longitudes in the file go from 0 to 180, then -180 to
+        //0. This means the westmost boundary and the eastmost boundary
+        //are both zero (actually -.5675 or something like that, the center of a cell
+        //with one edge at 0.)
+        //Passing a bounding box with identical eastmost and westmost bounds to
+        //ncWMS results in an error, so create a new Canada-only bounding box and
+        //ignore the worldwide extent of this map.
+        var corner1 = L.latLng(90, -50);
+        var corner2 = L.latLng(40, -150);
+        bounds = L.latLngBounds(corner1, corner2);
+      }
       var minmaxParams = _.pick(this.getWMSParams(layer, props),
           "layers", "styles", "version", "srs", "time");
       _.extend(minmaxParams, {
@@ -392,9 +408,11 @@ var CanadaMap = React.createClass({
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
     if(this.ncwmsRasterLayer) {
       delete(this.ncwmsRasterLayer.wmsParams.colorscalerange);
+      delete(this.ncwmsRasterLayer.wmsParams.layers);
     }
     if(this.ncwmsIsolineLayer) {
       delete(this.ncwmsIsolineLayer.wmsParams.colorscalerange);
+      delete(this.ncwmsIsolineLayer.wmsParams.layers);
     }
 
     if(newProps.rasterDataset) {

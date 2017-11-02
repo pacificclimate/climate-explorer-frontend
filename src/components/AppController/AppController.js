@@ -26,6 +26,13 @@ var App = React.createClass({
 
   mixins: [AppMixin],
 
+  //This filter controls which datasets are available for viewing on this portal;
+  //only datasets the filter returns a truthy value for are available.
+  //Filters out noisy multi-year monthly datasets.
+  datasetFilter: function (datafile) {
+    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+  },
+
   render: function () {
     return (
       <Grid fluid>
