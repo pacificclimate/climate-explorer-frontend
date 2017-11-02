@@ -194,11 +194,28 @@ var mockAPI = require('./sample-API-results');
     xit('returns the requested option', function () {});
   });
 
-  describe('timeIndexToTimeOfYear', function() {
+  describe('timeKeyToTimeOfYear', function() {
     it('converts a time index into human-readable string', function () {
-      expect(util.timeIndexToTimeOfYear(1)).toBe("February");
-      expect(util.timeIndexToTimeOfYear(16)).toBe("Annual");
-      expect(util.timeIndexToTimeOfYear(39)).toBe(undefined);
+      expect(util.timeKeyToTimeOfYear(1)).toBe("February");
+      expect(util.timeKeyToTimeOfYear(16)).toBe("Annual");
+      expect(util.timeKeyToTimeOfYear(39)).toBe(undefined);
+    });
+  });
+
+  describe('timeKeyToResolutionIndex', function () {
+    it('converts a time index into a resolution / index pairing', function () {
+      expect(util.timeKeyToResolutionIndex(0)).toEqual({timescale: "monthly", timeidx: 0});
+      expect(util.timeKeyToResolutionIndex(16)).toEqual({timescale: "yearly", timeidx: 0});
+      expect(util.timeKeyToResolutionIndex(13)).toEqual({timescale: "seasonal", timeidx: 1});
+      expect(util.timeKeyToResolutionIndex(30)).toBe(undefined);
+    });
+  });
+
+  describe('resolutionIndexToTimeKey', function () {
+    it('converts a resolution/index pairing into a time index', function () {
+      expect(util.resolutionIndexToTimeKey("monthly", 0)).toBe(0);
+      expect(util.resolutionIndexToTimeKey("yearly", 0)).toBe(16);
+      expect(util.resolutionIndexToTimeKey("seasonal", 1)).toBe(13);
     });
   });
 
@@ -234,6 +251,13 @@ var mockAPI = require('./sample-API-results');
     });
     it('does not convert unrecognized resolutions', function () {
       expect(util.timestampToTimeOfYear("1977-07-05T00:00:00Z", "daily", true)).toBe("1977-07-05T00:00:00Z");
+    });
+  });
+
+  describe('timestampToYear', function () {
+    it('extracts the year from ISO 8601 timestamps', function () {
+      expect(util.timestampToYear("1977-01-01T11:32:12Z")).toBe("1977");
+      expect(util.timestampToYear("2020-03-24")).toBe("2020");
     });
   });
 

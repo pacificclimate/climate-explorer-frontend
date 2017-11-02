@@ -17,7 +17,7 @@
  *  - Annual cycle DataGraph (monthly resolution only)
  *
  * Non multi-year mean:
- *  - A freeform timeseries Datagraph showing data at whateber resolution
+ *  - A freeform timeseries Datagraph showing data at whatever resolution
  *    is available.
  *
  * In both cases, a stats DataTable summarizing the dataset is also

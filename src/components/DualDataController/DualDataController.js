@@ -34,7 +34,8 @@ import Loader from 'react-loader';
 import _ from 'underscore';
 
 
-import { parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData,
+         timeKeyToResolutionIndex} from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
         timeseriesToTimeseriesGraph,
@@ -148,10 +149,9 @@ var DualDataController = React.createClass({
    * Long Term Average graph. Redraw the Long Term Average graph and
    * store the selected time scale and index in state.
    */
-  updateLongTermAverageTimeOfYear: function (timeidx) {
-    var idx = JSON.parse(timeidx).timeidx;
-    var scale = JSON.parse(timeidx).timescale;     
-    this.loadDualLongTermAverageGraph(this.props, scale, idx);
+  updateLongTermAverageTimeOfYear: function (index) {
+    var time = timeKeyToResolutionIndex(index);
+    this.loadDualLongTermAverageGraph(this.props, time.timescale, time.timeidx);
   },
 
   /*

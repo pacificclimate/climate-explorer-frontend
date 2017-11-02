@@ -8,14 +8,12 @@
  * Built around the js-xlsx library
  *******************************************************************/
 
-var moment = require('moment/moment');
 var _ = require('underscore');
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
-import { timeIndexToTimeOfYear, 
-         timeResolutionIndexToTimeOfYear,
+import { timeResolutionIndexToTimeOfYear,
          PRECISION,
          getVariableOptions} from './util';
 

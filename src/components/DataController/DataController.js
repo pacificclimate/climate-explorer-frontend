@@ -32,7 +32,10 @@ import _ from 'underscore';
 
 import styles from './DataController.css';
 
-import { parseBootstrapTableData } from '../../core/util';
+import { parseBootstrapTableData,
+         timeResolutionIndexToTimeOfYear,
+         timeKeyToResolutionIndex,
+         resolutionIndexToTimeKey} from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
         timeseriesToTimeseriesGraph} from '../../core/chart';
@@ -79,11 +82,12 @@ var DataController = React.createClass({
     if(this.multiYearMeanSelected(props)) {
       this.loadAnnualCycleGraph(props);
       this.loadLongTermAverageGraph(props);
+      this.loadDataTable(props);
     }
     else {
       this.loadTimeseriesGraph(props);
+      this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
-    this.loadDataTable(props);
   },
 
   //Removes all data from the Annual Cycle graph and displays a message
@@ -135,7 +139,7 @@ var DataController = React.createClass({
    * in state, fetches new data, and redraws the Long Term Average graph.
    */
   updateLongTermAverageTimeOfYear: function (timeidx) {
-    this.loadLongTermAverageGraph(this.props, JSON.parse(timeidx));
+    this.loadLongTermAverageGraph(this.props, timeKeyToResolutionIndex(timeidx));
   },
 
   /* 
@@ -144,7 +148,7 @@ var DataController = React.createClass({
    * in state, and updates the table.
    */
   updateDataTableTimeOfYear: function (timeidx) {
-    this.loadDataTable(this.props, JSON.parse(timeidx));
+    this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
     },
 
   /*
@@ -262,7 +266,7 @@ var DataController = React.createClass({
     
     var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
     var timeres = time ? time.timescale : this.state.dataTableTimeScale;
-        
+
     //load stats table
     this.setStatsTableNoDataMessage("Loading Data");
     var myStatsPromise = this.getStatsPromise(props, timeidx);
@@ -271,11 +275,20 @@ var DataController = React.createClass({
       //remove all results from datasets with the wrong timescale
       var stats = this.filterAPIResults(response.data, 
           {timescale: timeres}, props.meta);
-      this.setState({
-        dataTableTimeOfYear: timeidx,
-        dataTableTimeScale: timeres,
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
-      });
+      if(_.allKeys(stats).length > 0) {
+        this.setState({
+          dataTableTimeOfYear: timeidx,
+          dataTableTimeScale: timeres,
+          statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+        });
+      }
+      else {
+        this.setState({
+          dataTableTimeOfYear: timeidx,
+          dataTableTimeScale: timeres,
+        });
+        this.setStatsTableNoDataMessage("Statistics unavailable for this time period.");
+      }
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
@@ -304,6 +317,9 @@ var DataController = React.createClass({
         selectedInstance = id[0];
       }
     });
+
+    var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
+      this.state.dataTableTimeOfYear);
 
     var annualTab, longTermTab, timeseriesTab, annualTabPanel, longTermTabPanel, timeseriesTabPanel;
     if(this.multiYearMeanSelected()) {
@@ -373,7 +389,7 @@ var DataController = React.createClass({
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} />
+            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
           </Col>
         </Row>
         <DataTable data={statsData}  options={this.state.statsTableOptions}/>
