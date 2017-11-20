@@ -403,7 +403,7 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
       //in the C3 data object. This will cause C3 to render the
       //line with a break where the missing timestamp is.
       for(var t = 0; t < timestamps.length; t++ ) {
-        series.push(call[run].data[timestamps[t]] ? call[run].data[timestamps[t]] : null);
+        series.push(_.isUndefined(call[run].data[timestamps[t]]) ? null : call[run].data[timestamps[t]]);
       }
       c3Data.columns.push(series);
       c3Data.types[runName] = "line";
@@ -617,7 +617,7 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
     for(var t = 0; t < timestamps.length; t++ ) {
       //assigns "null" for any timestamps missing from this series.
       //C3's behaviour toward null values is set by the line.connectNull attribute
-      column.push(timeseries.data[timestamps[t]] ? timeseries.data[timestamps[t]] : null);
+      column.push(_.isUndefined(timeseries.data[timestamps[t]]) ? null : timeseries.data[timestamps[t]]);
     }
 
     c3Data.columns.push(column);
