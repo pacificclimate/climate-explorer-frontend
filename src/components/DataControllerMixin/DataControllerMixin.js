@@ -84,7 +84,7 @@ var ModalMixin = {
      instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
          "start_date", "end_date", "ensemble_member");
    }
-   exportDataToWorksheet("timeseries", this.props, this.state.timeseriesData, format, instance);
+   exportDataToWorksheet("timeseries", this.props, this.state.annualCycleData, format, instance);
   },
 
   exportLongTermAverage: function(format) {
