@@ -56,20 +56,27 @@ var App = React.createClass({
   },
 
   render: function () {
+    //hierarchical data selection: model, then experiment, then variable(s)
+    var modOptions = this.getMetadataItems('model_id');
+    var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
+        this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
+    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
+        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
+ 
     return (
       <Grid fluid>
         <Row>
           <Col lg={3} md={3}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={this.getMetadataItems('model_id')} value={this.state.model_id}/>
+            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
           </Col>
             <Col lg={3} md={3}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')} value={this.state.experiment}/>
+            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #1 (Colour blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
+            <Selector label={"Variable #1 (Colour blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={this.getVariableIdNameArray()} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
+            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={varOptions} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
           </Col>
         </Row>
         <Row>

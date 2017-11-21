@@ -34,17 +34,24 @@ var App = React.createClass({
   },
 
   render: function () {
+    //hierarchical selection: model, then variable, then experiment
+    var modOptions = this.getMetadataItems('model_id');
+    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
+        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id}));
+    var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
+        this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
+
     return (
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={this.getMetadataItems('model_id')} value={this.state.model_id}/>
+            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={this.getVariableIdNameArray()} value={this.state.variable_id}/>
+            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={this.getMetadataItems('experiment')} value={this.state.experiment}/>
+            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
           </Col>
         </Row>
         <Row>
