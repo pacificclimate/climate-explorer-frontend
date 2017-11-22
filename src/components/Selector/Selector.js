@@ -86,7 +86,7 @@ var Selector = React.createClass({
           <div>
             <ControlLabel className={styles.selectorlabel}>{this.props.label}</ControlLabel>
           </div>
-          <Dropdown block vertical disabled={this.props.disabled} onSelect={this.handleChange}>
+          <Dropdown block vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
             <Dropdown.Toggle className={styles.selectortitle}>
               {this.displayString}
             </Dropdown.Toggle>
