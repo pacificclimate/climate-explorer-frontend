@@ -16,44 +16,55 @@ describe('Selector', function () {
     expect(labelNode.textContent).toEqual('New Label');
   });
 
-  it('sets passed items', function () {
+  it('can handle passed items', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector items={['apple', 'banana', 'carrot']} />
     );
 
-    var optionNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
-    var content = optionNodes.map(function (obj) {
+    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'li');
+    var content = itemNodes.map(function (obj) {
       return obj.textContent;
     });
     expect(content).toEqual(['apple', 'banana', 'carrot']);
   });
 
-  it('can handle "tuples"', function () {
+  it('can handle [key, label] pairs', function () {
     var selector = TestUtils.renderIntoDocument(
       <Selector items={[['apple_value', 'Apple label'], ['banana_value', 'Banana label']]} />
     );
-    var optionNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
+    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'li');
 
-    var content = optionNodes.map(function (obj) {
+    var content = itemNodes.map(function (obj) {
       return obj.textContent;
     });
     expect(content).toEqual(['Apple label', 'Banana label']);
+  });
 
-    var keys = optionNodes.map(function (obj) {
-      return obj.value;
-    });
-    expect(keys).toEqual(['apple_value', 'banana_value']);
+  it('can handle [key, label, disabled] triples', function() {
+    var selector = TestUtils.renderIntoDocument(
+        <Selector items={[['apple_value', 'Apple label', true],['banana_value', 'Banana label', false]]} />
+    );
+    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'a');
+    //This is a very low-level way to test this, and very dependant on
+    //exact implementation in a way we normally don't have to care about. 
+    //This test would likely be broken by a react or react-bootstrap upgrade. There is
+    //probably a more semantic and less fragile way to test whether an element is
+    //disabled, but I have been unable to determine it.
+    expect(itemNodes[0].style[0]).toBe("pointer-events");
+    expect(itemNodes[1].style[0]).toBe(undefined);
   });
 
   it('calls the callback', function () {
     var dummyCallback = jest.genMockFunction();
     var selector = TestUtils.renderIntoDocument(
-      <Selector onChange={dummyCallback} />
+      <Selector onChange={dummyCallback} items={[["one", "first"], ["two", "second"]]}/>
     );
 
-    var selectorNode = TestUtils.findRenderedDOMComponentWithTag(selector, 'select');
-    TestUtils.Simulate.change(selectorNode, { target: { value: 'new value' } });
+    var dropdownButton = TestUtils.findRenderedDOMComponentWithTag(selector, 'button');
+    TestUtils.Simulate.click(dropdownButton);
+    var option = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'a')[1];
+    TestUtils.Simulate.click(option);
 
-    expect(dummyCallback).toBeCalled();
+    expect(dummyCallback).toBeCalledWith("two");
   });
 });
