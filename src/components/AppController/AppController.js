@@ -24,6 +24,12 @@ var App = React.createClass({
    * Includes: - model_id - variable_id - experiment
    */
 
+  getDefaultProps: function () {
+    return {
+      ensemble_name: CE_ENSEMBLE_NAME
+    };
+  },
+
   mixins: [AppMixin],
 
   //This filter controls which datasets are available for viewing on this portal;

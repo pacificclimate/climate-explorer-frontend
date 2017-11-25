@@ -29,7 +29,7 @@ var AppMixin = {
 
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
-      params: { ensemble_name: CE_ENSEMBLE_NAME },
+      params: { ensemble_name: this.props.ensemble_name },
       }).then(response => {
         for (var key in response.data) {
           vars = Object.keys(response.data[key].variables);

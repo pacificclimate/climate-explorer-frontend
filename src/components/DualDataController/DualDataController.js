@@ -58,6 +58,7 @@ var DualDataController = React.createClass({
     area: React.PropTypes.string,
     meta: React.PropTypes.array,
     comparandMeta: React.PropTypes.array,
+    ensemble_name: React.PropTypes.string,
   },
 
   mixins: [DataControllerMixin],

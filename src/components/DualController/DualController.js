@@ -35,6 +35,12 @@ var App = React.createClass({
    *  - meta
    */
 
+  getDefaultProps: function () {
+    return {
+      ensemble_name: CE_ENSEMBLE_NAME
+    };
+  },
+
   mixins: [AppMixin],
   
   //This function filters out datasets inappropriate for this portal. A dataset

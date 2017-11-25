@@ -109,7 +109,7 @@ var ModalMixin = {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'data'),
       params: {
-        ensemble_name: CE_ENSEMBLE_NAME,
+        ensemble_name: this.props.ensemble_name,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
