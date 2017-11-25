@@ -206,6 +206,11 @@ var CanadaMap = React.createClass({
     }).getLayers()[0]);
   },
 
+  //Map should only rerender when something has changed
+  shouldComponentUpdate: function (nextProps, nextState) {
+    return !(_.isEqual(nextState, this.state) && _.isEqual(nextProps, this.props));
+  },
+
   //initializes the map, loads data, and generates controls
   //NOTE: the buttons that open the "Map Settings" menu are
   //actually provided by MapController, not this component.
@@ -403,6 +408,12 @@ var CanadaMap = React.createClass({
   },
 
   componentWillReceiveProps: function (newProps) {
+    //MapController has a modal menu, and has to rerender itself (and CanadaMap)
+    //when the modal opens or closes, but the map itself doesn't need to be
+    //redrawn unless something has actually changed.
+    if(_.isEqual(this.props, newProps)) {
+      return;
+    }
     
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
