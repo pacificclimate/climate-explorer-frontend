@@ -377,6 +377,11 @@ var CanadaMap = React.createClass({
       map.addControl(rasterBar);
       map.addControl(autoscale);
     }
+
+    //Set and display an area if one was received
+    if(this.props.area && !this.state.area) {
+      this.handleNewArea(this.props.area);
+    }
   },
   
   //returns an array of two controls registered to the layer:
