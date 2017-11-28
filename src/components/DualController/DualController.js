@@ -35,12 +35,6 @@ var App = React.createClass({
    *  - meta
    */
 
-  getDefaultProps: function () {
-    return {
-      ensemble_name: CE_ENSEMBLE_NAME
-    };
-  },
-
   mixins: [AppMixin],
   
   //This function filters out datasets inappropriate for this portal. A dataset
@@ -90,6 +84,7 @@ var App = React.createClass({
           </Col>
           <Col lg={6}>
             <DualDataController
+              ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}

@@ -27,7 +27,7 @@ import {validateLongTermAverageData,
 var ModalMixin = {
 
   verifyParams: function (props) {
-    var stringPropList = _.values(_.pick(props, 'meta', 'model_id', 'variable_id', 'experiment'));
+    var stringPropList = _.values(_.pick(props, 'ensemble_name', 'meta', 'model_id', 'variable_id', 'experiment'));
     return (stringPropList.length > 0) && stringPropList.every(Boolean);
   },
 
@@ -109,7 +109,7 @@ var ModalMixin = {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'data'),
       params: {
-        ensemble_name: this.props.ensemble_name,
+        ensemble_name: props.ensemble_name,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,
@@ -126,7 +126,7 @@ var ModalMixin = {
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
       params: {
-        ensemble_name: CE_ENSEMBLE_NAME,
+        ensemble_name: props.ensemble_name,
         model: props.model_id,
         variable: props.variable_id,
         emission: props.experiment,

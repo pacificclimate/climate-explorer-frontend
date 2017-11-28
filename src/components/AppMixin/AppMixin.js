@@ -19,6 +19,7 @@ import {timestampToYear} from '../../core/util';
 var AppMixin = {
   getInitialState: function () {
     return {
+      ensemble_name: this.props.params.ensemble_name || this.props.ensemble_name || CE_ENSEMBLE_NAME,
       meta: [],
     };
   },
@@ -29,7 +30,7 @@ var AppMixin = {
 
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
-      params: { ensemble_name: this.props.ensemble_name },
+      params: { ensemble_name: this.state.ensemble_name },
       }).then(response => {
         for (var key in response.data) {
           vars = Object.keys(response.data[key].variables);
