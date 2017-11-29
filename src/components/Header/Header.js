@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 
@@ -22,14 +22,21 @@ class Header extends Component {
                 />
               </a>
             </Col>
-            <Col lg={4} />
-            <Col lg={4}>
-            <ul>
-              <li><Link to="/climo/all_downscale_files">Standard climatologies</Link></li>
-              <li><Link to="/climo/all_CLIMDEX_files">ClimDEX climatologies</Link></li>
-              <li><Link to="/compare/all_downscale_files">Standard comparison</Link></li>
-              <li><Link to="/compare/all_CLIMDEX_files">ClimDEX comparison</Link></li>
-            </ul>
+            <Col lg={8}>
+              <Row>
+                <Link to="/climo/all_downscale_files" activeClassName="active">
+                  <Button bsStyle="primary">Standard climatologies</Button>
+                </Link>
+                <Link to="/climo/all_CLIMDEX_files" activeClassName="active">
+                  <Button bsStyle="primary">ClimDEX climatologies</Button>
+                </Link>
+                <Link to="/compare/all_downscale_files" activeClassName="active">
+                  <Button bsStyle="primary">Standard comparision</Button>
+                </Link>
+                <Link to="/compare/all_CLIMDEX_files" activeClassName="active">
+                  <Button bsStyle="primary">ClimDEX comparision</Button>
+                </Link>
+              </Row>
             </Col>
           </Row>
         </Grid>
