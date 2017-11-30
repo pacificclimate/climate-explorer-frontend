@@ -18,15 +18,21 @@ import {timestampToYear} from '../../core/util';
 
 var AppMixin = {
   getInitialState: function () {
+    var ensemble_name = (typeof this.props.params !== 'undefined') ?
+        this.props.params.ensemble_name : ((typeof this.props.ensemble_name !== 'undefined') ?
+                                          this.props.ensemble_name : CE_ENSEMBLE_NAME);
     return {
-      ensemble_name: this.props.params.ensemble_name || this.props.ensemble_name || CE_ENSEMBLE_NAME,
+      ensemble_name: ensemble_name,
       meta: [],
     };
   },
 
   componentWillReceiveProps: function(nextProps) {
+    var ensemble_name = (typeof nextProps.params !== 'undefined') ?
+        nextProps.params.ensemble_name : ((typeof nextProps.ensemble_name !== 'undefined') ?
+                                          nextProps.ensemble_name : CE_ENSEMBLE_NAME);
     this.setState({
-      ensemble_name: nextProps.params.ensemble_name || nextProps.ensemble_name || CE_ENSEMBLE_NAME,
+      ensemble_name: ensemble_name,
     });
   },
 
