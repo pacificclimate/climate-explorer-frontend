@@ -21,7 +21,7 @@ var App = React.createClass({
           <Header />
         </div>
         <div>
-          {this.props.children || <MotiController />}
+          {this.props.children || <AppController ensemble_name="all_downscale_files"/>}
         </div>
       </div>
     );
@@ -31,9 +31,9 @@ var App = React.createClass({
 render((
   <Router history={browserHistory}>
     <Route path='/' component={App}>
-      <Route path='moti' component={MotiController} />
-      <Route path='climo/:ensemble_name' component={AppController} />
-      <Route path='compare/:ensemble_name' component={DualController} />
+      <Route path='/moti' component={MotiController} />
+      <Route path='/climo/:ensemble_name' component={AppController} />
+      <Route path='/compare/:ensemble_name' component={DualController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));
