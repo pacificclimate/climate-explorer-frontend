@@ -5,12 +5,21 @@ import classNames from 'classnames';
 
 import styles from './Header.css';
 
-class Header extends Component {
+const Header = React.createClass({
+
+  getInitialState() {
+    return {activeKey: 1};
+  },
 
   render() {
 
-    var handleSelect = function() {
-      browserHistory.push(this.href);
+    const updateNav = function(key) {
+        this.setState({activeKey: key})
+    }.bind(this);
+
+    const handleSelect = function(selectedKey, evt) {
+        updateNav(selectedKey);
+        browserHistory.push(this.href);
     };
 
     return (
@@ -28,7 +37,7 @@ class Header extends Component {
               </a>
             </Col>
             <Col lg={8}>
-              <Nav bsStyle="tabs" justified activeKey={1} onSelect={handleSelect}>
+              <Nav bsStyle="tabs" justified activeKey={this.state.activeKey} onSelect={handleSelect}>
                 <NavItem eventKey={1} href="/climo/all_downscale_files">Standard climatologies</NavItem>
                 <NavItem eventKey={2} href="/climo/all_CLIMDEX_files">ClimDEX climatologies</NavItem>
                 <NavItem eventKey={3} href="/compare/all_downscale_files">Standard comparison</NavItem>
@@ -40,6 +49,6 @@ class Header extends Component {
       </div>
     );
   }
-}
+});
 
 export default Header;
