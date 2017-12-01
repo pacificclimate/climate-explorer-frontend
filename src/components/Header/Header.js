@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col, Nav, NavItem } from 'react-bootstrap';
-import { browserHistory } from 'react-router';
+import { hashHistory } from 'react-router';
 import classNames from 'classnames';
 
 import styles from './Header.css';
@@ -19,7 +19,7 @@ const Header = React.createClass({
 
     const handleSelect = function(selectedKey, evt) {
         updateNav(selectedKey);
-        browserHistory.push(this.href);
+        hashHistory.push(this.href);
     };
 
     return (

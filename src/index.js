@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, hashHistory } from 'react-router';
 
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
@@ -29,7 +29,7 @@ var App = React.createClass({
 });
 
 render((
-  <Router history={browserHistory}>
+  <Router history={hashHistory}>
     <Route path='/' component={App}>
       <Route path='/moti' component={MotiController} />
       <Route path='/climo/:ensemble_name' component={AppController} />
