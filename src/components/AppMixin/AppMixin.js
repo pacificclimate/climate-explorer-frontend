@@ -22,7 +22,11 @@ var AppMixin = {
         this.props.params.ensemble_name : ((typeof this.props.ensemble_name !== 'undefined') ?
                                           this.props.ensemble_name : CE_ENSEMBLE_NAME);
     return {
-      ensemble_name: ensemble_name,
+      ensemble_name,
+      model_id: '',
+      variable_id: '',
+      experiment: '',
+      area: '',
       meta: [],
     };
   },
@@ -32,7 +36,7 @@ var AppMixin = {
         nextProps.params.ensemble_name : ((typeof nextProps.ensemble_name !== 'undefined') ?
                                           nextProps.ensemble_name : CE_ENSEMBLE_NAME);
     this.setState({
-      ensemble_name: ensemble_name,
+      ensemble_name,
     });
   },
 
@@ -75,15 +79,15 @@ var AppMixin = {
         // is not available from the current metadata, simply use
         // the first available
 
-        var newstate = _.mapObject(_.pick(this.state, 'model_id', 'variable_id', 'experiment'), (val, key) => {
+        const {model_id, variable_id, experiment} = _.mapObject(_.pick(this.state, 'model_id', 'variable_id', 'experiment'), (val, key) => {
             return _.contains(_.pluck(models, key), val) ? val : models[0][key];
         });
 
         this.setState({
           meta: models,
-          model_id: newstate['model_id'],
-          variable_id: newstate['variable_id'],
-          experiment: newstate['experiment']
+          model_id,
+          variable_id,
+          experiment,
         });
     });
   },
