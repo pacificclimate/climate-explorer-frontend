@@ -16,13 +16,14 @@ import urljoin from 'url-join';
 import axios from 'axios';
 import {timestampToYear} from '../../core/util';
 
+var findEnsemble = function(props) {
+    return (props.params && props.params.ensemble_name) || props.ensemble_name || CE_ENSEMBLE_NAME;
+};
+
 var AppMixin = {
   getInitialState: function () {
-    var ensemble_name = (typeof this.props.params !== 'undefined') ?
-        this.props.params.ensemble_name : ((typeof this.props.ensemble_name !== 'undefined') ?
-                                          this.props.ensemble_name : CE_ENSEMBLE_NAME);
     return {
-      ensemble_name,
+      ensemble_name: findEnsemble(this.props),
       model_id: '',
       variable_id: '',
       experiment: '',
@@ -32,11 +33,8 @@ var AppMixin = {
   },
 
   componentWillReceiveProps: function(nextProps) {
-    var ensemble_name = (typeof nextProps.params !== 'undefined') ?
-        nextProps.params.ensemble_name : ((typeof nextProps.ensemble_name !== 'undefined') ?
-                                          nextProps.ensemble_name : CE_ENSEMBLE_NAME);
     this.setState({
-      ensemble_name,
+      ensemble_name: findEnsemble(nextProps),
     });
   },
 
