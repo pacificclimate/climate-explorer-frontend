@@ -84,6 +84,7 @@ var App = React.createClass({
           </Col>
           <Col lg={6}>
             <DualDataController
+              ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}

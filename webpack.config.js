@@ -71,6 +71,7 @@ module.exports = {
   devServer : {
     disableHostCheck: true,
     historyApiFallback : true,
+    contentBase: './',
     hot : true,
     inline : true,
     progress : true,

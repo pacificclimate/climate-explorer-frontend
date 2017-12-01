@@ -51,6 +51,7 @@ import styles from './DualDataController.css';
 var DualDataController = React.createClass({
 
   propTypes: {
+    ensemble_name: React.PropTypes.string,
     model_id: React.PropTypes.string,
     variable_id: React.PropTypes.string,
     comparand_id: React.PropTypes.string,

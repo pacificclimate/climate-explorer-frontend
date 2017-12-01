@@ -58,10 +58,8 @@ var App = React.createClass({
           </Col>
           <Col lg={6}>
             <DataController
-              model_id={this.state.model_id}
-              variable_id={this.state.variable_id}
-              experiment={this.state.experiment}
-              area={this.state.area}
+              // ensemble_name, model_id, variable_id, experiment, area
+              {...this.state}
               meta = {this.getfilteredMeta()}
             />
           </Col>

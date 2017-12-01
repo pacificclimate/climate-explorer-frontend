@@ -16,20 +16,39 @@ import urljoin from 'url-join';
 import axios from 'axios';
 import {timestampToYear} from '../../core/util';
 
+var findEnsemble = function(props) {
+    return (props.params && props.params.ensemble_name) || props.ensemble_name || CE_ENSEMBLE_NAME;
+};
+
 var AppMixin = {
   getInitialState: function () {
     return {
+      ensemble_name: findEnsemble(this.props),
+      model_id: '',
+      variable_id: '',
+      experiment: '',
+      area: '',
       meta: [],
     };
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      ensemble_name: findEnsemble(nextProps),
+    });
+  },
+
   componentDidMount: function () {
+    this.updateMetadata();
+  },
+
+  updateMetadata: function () {
     var models = [];
     var vars;
 
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
-      params: { ensemble_name: CE_ENSEMBLE_NAME },
+      params: { ensemble_name: this.state.ensemble_name },
       }).then(response => {
         for (var key in response.data) {
           vars = Object.keys(response.data[key].variables);
@@ -48,17 +67,38 @@ var AppMixin = {
                 end_date: end,
                 variable_name: response.data[key].variables[vars[v]],
                 }, _.omit(response.data[key], 'variables', 'start_date', 'end_date')));
-              }
             }
           }
+        }
 
-         this.setState({
-         meta: models,
-         model_id: models[0].model_id,
-         variable_id: models[0].variable_id,
-         experiment: models[0].experiment,
-         });
+        // Merge the selection information
+        //
+        // If it has not already been set or the current selection
+        // is not available from the current metadata, simply use
+        // the first available
+
+        const {model_id, variable_id, experiment} = _.mapObject(_.pick(this.state, 'model_id', 'variable_id', 'experiment'), (val, key) => {
+            return _.contains(_.pluck(models, key), val) ? val : models[0][key];
         });
+
+        this.setState({
+          meta: models,
+          model_id,
+          variable_id,
+          experiment,
+        });
+    });
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
+  },
+
+  componentDidUpdate: function(nextProps, nextState) {
+    // The metadata needs to be updated if the ensemble has changed
+    if (nextState.ensemble_name !== this.state.ensmeble_name) {
+      this.updateMetadata();
+    }
   },
 
   handleSetArea: function (wkt) {

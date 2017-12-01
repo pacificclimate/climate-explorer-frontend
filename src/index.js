@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, hashHistory } from 'react-router';
 
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
@@ -21,7 +21,7 @@ var App = React.createClass({
           <Header />
         </div>
         <div>
-          {this.props.children || <MotiController />}
+          {this.props.children || <AppController ensemble_name="all_downscale_files"/>}
         </div>
       </div>
     );
@@ -29,11 +29,11 @@ var App = React.createClass({
 });
 
 render((
-  <Router history={browserHistory}>
+  <Router history={hashHistory}>
     <Route path='/' component={App}>
-      <Route path='moti' component={MotiController} />
-      <Route path='climo' component={AppController} />
-      <Route path='compare' component={DualController} />
+      <Route path='/moti' component={MotiController} />
+      <Route path='/climo/:ensemble_name' component={AppController} />
+      <Route path='/compare/:ensemble_name' component={DualController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));

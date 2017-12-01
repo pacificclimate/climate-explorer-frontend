@@ -53,6 +53,7 @@ var DataController = React.createClass({
     experiment: React.PropTypes.string,
     area: React.PropTypes.string,
     meta: React.PropTypes.array,
+    ensemble_name: React.PropTypes.string,
   },
 
   mixins: [DataControllerMixin],
