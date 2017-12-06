@@ -82,7 +82,6 @@ var CanadaMap = React.createClass({
         noWrap: true,
         format: "image/png",
         transparent: true,
-        opacity: 80,
         time: props[`${layer}Time`],
         numcolorbands: 249,
         version: "1.1.1",
@@ -91,6 +90,7 @@ var CanadaMap = React.createClass({
     };
     if(layer == "raster") {
       params.styles = `default-scalar/${props.rasterPalette}`;
+      params.opacity = .7;
       if(props.rasterLogscale=="true" && !_.isUndefined(this.layerRange.raster)) {
         //clip the dataset to > 0, values of 0 or less do not have a
         //non-complex logarithm
@@ -105,6 +105,7 @@ var CanadaMap = React.createClass({
     else if (layer == "isoline") {
       params.styles = `colored_contours/${props.isolinePalette}`;
       params.numContours = props.numberOfContours;
+      params.opacity = 1;
       if(props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
         //clip the dataset to > 0
         params.logscale = props.isolineLogscale;
@@ -204,6 +205,11 @@ var CanadaMap = React.createClass({
       fillOpacity: 0.2,
       clickable: true,
     }).getLayers()[0]);
+  },
+
+  //Map should only rerender when something has changed
+  shouldComponentUpdate: function (nextProps, nextState) {
+    return !(_.isEqual(nextState, this.state) && _.isEqual(nextProps, this.props));
   },
 
   //initializes the map, loads data, and generates controls
@@ -372,6 +378,11 @@ var CanadaMap = React.createClass({
       map.addControl(rasterBar);
       map.addControl(autoscale);
     }
+
+    //Set and display an area if one was received
+    if(this.props.area && !this.state.area) {
+      this.handleNewArea(this.props.area);
+    }
   },
   
   //returns an array of two controls registered to the layer:
@@ -403,6 +414,12 @@ var CanadaMap = React.createClass({
   },
 
   componentWillReceiveProps: function (newProps) {
+    //MapController has a modal menu, and has to rerender itself (and CanadaMap)
+    //when the modal opens or closes, but the map itself doesn't need to be
+    //redrawn unless something has actually changed.
+    if(_.isEqual(this.props, newProps)) {
+      return;
+    }
     
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
@@ -415,12 +432,20 @@ var CanadaMap = React.createClass({
       delete(this.ncwmsIsolineLayer.wmsParams.layers);
     }
 
+    //Both ncWMS and Leaflet use an "opacity" parameter. When a map layer is
+    //initialized, its opacity is set from the "opacity" parameter. After the
+    //layer is initialized, if it receives another opacity parameter via
+    //setParams, the opacity value is sent to ncWMS. Since Leaflet opacities
+    //are 0-1 and ncWMS opacities are required to be integers, this causes a
+    //ncWMS ServiceException. Omit the opacity parameter.
     if(newProps.rasterDataset) {
-      this.ncwmsRasterLayer.setParams(this.getWMSParams("raster", newProps));
+      var rasterParams = _.omit(this.getWMSParams("raster", newProps), "opacity");
+      this.ncwmsRasterLayer.setParams(rasterParams);
       this.updateLayerMinmax("raster", newProps);
     }
     if(newProps.isolineDataset) {
-      this.ncwmsIsolineLayer.setParams(this.getWMSParams("isoline", newProps));
+      var isolineParams = _.omit(this.getWMSParams("isoline", newProps), "opacity");
+      this.ncwmsIsolineLayer.setParams(isolineParams);
       this.updateLayerMinmax("isoline", newProps);
     }
     if (this.state.area !== newProps.area) {
