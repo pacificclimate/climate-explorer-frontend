@@ -342,7 +342,9 @@ var CanadaMap = React.createClass({
       onAdd: initPrintControl,
     });
 
-    map.addControl(new PrintControl());
+    //Print control is temporarily removed until map printing is working.
+    //See https://github.com/pacificclimate/climate-explorer-frontend/issues/77
+    //map.addControl(new PrintControl());
     
     var autoscale, rasterBar, isolineBar;
     //create controls for each map layer currently defined
