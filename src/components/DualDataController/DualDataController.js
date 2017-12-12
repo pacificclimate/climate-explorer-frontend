@@ -339,6 +339,7 @@ var DualDataController = React.createClass({
 
     //add data from the comparand, if it exists
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
+      params.area = props.area;
       timeseriesPromises.push(this.getTimeseriesPromise(params, comparandMetadata.unique_id));
     }
 
