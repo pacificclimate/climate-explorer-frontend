@@ -38,6 +38,7 @@ var AppMixin = {
     });
   },
 
+  //query, parse, and store metadata for all datasets
   componentDidMount: function () {
     this.updateMetadata();
   },
@@ -101,10 +102,18 @@ var AppMixin = {
     }
   },
 
+  /*
+   * Called when user sets an area on the MapController. Propagates the area 
+   * chosen to a DataController.
+   */
   handleSetArea: function (wkt) {
     this.setState({ area: wkt });
   },
 
+  /*
+   * Return metadata from all datasets that match the currently selected model,
+   * emissions scenario, and either selected variable or one supplied as an argument.
+   */
   getfilteredMeta: function (variableFilter = this.state.variable_id) {
     var l = this.state.meta.filter(function (x) {
       return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === variableFilter;
@@ -113,6 +122,10 @@ var AppMixin = {
     return l;
   },
 
+  /*
+   * Creates an array of [variable name, variable description] tuples to populate
+   * variable selection dropdowns.
+   */
   getVariableIdNameArray: function () {
     var varArray = _.zip(this.getMetadataItems('variable_id'), this.getMetadataItems('variable_name'));
     var varNames = _.map(varArray, function (v) {
@@ -124,14 +137,47 @@ var AppMixin = {
     return varOptions;
   },
   
+  /*
+   * Records user choices for model, emissions scenario, or variable(s) in state.
+   */
   updateSelection: function (param, selection) {
     var update = {}; update[param] = selection;
     this.setState(update);
   },
 
+  /*
+   * Returns a list of all unique values for a metadata attribute
+   * like model or emissions scenario. Used to populate selection menus.
+   */
   getMetadataItems: function (name) {
     return _.unique(this.state.meta.map(function (el) {return el[name];}));
-  },  
+  },
+
+  /*
+   * Examines all datasets matching filter, and returns a list of each unique value
+   * for the named metadata attribute found in the filtered datasets. For example:
+   * getFilteredMetadataItems("variable_id", {model: "CanESM2"}) 
+   * would return the list of all variables in datasets from the CanESM2 model.
+   */
+  getFilteredMetadataItems: function (name, filter) {
+    return _.unique(_.pluck(_.where(this.state.meta, filter), name));
+  },
+
+  /*
+   * Generates an array to populate a selector.
+   * Accepts an array of either keys or [key, description] tuples and a
+   * checklist array of keys. Returns an array of [key, description, disabled]
+   * tuples where any key not present in the checklist array has "disabled" set
+   * to true and description is the same as key if no description provided.
+   */
+  markDisabledMetadataItems: function(items, checklist) {
+    return _.map(items, item => {
+      var key = _.isArray(item) ? item[0] : item;
+      var description = _.isArray(item) ? item[1] : item;
+      var disabled = checklist.indexOf(key) == -1;
+      return([key, description, disabled]);
+    });
+  }
 };
 
 export default AppMixin;

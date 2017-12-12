@@ -1,0 +1,24 @@
+.selectorlabel {
+	display: block;
+	}
+
+.selectortitle {
+	text-align: left;
+	
+}
+
+/*leaflet controls have z index 1000, need the menu to be above them.*/
+.selectormenu {
+	z-index: 1001;
+}
+
+.selectoritem {
+	color: WhiteSmoke;
+}
+
+.selectorframe {
+	padding-top: 5px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	padding-left: 5px;
+}

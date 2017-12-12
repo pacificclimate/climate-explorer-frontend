@@ -9,13 +9,18 @@
  *   items - the array of possible choices. Can be either:
  *             * an array of strings - the string user picks is sent to
  *               callback
- *             * a array of tuples: the 1st item in the tuple will be
+ *             * an array of pairs: the 1st item in the tuple will be
  *               the string displayed the users, the 0th is what is sent
  *               to the callback if the displayed string is selected.
+ *             * an array of triples: the 0th item is the callback string,
+ *               the 1st is the choice label, the 2nd is a boolean for
+ *               whether this choice is disabled
  **********************************************************************/
 
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { DropdownButton, Input, ControlLabel, MenuItem, Dropdown} from 'react-bootstrap';
+import _ from 'underscore';
+import styles from './Selector.css';
 
 var Selector = React.createClass({
 
@@ -36,26 +41,61 @@ var Selector = React.createClass({
     };
   },
 
+  componentWillReceiveProps: function (newProps) {
+    this.updateDisplayValue(newProps.value, newProps.items);
+  },
+
+  //store the display string for the already-selected value
+  updateDisplayValue: function (value, items=this.props.items) {
+    if(_.indexOf(items, value) != -1) {
+      //display string is the same as value string.
+      this.displayString = value;
+    }
+    else { //display the associated user string,
+      //if associated user string cannot be found,
+      //just display the original string, on the assumption
+      //it's something like "Select a Choice"
+      var item = _.findWhere(items, {0: value});
+      this.displayString = item ? item[1] : value;
+    }
+  },
+
   handleChange: function (event) {
-    this.props.onChange(event.target.value);
+    this.props.onChange(event);
+  },
+
+  //renders an item into a react.bootstrap MenuItem
+  //if item is an atom, it is used for both user text and event key
+  //otherwise, the 0th item is event key, the 1st user text, and the 2rd,
+  //if present, whether the item is disabled.
+  createMenuItem: function (item) {
+    var choice = _.isArray(item) ? item[1] : item;
+    var eventKey = _.isArray(item) ? item[0] : item;
+    var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
+
+    return (
+      <MenuItem eventKey={eventKey} disabled={disabled} block className={styles.selectoritem}>
+        {choice}
+      </MenuItem>
+    );
   },
 
   render: function () {
     return (
-      <Input
-        type='select'
-        label={this.props.label}
-        onChange={this.handleChange}
-        value={this.props.value ? this.props.value : undefined}
-        disabled={this.props.disabled}
-      >
-        {
-          this.props.items.map(function (item) {
-            return Array.isArray(item) ? <option value={item[0]} key={item[0]}>{item[1]}</option> : <option value={item} key={item}>{item}</option>;
-          })
-        }
-      </Input>
-      );
+        <div className={styles.selectorframe}>
+          <div>
+            <ControlLabel className={styles.selectorlabel}>{this.props.label}</ControlLabel>
+          </div>
+          <Dropdown block vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
+            <Dropdown.Toggle className={styles.selectortitle}>
+              {this.displayString}
+            </Dropdown.Toggle>
+            <Dropdown.Menu block className={styles.selectormenu}>
+              {this.props.items.map(this.createMenuItem)}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+    );
   },
 });
 
