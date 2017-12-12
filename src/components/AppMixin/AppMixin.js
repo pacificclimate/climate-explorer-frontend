@@ -82,12 +82,21 @@ var AppMixin = {
             return _.contains(_.pluck(models, key), val) ? val : models[0][key];
         });
 
-        this.setState({
-          meta: models,
-          model_id,
-          variable_id,
-          experiment,
-        });
+        var update = {
+            meta: models,
+            model_id,
+            variable_id,
+            experiment,
+          };
+
+        //if this portal is using a comparison variable, check to see if it is present
+        //in the current data, and update it if not.
+        if(!_.isUndefined(this.state.comparand_id)) {
+          if(!_.contains(_.pluck(models, "variable_id"), this.comparand_id)) {
+            update["comparand_id"] = models[0].variable_id;
+          }
+        }
+        this.setState(update);
     });
   },
 
@@ -97,7 +106,7 @@ var AppMixin = {
 
   componentDidUpdate: function(nextProps, nextState) {
     // The metadata needs to be updated if the ensemble has changed
-    if (nextState.ensemble_name !== this.state.ensmeble_name) {
+    if (nextState.ensemble_name !== this.state.ensemble_name) {
       this.updateMetadata();
     }
   },
