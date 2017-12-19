@@ -92,6 +92,17 @@ var DualDataController = createReactClass({
    * in the first qualifying dataset.
    */
   getData: function (props) {
+    //When switching ensembles, DualDataController is sometimes rendered when
+    //the primary variable has been updated to reflect the new ensemble,
+    //but the comparand hasn't yet.
+    if(props.meta.length > 0 && props.comparandMeta.length < 1) {
+      var text = "Loading ensemble";
+      this.setLongTermAverageGraphNoDataMessage(text);
+      this.setAnnualCycleGraphNoDataMessage(text);
+      this.setTimeseriesGraphNoDataMessage(text);
+      return;
+    }
+
     var variableMYM = this.multiYearMeanSelected(props);
     var comparandParams = _.pick(props, 'model_id', 'experiment');
     comparandParams.variable_id = props.comparand_id;
