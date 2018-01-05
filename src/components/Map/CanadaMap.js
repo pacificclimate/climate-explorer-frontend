@@ -47,6 +47,7 @@ var CanadaMap = React.createClass({
     rasterVariable: React.PropTypes.string,
     isolineVariable: React.PropTypes.string,    
     onSetArea: React.PropTypes.func.isRequired,
+    onSetStation: React.PropTypes.func.isRequired,
     area: React.PropTypes.object,
     origin: React.PropTypes.object,
   },
@@ -428,9 +429,9 @@ var CanadaMap = React.createClass({
         return _.isEqual(station.geometry.coordinates, stationJSON.geometry.coordinates);
       });  
     }
-    
-    //for now, just print out list of selected stations by name.
-    console.log(_.map(this.selectedStations, station => {return station.properties.name;}));
+
+    //pass list of selected stations up to MapController
+    this.props.onSetStation(this.selectedStations);
   },
   
   onMapClick: function () {

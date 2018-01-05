@@ -50,6 +50,7 @@ var MapController = React.createClass({
     meta: React.PropTypes.array,
     comparandMeta: React.PropTypes.array,
     onSetArea: React.PropTypes.func.isRequired,
+    onSetStation: React.PropTypes.func,
   },
 
   mixins: [ModalMixin],
@@ -329,6 +330,22 @@ var MapController = React.createClass({
   handleSetArea: function (geojson) {
     this.setState({ area: geojson });
     this.props.onSetArea(geojson ? g.geojson(geojson).toWKT() : undefined);
+  },
+  
+  //Passes a station selected by the user on the map up to MapController's
+  //parent (an AppController), to display numeric information about that station
+  handleSetStation: function(stations) {
+    console.log("set stations received by MapController");
+    console.log(stations);
+    if(true){ //this.props.onSetStation) {
+      var flatten = function(s) {
+        return {
+          fileId: s.properties.fileId,
+          station: s.properties.station
+        };
+      };
+      this.props.onSetStation(stations.map(flatten));
+    } 
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
@@ -685,6 +702,7 @@ var MapController = React.createClass({
           rasterTime={this.state.variableWmsTime}
           isolineTime={this.state.comparandWmsTime}
           onSetArea={this.handleSetArea}
+          onSetStation={this.handleSetStation}
           area={this.state.area}
           updateMinmax={this.updateLayerMinmax}
         />
@@ -692,7 +710,11 @@ var MapController = React.createClass({
       mapFooter = this.makeMapFooter();
 
     } else {
-      map = <Loader />;
+//      map = <Loader />;
+      //causes errors in general, but good for development
+      map = (<CanadaMap 
+          onSetStation={this.handleSetStation}
+      />);
       mapFooter = "";
     }
 

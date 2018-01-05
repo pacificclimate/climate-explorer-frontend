@@ -42,6 +42,7 @@ const Header = React.createClass({
                 <NavItem eventKey={2} href="/climo/all_CLIMDEX_files">ClimDEX climatologies</NavItem>
                 <NavItem eventKey={3} href="/compare/all_downscale_files">Standard comparison</NavItem>
                 <NavItem eventKey={4} href="/compare/all_CLIMDEX_files">ClimDEX comparison</NavItem>
+                <NavItem eventKey={5} href="/streamflow/hydro">Routed Streamflows</NavItem>
               </Nav>
             </Col>
           </Row>

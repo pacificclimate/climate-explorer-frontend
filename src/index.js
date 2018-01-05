@@ -35,7 +35,7 @@ render((
       <Route path='/moti' component={MotiController} />
       <Route path='/climo/:ensemble_name' component={AppController} />
       <Route path='/compare/:ensemble_name' component={DualController} />
-      <Route path='streamflow/:ensemble_name' component={StreamflowController} />
+      <Route path='/streamflow/:ensemble_name' component={StreamflowController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));

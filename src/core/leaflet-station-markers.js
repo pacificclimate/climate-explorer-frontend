@@ -23,8 +23,6 @@ var StationIcon = L.Icon.extend({
 var unselectedIcon = new StationIcon({iconUrl: '../../public/images/hydro_marker_unselected.svg'});
 var selectedIcon = new StationIcon({iconUrl: '../../public/images/hydro_marker_selected.svg'});
 
-
-
 /*
  * addStationMarkerLayer - asynchronous function that queries the climate
  * explorer backend to learn the locations of hydro stations, creates a
@@ -41,6 +39,8 @@ var addStationMarkerLayer = function (map, onClick) {
   var onMarkerClick = function () {
     var markerJSON = this.toGeoJSON();
     markerJSON.properties.name = this.options.title;
+    markerJSON.properties.fileId = this.options.fileId;
+    markerJSON.properties.station = this.options.id;
     if(this.options.icon == selectedIcon) {
       this.setIcon(unselectedIcon);
       markerJSON.properties.selected = false;
@@ -67,12 +67,12 @@ var addStationMarkerLayer = function (map, onClick) {
         var stationName = `${response.data[key].watershed} ${station}`;
         var stationLat = response.data[key].outlets[station].latitude;
         var stationLong = response.data[key].outlets[station].longitude;
-        stations[stationName] = {latitude: stationLat, longitude: stationLong};
+        stations[stationName] = {latitude: stationLat, longitude: stationLong, id: station, fileId: key};
       }
     }
     for(var station in stations) {
       var marker = L.marker([stations[station].latitude, stations[station].longitude],
-          {title: station, icon: unselectedIcon});
+          {title: station, icon: unselectedIcon, id:stations[station].id, fileId: stations[station].fileId});
       marker.on('click', onMarkerClick);
       markers.push(marker);
     }

@@ -95,16 +95,11 @@ var AppMixin = {
           variable_id,
           experiment,
         });
-<<<<<<< 31e02bbb373f7c9200ddf5f1cae1f9eaafe89e25
     });
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
     return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
-=======
-    
-    console.log(this.state);
->>>>>>> Skeleton of hydro portal functionality
   },
 
   componentDidUpdate: function(nextProps, nextState) {

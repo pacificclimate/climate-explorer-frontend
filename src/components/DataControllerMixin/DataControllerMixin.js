@@ -149,6 +149,19 @@ var ModalMixin = {
       }
     }).then(validate);
   },
+  
+  //Fetches and validates data from a call to the backend's 
+  //"streamflow/flowseries" endpoint
+  getFlowseriesPromise: function (props, flowseriesDatasetId, stationId) {
+    var validate = this.multiYearMeanSelected() ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'streamflow/flowseries'),
+      params: {
+        id_: flowseriesDatasetId,
+        station: stationId
+      }
+    }).then(validate);
+  },
 
     /*
      * this function is called to display any error generated in the 

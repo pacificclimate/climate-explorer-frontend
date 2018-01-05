@@ -33,10 +33,18 @@ var App = React.createClass({
 
   getInitialState: function () {
     return {
-      metadataQuery: "streamflow/multistation"
+      metadataQuery: "streamflow/multistation",
+      selectedStations: []
     };
   },
   
+  handleSetStation: function(stations) {
+    console.log("handleSetStation in SteamflowController");
+    this.setState({
+      selectedStations: stations
+    });
+  },
+
   mixins: [AppMixin],
 
   render: function () {
@@ -56,6 +64,7 @@ var App = React.createClass({
               <MapController
                 meta = {this.getfilteredMeta()}
                 onSetArea={this.handleSetArea}
+                onSetStation={this.handleSetStation}
               />
             </div>
           </Col>
@@ -65,6 +74,7 @@ var App = React.createClass({
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
               area={this.state.area}
+              stations={this.state.selectedStations}
               meta = {this.getfilteredMeta()}
             />
           </Col>
