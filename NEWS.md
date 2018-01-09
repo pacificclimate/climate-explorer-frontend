@@ -1,5 +1,12 @@
 # News / Release Notes
 
+##1.0.2
+*9-January-2018*
+* [Disable parameters that don't match any datasets on dataset dropdown menus](https://github.com/pacificclimate/climate-explorer-frontend/pull/98)
+* [Fix a bug that prevented comparing variables across a specified area](https://github.com/pacificclimate/climate-explorer-frontend/pull/109)
+* [Fix map usability bugs](https://github.com/pacificclimate/climate-explorer-frontend/pull/100)
+* [Add application-wide routing and access to multiple ensembles](https://github.com/pacificclimate/climate-explorer-frontend/pull/101)
+
 ## 1.0.1
 *20-November-2017*
 
