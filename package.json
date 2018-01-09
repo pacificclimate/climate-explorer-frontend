@@ -1,6 +1,6 @@
 {
   "name": "Climate-explorer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "PCIC Climate Explorer front end application",
   "main": "index.js",
   "scripts": {
