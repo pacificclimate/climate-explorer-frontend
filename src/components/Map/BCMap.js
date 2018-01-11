@@ -12,12 +12,21 @@ var styles = {
 
 var BCMap = React.createClass({
   componentDidMount: function () {
-    var crs = new L.Proj.CRS.TMS(
+    var crs = new L.Proj.CRS(
       'EPSG:3005',
       '+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs',
-      [-1000000, -1000000, 3000000, 3000000],
       {
         resolutions: utils.generateResolutions(7812.5, 12),
+        // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
+        // coordinates incorrectly. You have to know the magic origin value.
+        //
+        // It is also probably important to know that the bc_osm tile set is a TMS tile set, which has axes
+        // transposed with respect to Leaflet axes. The proj4leaflet documentation incorrectly states that
+        // there is a CRS constructor `L.Proj.CRS.TMS` for TMS tilesets. It is absent in the version
+        // (1.0.2) we are using. It exists in proj4leaflet ver 0.7.1 (formerly in use here), and shows that the
+        // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
+        // of the TMS constructor.
+        origin: [-1000000, 3000000],
       }
     );
 

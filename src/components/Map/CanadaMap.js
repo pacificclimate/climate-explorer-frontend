@@ -59,12 +59,21 @@ var CanadaMap = React.createClass({
   //generates initial (and unchanging) map settings - origin, projection, etc. 
   getDefaultProps: function () {
     return {
-      crs: new L.Proj.CRS.TMS(
+      crs: new L.Proj.CRS(
         'EPSG:4326',
         '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
-        [-150, -10, -50, 90],
         {
           resolutions: utils.generateResolutions(0.09765625, 10),
+          // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
+          // coordinates incorrectly. You have to know the magic origin value.
+          //
+          // It is also probably important to know that the bc_osm tile set is a TMS tile set, which has axes
+          // transposed with respect to Leaflet axes. The proj4leaflet documentation incorrectly states that
+          // there is a CRS constructor `L.Proj.CRS.TMS` for TMS tilesets. It is absent in the version
+          // (1.0.2) we are using. It exists in proj4leaflet ver 0.7.1 (formerly in use here), and shows that the
+          // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
+          // of the TMS constructor.
+          origin: [-150, 90],
         }
       ),
       version: '1.1.1',
