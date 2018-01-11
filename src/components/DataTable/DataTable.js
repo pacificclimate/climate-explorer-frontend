@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 var DataTable = React.createClass({
 
   propTypes: {
-    data: React.PropTypes.array,
+    data: PropTypes.array,
   },
 
   render: function () {

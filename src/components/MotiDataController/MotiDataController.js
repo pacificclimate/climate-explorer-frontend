@@ -23,6 +23,8 @@
  * In both cases, a stats DataTable summarizing the dataset is also
  * generated.
  ************************************************************************/
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 
@@ -39,12 +41,12 @@ import styles from './MotiDataController.css';
 var MotiDataController = React.createClass({
 
   propTypes: {
-    model_id: React.PropTypes.string,
-    variable_id: React.PropTypes.string,
-    experiment: React.PropTypes.string,
-    area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    ensemble_name: React.PropTypes.string,
+    model_id: PropTypes.string,
+    variable_id: PropTypes.string,
+    experiment: PropTypes.string,
+    area: PropTypes.string,
+    meta: PropTypes.array,
+    ensemble_name: PropTypes.string,
   },
 
   mixins: [DataControllerMixin],

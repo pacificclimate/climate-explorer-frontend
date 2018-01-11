@@ -27,6 +27,8 @@
  * Also allows downloading of the data displayed in the graphs.
  *********************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
@@ -51,14 +53,14 @@ import styles from './DualDataController.css';
 var DualDataController = React.createClass({
 
   propTypes: {
-    ensemble_name: React.PropTypes.string,
-    model_id: React.PropTypes.string,
-    variable_id: React.PropTypes.string,
-    comparand_id: React.PropTypes.string,
-    experiment: React.PropTypes.string,
-    area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    comparandMeta: React.PropTypes.array,
+    ensemble_name: PropTypes.string,
+    model_id: PropTypes.string,
+    variable_id: PropTypes.string,
+    comparand_id: PropTypes.string,
+    experiment: PropTypes.string,
+    area: PropTypes.string,
+    meta: PropTypes.array,
+    comparandMeta: PropTypes.array,
   },
 
   mixins: [DataControllerMixin],

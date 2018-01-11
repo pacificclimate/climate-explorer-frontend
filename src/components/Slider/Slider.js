@@ -1,3 +1,4 @@
+var PropTypes = require('prop-types');
 var React = require('react');
 var ReactDOM = require('react-dom');
 var BootstrapSlider = require('bootstrap-slider');
@@ -5,18 +6,18 @@ var BootstrapSlider = require('bootstrap-slider');
 var Slider = React.createClass({
 
   propTypes: {
-    id: React.PropTypes.string,
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
-    step: React.PropTypes.number,
-    value: React.PropTypes.number.isRequired,
-    ticks: React.PropTypes.array,
-    ticksLabels: React.PropTypes.array,
-    ticksPositions: React.PropTypes.array,
-    toolTip: React.PropTypes.bool,
-    selection: React.PropTypes.string,
-    onSlide: React.PropTypes.func,
-    onSlideStop: React.PropTypes.func,
+    id: PropTypes.string,
+    min: PropTypes.number,
+    max: PropTypes.number,
+    step: PropTypes.number,
+    value: PropTypes.number.isRequired,
+    ticks: PropTypes.array,
+    ticksLabels: PropTypes.array,
+    ticksPositions: PropTypes.array,
+    toolTip: PropTypes.bool,
+    selection: PropTypes.string,
+    onSlide: PropTypes.func,
+    onSlideStop: PropTypes.func,
   },
 
   getDefaultProps: function () {

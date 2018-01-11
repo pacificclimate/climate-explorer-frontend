@@ -17,6 +17,8 @@
  *               whether this choice is disabled
  **********************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { DropdownButton, Input, ControlLabel, MenuItem, Dropdown} from 'react-bootstrap';
 import _ from 'underscore';
@@ -25,11 +27,11 @@ import styles from './Selector.css';
 var Selector = React.createClass({
 
   propTypes: {
-    onChange: React.PropTypes.any, // Using 'function' logs warnings
-    label: React.PropTypes.string,
-    items: React.PropTypes.array,
-    value: React.PropTypes.node,
-    disabled: React.PropTypes.bool
+    onChange: PropTypes.any, // Using 'function' logs warnings
+    label: PropTypes.string,
+    items: PropTypes.array,
+    value: PropTypes.node,
+    disabled: PropTypes.bool
   },
 
   getDefaultProps: function () {

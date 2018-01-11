@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -11,7 +12,7 @@ var exportPolygon = function (area, format) {
 var GeoExporterDropdown = React.createClass({
 
   propTypes: {
-    area: React.PropTypes.object,
+    area: PropTypes.object,
   },
 
   render() {

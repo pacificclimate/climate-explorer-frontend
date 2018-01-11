@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
@@ -8,7 +9,7 @@ import styles from './ExperimentSelector.css';
 var ExperimentSelector = React.createClass({
 
   propTypes: {
-    onChange: React.PropTypes.function,
+    onChange: PropTypes.function,
   },
 
   getInitialState: function () {

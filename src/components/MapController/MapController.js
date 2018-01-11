@@ -18,6 +18,8 @@
  * to be calculated over a specific area.
  *******************************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { Row, Col, Button, ToggleButton,
          ButtonGroup, Glyphicon,
@@ -47,9 +49,9 @@ var MapController = React.createClass({
  ******************************************************************/
 
   propTypes: {
-    meta: React.PropTypes.array,
-    comparandMeta: React.PropTypes.array,
-    onSetArea: React.PropTypes.func.isRequired,
+    meta: PropTypes.array,
+    comparandMeta: PropTypes.array,
+    onSetArea: PropTypes.func.isRequired,
   },
 
   mixins: [ModalMixin],

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input, Button, Glyphicon, Modal } from 'react-bootstrap';
 
@@ -15,8 +16,8 @@ Calls callback with resulting geojson
 var GeoLoader = React.createClass({
 
   propTypes: {
-    onLoadArea: React.PropTypes.func.isRequired,
-    title: React.PropTypes.string,
+    onLoadArea: PropTypes.func.isRequired,
+    title: PropTypes.string,
   },
 
   mixins: [ModalMixin],

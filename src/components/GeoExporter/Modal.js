@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
@@ -12,8 +13,8 @@ var exportPolygon = function (area, format) {
 var GeoExporterModal = React.createClass({
 
   propTypes: {
-    area: React.PropTypes.object,
-    title: React.PropTypes.string,
+    area: PropTypes.object,
+    title: PropTypes.string,
   },
 
   mixins: [ModalMixin],

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, hashHistory } from 'react-router';
@@ -11,7 +12,7 @@ import Header from './components/Header';
 var App = React.createClass({
 
   propTypes: {
-    children: React.PropTypes.element,
+    children: PropTypes.element,
   },
 
   render: function () {

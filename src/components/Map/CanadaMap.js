@@ -21,6 +21,8 @@
  * 
  *****************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
@@ -36,18 +38,18 @@ import styles from './map.css';
 var CanadaMap = React.createClass({
 
   propTypes: {
-    rasterPalette: React.PropTypes.string,
-    rasterLogscale: React.PropTypes.string,
-    isolinePalette: React.PropTypes.string,
-    numberOfContours: React.PropTypes.number,
-    isolineLogscale: React.PropTypes.string,
-    rasterDataset: React.PropTypes.string,
-    isolineDataset: React.PropTypes.string,
-    rasterVariable: React.PropTypes.string,
-    isolineVariable: React.PropTypes.string,    
-    onSetArea: React.PropTypes.func.isRequired,
-    area: React.PropTypes.object,
-    origin: React.PropTypes.object,
+    rasterPalette: PropTypes.string,
+    rasterLogscale: PropTypes.string,
+    isolinePalette: PropTypes.string,
+    numberOfContours: PropTypes.number,
+    isolineLogscale: PropTypes.string,
+    rasterDataset: PropTypes.string,
+    isolineDataset: PropTypes.string,
+    rasterVariable: PropTypes.string,
+    isolineVariable: PropTypes.string,    
+    onSetArea: PropTypes.func.isRequired,
+    area: PropTypes.object,
+    origin: PropTypes.object,
   },
 
   getInitialState: function () {

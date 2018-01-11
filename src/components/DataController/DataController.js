@@ -24,6 +24,8 @@
  * climatology period or timeseries is also generated. 
  *******************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
@@ -48,12 +50,12 @@ import DataControllerMixin from '../DataControllerMixin';
 var DataController = React.createClass({
 
   propTypes: {
-    model_id: React.PropTypes.string,
-    variable_id: React.PropTypes.string,
-    experiment: React.PropTypes.string,
-    area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    ensemble_name: React.PropTypes.string,
+    model_id: PropTypes.string,
+    variable_id: PropTypes.string,
+    experiment: PropTypes.string,
+    area: PropTypes.string,
+    meta: PropTypes.array,
+    ensemble_name: PropTypes.string,
   },
 
   mixins: [DataControllerMixin],

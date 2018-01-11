@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 var C3 = require('c3/c3');
 import _ from 'underscore';
@@ -6,8 +7,8 @@ import styles from './DataGraph.css';
 var DataGraph = React.createClass({
 
   propTypes: {
-    data: React.PropTypes.object.isRequired,
-    axis: React.PropTypes.object,
+    data: PropTypes.object.isRequired,
+    axis: PropTypes.object,
   },
 
   getDefaultProps: function () {
