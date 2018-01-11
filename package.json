@@ -44,6 +44,7 @@
     "moment": "^2.10.6",
     "proj4": "^2.4.4",
     "proj4leaflet": "^1.0.2",
+    "prop-types": "^15.6.0",
     "react-bootstrap-table": "^1.2.5",
     "xlsx": "^0.8.0"
   },
