@@ -73,7 +73,7 @@ class Selector extends React.Component {
     var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
 
     return (
-      <MenuItem eventKey={eventKey} disabled={disabled} block className={styles.selectoritem}>
+      <MenuItem key={choice} eventKey={eventKey} disabled={disabled} className={styles.selectoritem}>
         {choice}
       </MenuItem>
     );
@@ -85,11 +85,11 @@ class Selector extends React.Component {
           <div>
             <ControlLabel className={styles.selectorlabel}>{this.props.label}</ControlLabel>
           </div>
-          <Dropdown block vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
+          <Dropdown vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
             <Dropdown.Toggle className={styles.selectortitle}>
               {this.displayString}
             </Dropdown.Toggle>
-            <Dropdown.Menu block className={styles.selectormenu}>
+            <Dropdown.Menu className={styles.selectormenu}>
               {this.props.items.map(this.createMenuItem)}
             </Dropdown.Menu>
           </Dropdown>
