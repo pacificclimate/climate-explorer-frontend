@@ -10,8 +10,8 @@ var styles = {
   },
 };
 
-var BCMap = React.createClass({
-  componentDidMount: function () {
+class BCMap extends React.Component {
+  componentDidMount() {
     var crs = new L.Proj.CRS(
       'EPSG:3005',
       '+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs',
@@ -48,20 +48,22 @@ var BCMap = React.createClass({
 
     map.on('click', this.onMapClick);
     map.setView(L.latLng(55, -125), 2);
-  },
+  }
 
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     this.map.off('click', this.onMapClick);
     this.map = null;
-  },
-  onMapClick: function () {
+  }
+
+  onMapClick = () => {
     // console.log('clicked on map');
-  },
-  render: function () {
+  };
+
+  render() {
     return (
             <div style={styles.map}></div>
         );
-  },
-});
+  }
+}
 
 module.exports.BCMap = BCMap;

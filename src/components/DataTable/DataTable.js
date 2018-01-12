@@ -2,13 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-var DataTable = React.createClass({
-
-  propTypes: {
+class DataTable extends React.Component {
+  static propTypes = {
     data: PropTypes.array,
-  },
+  };
 
-  render: function () {
+  render() {
     return (
       <div id={'table'}>
         <BootstrapTable data={this.props.data} options={this.props.options} striped hover >
@@ -23,7 +22,7 @@ var DataTable = React.createClass({
         </BootstrapTable>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DataTable;

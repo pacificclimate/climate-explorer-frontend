@@ -6,32 +6,29 @@ import axios from 'axios';
 
 import styles from './ExperimentSelector.css';
 
-var ExperimentSelector = React.createClass({
-
-  propTypes: {
+class ExperimentSelector extends React.Component {
+  static propTypes = {
     onChange: PropTypes.function,
-  },
+  };
 
-  getInitialState: function () {
-    return {
-      items: [],
-    };
-  },
+  state = {
+    items: [],
+  };
 
-  componentDidMount: function () {
+  componentDidMount() {
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'models'),
     }).then(response => {
       this.setState({ items: _.uniq(response.data) });
     });
-  },
+  }
 
-  onChange: function (event) {
+  onChange = (event) => {
     this.setState({ value: event.target.value });
     this.props.onChange(event.target.value);
-  },
+  };
 
-  render: function () {
+  render() {
     return (
       <div className={styles.selector}>
         <select onChange={this.onChange} value={this.state.value}>
@@ -39,7 +36,7 @@ var ExperimentSelector = React.createClass({
         </select>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ExperimentSelector;

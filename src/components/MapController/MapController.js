@@ -21,6 +21,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button, ToggleButton,
          ButtonGroup, Glyphicon,
          Modal, Tooltip, OverlayTrigger } from 'react-bootstrap';
@@ -42,11 +43,12 @@ import { timestampToTimeOfYear,
 
 import styles from './MapController.css';
 
-var MapController = React.createClass({
+var MapController = createReactClass({
+  displayName: 'MapController',
 
-/******************************************************************
- * MapController Initialization Functions
- ******************************************************************/
+  /******************************************************************
+   * MapController Initialization Functions
+   ******************************************************************/
 
   propTypes: {
     meta: PropTypes.array,
@@ -155,9 +157,9 @@ var MapController = React.createClass({
     }
   },
 
-/*****************************************************************
- * Data Handling and Loading Functions
- *****************************************************************/
+  /*****************************************************************
+   * Data Handling and Loading Functions
+   *****************************************************************/
 
   //returns true if props has all necessary information to generate
   //a map. Expected values for symbol: "variable" or "comparand"
@@ -278,9 +280,9 @@ var MapController = React.createClass({
     });
   },
 
-/******************************************************************
- * Callback and reaction functions
- ******************************************************************/
+  /******************************************************************
+   * Callback and reaction functions
+   ******************************************************************/
 
   //this function handles user selection of all the straightforward
   //parameters like logscale or palette.
@@ -355,10 +357,10 @@ var MapController = React.createClass({
     this.setState(update);
   },
 
-/**************************************************************************
- * JSX generator functions that produce controls for the Map Settings
- * Menu based on data stored in this.state
- **************************************************************************/
+  /**************************************************************************
+   * JSX generator functions that produce controls for the Map Settings
+   * Menu based on data stored in this.state
+   **************************************************************************/
   //used to generate human-friendly text for labels
   userLabels: {"isoline": "Isoline", "raster": "Block Colour",
     "variable": "Block Colour", "comparand": "Isoline"},

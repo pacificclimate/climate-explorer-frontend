@@ -27,6 +27,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
@@ -47,7 +48,8 @@ import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
 
-var DataController = React.createClass({
+var DataController = createReactClass({
+  displayName: 'DataController',
 
   propTypes: {
     model_id: PropTypes.string,
@@ -162,7 +164,7 @@ var DataController = React.createClass({
   updateAnnualCycleDataset: function (instance) {
     this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
   },
-  
+
   /*
    * This function retrieves fetches monthly, seasonal, and yearly resolution
    * annual cycle data and displays them on the graph. If instance (an object 
@@ -211,7 +213,7 @@ var DataController = React.createClass({
       this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });    
   },
-  
+
   /*
    * This function fetches and loads data  for the Long Term Average graphs.
    * If passed a time of year(resolution and index), it will load
@@ -235,7 +237,7 @@ var DataController = React.createClass({
       this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
-  
+
   /*
    * This function fetches and loads data for the Timeseries graph.
    * As the Timeseries graph shows all data points at once, there's no

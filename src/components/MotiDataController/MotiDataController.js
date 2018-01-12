@@ -26,6 +26,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ControlLabel } from 'react-bootstrap';
 
 import { parseBootstrapTableData } from '../../core/util';
@@ -38,7 +39,8 @@ import _ from 'underscore';
 
 import styles from './MotiDataController.css';
 
-var MotiDataController = React.createClass({
+var MotiDataController = createReactClass({
+  displayName: 'MotiDataController',
 
   propTypes: {
     model_id: PropTypes.string,

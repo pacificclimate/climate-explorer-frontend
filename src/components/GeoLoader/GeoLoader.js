@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Input, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
@@ -13,7 +14,8 @@ Calls callback with resulting geojson
 
 */
 
-var GeoLoader = React.createClass({
+var GeoLoader = createReactClass({
+  displayName: 'GeoLoader',
 
   propTypes: {
     onLoadArea: PropTypes.func.isRequired,
@@ -91,7 +93,6 @@ var GeoLoader = React.createClass({
       </div>
     );
   },
-
 });
 
 export default GeoLoader;

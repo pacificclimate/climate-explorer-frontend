@@ -9,13 +9,12 @@ import DualController from './components/DualController';
 
 import Header from './components/Header';
 
-var App = React.createClass({
-
-  propTypes: {
+class App extends React.Component {
+  static propTypes = {
     children: PropTypes.element,
-  },
+  };
 
-  render: function () {
+  render() {
     return (
       <div>
         <div>
@@ -26,8 +25,8 @@ var App = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 render((
   <Router history={hashHistory}>

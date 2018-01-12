@@ -17,6 +17,7 @@
  ************************************************************************/
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import MapController from '../MapController';
@@ -24,7 +25,8 @@ import DualDataController from '../DualDataController/DualDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
 
-var App = React.createClass({
+var App = createReactClass({
+  displayName: 'App',
 
   /*
    * Initial state is set after the multimeta API query run in AppMixin.componentDidMount()
@@ -36,7 +38,7 @@ var App = React.createClass({
    */
 
   mixins: [AppMixin],
-  
+
   //This function filters out datasets inappropriate for this portal. A dataset
   //the filter returns "false" on will be removed.
   //Filters out multi-year monthly datasets; too noisy to be useful.

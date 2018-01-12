@@ -24,31 +24,28 @@ import { DropdownButton, Input, ControlLabel, MenuItem, Dropdown} from 'react-bo
 import _ from 'underscore';
 import styles from './Selector.css';
 
-var Selector = React.createClass({
-
-  propTypes: {
+class Selector extends React.Component {
+  static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     label: PropTypes.string,
     items: PropTypes.array,
     value: PropTypes.node,
     disabled: PropTypes.bool
-  },
+  };
 
-  getDefaultProps: function () {
-    return {
-      label: 'Selection',
-      items: [],
-      value: '',
-      disabled: false,
-    };
-  },
+  static defaultProps = {
+    label: 'Selection',
+    items: [],
+    value: '',
+    disabled: false,
+  };
 
-  componentWillReceiveProps: function (newProps) {
+  componentWillReceiveProps(newProps) {
     this.updateDisplayValue(newProps.value, newProps.items);
-  },
+  }
 
   //store the display string for the already-selected value
-  updateDisplayValue: function (value, items=this.props.items) {
+  updateDisplayValue = (value, items=this.props.items) => {
     if(_.indexOf(items, value) != -1) {
       //display string is the same as value string.
       this.displayString = value;
@@ -60,17 +57,17 @@ var Selector = React.createClass({
       var item = _.findWhere(items, {0: value});
       this.displayString = item ? item[1] : value;
     }
-  },
+  };
 
-  handleChange: function (event) {
+  handleChange = (event) => {
     this.props.onChange(event);
-  },
+  };
 
   //renders an item into a react.bootstrap MenuItem
   //if item is an atom, it is used for both user text and event key
   //otherwise, the 0th item is event key, the 1st user text, and the 2rd,
   //if present, whether the item is disabled.
-  createMenuItem: function (item) {
+  createMenuItem = (item) => {
     var choice = _.isArray(item) ? item[1] : item;
     var eventKey = _.isArray(item) ? item[0] : item;
     var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
@@ -80,9 +77,9 @@ var Selector = React.createClass({
         {choice}
       </MenuItem>
     );
-  },
+  };
 
-  render: function () {
+  render() {
     return (
         <div className={styles.selectorframe}>
           <div>
@@ -98,7 +95,7 @@ var Selector = React.createClass({
           </Dropdown>
         </div>
     );
-  },
-});
+  }
+}
 
 export default Selector;

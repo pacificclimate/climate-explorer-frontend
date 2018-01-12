@@ -5,11 +5,8 @@ import classNames from 'classnames';
 
 import styles from './Header.css';
 
-const Header = React.createClass({
-
-  getInitialState() {
-    return {activeKey: 1};
-  },
+class Header extends React.Component {
+  state = {activeKey: 1};
 
   render() {
 
@@ -49,6 +46,6 @@ const Header = React.createClass({
       </div>
     );
   }
-});
+}
 
 export default Header;

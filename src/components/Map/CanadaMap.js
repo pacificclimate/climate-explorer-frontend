@@ -35,9 +35,8 @@ import NcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 import styles from './map.css';
 
-var CanadaMap = React.createClass({
-
-  propTypes: {
+class CanadaMap extends React.Component {
+  static propTypes = {
     rasterPalette: PropTypes.string,
     rasterLogscale: PropTypes.string,
     isolinePalette: PropTypes.string,
@@ -50,42 +49,38 @@ var CanadaMap = React.createClass({
     onSetArea: PropTypes.func.isRequired,
     area: PropTypes.object,
     origin: PropTypes.object,
-  },
-
-  getInitialState: function () {
-    return {
-      area: undefined,
-    };
-  },
+  };
 
   //generates initial (and unchanging) map settings - origin, projection, etc. 
-  getDefaultProps: function () {
-    return {
-      crs: new L.Proj.CRS(
-        'EPSG:4326',
-        '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
-        {
-          resolutions: utils.generateResolutions(0.09765625, 10),
-          // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
-          // coordinates incorrectly. You have to know the magic origin value.
-          //
-          // It is also probably important to know that the bc_osm tile set is a TMS tile set, which has axes
-          // transposed with respect to Leaflet axes. The proj4leaflet documentation incorrectly states that
-          // there is a CRS constructor `L.Proj.CRS.TMS` for TMS tilesets. It is absent in the version
-          // (1.0.2) we are using. It exists in proj4leaflet ver 0.7.1 (formerly in use here), and shows that the
-          // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
-          // of the TMS constructor.
-          origin: [-150, 90],
-        }
-      ),
-      version: '1.1.1',
-      srs: 'EPSG:4326',
-      origin: { lat: 60, lon: -100, zoom: 0 },
-    };
-  },
-  
+  static defaultProps = {
+    crs: new L.Proj.CRS(
+      'EPSG:4326',
+      '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
+      {
+        resolutions: utils.generateResolutions(0.09765625, 10),
+        // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
+        // coordinates incorrectly. You have to know the magic origin value.
+        //
+        // It is also probably important to know that the bc_osm tile set is a TMS tile set, which has axes
+        // transposed with respect to Leaflet axes. The proj4leaflet documentation incorrectly states that
+        // there is a CRS constructor `L.Proj.CRS.TMS` for TMS tilesets. It is absent in the version
+        // (1.0.2) we are using. It exists in proj4leaflet ver 0.7.1 (formerly in use here), and shows that the
+        // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
+        // of the TMS constructor.
+        origin: [-150, 90],
+      }
+    ),
+    version: '1.1.1',
+    srs: 'EPSG:4326',
+    origin: { lat: 60, lon: -100, zoom: 0 },
+  };
+
+  state = {
+    area: undefined,
+  };
+
   //get map formatting parameters for the raster or isoline layers.
-  getWMSParams: function (layer, props = this.props) {
+  getWMSParams = (layer, props = this.props) => {
     var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
 
     var params = {
@@ -128,8 +123,8 @@ var CanadaMap = React.createClass({
       }
     }
     return params;    
-  },
-  
+  };
+
   /*
    * Queries WMS about the minimum and maximum values of a map.
    * Used primarily to configure logarithmic shading, which
@@ -137,7 +132,7 @@ var CanadaMap = React.createClass({
    * the data range.
    * Updates itself and MapController with the results.
    */
-  updateLayerMinmax: function (layer, props) {
+  updateLayerMinmax = (layer, props) => {
     try {
       var bounds = this.map.getBounds();
       if(bounds.getWest() == bounds.getEast()) {
@@ -187,23 +182,23 @@ var CanadaMap = React.createClass({
         throw err;
       }
     }
-  },
-  
-  clearMapFeatures: function () {
+  };
+
+  clearMapFeatures = () => {
     this.drawnItems.getLayers().map(function (layer) {
       this.drawnItems.removeLayer(layer);
     }.bind(this));
-  },
+  };
 
   // generally called for a new area originating from within this component
   // propagate the area up the component stack
-  handleSetArea: function (geojson) {
+  handleSetArea = (geojson) => {
     this.setState({ area: geojson });
     this.props.onSetArea(geojson);
-  },
+  };
 
   // area received from props; don't propagate back up the component stack
-  handleNewArea: function (geojson) {
+  handleNewArea = (geojson) => {
     this.setState({ area: geojson });
     this.clearMapFeatures();
         // L.geoJson returns a FeatureGroup. Only add first layer of group.
@@ -216,19 +211,19 @@ var CanadaMap = React.createClass({
       fillOpacity: 0.2,
       clickable: true,
     }).getLayers()[0]);
-  },
+  };
 
   //Map should only rerender when something has changed
-  shouldComponentUpdate: function (nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return !(_.isEqual(nextState, this.state) && _.isEqual(nextProps, this.props));
-  },
+  }
 
   //initializes the map, loads data, and generates controls
   //NOTE: the buttons that open the "Map Settings" menu are
   //actually provided by MapController, not this component.
   //CanadaMap draws colourbars, the autoscale button, and the
   //area drawing and manipulation controls.
-  componentDidMount: function () {
+  componentDidMount() {
     this.layerRange = {};
 
     var map = this.map = L.map(this._map, {
@@ -396,13 +391,13 @@ var CanadaMap = React.createClass({
     if(this.props.area && !this.state.area) {
       this.handleNewArea(this.props.area);
     }
-  },
-  
+  }
+
   //returns an array of two controls registered to the layer:
   //a coloured bar legend, and an autoscale button
   //the autoscale button is registered to every layer this function 
   //has been called on. (It is assumed that all layers autoscale together)
-  makeColourControls: function (layer) {
+  makeColourControls = (layer) => {
     if(this.autoscaleControl) {
       this.autoscaleControl.addLayer(layer);
     }
@@ -415,18 +410,18 @@ var CanadaMap = React.createClass({
       this.autoscaleControl,
       new NcWMSColorbarControl(layer, {position: 'bottomright'})
     ];
-  },
+  };
 
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     this.map.off('click', this.onMapClick);
     this.map = null;
-  },
+  }
 
-  onMapClick: function () {
+  onMapClick = () => {
     //console.log('clicked on map');
-  },
+  };
 
-  componentWillReceiveProps: function (newProps) {
+  componentWillReceiveProps(newProps) {
     //MapController has a modal menu, and has to rerender itself (and CanadaMap)
     //when the modal opens or closes, but the map itself doesn't need to be
     //redrawn unless something has actually changed.
@@ -464,15 +459,15 @@ var CanadaMap = React.createClass({
     if (this.state.area !== newProps.area) {
       this.handleNewArea(newProps.area);
     }
-  },
+  }
 
-  render: function () {
+  render() {
     return (
       <div className={styles.map}>
         <div ref={ (c) => this._map = c } className={styles.map} />
       </div>
     );
-  },
-});
+  }
+}
 
 module.exports.CanadaMap = CanadaMap;

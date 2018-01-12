@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
@@ -10,7 +11,8 @@ var exportPolygon = function (area, format) {
   g.geojson(area).save(format);
 };
 
-var GeoExporterModal = React.createClass({
+var GeoExporterModal = createReactClass({
+  displayName: 'GeoExporterModal',
 
   propTypes: {
     area: PropTypes.object,
@@ -49,7 +51,6 @@ var GeoExporterModal = React.createClass({
       </div>
     );
   },
-
 });
 
 export default GeoExporterModal;

@@ -9,11 +9,10 @@ var exportPolygon = function (area, format) {
   g.geojson(area).save(format);
 };
 
-var GeoExporterDropdown = React.createClass({
-
-  propTypes: {
+class GeoExporterDropdown extends React.Component {
+  static propTypes = {
     area: PropTypes.object,
-  },
+  };
 
   render() {
     var boundExport = function (e, key) {
@@ -29,8 +28,7 @@ var GeoExporterDropdown = React.createClass({
         <MenuItem eventKey='gpx'>GPX</MenuItem>
       </DropdownButton>
     );
-  },
-
-});
+  }
+}
 
 export default GeoExporterDropdown;

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import MapController from '../MapController';
@@ -7,7 +8,8 @@ import Selector from '../Selector';
 import AppMixin from '../AppMixin';
 
 
-var App = React.createClass({
+var App = createReactClass({
+  displayName: 'App',
 
   /**
    * Initial state set upon metadata returning in {@link App#componentDidMount}.

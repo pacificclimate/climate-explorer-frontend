@@ -30,6 +30,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
 import Loader from 'react-loader';
@@ -50,7 +51,8 @@ import DataControllerMixin from '../DataControllerMixin';
 
 import styles from './DualDataController.css';
 
-var DualDataController = React.createClass({
+var DualDataController = createReactClass({
+  displayName: 'DualDataController',
 
   propTypes: {
     ensemble_name: PropTypes.string,
@@ -165,7 +167,7 @@ var DualDataController = React.createClass({
   updateAnnualCycleDataset: function (instance) {
     this.loadDualAnnualCycleGraph(this.props, JSON.parse(instance));
   },
-  
+
   /*
    * Fetches and loads data for the Long Term Average graph.
    * Loads data for two variables if both props.variable_id and 
@@ -202,7 +204,7 @@ var DualDataController = React.createClass({
       this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
-  
+
   /*
    * Fetches and loads data for the Annual Cycle graph. Loads data for
    * two variables if props.variable_id and props.comparand_id are both
