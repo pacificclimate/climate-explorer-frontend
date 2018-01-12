@@ -2,7 +2,7 @@ jest.dontMock('../Selector');
 jest.dontMock('react-bootstrap');
 
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 
 const Selector = require('../Selector');
 
