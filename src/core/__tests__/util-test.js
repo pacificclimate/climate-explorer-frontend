@@ -18,7 +18,7 @@ jest.dontMock('xlsx');
 var _ = require('underscore');
 var xlsx = require('xlsx');
 var util = require('../util');
-var mockAPI = require('./sample-API-results');
+var mockAPI = require('../__test_data__/sample-API-results');
 
   //expected results for the parseBootstrapTableData test - the
   // ./sample-API-Results.tasmaxStats data rendered into a table.
