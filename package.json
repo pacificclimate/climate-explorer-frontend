@@ -28,8 +28,7 @@
     "unmockedModulePathPatterns": [
       "fbjs",
       "react",
-      "react-dom",
-      "react-addons-test-utils"
+      "react-dom"
     ]
   },
   "dependencies": {
@@ -72,7 +71,6 @@
     "postcss-import": "^7.1.0",
     "postcss-loader": "^0.7.0",
     "react": "^15.6.2",
-    "react-addons-test-utils": "^0.14.3",
     "react-bootstrap": "^0.29.5",
     "react-dom": "^15.6.2",
     "react-hot-loader": "^1.3.0",
