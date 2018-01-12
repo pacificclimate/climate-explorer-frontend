@@ -9,7 +9,7 @@ const DataTable = require('../DataTable');
 describe('DataTable', function () {
   it('renders', function () {
     var table = TestUtils.renderIntoDocument(
-      <DataTable data={[]} /import TestUtils from 'react-dom/test-utils'
+      <DataTable data={[]} />
     );
     expect(TestUtils.isCompositeComponent(table)).toBeTruthy();
   });
