@@ -20,7 +20,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
-import { DropdownButton, Input, ControlLabel, MenuItem, Dropdown} from 'react-bootstrap';
+import { ControlLabel, MenuItem, Dropdown } from 'react-bootstrap';
 import _ from 'underscore';
 import styles from './Selector.css';
 
