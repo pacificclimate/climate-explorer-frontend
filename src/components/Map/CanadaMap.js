@@ -26,6 +26,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'underscore';
 import leafletImage from 'leaflet-image';
+import { Map, TileLayer } from 'react-leaflet';
+import 'leaflet-draw';
+import 'proj4';
+import 'proj4leaflet';
 import { saveAs } from 'filesaver.js';
 import axios from 'axios';
 
