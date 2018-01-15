@@ -691,6 +691,7 @@ var MapController = createReactClass({
           onSetArea={this.handleSetArea}
           area={this.state.area}
           updateMinmax={this.updateLayerMinmax}
+          // oldschool
         />
       );
       mapFooter = this.makeMapFooter();
