@@ -6,6 +6,7 @@ import { Router, Route, hashHistory } from 'react-router';
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
 import DualController from './components/DualController';
+import TestApp from './components/TestApp';
 
 import Header from './components/Header';
 
@@ -28,12 +29,22 @@ class App extends React.Component {
   }
 }
 
-render((
-  <Router history={hashHistory}>
-    <Route path='/' component={App}>
-      <Route path='/moti' component={MotiController} />
-      <Route path='/climo/:ensemble_name' component={AppController} />
-      <Route path='/compare/:ensemble_name' component={DualController} />
-    </Route>
-  </Router>
-), document.getElementById('wrapper'));
+const test = true;
+
+if (test) {
+  render((
+    <TestApp/>
+  ), document.getElementById('wrapper'));
+} else {
+  render((
+    <Router history={hashHistory}>
+      <Route path='/' component={App}>
+        <Route path='/moti' component={MotiController} />
+        <Route path='/climo/:ensemble_name' component={AppController} />
+        <Route path='/compare/:ensemble_name' component={DualController} />
+      </Route>
+    </Router>
+  ), document.getElementById('wrapper'));
+}
+
+
