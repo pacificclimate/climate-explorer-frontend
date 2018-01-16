@@ -148,11 +148,14 @@ class TestMap extends React.Component {
               noWrap={true}
               maxZoom={12}
             />
-            <WMSTileLayer
-              url={NCWMS_URL}
-              {...this.getWMSParams('raster')}
-              ref={this.handleNcwmsRasterLayerRef}
-            />
+            {
+              this.props.rasterDataset &&
+              <WMSTileLayer
+                url={NCWMS_URL}
+                {...this.getWMSParams('raster')}
+                ref={this.handleNcwmsRasterLayerRef}
+              />
+            }
             <FeatureGroup>
               <EditControl
                 position='topleft'
