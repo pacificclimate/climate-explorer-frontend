@@ -3,22 +3,32 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { Map, TileLayer, WMSTileLayer } from 'react-leaflet';
+import { Map, TileLayer, WMSTileLayer, FeatureGroup } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
+import { EditControl } from 'react-leaflet-draw';
 
 import StaticControl from '../StaticControl';
 import './TestMap.css';
 import utils from "../Map/utils";
 
-// Set up BC Albers projection
-const maxRes = 7812.5;
-let resolutions = [];
-for (let i = 0; i < 12; i += 1) {
-  resolutions.push(maxRes / Math.pow(2, i));
-}
 
 class TestMap extends React.Component {
+  static propTypes = {
+    rasterPalette: PropTypes.string,
+    rasterLogscale: PropTypes.string,
+    isolinePalette: PropTypes.string,
+    numberOfContours: PropTypes.number,
+    isolineLogscale: PropTypes.string,
+    rasterDataset: PropTypes.string,
+    isolineDataset: PropTypes.string,
+    rasterVariable: PropTypes.string,
+    isolineVariable: PropTypes.string,
+    onSetArea: PropTypes.func.isRequired,
+    area: PropTypes.object,
+    origin: PropTypes.object,
+  };
+
   static defaultProps = {
     crs: new L.Proj.CRS(
       'EPSG:4326',
@@ -113,6 +123,19 @@ class TestMap extends React.Component {
               {...this.getWMSParams('raster')}
               ref={(c) => this.ncwmsRasterLayer = c.leafletElement}
             />
+            <FeatureGroup>
+              <EditControl
+                position='topleft'
+                draw={{
+                  marker: false,
+                  circle: false,
+                  polyline: false,
+                }}
+                onCreated={this.onDraw}
+                onEdited={this.onEdit}
+                onDeleted={this.onDelete}
+              />
+            </FeatureGroup>
           </Map>
       </div>
     );

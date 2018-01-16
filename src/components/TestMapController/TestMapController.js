@@ -7,10 +7,12 @@ import _ from 'underscore';
 import './TestMapController.css';
 import TestMap from '../TestMap';
 
-
+// This class is the counterpart of CanadaMap
 class TestMapController extends React.Component {
   constructor(props) {
     super(props);
+
+    // Set up test state.
     this.state = {
       rasterLogscale: false,
       rasterPalette: 'x-Occam',
@@ -26,7 +28,7 @@ class TestMapController extends React.Component {
   }
 
 
-  handleSetArea = () => {};
+  handleSetArea = (area) => { this.setState({ area }); };
 
   updateLayerMinmax = () => {};
 
