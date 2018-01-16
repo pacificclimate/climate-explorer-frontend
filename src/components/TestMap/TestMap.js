@@ -1,19 +1,35 @@
+/* eslint-disable no-trailing-spaces */
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import _ from 'underscore';
 
-import { Map, TileLayer, WMSTileLayer, FeatureGroup } from 'react-leaflet';
+import { Map, TileLayer, WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
 import StaticControl from '../StaticControl';
 import './TestMap.css';
-import utils from "../Map/utils";
+import utils from '../Map/utils';
+
+
+function makeHandleLeafletRef(name) {
+  return function (c) {
+    console.log('handleLeafletRef:', name);
+    this[name] = c & c.leafletElement;
+  };
+}
 
 
 class TestMap extends React.Component {
+  // Notes:
+  // - Do we really want `crs`, `version`, `srs`, `origin` to be props? These props are not passed in any existing
+  //    code; only their default values are used.
+  // - `area` is a prop and should not be stored as state in this component. This is basic React good practice, and
+  //    it also simplifies the code enormously.
+  //
+
   static propTypes = {
     rasterPalette: PropTypes.string,
     rasterLogscale: PropTypes.string,
@@ -52,6 +68,7 @@ class TestMap extends React.Component {
     origin: { lat: 60, lng: -100, zoom: 0 },
   };
 
+  // TODO: Extract to a utility module?
   getWMSParams = (layer, props = this.props) => {
     var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
 
@@ -97,6 +114,19 @@ class TestMap extends React.Component {
     return params;
   };
 
+  handleMapRef = makeHandleLeafletRef('map').bind(this);
+  handleNcwmsRasterLayerRef = makeHandleLeafletRef('ncwmsRasterLayer').bind(this);
+
+  handleAreaCreatedOrEdited = (e) => {
+    const area = e.layer.toGeoJSON();
+    area.properties.source = 'PCIC Climate Explorer';
+    this.props.onSetArea(area);
+  };
+
+  handleAreaDeleted = (e) => {
+    this.props.onSetArea(undefined);
+  };
+
   render() {
     const center = _.pick(this.props.origin, 'lat', 'lng');
     return (
@@ -108,7 +138,7 @@ class TestMap extends React.Component {
             minZoom={0}
             maxZoom={10}
             maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
-            ref={ (c) => this.map = c.leafletElement }
+            ref={this.handleMapRef}
           >
             <StaticControl position={'topright'}>React Leaflet</StaticControl>
             <TileLayer
@@ -121,7 +151,7 @@ class TestMap extends React.Component {
             <WMSTileLayer
               url={NCWMS_URL}
               {...this.getWMSParams('raster')}
-              ref={(c) => this.ncwmsRasterLayer = c.leafletElement}
+              ref={this.handleNcwmsRasterLayerRef}
             />
             <FeatureGroup>
               <EditControl
@@ -131,11 +161,17 @@ class TestMap extends React.Component {
                   circle: false,
                   polyline: false,
                 }}
-                onCreated={this.onDraw}
-                onEdited={this.onEdit}
-                onDeleted={this.onDelete}
+                onCreated={this.handleAreaCreatedOrEdited}
+                onEdited={this.handleAreaCreatedOrEdited}
+                onDeleted={this.handleAreaDeleted}
               />
             </FeatureGroup>
+            {
+              this.props.area &&
+              <GeoJSON
+                data={this.props.area}
+              />
+            }
           </Map>
       </div>
     );

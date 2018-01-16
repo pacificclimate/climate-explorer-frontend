@@ -24,11 +24,15 @@ class TestMapController extends React.Component {
       variableWmsTime: '1977-07-02T00:00:00Z',
       comparandWmsTime: undefined,
       area: undefined,
+      // area: {"type":"Feature","properties":{"source":"PCIC Climate Explorer"},"geometry":{"type":"Polygon","coordinates":[[[-120.117187,68.027344],[-110.449219,64.707031],[-119.53125,62.070312],[-120.117187,68.027344]]]}}, // works as expected
     };
   }
 
 
-  handleSetArea = (area) => { this.setState({ area }); };
+  handleSetArea = (area) => {
+    console.log('handleSetArea', JSON.stringify(area, 2));
+    this.setState({ area });
+  };
 
   updateLayerMinmax = () => {};
 
