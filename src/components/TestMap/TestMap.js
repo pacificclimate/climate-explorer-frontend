@@ -122,19 +122,45 @@ class TestMap extends React.Component {
     return params;
   };
 
-  handleMapRef = makeHandleLeafletRef('map').bind(this);
+  handleMapRef = makeHandleLeafletRef('map', (map) => {
+    console.log('handleMapRef', map);
+    // Set up the promises for the raster and isoline layers.
+    // Each promise is resolved with either the layer or null if the layer is not created (according to props).
+    const rasterLayerPromise = new Promise((resolve) => {
+      // This will be called later by the ref callback for the raster layer.
+      this.rasterLayerResolve = resolve;
+    });
+    this.layersPromise = Promise.all([rasterLayerPromise]).then(this.handleLayers);
+  }).bind(this);
 
   handleNcwmsRasterLayerRef = makeHandleLeafletRef('ncwmsRasterLayer', (layer) => {
+    console.log('handleNcwmsRasterLayerRef', layer);
+    this.rasterLayerResolve(layer);
+  }).bind(this);
+
+  handleLayers = ([rasterLayer]) => {
     // When the raster layer (a.k.a "colour blocks") has been added, create and add the
     // raster colour bar control and the autoscale control.
-    console.log('handleNcwmsRasterLayerRef', layer);
-    const rasterBar = new LeafletNcWMSColorbarControl(layer, { position: 'bottomright' });
-    const autoscale = new LeafletNcWMSAutoscaleControl(layer, { position: 'bottomright' });
+    const rasterBar = new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
+    const autoscale = new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
     // This relies on this.map being defined at the time this handler is called. That is guaranteed(?) by the
     // fact that the raster layer component (a WMSTileLayer) is rendered inside the Map component.
     this.map.addControl(rasterBar);
     this.map.addControl(autoscale);
-  }).bind(this);
+  };
+
+  makeRasterLayer() {
+    if (this.props.rasterDataset) {
+      return (
+        <WMSTileLayer
+          url={NCWMS_URL}
+          {...this.getWMSParams('raster')}
+          ref={this.handleNcwmsRasterLayerRef}
+        />
+      );
+    }
+    this.rasterLayerResolve(undefined);
+  }
 
   handleAreaCreatedOrEdited = (e) => {
     const area = e.layer.toGeoJSON();
@@ -167,14 +193,7 @@ class TestMap extends React.Component {
               noWrap={true}
               maxZoom={12}
             />
-            {
-              this.props.rasterDataset &&
-              <WMSTileLayer
-                url={NCWMS_URL}
-                {...this.getWMSParams('raster')}
-                ref={this.handleNcwmsRasterLayerRef}
-              />
-            }
+            { this.makeRasterLayer() }
             <FeatureGroup>
               <EditControl
                 position='topleft'
