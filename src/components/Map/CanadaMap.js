@@ -26,6 +26,7 @@ import _ from 'underscore';
 import leafletImage from 'leaflet-image';
 import { saveAs } from 'filesaver.js';
 import axios from 'axios';
+import urljoin from 'url-join';
 
 import utils from './utils';
 import NcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
@@ -47,7 +48,7 @@ var CanadaMap = React.createClass({
     rasterVariable: React.PropTypes.string,
     isolineVariable: React.PropTypes.string,    
     onSetArea: React.PropTypes.func.isRequired,
-    onSetStation: React.PropTypes.func.isRequired,
+    onSetStation: React.PropTypes.func,
     area: React.PropTypes.object,
     origin: React.PropTypes.object,
   },
@@ -190,7 +191,9 @@ var CanadaMap = React.createClass({
   // propagate the area up the component stack
   handleSetArea: function (geojson) {
     this.setState({ area: geojson });
-    this.props.onSetArea(geojson);
+    if(this.props.onSetArea) {
+      this.props.onSetArea(geojson);
+    }
   },
 
   // area received from props; don't propagate back up the component stack
@@ -208,7 +211,64 @@ var CanadaMap = React.createClass({
       clickable: true,
     }).getLayers()[0]);
   },
+  
+  //data promise for watershed query - given a file id and a station name,
+  //returns a geoJSON Polygon delineating the watershed that drains to that
+  //station.
+  getWatershedPromise: function (id, station) {
+    return axios({
+      baseURL: urljoin(CE_BACKEND_URL, 'streamflow/watershed'),
+      params: {
+        id_: id,
+        station: station
+      }
+    });
+  },
+  
+  //draw outlines around station watersheds
+  drawWatersheds: function() {
+    this.clearWatersheds();
 
+    //fetch watersheds for each selected station
+    var watershedPromises = [];
+    
+    for(let i = 0; i < this.selectedStations.length; i++) {
+      var id = this.selectedStations[i].properties.fileId;
+      var station = this.selectedStations[i].properties.station;
+      watershedPromises.push(this.getWatershedPromise(id, station));
+    }
+    
+    Promise.all(watershedPromises).then(promises => {
+      var watershedPolygons = {
+          "type": "MultiPolygon",
+          "coordinates": []
+      };
+      var data = _.pluck(promises, "data");
+      //combine the geoJSON Polygons from each separate watershed 
+      //into a geoJSON MultiPolygon
+      for(let i = 0; i < data.length; i++) {
+        var coords = data[i].geometry.coordinates;
+        watershedPolygons["coordinates"].push(data[i].geometry.coordinates);
+      }
+            
+      this.watersheds.addLayer(L.geoJson(watershedPolygons, {
+        stroke: true,
+        color: '#0000ff',
+        weight: 4,
+        opacity: 0.5,
+        fill: false,
+        clickable:true,
+      }));      
+    });
+  },
+
+  //clear existing watersheds
+  clearWatersheds: function () {
+    this.watersheds.getLayers().map(function(layer) {
+      this.watersheds.removeLayer(layer);
+    }.bind(this));
+  },
+  
   //Map should only rerender when something has changed
   shouldComponentUpdate: function (nextProps, nextState) {
     return !(_.isEqual(nextState, this.state) && _.isEqual(nextProps, this.props));
@@ -222,8 +282,6 @@ var CanadaMap = React.createClass({
   componentDidMount: function () {
     this.layerRange = {};
     
-    this.selectedStations = [];
-
     var map = this.map = L.map(this._map, {
       crs: this.props.crs,
       minZoom: 0,
@@ -391,7 +449,12 @@ var CanadaMap = React.createClass({
     }
     
     //add station markers if displaying hydrological information.
-    addStationMarkerLayer(map, this.onStationClick);
+    if(this.props.onSetStation) {
+      this.selectedStations = [];
+      addStationMarkerLayer(map, this.onStationClick);
+      var watersheds = this.watersheds = new L.FeatureGroup();
+      map.addLayer(watersheds);
+    }
   },
   
   //returns an array of two controls registered to the layer:
@@ -427,11 +490,16 @@ var CanadaMap = React.createClass({
     else {
       this.selectedStations = _.reject(this.selectedStations, station => {
         return _.isEqual(station.geometry.coordinates, stationJSON.geometry.coordinates);
-      });  
+      });
     }
 
     //pass list of selected stations up to MapController
     this.props.onSetStation(this.selectedStations);
+    
+    
+    //set the "area" based on selected stations
+    var area = [];
+    this.drawWatersheds();
   },
   
   onMapClick: function () {
