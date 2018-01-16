@@ -12,12 +12,20 @@ import { EditControl } from 'react-leaflet-draw';
 import StaticControl from '../StaticControl';
 import './TestMap.css';
 import utils from '../Map/utils';
+import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
+import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 
-function makeHandleLeafletRef(name) {
+function makeHandleLeafletRef(name, leafletAction = () => {}) {
+  // Return a handler that sets this[name] to the leaflet element of the component,
+  // then calls an optional action function on that leaflet element.
   return function (c) {
     console.log('handleLeafletRef:', name);
-    this[name] = c & c.leafletElement;
+    if (c) {
+      let leafletElement = c.leafletElement;
+      this[name] = leafletElement;
+      leafletAction(leafletElement);
+    }
   };
 }
 
@@ -115,7 +123,18 @@ class TestMap extends React.Component {
   };
 
   handleMapRef = makeHandleLeafletRef('map').bind(this);
-  handleNcwmsRasterLayerRef = makeHandleLeafletRef('ncwmsRasterLayer').bind(this);
+
+  handleNcwmsRasterLayerRef = makeHandleLeafletRef('ncwmsRasterLayer', (layer) => {
+    // When the raster layer (a.k.a "colour blocks") has been added, create and add the
+    // raster colour bar control and the autoscale control.
+    console.log('handleNcwmsRasterLayerRef', layer);
+    const rasterBar = new LeafletNcWMSColorbarControl(layer, { position: 'bottomright' });
+    const autoscale = new LeafletNcWMSAutoscaleControl(layer, { position: 'bottomright' });
+    // This relies on this.map being defined at the time this handler is called. That is guaranteed(?) by the
+    // fact that the raster layer component (a WMSTileLayer) is rendered inside the Map component.
+    this.map.addControl(rasterBar);
+    this.map.addControl(autoscale);
+  }).bind(this);
 
   handleAreaCreatedOrEdited = (e) => {
     const area = e.layer.toGeoJSON();
