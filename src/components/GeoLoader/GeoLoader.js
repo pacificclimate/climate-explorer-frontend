@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import { Input, Button, Glyphicon, Modal } from 'react-bootstrap';
+import { FormControl, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
-import ModalMixin from '../ModalMixin';
 
 /*
 
@@ -14,62 +12,81 @@ Calls callback with resulting geojson
 
 */
 
-var GeoLoader = createReactClass({
-  displayName: 'GeoLoader',
+// TODO: Refactor as a HOC that composes the button, modal dialog, and error
+// dialog from separate components. Unfortunately we are in a bit of a hurry
+// and so we use a little cut-paste instead of the deprecated mixin.
+// See HOCs/buttonWithModal for a start on the HOC.
 
-  propTypes: {
+class GeoLoader extends React.Component {
+  static propTypes = {
     onLoadArea: PropTypes.func.isRequired,
     title: PropTypes.string,
-  },
+  };
 
-  mixins: [ModalMixin],
+  constructor(props) {
+    super(props);
 
-  importError: function () {
-    this.setState({
-      showError: true,
-    });
-  },
+    this.state = {
+      showModal: false,
+      showError: false,
+    };
+  }
 
-  closeError: function () {
+  openModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
+  openError = () => {
+    this.setState({ showError: true });
+  };
+
+  closeError = () =>  {
     this.setState({
       showError: false,
     });
-  },
+  };
 
-  importPolygon: function (file) {
+  importPolygon(file) {
     this.close();
     g.load(file, this.props.onLoadArea, function () {
-      setTimeout(this.importError, 200); // Wait to avoid syling issues with Modal
+      setTimeout(this.openError, 200); // Wait to avoid syling issues with Modal
     }.bind(this));
-  },
+  }
 
-  render: function () {
+  render() {
     return (
       <div>
 
-        <Button onClick={this.open} title={this.props.title}>
+        <Button onClick={this.openModal} title={this.props.title}>
           <Glyphicon glyph='open-file' />
         </Button>
 
-        <Modal show={this.state.showModal} onHide={this.close}>
+        <Modal show={this.state.showModal} onHide={this.closeModal}>
 
           <Modal.Header closeButton>
             <Modal.Title>Import Polygon</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
-
-            <Input type='file'
+            <FormControl
+              type='file'
               label='Select file'
-              help='Accepts a zipped Shapefile or a single geojson Feature (not FeatureCollection)'
               onChange={function (e) {
                 this.importPolygon(e.currentTarget.files[0]);
               }.bind(this)}
             />
+            <p>
+              Accepts a zipped Shapefile or a single geojson Feature
+              (not FeatureCollection)
+            </p>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button onClick={this.close}>Close</Button>
+            <Button onClick={this.closeModal}>Close</Button>
           </Modal.Footer>
 
         </Modal>
@@ -81,7 +98,8 @@ var GeoLoader = createReactClass({
           </Modal.Header>
 
           <Modal.Body>
-            Currently accepted types are single GeoJSON features and zipped shapefiles with a single feature.
+            Currently accepted types are single GeoJSON features and zipped
+            shapefiles with a single feature.
           </Modal.Body>
 
           <Modal.Footer>
@@ -92,7 +110,7 @@ var GeoLoader = createReactClass({
 
       </div>
     );
-  },
-});
+  }
+}
 
 export default GeoLoader;
