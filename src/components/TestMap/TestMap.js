@@ -9,12 +9,12 @@ import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
-import StaticControl from '../StaticControl';
 import './TestMap.css';
 import utils from '../Map/utils';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 import CanadaBaseMap from '../CanadaBaseMap';
+import {sameYear, timestampToTimeOfYear} from "../../core/util";
 
 
 function makeHandleLeafletRef(name, leafletAction = () => {}) {
@@ -67,7 +67,6 @@ class TestMap extends React.Component {
     isolineVariable: PropTypes.string,
     onSetArea: PropTypes.func.isRequired,
     area: PropTypes.object,
-    origin: PropTypes.object,
   };
 
   // TODO: Extract to a utility module?
@@ -98,8 +97,7 @@ class TestMap extends React.Component {
         params.abovemaxcolor="transparent";
         params.belowmincolor="transparent";
       }
-    }
-    else if (layer == "isoline") {
+    } else if (layer == "isoline") {
       params.styles = `colored_contours/${props.isolinePalette}`;
       params.numContours = props.numberOfContours;
       params.opacity = 1;
@@ -243,6 +241,7 @@ class TestMap extends React.Component {
                 data={this.props.area}
               />
             }
+            { this.props.children }
           </CanadaBaseMap>
       </div>
     );

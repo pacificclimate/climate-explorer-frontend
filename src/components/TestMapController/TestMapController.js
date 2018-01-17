@@ -6,33 +6,54 @@ import _ from 'underscore';
 
 import './TestMapController.css';
 import TestMap from '../TestMap';
+import MapFooter from '../MapFooter';
+
 
 // This class is the counterpart of CanadaMap
 class TestMapController extends React.Component {
+  static propTypes = {
+    meta: PropTypes.array,
+    comparandMeta: PropTypes.array,
+    onSetArea: PropTypes.func,
+  };
+
   constructor(props) {
     super(props);
 
     // Set up test state.
     this.state = {
+      run: 'r1i1p1',
+      start_date: '1950',
+      end_date: '2100',
+
+      variable: 'tasmax',
+      variableTimes: { '{"timescale": "foo"}': '1977-07-02T00:00:00Z' },
+      variableTimeIdx: '{"timescale": "foo"}', // ??
+      variableWmsTime: '1977-07-02T00:00:00Z',
+
+      comparand: undefined,
+      comparandTimes: undefined,
+      comparandTimeIdx: undefined,
+      comparandWmsTime: undefined,
+
+      linkTimes: 'linkTimes',   // ?
+
       rasterLogscale: false,
       rasterPalette: 'x-Occam',
-      variable: 'tasmax',
+
       isolineLogscale: false,
       isolinePalette: undefined,
-      comparand: undefined,
       numberOfContours: 10,
-      variableWmsTime: '1977-07-02T00:00:00Z',
-      comparandWmsTime: undefined,
-      area: undefined,
-      // area: {"type":"Feature","properties":{"source":"PCIC Climate Explorer"},"geometry":{"type":"Polygon","coordinates":[[[-120.117187,68.027344],[-110.449219,64.707031],[-119.53125,62.070312],[-120.117187,68.027344]]]}}, // works as expected
     };
   }
 
+  // TODO: Extract to a utility module?
+  hasValidData(symbol, props = this.props) {
+    var dataLocation = symbol == "variable" ? "meta" : "comparandMeta";
 
-  handleSetArea = (area) => {
-    console.log('handleSetArea', JSON.stringify(area, 2));
-    this.setState({ area });
-  };
+    return !_.isUndefined(props[dataLocation]) &&
+      props[dataLocation].length > 0;
+  }
 
   updateLayerMinmax = () => {};
 
@@ -54,10 +75,22 @@ class TestMapController extends React.Component {
         time={this.state.variableWmsTime}
         rasterTime={this.state.variableWmsTime}
         isolineTime={this.state.comparandWmsTime}
-        onSetArea={this.handleSetArea}
-        area={this.state.area}
+        onSetArea={this.onSetArea}
+        area={this.props.area}
         updateMinmax={this.updateLayerMinmax}
-      />
+      >
+        <MapFooter
+          start_date={this.state.start_date}
+          end_date={this.state.end_date}
+          run={this.state.run}
+          variable={this.state.variable}
+          variableTimes={this.state.variableTimes}
+          variableWmsTime={this.state.variableWmsTime}
+          hasValidComparand={this.hasValidData('comparand')}
+          comparand={this.state.comparand}
+          comparandWmsTime={this.state.comparandWmsTime}
+        />
+      </TestMap>
     );
   }
 }
