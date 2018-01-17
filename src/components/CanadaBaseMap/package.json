@@ -1,0 +1,6 @@
+{
+  "name": "CanadaBaseMap",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./CanadaBaseMap.js"
+}
