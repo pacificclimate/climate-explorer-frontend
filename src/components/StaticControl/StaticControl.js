@@ -5,23 +5,27 @@ import L from 'leaflet';
 
 import './StaticControl.css';
 
+
 class StaticControl extends MapControl {
     createLeafletElement(props) {
-        const leafletElement = L.control();
+      const leafletElement = L.control({ position: props.position });
 
-        leafletElement.onAdd = map => {
-            this.container = L.DomUtil.create('div', 'StaticControl leaflet-control');
-             ReactDom.render(props.children, this.container);
-            return this.container;
-        };
+      leafletElement.onAdd = map => {
+        this.container = L.DomUtil.create(
+          'div',
+          'StaticControl leaflet-control'
+        );
+        ReactDom.render(props.children, this.container);
+        return this.container;
+      };
 
-        return leafletElement;
+      return leafletElement;
     }
 
-    updateLeafletElement (fromProps, toProps) {
-        if (fromProps.children !== toProps.children) {
-            ReactDom.render(toProps.children, this.container);
-        }
+    updateLeafletElement(fromProps, toProps) {
+      if (fromProps.children !== toProps.children) {
+        ReactDom.render(toProps.children, this.container);
+      }
     }
 }
 
