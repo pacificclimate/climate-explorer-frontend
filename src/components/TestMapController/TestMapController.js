@@ -2,11 +2,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Glyphicon } from 'react-bootstrap';
+
 import _ from 'underscore';
 
 import './TestMapController.css';
 import TestMap from '../TestMap';
 import MapFooter from '../MapFooter';
+import StaticControl from '../StaticControl';
+import ButtonControl from '../ButtonControl';
+import GeoLoader from '../GeoLoader';
 
 
 // This class is the counterpart of CanadaMap
@@ -79,6 +84,9 @@ class TestMapController extends React.Component {
         area={this.props.area}
         updateMinmax={this.updateLayerMinmax}
       >
+        <StaticControl position='topleft'>
+          <GeoLoader onLoadArea={this.onSetArea} title='Import polygon' />
+        </StaticControl>
         <MapFooter
           start_date={this.state.start_date}
           end_date={this.state.end_date}
