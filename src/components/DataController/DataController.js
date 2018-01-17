@@ -17,8 +17,14 @@
  *  - a Long Term Average Datagraph showing the mean of each climatology
  *    period as a seperate data point.
  *
+ *  - a Model Context Datagraph similar to the Long Term Average
+ *    Datagraph, but with a separate line for each model.
+ *
  * If the selected dataset is not a multi year mean:
  *  - a Time Series Datagraph showing each time point available.
+ *
+ *  - a Model Context datagraph similar to the Time Series Datagraph,
+ *    but showing data for each model.
  *
  * A Data Table viewer component showing statistical information for each
  * climatology period or timeseries is also generated. 
@@ -40,7 +46,10 @@ import { parseBootstrapTableData,
          resolutionIndexToTimeKey} from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
-        timeseriesToTimeseriesGraph} from '../../core/chart';
+        timeseriesToTimeseriesGraph,
+        assignColoursByGroup,
+        fadeSeriesByRank,
+        hideSeriesInLegend} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -72,6 +81,7 @@ var DataController = createReactClass({
       annualCycleData: undefined,
       timeseriesData: undefined,
       statsData: undefined,
+      contextData: undefined
     };
   },
 
@@ -87,10 +97,12 @@ var DataController = createReactClass({
       this.loadAnnualCycleGraph(props);
       this.loadLongTermAverageGraph(props);
       this.loadDataTable(props);
+      this.loadContextGraph(props);
     }
     else {
       this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
+      this.loadContextGraph(props);
     }
   },
 
@@ -118,6 +130,14 @@ var DataController = createReactClass({
     });
   },
 
+  //Removes all data from the Context Graph and displays a message
+  setContextGraphNoDataMessage: function(message) {
+    this.setState({
+      contextData: { data: { columns: [], empty: { label: { text: message }, }, },
+        axis: {} },
+    });
+  },
+
   //Removes all data from the Timeseries Graph and displays a message
   setTimeseriesGraphNoDataMessage: function(message) {
     this.setState({
@@ -133,6 +153,7 @@ var DataController = createReactClass({
      _.isEqual(nextState.statsData, this.state.statsData) &&
      _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+     _.isEqual(nextState.contextData, this.state.contextData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
@@ -296,7 +317,112 @@ var DataController = createReactClass({
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
+  },
 
+  /*
+   * This function fetches and loads data for the Context Graph
+   * comparing several models. Multi-year-mean and nominal time
+   * datasets are accessed by different API endpoints; this function
+   * will use the relevant query, then postprocess the graph.
+   */
+  loadContextGraph: function (props) {
+    this.setContextGraphNoDataMessage("Loading Data");
+
+    var graph = this.blankGraph;
+
+    //helper function to postprocesses a generated graph to make
+    //the currently selected model visually distinguishable from all the
+    //other models. "Context" models are assigned a shared colour,
+    //faded, and hidden from the legend.
+    var distinguishSelectedModel = function (graph) {
+
+      //segmentor helper function used to distinguish selected model from all others
+      var makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
+        return function(dataseries) {
+          return dataseries[0].search(props.model_id) != -1 ? selectedModelOutput : otherModelOutput;
+        }
+      };
+
+      graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
+      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, .35));
+      graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
+
+      //simplify graph by turning off tooltip and missing data gaps
+      graph.line.connectNull = true;
+      graph.tooltip = {show: false};
+
+      return graph;
+    };
+
+    if(this.multiYearMeanSelected(props)) {
+      //multi year means use the "data" API endpoint
+      var dataPromises = [];
+      var dataQueryParams = [];
+      var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
+      var params = _.pick(props, 'experiment', 'variable_id', "ensemble_name");
+      params.timescale = 'yearly';
+      params.multi_year_mean = true;
+
+      //determine which models have data that matches this variable and experiment
+      for(let i = 0; i < contextModels.length; i++ ) {
+        params.model_id = contextModels[i];
+        if(_.where(props.contextMeta, params)){
+          dataPromises.push(this.getDataPromise(params, "yearly", 0));
+          dataQueryParams.push(_.extend({}, params));
+        }
+      }
+
+      //add the selected model last, so it stands out
+      params.model_id = props.model_id;
+      dataPromises.push(this.getDataPromise(params, "yearly", 0));
+      dataQueryParams.push(_.extend({}, params));
+
+      //fetch data from the backend and assemble the graph
+      Promise.all(dataPromises).then(responses=> {
+        var data = _.pluck(responses, "data");
+        graph = dataToLongTermAverageGraph(data, dataQueryParams);
+
+        graph = distinguishSelectedModel(graph);
+
+        this.setState({
+          contextData: graph
+        });
+      }).catch(error => {
+        this.displayError(error, this.setContextGraphNoDataMessage);
+      });
+    } else {
+      //Non-multi-year-means use the "timeseries" API endpoint
+      //Collect metadata for all datasets that can be compared to the selected one.
+      var params = _.pick(props, 'variable_id', 'experiment');
+      params.multi_year_mean = false;
+      params.timescale = "yearly";
+      var selected = _.where(props.contextMeta, params);
+
+      //query the backend about all relevant datasets
+      var timeseriesPromises = [];
+
+      for(let i = 0; i < selected.length; i++) {
+        params.model_id = selected[i].model_id;
+        timeseriesPromises.push(this.getTimeseriesPromise(params, selected[i].unique_id));
+      }
+
+      //generate graph
+      Promise.all(timeseriesPromises).then(responses => {
+        var data = _.pluck(responses, "data");
+
+        //move data associated with the selected model to the end of the data array
+        //so it's maximally visible when graphed.
+        data.sort(result => {return result.id.search(props.model_id);});
+
+        graph = timeseriesToTimeseriesGraph(selected, ...data);
+        graph = distinguishSelectedModel(graph);
+        this.setState({
+          contextData: graph
+        });
+      }).catch(error => {
+        this.displayError(error, this.setContextGraphNoDataMessage);
+      });
+    }
   },
 
   render: function () {
@@ -374,6 +500,19 @@ var DataController = createReactClass({
       );
     }
 
+    var contextData = this.state.contextData ? this.state.contextData : this.blankGraph;
+    var contextTab = (
+        <Tab> eventKey={3} title='Model Context'>
+          <DataGraph
+            data={contextData.data}
+            axis={contextData.axis}
+            legend={contextData.legend}
+            line={contextData.line}
+            tooltip={contextData.tooltip}
+          />
+        </Tab>
+    );
+
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
@@ -381,6 +520,7 @@ var DataController = createReactClass({
           {annualTab}
           {longTermTab}
           {timeseriesTab}
+          {contextTab}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
