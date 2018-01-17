@@ -30,13 +30,29 @@ function makeHandleLeafletRef(name, leafletAction = () => {}) {
 }
 
 
+function DataLayer(props) {
+  console.log('DataLayer', props);
+  const { dataset, onLayerRef, onNoLayer, ...wmsParams } = props;
+  if (dataset) {
+    return (
+      <WMSTileLayer
+        url={NCWMS_URL}
+        {...wmsParams}
+        ref={onLayerRef}
+      />
+    );
+  }
+  onNoLayer();
+  return null;
+}
+
+
 class TestMap extends React.Component {
   // Notes:
   // - Do we really want `crs`, `version`, `srs`, `origin` to be props? These props are not passed in any existing
   //    code; only their default values are used.
   // - `area` is a prop and should not be stored as state in this component. This is basic React good practice, and
   //    it also simplifies the code enormously.
-  //
 
   static propTypes = {
     rasterPalette: PropTypes.string,
@@ -94,9 +110,9 @@ class TestMap extends React.Component {
     if(layer == "raster") {
       params.styles = `default-scalar/${props.rasterPalette}`;
       params.opacity = .7;
-      if(props.rasterLogscale=="true" && false && !_.isUndefined(this.layerRange.raster)) {
-        //clip the dataset to > 0, values of 0 or less do not have a
-        //non-complex logarithm
+      if (props.rasterLogscale=="true" && false && !_.isUndefined(this.layerRange.raster)) {
+        // clip the dataset to > 0, values of 0 or less do not have a
+        // non-complex logarithm
         params.logscale = props.rasterLogscale;
         var min = Math.max(this.layerRange.raster.min, Number.EPSILON);
         var max = Math.max(this.layerRange.raster.max, Number.EPSILON * 2);
@@ -109,8 +125,8 @@ class TestMap extends React.Component {
       params.styles = `colored_contours/${props.isolinePalette}`;
       params.numContours = props.numberOfContours;
       params.opacity = 1;
-      if(props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
-        //clip the dataset to > 0
+      if (props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
+        // clip the dataset to > 0
         params.logscale = props.isolineLogscale;
         var min = Math.max(this.layerRange.isoline.min, Number.EPSILON);
         var max = Math.max(this.layerRange.isoline.max, Number.EPSILON * 2);
@@ -122,45 +138,84 @@ class TestMap extends React.Component {
     return params;
   };
 
+  // Handlers for wrangling base map, data layers, and data rendering controls.
+  //
+  // Responsibilities:
+  //
+  // -- Create and add the colour bar and autoscale controls for each data layer present
+  //
+  //      - A data layer is present if its dataset is. This is handled by the DataLayer component, which returns a
+  //        a WMSTileLayer component if the dataset is present, or else null.
+  //      - Each data layer, if present, has a corresponding colour bar control.
+  //      - An autoscaler control always present. Each data layer present has the autoscaler control registered to it.
+  //
+  //      The controls must be positioned depending on which of the two data layers (or both) is present. Data
+  //      layers are rendered independently of each other, so there is no single event or callback that will coordinate
+  //      both layers completing (whether present or null). [Oops, except for this component's componentDidMount
+  //      lifecycle event ... hmmm, probably should refactor. Probably better to wrap that in a single component
+  //      DataLayers to encapsulate the complexity. Alas.] So we create a promise (this.layersPromise) that resolves
+  //      when the two layers have completed; when it resolves, we create and deploy the data rendering controls.
+
   handleMapRef = makeHandleLeafletRef('map', (map) => {
     console.log('handleMapRef', map);
     // Set up the promises for the raster and isoline layers.
     // Each promise is resolved with either the layer or null if the layer is not created (according to props).
+    // The resolve callback for each promise is cached on `this` so that it can be invoked by the layer callbacks
+    // later.
     const rasterLayerPromise = new Promise((resolve) => {
-      // This will be called later by the ref callback for the raster layer.
       this.rasterLayerResolve = resolve;
     });
-    this.layersPromise = Promise.all([rasterLayerPromise]).then(this.handleLayers);
+    const isolineLayerPromise = new Promise((resolve) => {
+      this.isolineLayerResolve = resolve;
+    });
+    this.layersPromise = Promise.all([rasterLayerPromise, isolineLayerPromise]).then(this.addDataControls);
   }).bind(this);
 
-  handleNcwmsRasterLayerRef = makeHandleLeafletRef('ncwmsRasterLayer', (layer) => {
-    console.log('handleNcwmsRasterLayerRef', layer);
+  handleRasterLayerRef = makeHandleLeafletRef('rasterLayer', (layer) => {
     this.rasterLayerResolve(layer);
   }).bind(this);
 
-  handleLayers = ([rasterLayer]) => {
-    // When the raster layer (a.k.a "colour blocks") has been added, create and add the
-    // raster colour bar control and the autoscale control.
-    const rasterBar = new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
-    const autoscale = new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
-    // This relies on this.map being defined at the time this handler is called. That is guaranteed(?) by the
-    // fact that the raster layer component (a WMSTileLayer) is rendered inside the Map component.
-    this.map.addControl(rasterBar);
-    this.map.addControl(autoscale);
+  handleNoRasterLayer = () => {
+    this.rasterLayerResolve(undefined);
   };
 
-  makeRasterLayer() {
-    if (this.props.rasterDataset) {
-      return (
-        <WMSTileLayer
-          url={NCWMS_URL}
-          {...this.getWMSParams('raster')}
-          ref={this.handleNcwmsRasterLayerRef}
-        />
-      );
+  handleIsolineLayerRef = makeHandleLeafletRef('isolineLayer', (layer) => {
+    this.isolineLayerResolve(layer);
+  }).bind(this);
+
+  handleNoIsolineLayer = () => {
+    this.isolineLayerResolve(undefined);
+  };
+
+  addDataControls = ([rasterLayer, isolineLayer]) => {
+    // Create and add the corresponding colour bar controls and the autoscale control for the layers
+    // (raster, isoline, or both).
+    // A colour bar is created added for each layer present.
+    // The autoscale control is always created and is registered to each layer present.
+    
+    // Create and register controls to layer(s)
+    const rasterBar = rasterLayer && new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
+    const isolineBar = isolineLayer && new LeafletNcWMSColorbarControl(isolineLayer, { position: 'bottomright' });
+    let autoscale;
+    autoscale = rasterLayer && new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
+    if (autoscale && isolineLayer) {
+      autoscale.addLayer(isolineLayer);
+    } else {
+      autoscale = new LeafletNcWMSAutoscaleControl(isolineLayer, { position: 'bottomright' });
     }
-    this.rasterLayerResolve(undefined);
-  }
+
+    // Add controls to map. Ordering depends on which of the controls is present.
+    if (rasterBar && isolineBar) {
+      this.map.addControl(rasterBar);
+      this.map.addControl(autoscale);
+      this.map.addControl(isolineBar);
+    } else {
+      this.map.addControl(rasterBar || isolineBar);
+      this.map.addControl(autoscale);
+    }
+  };
+
+  // Handlers for area selection.
 
   handleAreaCreatedOrEdited = (e) => {
     const area = e.layer.toGeoJSON();
@@ -171,6 +226,7 @@ class TestMap extends React.Component {
   handleAreaDeleted = (e) => {
     this.props.onSetArea(undefined);
   };
+
 
   render() {
     const center = _.pick(this.props.origin, 'lat', 'lng');
@@ -193,7 +249,18 @@ class TestMap extends React.Component {
               noWrap={true}
               maxZoom={12}
             />
-            { this.makeRasterLayer() }
+            <DataLayer
+              dataset={this.props.rasterDataset}
+              onLayerRef={this.handleRasterLayerRef}
+              onNoLayer={this.handleNoRasterLayer}
+              {...this.getWMSParams('raster')}
+            />
+            <DataLayer
+              dataset={this.props.isolineDataset}
+              onLayerRef={this.handleIsolineLayerRef}
+              onNoLayer={this.handleNoIsolineLayer}
+              {...this.getWMSParams('isoline')}
+            />
             <FeatureGroup>
               <EditControl
                 position='topleft'
