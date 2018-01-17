@@ -4,7 +4,7 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { Map, TileLayer, WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
+import { WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -14,6 +14,7 @@ import './TestMap.css';
 import utils from '../Map/utils';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
+import CanadaBaseMap from '../CanadaBaseMap';
 
 
 function makeHandleLeafletRef(name, leafletAction = () => {}) {
@@ -30,6 +31,7 @@ function makeHandleLeafletRef(name, leafletAction = () => {}) {
 }
 
 
+// TODO: Extract to separate module
 function DataLayer(props) {
   console.log('DataLayer', props);
   const { dataset, onLayerRef, onNoLayer, ...wmsParams } = props;
@@ -49,10 +51,9 @@ function DataLayer(props) {
 
 class TestMap extends React.Component {
   // Notes:
-  // - Do we really want `crs`, `version`, `srs`, `origin` to be props? These props are not passed in any existing
-  //    code; only their default values are used.
-  // - `area` is a prop and should not be stored as state in this component. This is basic React good practice, and
-  //    it also simplifies the code enormously.
+  // - `area` is a prop and should not be stored as state in this component.
+  //    This is basic React good practice, and it also simplifies the code
+  //    enormously.
 
   static propTypes = {
     rasterPalette: PropTypes.string,
@@ -67,29 +68,6 @@ class TestMap extends React.Component {
     onSetArea: PropTypes.func.isRequired,
     area: PropTypes.object,
     origin: PropTypes.object,
-  };
-
-  static defaultProps = {
-    crs: new L.Proj.CRS(
-      'EPSG:4326',
-      '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
-      {
-        resolutions: utils.generateResolutions(0.09765625, 10),
-        // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
-        // coordinates incorrectly. You have to know the magic origin value.
-        //
-        // It is also probably important to know that the bc_osm tile set is a TMS tile set, which has axes
-        // transposed with respect to Leaflet axes. The proj4leaflet documentation incorrectly states that
-        // there is a CRS constructor `L.Proj.CRS.TMS` for TMS tilesets. It is absent in the version
-        // (1.0.2) we are using. It exists in proj4leaflet ver 0.7.1 (formerly in use here), and shows that the
-        // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
-        // of the TMS constructor.
-        origin: [-150, 90],
-      }
-    ),
-    version: '1.1.1',
-    srs: 'EPSG:4326',
-    origin: { lat: 60, lng: -100, zoom: 0 },
   };
 
   // TODO: Extract to a utility module?
@@ -229,26 +207,11 @@ class TestMap extends React.Component {
 
 
   render() {
-    const center = _.pick(this.props.origin, 'lat', 'lng');
     return (
         <div style={{width: 800, height: 600}}>
-          <Map
-            crs={this.props.crs}
-            center={center}
-            zoom={this.props.origin.zoom}
-            minZoom={0}
-            maxZoom={10}
-            maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
-            ref={this.handleMapRef}
+          <CanadaBaseMap
+            mapRef={this.handleMapRef}
           >
-            <StaticControl position={'topright'}>React Leaflet</StaticControl>
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url={TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
-              subdomains={'abc'}
-              noWrap={true}
-              maxZoom={12}
-            />
             <DataLayer
               dataset={this.props.rasterDataset}
               onLayerRef={this.handleRasterLayerRef}
@@ -280,7 +243,7 @@ class TestMap extends React.Component {
                 data={this.props.area}
               />
             }
-          </Map>
+          </CanadaBaseMap>
       </div>
     );
   }
