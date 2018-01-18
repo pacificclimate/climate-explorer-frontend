@@ -3,6 +3,8 @@ import React from 'react';
 import { Button, Glyphicon } from 'react-bootstrap';
 import DialogWithError from './DialogWithError';
 
+import compAcontrolsB from '../../HOCs/compAcontrolsB';
+
 /*
 
 Provides a dialog to load a local spatial file.
@@ -22,37 +24,23 @@ class GeoLoader extends React.Component {
     title: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
+  A = (props) =>
+    <Button onClick={props.open} title={this.props.title}>
+      <Glyphicon glyph='open-file'/>
+    </Button>
+  ;
 
-    this.state = {
-      showModal: false,
-    };
-  }
-
-  openModal = () => {
-    this.setState({ showModal: true });
-  };
-
-  closeModal = () => {
-    this.setState({ showModal: false });
-  };
+  B = (props) =>
+    <DialogWithError
+      show={props.show}
+      onHide={props.close}
+      onLoadArea={this.props.onLoadArea}
+    />
+  ;
 
   render() {
-    return (
-      <div>
-
-        <Button onClick={this.openModal} title={this.props.title}>
-          <Glyphicon glyph='open-file' />
-        </Button>
-
-        <DialogWithError
-          show={this.state.showModal}
-          onHide={this.closeModal}
-          onLoadArea={this.props.onLoadArea}
-        />
-      </div>
-    );
+    const ButtonWithModal = compAcontrolsB(this.A, this.B);
+    return <ButtonWithModal/>;
   }
 }
 
