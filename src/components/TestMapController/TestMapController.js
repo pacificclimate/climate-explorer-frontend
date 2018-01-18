@@ -10,8 +10,8 @@ import './TestMapController.css';
 import TestMap from '../TestMap';
 import MapFooter from '../MapFooter';
 import StaticControl from '../StaticControl';
-import ButtonControl from '../ButtonControl';
 import GeoLoader from '../GeoLoader';
+import GeoExporter from '../GeoExporter';
 
 
 // This class is the counterpart of CanadaMap
@@ -19,6 +19,7 @@ class TestMapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
+    area: PropTypes.object,
     onSetArea: PropTypes.func,
   };
 
@@ -80,12 +81,15 @@ class TestMapController extends React.Component {
         time={this.state.variableWmsTime}
         rasterTime={this.state.variableWmsTime}
         isolineTime={this.state.comparandWmsTime}
-        onSetArea={this.onSetArea}
+        onSetArea={this.props.onSetArea}
         area={this.props.area}
         updateMinmax={this.updateLayerMinmax}
       >
         <StaticControl position='topleft'>
           <GeoLoader onLoadArea={this.onSetArea} title='Import polygon' />
+        </StaticControl>
+        <StaticControl position='topleft'>
+          <GeoExporter.Modal area={this.props.area} title='Export polygon' />
         </StaticControl>
         <MapFooter
           start_date={this.state.start_date}
