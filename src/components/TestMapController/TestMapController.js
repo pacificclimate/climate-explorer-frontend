@@ -9,6 +9,7 @@ import _ from 'underscore';
 import './TestMapController.css';
 import TestMap from '../TestMap';
 import MapFooter from '../MapFooter';
+import MapSettings from '../MapSettings';
 import StaticControl from '../StaticControl';
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
@@ -90,6 +91,10 @@ class TestMapController extends React.Component {
         </StaticControl>
         <StaticControl position='topleft'>
           <GeoExporter.Modal area={this.props.area} title='Export polygon' />
+        </StaticControl>
+        <StaticControl position='topright'>
+          <MapSettings
+          />
         </StaticControl>
         <MapFooter
           start_date={this.state.start_date}
