@@ -192,6 +192,8 @@ class TestMap extends React.Component {
   };
 
   // Handlers for area selection.
+  // TODO: Promote area components and handlers up a level when confirmed that
+  // area is not used at this level.
 
   handleAreaCreatedOrEdited = (e) => {
     const area = e.layer.toGeoJSON();

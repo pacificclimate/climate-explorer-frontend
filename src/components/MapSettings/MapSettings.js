@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Grid, Row, Button, Glyphicon, Modal } from 'react-bootstrap';
+import { Grid, Row, Col, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -35,11 +35,13 @@ export default class MapSettings extends React.Component {
       <Modal.Body>
         <Grid>
           <Row>
-            <DatasetSelector
-              meta={this.props.meta}
-              value={this.props.dataset}
-              onChange={this.props.onDatasetChange}
-            />
+            <Col>
+              <DatasetSelector
+                meta={this.props.meta}
+                value={this.props.dataset}
+                onChange={this.props.onDatasetChange}
+              />
+            </Col>
           </Row>
           <Row>
             rasterControls
