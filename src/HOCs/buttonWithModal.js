@@ -3,10 +3,7 @@ import { Button, Modal } from 'react-bootstrap';
 
 
 function buttonWithModal(ButtonContent, ModalBody) {
-  return class extends React.Component {
-    static propTypes = {
-    };
-
+  return class ButtonWithModalWrapper extends React.Component {
     constructor(props) {
       super(props);
 
