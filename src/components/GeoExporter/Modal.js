@@ -1,33 +1,45 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
-import ModalMixin from '../ModalMixin';
+
 
 var exportPolygon = function (area, format) {
-  this.close();
+  this.closeModal();
   g.geojson(area).save(format);
 };
 
-var GeoExporterModal = createReactClass({
-  displayName: 'GeoExporterModal',
 
-  propTypes: {
+class GeoExporterModal extends React.Component {
+  static propTypes = {
     area: PropTypes.object,
     title: PropTypes.string,
-  },
+  };
 
-  mixins: [ModalMixin],
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+    };
+  }
+
+  openModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
 
   render() {
     return (
       <div>
 
-        <Button onClick={this.open} title={this.props.title}><Glyphicon glyph='save-file' /></Button>
+        <Button onClick={this.openModal} title={this.props.title}><Glyphicon glyph='save-file' /></Button>
 
-        <Modal show={this.state.showModal} onHide={this.close}>
+        <Modal show={this.state.showModal} onHide={this.closeModal}>
 
           <Modal.Header closeButton>
             <Modal.Title>Export Polygon by Type</Modal.Title>
@@ -44,13 +56,13 @@ var GeoExporterModal = createReactClass({
           </Modal.Body>
 
           <Modal.Footer>
-            <Button onClick={this.close}>Close</Button>
+            <Button onClick={this.closeModal}>Close</Button>
           </Modal.Footer>
 
         </Modal>
       </div>
     );
-  },
-});
+  }
+}
 
 export default GeoExporterModal;
