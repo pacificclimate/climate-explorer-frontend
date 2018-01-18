@@ -30,6 +30,7 @@ class TestApp extends React.Component {
       <TestMapController
         meta={this.state.meta}
         comparandMeta={this.state.comparandMeta}
+        area={this.state.area}
         onSetArea={this.handleSetArea}
       />
     );
