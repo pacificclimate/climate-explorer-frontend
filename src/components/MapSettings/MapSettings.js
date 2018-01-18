@@ -7,6 +7,9 @@ import _ from 'underscore';
 import './MapSettings.css';
 import compAcontrolsB from '../../HOCs/compAcontrolsB';
 import DatasetSelector from './DatasetSelector';
+import RasterControls from './RasterControls';
+import LinkControls from './LinkControls';
+import IsolineControls from './IsolineControls';
 
 
 export default class MapSettings extends React.Component {
@@ -16,6 +19,7 @@ export default class MapSettings extends React.Component {
     meta: PropTypes.array,
     dataset: PropTypes.string,  // current dataset selection, encoded as JSON string
     onDatasetChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
+    hasComparand: PropTypes.bool,
   };
 
   A = (props) =>
@@ -33,7 +37,7 @@ export default class MapSettings extends React.Component {
       </Modal.Header>
 
       <Modal.Body>
-        <Grid>
+        <Grid fluid>
           <Row>
             <Col>
               <DatasetSelector
@@ -44,9 +48,21 @@ export default class MapSettings extends React.Component {
             </Col>
           </Row>
           <Row>
-            rasterControls
-            linkControls
-            isolineControls
+            <Col lg={this.props.hasComparand ? 6 : 12}>
+              <RasterControls/>
+            </Col>
+            {
+              this.props.hasComparand &&
+              <Col lg={1}>
+                <LinkControls/>
+              </Col>
+            }
+            {
+              this.props.hasComparand &&
+              <Col lg={5}>
+                <IsolineControls/>
+              </Col>
+            }
           </Row>
         </Grid>
       </Modal.Body>

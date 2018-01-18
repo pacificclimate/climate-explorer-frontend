@@ -62,6 +62,10 @@ class TestMapController extends React.Component {
       props[dataLocation].length > 0;
   }
 
+  hasComparand() {
+    return this.hasValidData('comparand');
+  }
+
   updateLayerMinmax = () => {};
 
   currentDataset() {
@@ -116,6 +120,7 @@ class TestMapController extends React.Component {
             meta={this.props.meta}
             dataset={this.currentDataset()}
             onDatasetChange={this.updateDataset}
+            hasComparand={this.hasComparand()}
           />
         </StaticControl>
         <MapFooter
@@ -125,7 +130,7 @@ class TestMapController extends React.Component {
           variable={this.state.variable}
           variableTimes={this.state.variableTimes}
           variableWmsTime={this.state.variableWmsTime}
-          hasValidComparand={this.hasValidData('comparand')}
+          hasValidComparand={this.hasComparand()}
           comparand={this.state.comparand}
           comparandWmsTime={this.state.comparandWmsTime}
         />
