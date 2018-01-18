@@ -3,7 +3,7 @@ import React from 'react';
 import { ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
-import buttonWithModal from "../../HOCs/buttonWithModal";
+import buttonWithModal from '../../HOCs/buttonWithModal';
 
 
 var exportPolygon = function (area, format) {
@@ -13,6 +13,11 @@ var exportPolygon = function (area, format) {
 
 
 class GeoExporterModal extends React.Component {
+  // This class composes the button content with the modal content using
+  // the HOC `buttonWithModal`. Doing this was instructive; it's not quite
+  // as simple as it might seem. For details, the documentation in
+  // `buttonWithModal`.
+
   static propTypes = {
     area: PropTypes.object,
     title: PropTypes.string,
@@ -44,10 +49,7 @@ class GeoExporterModal extends React.Component {
   </div>;
 
   render() {
-    const ButtonWithModal = buttonWithModal(
-      this.ButtonBody,
-      this.ModalBody,
-    );
+    const ButtonWithModal = buttonWithModal(this.ButtonBody, this.ModalBody);
     return <ButtonWithModal/>;
   }
 }
