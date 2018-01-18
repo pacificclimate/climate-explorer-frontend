@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormControl, Button, Glyphicon, Modal } from 'react-bootstrap';
-
-import g from '../../core/geo';
+import { Button, Glyphicon } from 'react-bootstrap';
+import DialogWithError from './DialogWithError';
 
 /*
 
@@ -28,7 +27,6 @@ class GeoLoader extends React.Component {
 
     this.state = {
       showModal: false,
-      showError: false,
     };
   }
 
@@ -40,23 +38,6 @@ class GeoLoader extends React.Component {
     this.setState({ showModal: false });
   };
 
-  openError = () => {
-    this.setState({ showError: true });
-  };
-
-  closeError = () =>  {
-    this.setState({
-      showError: false,
-    });
-  };
-
-  importPolygon(file) {
-    this.close();
-    g.load(file, this.props.onLoadArea, function () {
-      setTimeout(this.openError, 200); // Wait to avoid syling issues with Modal
-    }.bind(this));
-  }
-
   render() {
     return (
       <div>
@@ -65,49 +46,11 @@ class GeoLoader extends React.Component {
           <Glyphicon glyph='open-file' />
         </Button>
 
-        <Modal show={this.state.showModal} onHide={this.closeModal}>
-
-          <Modal.Header closeButton>
-            <Modal.Title>Import Polygon</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <FormControl
-              type='file'
-              label='Select file'
-              onChange={function (e) {
-                this.importPolygon(e.currentTarget.files[0]);
-              }.bind(this)}
-            />
-            <p>
-              Accepts a zipped Shapefile or a single geojson Feature
-              (not FeatureCollection)
-            </p>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.closeModal}>Close</Button>
-          </Modal.Footer>
-
-        </Modal>
-
-        <Modal show={this.state.showError} onHide={this.closeError}>
-
-          <Modal.Header closeButton>
-            <Modal.Title>Error Importing Polygon</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            Currently accepted types are single GeoJSON features and zipped
-            shapefiles with a single feature.
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.closeError}>Close</Button>
-          </Modal.Footer>
-
-        </Modal>
-
+        <DialogWithError
+          show={this.state.showModal}
+          onHide={this.closeModal}
+          onLoadArea={this.props.onLoadArea}
+        />
       </div>
     );
   }
