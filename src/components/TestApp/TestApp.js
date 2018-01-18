@@ -15,12 +15,12 @@ class TestApp extends React.Component {
       meta: [
         {
           start_date: '1950',
-          end_date: '2100',
+          end_date: '1990',
           ensemble_member: 'r1i1p1',
         },
         {
           start_date: '1950',
-          end_date: '2100',
+          end_date: '1990',
           ensemble_member: 'r2i2p2',
         },
       ],
