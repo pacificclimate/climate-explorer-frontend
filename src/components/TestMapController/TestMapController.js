@@ -86,7 +86,7 @@ class TestMapController extends React.Component {
         updateMinmax={this.updateLayerMinmax}
       >
         <StaticControl position='topleft'>
-          <GeoLoader onLoadArea={this.onSetArea} title='Import polygon' />
+          <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
         </StaticControl>
         <StaticControl position='topleft'>
           <GeoExporter.Modal area={this.props.area} title='Export polygon' />
