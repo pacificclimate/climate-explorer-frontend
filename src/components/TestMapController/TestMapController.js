@@ -64,6 +64,25 @@ class TestMapController extends React.Component {
 
   updateLayerMinmax = () => {};
 
+  currentDataset() {
+    // Return encoding of currently selected dataset
+    // FIXME: This is bad! See TODO in DatasetSelector
+    return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
+    // WAAT? The below code is copied from existing MapController, but it
+    // doesn't drive Selector correctly. *&*#$@*
+    // return JSON.stringify({
+    //   start_date: this.state.start_date,
+    //   end_date: this.state.end_date,
+    //   ensemble_member: this.state.run
+    // });
+  }
+
+  updateDataset = (encoding) => {
+    // FIXME: This is bad! See TODO in DatasetSelector
+    const { start_date, end_date, ensemble_member } = JSON.parse(encoding);
+    this.setState({ start_date, end_date, run: ensemble_member });
+  };
+
   render() {
     const rasterDatasetID = 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada';
     const isolineDatasetID = undefined;
@@ -94,6 +113,9 @@ class TestMapController extends React.Component {
         </StaticControl>
         <StaticControl position='topright'>
           <MapSettings
+            meta={this.props.meta}
+            dataset={this.currentDataset()}
+            onDatasetChange={this.updateDataset}
           />
         </StaticControl>
         <MapFooter

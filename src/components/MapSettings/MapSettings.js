@@ -6,11 +6,16 @@ import _ from 'underscore';
 
 import './MapSettings.css';
 import compAcontrolsB from '../../HOCs/compAcontrolsB';
+import DatasetSelector from './DatasetSelector';
 
 
 export default class MapSettings extends React.Component {
   static propTypes = {
     title: PropTypes.string,
+    // TODO: Refactor according to comments in DatasetSelector
+    meta: PropTypes.array,
+    dataset: PropTypes.string,  // current dataset selection, encoded as JSON string
+    onDatasetChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
   };
 
   A = (props) =>
@@ -19,7 +24,7 @@ export default class MapSettings extends React.Component {
     </Button>
   ;
 
-
+  // TODO: ? Extract to a seaparate component `MapSettingsDialog`
   B = (props) =>
     <Modal show={props.show} onHide={props.close} >
 
@@ -30,7 +35,11 @@ export default class MapSettings extends React.Component {
       <Modal.Body>
         <Grid>
           <Row>
-            datasetSelector
+            <DatasetSelector
+              meta={this.props.meta}
+              value={this.props.dataset}
+              onChange={this.props.onDatasetChange}
+            />
           </Row>
           <Row>
             rasterControls
