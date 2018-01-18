@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormControl, Button, Modal } from 'react-bootstrap';
-import g from "../../core/geo";
+import g from '../../core/geo';
+import compAcontrolsB from '../../HOCs/compAcontrolsB';
 
 
 export default class DialogWithError extends React.Component {
@@ -11,76 +12,62 @@ export default class DialogWithError extends React.Component {
     onLoadArea: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showError: false,
+  A = (props) => {
+    const importPolygon = (file) => {
+      this.props.onHide();
+      g.load(file, this.props.onLoadArea,
+        () => setTimeout(props.open, 200) // Wait to avoid syling issues with Modal
+      );
     };
-  }
 
-  openError = () => {
-    this.setState({ showError: true });
+    return (
+      <Modal show={this.props.show} onHide={this.props.onHide}>
+
+        <Modal.Header closeButton>
+          <Modal.Title>Import Polygon</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <FormControl
+            type='file'
+            label='Select file'
+            onChange={(e) => importPolygon(e.currentTarget.files[0])}
+          />
+          <p>
+            Accepts a zipped Shapefile or a single geojson Feature
+            (not FeatureCollection)
+          </p>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button onClick={this.props.onHide}>Close</Button>
+        </Modal.Footer>
+
+      </Modal>
+    );
   };
 
-  closeError = () =>  {
-    this.setState({ showError: false });
-  };
+  B = (props) =>
+    <Modal show={props.show} onHide={props.close}>
 
-  importPolygon = (file) => {
-    this.props.onHide();
-    g.load(file, this.props.onLoadArea, function () {
-      setTimeout(this.openError, 200); // Wait to avoid syling issues with Modal
-    }.bind(this));
-  };
+      <Modal.Header closeButton>
+        <Modal.Title>Error Importing Polygon</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        Currently accepted types are single GeoJSON features and zipped
+        shapefiles with a single feature.
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button onClick={props.close}>Close</Button>
+      </Modal.Footer>
+
+    </Modal>
+  ;
 
   render() {
-    return (
-      <div>
-        <Modal show={this.props.show} onHide={this.props.onHide}>
-
-          <Modal.Header closeButton>
-            <Modal.Title>Import Polygon</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <FormControl
-              type='file'
-              label='Select file'
-              onChange={function (e) {
-                this.importPolygon(e.currentTarget.files[0]);
-              }.bind(this)}
-            />
-            <p>
-              Accepts a zipped Shapefile or a single geojson Feature
-              (not FeatureCollection)
-            </p>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.props.onHide}>Close</Button>
-          </Modal.Footer>
-
-        </Modal>
-
-        <Modal show={this.state.showError} onHide={this.closeError}>
-
-          <Modal.Header closeButton>
-            <Modal.Title>Error Importing Polygon</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            Currently accepted types are single GeoJSON features and zipped
-            shapefiles with a single feature.
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.closeError}>Close</Button>
-          </Modal.Footer>
-
-        </Modal>
-
-      </div>
-    );
+    const ModalControlsModal = compAcontrolsB(this.A, this.B);
+    return <ModalControlsModal/>;
   }
 }
