@@ -3,10 +3,11 @@ import React from 'react';
 import { ButtonGroup, Button, Glyphicon, Modal } from 'react-bootstrap';
 
 import g from '../../core/geo';
+import buttonWithModal from "../../HOCs/buttonWithModal";
 
 
 var exportPolygon = function (area, format) {
-  this.closeModal();
+  // this.closeModal();
   g.geojson(area).save(format);
 };
 
@@ -17,51 +18,37 @@ class GeoExporterModal extends React.Component {
     title: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
+  ButtonBody = () => <Glyphicon glyph='save-file'/>;
 
-    this.state = {
-      showModal: false,
-    };
-  }
+  // TODO: Tighten this rubbish up. Good grief.
+  exportShapefile = () => exportPolygon.bind(this, this.props.area, 'shp')();
+  exportGeoJSON = () => exportPolygon.bind(this, this.props.area, 'geojson')();
+  exportWKT = () => exportPolygon.bind(this, this.props.area, 'wkt')();
+  exportKML = () => exportPolygon.bind(this, this.props.area, 'kml')();
+  exportGPX = () => exportPolygon.bind(this, this.props.area, 'gpx')();
 
-  openModal = () => {
-    this.setState({ showModal: true });
-  };
+  ModalBody = () => <div>
+    <Modal.Header closeButton>
+      <Modal.Title>Export Polygon by Type</Modal.Title>
+    </Modal.Header>
 
-  closeModal = () => {
-    this.setState({ showModal: false });
-  };
+    <Modal.Body>
+      <ButtonGroup>
+        <Button onClick={this.exportShapefile}>Shapefile</Button>
+        <Button onClick={this.exportGeoJSON}>GeoJSON</Button>
+        <Button onClick={this.exportWKT}>WKT</Button>
+        <Button onClick={this.exportKML}>KML</Button>
+        <Button onClick={this.exportGPX}>GPX</Button>
+      </ButtonGroup>
+    </Modal.Body>
+  </div>;
 
   render() {
-    return (
-      <div>
-
-        <Button onClick={this.openModal} title={this.props.title}><Glyphicon glyph='save-file' /></Button>
-
-        <Modal show={this.state.showModal} onHide={this.closeModal}>
-
-          <Modal.Header closeButton>
-            <Modal.Title>Export Polygon by Type</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
-            <ButtonGroup>
-              <Button onClick={exportPolygon.bind(this, this.props.area, 'shp')}>Shapefile</Button>
-              <Button onClick={exportPolygon.bind(this, this.props.area, 'geojson')}>GeoJSON</Button>
-              <Button onClick={exportPolygon.bind(this, this.props.area, 'wkt')}>WKT</Button>
-              <Button onClick={exportPolygon.bind(this, this.props.area, 'kml')}>KML</Button>
-              <Button onClick={exportPolygon.bind(this, this.props.area, 'gpx')}>GPX</Button>
-            </ButtonGroup>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button onClick={this.closeModal}>Close</Button>
-          </Modal.Footer>
-
-        </Modal>
-      </div>
+    const ButtonWithModal = buttonWithModal(
+      this.ButtonBody,
+      this.ModalBody,
     );
+    return <ButtonWithModal/>;
   }
 }
 
