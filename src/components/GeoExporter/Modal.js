@@ -24,7 +24,7 @@ export default class GeoExporterModal extends React.Component {
   };
 
   A = (props) =>
-    <Button onClick={props.open}>
+    <Button onClick={props.open} title={this.props.title}>
       <Glyphicon glyph='save-file'/>
     </Button>
   ;
