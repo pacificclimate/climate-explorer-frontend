@@ -123,25 +123,33 @@ class DataMap extends React.Component {
   //
   // Responsibilities:
   //
-  // -- Create and add the colour bar and autoscale controls for each data layer present
+  // -- Create and add the colour bar and autoscale controls for each data
+  //    layer present
   //
-  //      - A data layer is present if its dataset is. This is handled by the DataLayer component, which returns a
-  //        a WMSTileLayer component if the dataset is present, or else null.
+  //      - A data layer is present if its dataset is. This is handled by the
+  //        DataLayer component, which returns a WMSTileLayer component if the
+  //        dataset is present, or else null.
   //      - Each data layer, if present, has a corresponding colour bar control.
-  //      - An autoscaler control always present. Each data layer present has the autoscaler control registered to it.
+  //      - An autoscaler control always present. Each data layer present has
+  //        the autoscaler control registered to it.
   //
-  //      The controls must be positioned depending on which of the two data layers (or both) is present. Data
-  //      layers are rendered independently of each other, so there is no single event or callback that will coordinate
-  //      both layers completing (whether present or null). [Oops, except for this component's componentDidMount
-  //      lifecycle event ... hmmm, probably should refactor. Probably better to wrap that in a single component
-  //      DataLayers to encapsulate the complexity. Alas.] So we create a promise (this.layersPromise) that resolves
-  //      when the two layers have completed; when it resolves, we create and deploy the data rendering controls.
+  //      The controls must be positioned depending on which of the two data
+  //      layers (or both) is present. Data layers are rendered independently
+  //      of each other, so there is no single event or callback that will
+  //      coordinate both layers completing (whether present or null).
+  //      [Oops, except for this component's componentDidMount lifecycle event
+  //      ... hmmm, probably should refactor. Probably better to wrap that in
+  //      a single component DataLayers to encapsulate the complexity. Alas.]
+  //      So we create a promise (this.layersPromise) that resolves when the
+  //      two layers have completed; when it resolves, we create and deploy
+  //      the data rendering controls.
 
   handleMapRef = makeHandleLeafletRef('map', (map) => {
     console.log('handleMapRef', map);
     // Set up the promises for the raster and isoline layers.
-    // Each promise is resolved with either the layer or null if the layer is not created (according to props).
-    // The resolve callback for each promise is cached on `this` so that it can be invoked by the layer callbacks
+    // Each promise is resolved with either the layer or null if the layer is
+    // not created (according to props). The resolve callback for each promise
+    // is cached on `this` so that it can be invoked by the layer callbacks
     // later.
     const rasterLayerPromise = new Promise((resolve) => {
       this.rasterLayerResolve = resolve;
@@ -149,7 +157,8 @@ class DataMap extends React.Component {
     const isolineLayerPromise = new Promise((resolve) => {
       this.isolineLayerResolve = resolve;
     });
-    this.layersPromise = Promise.all([rasterLayerPromise, isolineLayerPromise]).then(this.addDataControls);
+    this.layersPromise = Promise.all([rasterLayerPromise, isolineLayerPromise])
+      .then(this.addDataControls);
   }).bind(this);
 
   handleRasterLayerRef = makeHandleLeafletRef('rasterLayer', (layer) => {
@@ -175,14 +184,18 @@ class DataMap extends React.Component {
     // The autoscale control is always created and is registered to each layer present.
     
     // Create and register controls to layer(s)
-    const rasterBar = rasterLayer && new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
-    const isolineBar = isolineLayer && new LeafletNcWMSColorbarControl(isolineLayer, { position: 'bottomright' });
+    const rasterBar = rasterLayer &&
+      new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
+    const isolineBar = isolineLayer &&
+      new LeafletNcWMSColorbarControl(isolineLayer, { position: 'bottomright' });
     let autoscale;
-    autoscale = rasterLayer && new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
+    autoscale = rasterLayer &&
+      new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
     if (autoscale && isolineLayer) {
       autoscale.addLayer(isolineLayer);
     } else {
-      autoscale = new LeafletNcWMSAutoscaleControl(isolineLayer, { position: 'bottomright' });
+      autoscale = new LeafletNcWMSAutoscaleControl(
+        isolineLayer, { position: 'bottomright' });
     }
 
     // Add controls to map. Ordering depends on which of the controls is present.
@@ -213,44 +226,42 @@ class DataMap extends React.Component {
 
   render() {
     return (
-        <div style={{width: 800, height: 600}}>
-          <CanadaBaseMap
-            mapRef={this.handleMapRef}
-          >
-            <DataLayer
-              dataset={this.props.rasterDataset}
-              onLayerRef={this.handleRasterLayerRef}
-              onNoLayer={this.handleNoRasterLayer}
-              {...this.getWMSParams('raster')}
-            />
-            <DataLayer
-              dataset={this.props.isolineDataset}
-              onLayerRef={this.handleIsolineLayerRef}
-              onNoLayer={this.handleNoIsolineLayer}
-              {...this.getWMSParams('isoline')}
-            />
-            <FeatureGroup>
-              <EditControl
-                position='topleft'
-                draw={{
-                  marker: false,
-                  circle: false,
-                  polyline: false,
-                }}
-                onCreated={this.handleAreaCreatedOrEdited}
-                onEdited={this.handleAreaCreatedOrEdited}
-                onDeleted={this.handleAreaDeleted}
-              />
-            </FeatureGroup>
-            {
-              this.props.area &&
-              <GeoJSON
-                data={this.props.area}
-              />
-            }
-            { this.props.children }
-          </CanadaBaseMap>
-      </div>
+      <CanadaBaseMap
+        mapRef={this.handleMapRef}
+      >
+        <DataLayer
+          dataset={this.props.rasterDataset}
+          onLayerRef={this.handleRasterLayerRef}
+          onNoLayer={this.handleNoRasterLayer}
+          {...this.getWMSParams('raster')}
+        />
+        <DataLayer
+          dataset={this.props.isolineDataset}
+          onLayerRef={this.handleIsolineLayerRef}
+          onNoLayer={this.handleNoIsolineLayer}
+          {...this.getWMSParams('isoline')}
+        />
+        <FeatureGroup>
+          <EditControl
+            position='topleft'
+            draw={{
+              marker: false,
+              circle: false,
+              polyline: false,
+            }}
+            onCreated={this.handleAreaCreatedOrEdited}
+            onEdited={this.handleAreaCreatedOrEdited}
+            onDeleted={this.handleAreaDeleted}
+          />
+        </FeatureGroup>
+        {
+          this.props.area &&
+          <GeoJSON
+            data={this.props.area}
+          />
+        }
+        { this.props.children }
+      </CanadaBaseMap>
     );
   }
 }

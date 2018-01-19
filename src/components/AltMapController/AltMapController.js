@@ -1,6 +1,7 @@
 /* eslint-disable no-trailing-spaces */
 import PropTypes from 'prop-types';
 import React from 'react';
+import Loader from 'react-loader';
 
 import _ from 'underscore';
 
@@ -90,63 +91,71 @@ class AltMapController extends React.Component {
     const isolineDatasetID = undefined;
 
     return (
-      <DataMap
-        rasterLogscale={this.state.rasterLogscale}
-        rasterPalette={this.state.rasterPalette}
-        rasterDataset={rasterDatasetID}
-        rasterVariable={this.state.variable}
-        isolineLogscale={this.state.isolineLogscale}
-        isolinePalette={this.state.isolinePalette}
-        isolineDataset={isolineDatasetID}
-        isolineVariable={this.state.comparand}
-        numberOfContours={this.state.numberOfContours}
-        time={this.state.variableWmsTime}
-        rasterTime={this.state.variableWmsTime}
-        isolineTime={this.state.comparandWmsTime}
-        onSetArea={this.props.onSetArea}
-        area={this.props.area}
-        updateMinmax={this.updateLayerMinmax}
-      >
+      <div style={{ width: 800, height: 600 }}>
+        {
+          this.state.variableTimes || this.state.comparandTimes ? (
+            <DataMap
+              rasterLogscale={this.state.rasterLogscale}
+              rasterPalette={this.state.rasterPalette}
+              rasterDataset={rasterDatasetID}
+              rasterVariable={this.state.variable}
+              isolineLogscale={this.state.isolineLogscale}
+              isolinePalette={this.state.isolinePalette}
+              isolineDataset={isolineDatasetID}
+              isolineVariable={this.state.comparand}
+              numberOfContours={this.state.numberOfContours}
+              time={this.state.variableWmsTime}
+              rasterTime={this.state.variableWmsTime}
+              isolineTime={this.state.comparandWmsTime}
+              onSetArea={this.props.onSetArea}
+              area={this.props.area}
+              updateMinmax={this.updateLayerMinmax}
+            >
 
-        <StaticControl position='topleft'>
-          <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-        </StaticControl>
+              <StaticControl position='topleft'>
+                <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
+              </StaticControl>
 
-        <StaticControl position='topleft'>
-          <GeoExporter.Modal area={this.props.area} title='Export polygon' />
-        </StaticControl>
+              <StaticControl position='topleft'>
+                <GeoExporter.Modal area={this.props.area} title='Export polygon' />
+              </StaticControl>
 
-        <StaticControl position='topright'>
-          <MapSettings
-            title='Map Settings'
-            meta={this.props.meta}
-            dataset={this.currentDataset()}
-            onDatasetChange={this.updateDataset}
-            variableTimes={this.state.variableTimes}
-            variableTimeIdx={this.state.variableTimeIdx}
-            onChangeVariableTime={() => alert('onChangeVariableTime')}
-            hasComparand={this.hasComparand()}
-            comparandTimes={this.state.comparandTimes}
-            comparandTimeIdx={this.state.comparandTimeIdx}
-            onChangeComparandTime={() => alert('onChangeComparandTime')}
-          />
-        </StaticControl>
+              <StaticControl position='topright'>
+                <MapSettings
+                  title='Map Settings'
+                  meta={this.props.meta}
+                  dataset={this.currentDataset()}
+                  onDatasetChange={this.updateDataset}
+                  variableTimes={this.state.variableTimes}
+                  variableTimeIdx={this.state.variableTimeIdx}
+                  onChangeVariableTime={() => alert('onChangeVariableTime')}
+                  hasComparand={this.hasComparand()}
+                  comparandTimes={this.state.comparandTimes}
+                  comparandTimeIdx={this.state.comparandTimeIdx}
+                  onChangeComparandTime={() => alert('onChangeComparandTime')}
+                />
+              </StaticControl>
 
-        <StaticControl position='bottomleft'>
-          <MapFooter
-            start_date={this.state.start_date}
-            end_date={this.state.end_date}
-            run={this.state.run}
-            variable={this.state.variable}
-            variableTimes={this.state.variableTimes}
-            variableWmsTime={this.state.variableWmsTime}
-            hasValidComparand={this.hasComparand()}
-            comparand={this.state.comparand}
-            comparandWmsTime={this.state.comparandWmsTime}
-          />
-        </StaticControl>
+              <StaticControl position='bottomleft'>
+                <MapFooter
+                  start_date={this.state.start_date}
+                  end_date={this.state.end_date}
+                  run={this.state.run}
+                  variable={this.state.variable}
+                  variableTimes={this.state.variableTimes}
+                  variableWmsTime={this.state.variableWmsTime}
+                  hasValidComparand={this.hasComparand()}
+                  comparand={this.state.comparand}
+                  comparandWmsTime={this.state.comparandWmsTime}
+                />
+              </StaticControl>
 
-      </DataMap>
+            </DataMap>
+          ) : (
+            <Loader/>
+          )
+        }
+      </div>
     );
   }
 }
