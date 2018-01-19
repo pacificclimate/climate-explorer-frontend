@@ -2,11 +2,15 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import './TestApp.css';
-import TestMapController from '../TestMapController';
+import './TestAppController.css';
+import AltMapController from '../AltMapController';
 
 
-class TestApp extends React.Component {
+class TestAppController extends React.Component {
+  // This component is a test framework for AltMapController.
+  // It stubs the behaviour of existing component MapController.
+  // TODO: Remove when transition to new architecture is complete
+
   constructor(props) {
     super(props);
 
@@ -26,7 +30,6 @@ class TestApp extends React.Component {
       ],
       comparandMeta: undefined,
       area: undefined,
-      // area: {"type":"Feature","properties":{"source":"PCIC Climate Explorer"},"geometry":{"type":"Polygon","coordinates":[[[-120.117187,68.027344],[-110.449219,64.707031],[-119.53125,62.070312],[-120.117187,68.027344]]]}}, // works as expected
     };
   }
 
@@ -37,7 +40,7 @@ class TestApp extends React.Component {
 
   render() {
     return (
-      <TestMapController
+      <AltMapController
         meta={this.state.meta}
         comparandMeta={this.state.comparandMeta}
         area={this.state.area}
@@ -47,4 +50,4 @@ class TestApp extends React.Component {
   }
 }
 
-export default TestApp;
+export default TestAppController;

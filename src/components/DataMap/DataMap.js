@@ -9,12 +9,10 @@ import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
-import './TestMap.css';
-import utils from '../Map/utils';
+import './DataMap.css';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 import CanadaBaseMap from '../CanadaBaseMap';
-import {sameYear, timestampToTimeOfYear} from "../../core/util";
 
 
 function makeHandleLeafletRef(name, leafletAction = () => {}) {
@@ -49,24 +47,31 @@ function DataLayer(props) {
 }
 
 
-class TestMap extends React.Component {
+class DataMap extends React.Component {
+  // This component provides data display layers (DataLayer) for up to two
+  // variables, plus a polygon layer and polygon editing tools, all rendered
+  // within a base map (CanadaBaseMap).
+  // Renders its children within the base map.
+  //
   // Notes:
   // - `area` is a prop and should not be stored as state in this component.
   //    This is basic React good practice, and it also simplifies the code
   //    enormously.
 
   static propTypes = {
+    rasterDataset: PropTypes.string,
+    rasterVariable: PropTypes.string,
     rasterPalette: PropTypes.string,
-    rasterLogscale: PropTypes.string,
+    rasterLogscale: PropTypes.bool,
+
+    isolineDataset: PropTypes.string,
+    isolineVariable: PropTypes.string,
     isolinePalette: PropTypes.string,
     numberOfContours: PropTypes.number,
-    isolineLogscale: PropTypes.string,
-    rasterDataset: PropTypes.string,
-    isolineDataset: PropTypes.string,
-    rasterVariable: PropTypes.string,
-    isolineVariable: PropTypes.string,
-    onSetArea: PropTypes.func.isRequired,
+    isolineLogscale: PropTypes.bool,
+
     area: PropTypes.object,
+    onSetArea: PropTypes.func.isRequired,
   };
 
   // TODO: Extract to a utility module?
@@ -250,4 +255,4 @@ class TestMap extends React.Component {
   }
 }
 
-export default TestMap;
+export default DataMap;

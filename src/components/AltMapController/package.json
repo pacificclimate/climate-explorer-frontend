@@ -1,0 +1,6 @@
+{
+  "name": "AltMapController",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AltMapController.js"
+}

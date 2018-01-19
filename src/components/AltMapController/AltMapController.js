@@ -2,12 +2,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Glyphicon } from 'react-bootstrap';
-
 import _ from 'underscore';
 
-import './TestMapController.css';
-import TestMap from '../TestMap';
+import './AltMapController.css';
+import DataMap from '../DataMap';
 import MapFooter from '../MapFooter';
 import MapSettings from '../MapSettings';
 import StaticControl from '../StaticControl';
@@ -15,8 +13,10 @@ import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
 
-// This class is the counterpart of CanadaMap
-class TestMapController extends React.Component {
+// This class is the counterpart of MapController and will ultimately become
+// a drop-in replacement for it to transition over to the new architecture.
+
+class AltMapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
@@ -90,7 +90,7 @@ class TestMapController extends React.Component {
     const isolineDatasetID = undefined;
 
     return (
-      <TestMap
+      <DataMap
         rasterLogscale={this.state.rasterLogscale}
         rasterPalette={this.state.rasterPalette}
         rasterDataset={rasterDatasetID}
@@ -144,9 +144,9 @@ class TestMapController extends React.Component {
           comparandWmsTime={this.state.comparandWmsTime}
         />
 
-      </TestMap>
+      </DataMap>
     );
   }
 }
 
-export default TestMapController;
+export default AltMapController;
