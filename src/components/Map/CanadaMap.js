@@ -1,24 +1,24 @@
 /***************************************************************
  * CanadaMap.js - display component using ncWMS and Leaflet.
- * Will display up to two map layers, one as shaded color blocks,
- * and one as isolines, or either independently, over a tiled
+ * Will display up to two map layers, one as shaded color blocks, 
+ * and one as isolines, or either independently, over a tiled 
  * background. Origin and bounds display all of Canada.
- *
+ * 
  * Child of (and viewer for) MapController.
- *
+ * 
  * Props passed to configure shaded color map:
  *  - rasterPalette (name of an ncWMS color palette)
  *  - rasterLogscale (true for logarithmic color scale)
  *  - rasterDataset (name of the netCDF datafile)
  *  - rasterVariable (name of the variable)
- *
- * All the same props are passed to configure isolines,
- * prefixed "isoline", plus an additional prop to describe
+ *  
+ * All the same props are passed to configure isolines, 
+ * prefixed "isoline", plus an additional prop to describe 
  * the isoline layer: numberOfContours.
- *
- * other props: time (selects a time slice),
+ * 
+ * other props: time (selects a time slice), 
  *              area (configures an area to highlight).
- *
+ * 
  *****************************************************************/
 
 import PropTypes from 'prop-types';
@@ -49,13 +49,13 @@ class CanadaMap extends React.Component {
     rasterDataset: PropTypes.string,
     isolineDataset: PropTypes.string,
     rasterVariable: PropTypes.string,
-    isolineVariable: PropTypes.string,
+    isolineVariable: PropTypes.string,    
     onSetArea: PropTypes.func.isRequired,
     area: PropTypes.object,
     origin: PropTypes.object,
   };
 
-  //generates initial (and unchanging) map settings - origin, projection, etc.
+  //generates initial (and unchanging) map settings - origin, projection, etc. 
   static defaultProps = {
     crs: new L.Proj.CRS(
       'EPSG:4326',
@@ -77,7 +77,6 @@ class CanadaMap extends React.Component {
     version: '1.1.1',
     srs: 'EPSG:4326',
     origin: { lat: 60, lon: -100, zoom: 0 },
-    oldschool: false,
   };
 
   state = {
@@ -89,20 +88,19 @@ class CanadaMap extends React.Component {
     var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
 
     var params = {
-      layers: layerName,
-      noWrap: true,
-      format: "image/png",
-      transparent: true,
-      time: props[`${layer}Time`],
-      numcolorbands: 249,
-      version: "1.1.1",
-      srs: "EPSG:4326",
-      logscale: "false"
+        layers: layerName,
+        noWrap: true,
+        format: "image/png",
+        transparent: true,
+        time: props[`${layer}Time`],
+        numcolorbands: 249,
+        version: "1.1.1",
+        srs: "EPSG:4326",
+        logscale: "false"
     };
     if(layer == "raster") {
       params.styles = `default-scalar/${props.rasterPalette}`;
       params.opacity = .7;
-      params.zIndex = 2;
       if(props.rasterLogscale=="true" && !_.isUndefined(this.layerRange.raster)) {
         //clip the dataset to > 0, values of 0 or less do not have a
         //non-complex logarithm
@@ -128,7 +126,7 @@ class CanadaMap extends React.Component {
         params.belowmincolor="transparent";
       }
     }
-    return params;
+    return params;    
   };
 
   /*
@@ -157,7 +155,7 @@ class CanadaMap extends React.Component {
         bounds = L.latLngBounds(corner1, corner2);
       }
       var minmaxParams = _.pick(this.getWMSParams(layer, props),
-        "layers", "styles", "version", "srs", "time");
+          "layers", "styles", "version", "srs", "time");
       _.extend(minmaxParams, {
         styles: 'default-scalar',
         request: 'GetMetadata',
@@ -169,10 +167,10 @@ class CanadaMap extends React.Component {
         bbox: `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`
       })
       axios (NCWMS_URL,
-        {params: minmaxParams}).then(response => {
-        this.layerRange[layer] = response.data;
-        props.updateMinmax(layer, response.data);
-      });
+          {params: minmaxParams}).then(response => {
+            this.layerRange[layer] = response.data;
+            props.updateMinmax(layer, response.data);
+          });
     }
     catch (err) {
       //Because the map loads data asynchronously, it may not be ready yet,
@@ -207,7 +205,7 @@ class CanadaMap extends React.Component {
   handleNewArea = (geojson) => {
     this.setState({ area: geojson });
     this.clearMapFeatures();
-    // L.geoJson returns a FeatureGroup. Only add first layer of group.
+        // L.geoJson returns a FeatureGroup. Only add first layer of group.
     this.drawnItems.addLayer(L.geoJson(geojson, {
       stroke: true,
       color: '#f06eaa',
@@ -231,26 +229,21 @@ class CanadaMap extends React.Component {
   //area drawing and manipulation controls.
   componentDidMount() {
     this.layerRange = {};
-    var map;
-    if (this.props.oldschool) {
-      map = this.map = L.map(this._map, {
-        crs: this.props.crs,
-        minZoom: 0,
-        maxZoom: 10,
-        maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
-        layers: [
-          L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png', {
-            subdomains: 'abc',
-            noWrap: true,
-            maxZoom: 10,
-            attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          }),
-        ],
-      });
-    } else {
-      map = this.map;
-    }
 
+    var map = this.map = L.map(this._map, {
+      crs: this.props.crs,
+      minZoom: 0,
+      maxZoom: 10,
+      maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
+      layers: [
+        L.tileLayer(TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png', {
+          subdomains: 'abc',
+          noWrap: true,
+          maxZoom: 10,
+          attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }),
+      ],
+    });
 
     if(this.props.rasterDataset) {
       this.ncwmsRasterLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("raster")).addTo(map);
@@ -260,7 +253,7 @@ class CanadaMap extends React.Component {
       this.ncwmsIsolineLayer=L.tileLayer.wms(NCWMS_URL, this.getWMSParams("isoline")).addTo(map);
       this.updateLayerMinmax("isoline", this.props);
     }
-
+    
     map.setView(L.latLng(this.props.origin.lat, this.props.origin.lon), this.props.origin.zoom);
 
     /*
@@ -368,7 +361,7 @@ class CanadaMap extends React.Component {
     //Print control is temporarily removed until map printing is working.
     //See https://github.com/pacificclimate/climate-explorer-frontend/issues/77
     //map.addControl(new PrintControl());
-
+    
     var autoscale, rasterBar, isolineBar;
     //create controls for each map layer currently defined
     if(this.props.rasterDataset) {
@@ -377,10 +370,10 @@ class CanadaMap extends React.Component {
     if(this.props.isolineDataset) {
       [autoscale, isolineBar] = this.makeColourControls(this.ncwmsIsolineLayer);
     }
-
-    //all controls are positioned at leaflet "bottomright"
+    
+    //all controls are positioned at leaflet "bottomright" 
     //(see http://leafletjs.com/reference-1.2.0.html#control )
-    //and stack vertically up the side of the map. The first-added
+    //and stack vertically up the side of the map. The first-added 
     //control ends up at the bottom, the most recently added on top.
     //We want autoscale on top if there's only one colourbar, but
     //between the bars if there's two (to indicate it affects both layers)
@@ -406,7 +399,7 @@ class CanadaMap extends React.Component {
 
   //returns an array of two controls registered to the layer:
   //a coloured bar legend, and an autoscale button
-  //the autoscale button is registered to every layer this function
+  //the autoscale button is registered to every layer this function 
   //has been called on. (It is assumed that all layers autoscale together)
   makeColourControls = (layer) => {
     if(this.autoscaleControl) {
@@ -425,7 +418,7 @@ class CanadaMap extends React.Component {
 
   componentWillUnmount() {
     this.map.off('click', this.onMapClick);
-    // this.map = null;
+    this.map = null;
   }
 
   onMapClick = () => {
@@ -439,7 +432,7 @@ class CanadaMap extends React.Component {
     if(_.isEqual(this.props, newProps)) {
       return;
     }
-
+    
     // FIXME: This isn't ideal. Leaflet doesn't support /removing/
     // wmsParameters yet - https://github.com/Leaflet/Leaflet/issues/3441
     if(this.ncwmsRasterLayer) {
@@ -473,33 +466,10 @@ class CanadaMap extends React.Component {
   }
 
   render() {
-    console.log('CanadaMap: rendering', this.props);
-    if (this.props.oldschool) {
-      return (
-        <div className={styles.map}>
-          <div ref={(c) => this._map = c} className={styles.map}/>
-        </div>
-      );
-    }
-
     return (
-      <Map
-        crs={this.props.crs}
-        center={{lat: 60, lng: -100}}
-        zoom={0}
-        minZoom={0}
-        maxZoom={10}
-        maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
-        ref={(c) => this.map = c.leafletElement}
-      >
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url={TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
-          subdomains={'abc'}
-          noWrap
-          maxZoom={10}
-        />
-      </Map>
+      <div className={styles.map}>
+        <div ref={ (c) => this._map = c } className={styles.map} />
+      </div>
     );
   }
 }
