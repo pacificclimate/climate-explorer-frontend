@@ -7,9 +7,8 @@ import _ from 'underscore';
 import './MapSettings.css';
 import compAcontrolsB from '../../HOCs/compAcontrolsB';
 import DatasetSelector from './DatasetSelector';
-import RasterControls from './RasterControls';
+import DataDisplayControls from './DataDisplayControls';
 import LinkControls from './LinkControls';
-import IsolineControls from './IsolineControls';
 
 
 export default class MapSettings extends React.Component {
@@ -17,19 +16,37 @@ export default class MapSettings extends React.Component {
     title: PropTypes.string,
     // TODO: Refactor according to comments in DatasetSelector
     meta: PropTypes.array,
+
     dataset: PropTypes.string,  // current dataset selection, encoded as JSON string
     onDatasetChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
+
+    variableTimes: PropTypes.object,
+    variableTimeIdx: PropTypes.string,
+    onChangeVariableTime: PropTypes.func.isRequired,
+
     hasComparand: PropTypes.bool,
+    comparandTimes: PropTypes.object,
+    comparandTimeIdx: PropTypes.string,
+    onChangeComparandTime: PropTypes.func.isRequired, // required???
   };
 
-  A = (props) =>
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      linkTimes: false,  // Under control of LinkControls
+    };
+  }
+
+  handleLinkTimes = linkTimes => this.setState({ linkTimes });
+
+  MapSettingsButton = (props) =>
     <Button onClick={props.open} title={this.props.title}>
       <Glyphicon glyph='menu-hamburger'/>
     </Button>
   ;
 
-  // TODO: ? Extract to a seaparate component `MapSettingsDialog`
-  B = (props) =>
+  MapSettingsDialog = (props) =>
     <Modal show={props.show} onHide={props.close} >
 
       <Modal.Header closeButton>
@@ -39,7 +56,7 @@ export default class MapSettings extends React.Component {
       <Modal.Body>
         <Grid fluid>
           <Row>
-            <Col>
+            <Col lg={12}>
               <DatasetSelector
                 meta={this.props.meta}
                 value={this.props.dataset}
@@ -49,18 +66,32 @@ export default class MapSettings extends React.Component {
           </Row>
           <Row>
             <Col lg={this.props.hasComparand ? 6 : 12}>
-              <RasterControls/>
+              <DataDisplayControls
+                name='Raster'
+                times={this.props.variableTimes}
+                timeIdx={this.props.variableTimeIdx}
+                onChangeTime={this.props.onChangeVariableTime}
+              />
             </Col>
             {
               this.props.hasComparand &&
               <Col lg={1}>
-                <LinkControls/>
+                <LinkControls
+                  value={this.state.linkTimes}
+                  onChange={this.handleLinkTimes}
+                />
               </Col>
             }
             {
               this.props.hasComparand &&
               <Col lg={5}>
-                <IsolineControls/>
+                <DataDisplayControls
+                  name='Isoline'
+                  disabled={this.state.linkTimes}
+                  times={this.props.comparandTimes}
+                  timeIdx={this.props.comparandTimeIdx}
+                  onChangeTime={this.props.onChangeComparandTime}
+                />
               </Col>
             }
           </Row>
@@ -75,7 +106,10 @@ export default class MapSettings extends React.Component {
   ;
 
   render() {
-    const ButtonWithModal = compAcontrolsB(this.A, this.B);
-    return <ButtonWithModal/>;
+    const ButtonWithDialog = compAcontrolsB(
+      this.MapSettingsButton,
+      this.MapSettingsDialog
+    );
+    return <ButtonWithDialog/>;
   }
 }
