@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Grid, Row, Col, Button, Glyphicon, Modal } from 'react-bootstrap';
 
-import _ from 'underscore';
-
 import './MapSettings.css';
 import compAcontrolsB from '../../HOCs/compAcontrolsB';
 import DatasetSelector from './DatasetSelector';

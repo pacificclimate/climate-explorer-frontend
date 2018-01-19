@@ -43,8 +43,6 @@ class TestMapController extends React.Component {
       comparandTimeIdx: undefined,
       comparandWmsTime: undefined,
 
-      linkTimes: 'linkTimes',   // ?
-
       rasterLogscale: false,
       rasterPalette: 'x-Occam',
 
@@ -109,20 +107,31 @@ class TestMapController extends React.Component {
         area={this.props.area}
         updateMinmax={this.updateLayerMinmax}
       >
+
         <StaticControl position='topleft'>
           <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
         </StaticControl>
+
         <StaticControl position='topleft'>
           <GeoExporter.Modal area={this.props.area} title='Export polygon' />
         </StaticControl>
+
         <StaticControl position='topright'>
           <MapSettings
+            title='Map Settings'
             meta={this.props.meta}
             dataset={this.currentDataset()}
             onDatasetChange={this.updateDataset}
+            variableTimes={this.state.variableTimes}
+            variableTimeIdx={this.state.variableTimeIdx}
+            onChangeVariableTime={() => alert('onChangeVariableTime')}
             hasComparand={this.hasComparand()}
+            comparandTimes={this.state.comparandTimes}
+            comparandTimeIdx={this.state.comparandTimeIdx}
+            onChangeComparandTime={() => alert('onChangeComparandTime')}
           />
         </StaticControl>
+
         <MapFooter
           start_date={this.state.start_date}
           end_date={this.state.end_date}
@@ -134,6 +143,7 @@ class TestMapController extends React.Component {
           comparand={this.state.comparand}
           comparandWmsTime={this.state.comparandWmsTime}
         />
+
       </TestMap>
     );
   }
