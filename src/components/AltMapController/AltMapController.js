@@ -132,17 +132,19 @@ class AltMapController extends React.Component {
           />
         </StaticControl>
 
-        <MapFooter
-          start_date={this.state.start_date}
-          end_date={this.state.end_date}
-          run={this.state.run}
-          variable={this.state.variable}
-          variableTimes={this.state.variableTimes}
-          variableWmsTime={this.state.variableWmsTime}
-          hasValidComparand={this.hasComparand()}
-          comparand={this.state.comparand}
-          comparandWmsTime={this.state.comparandWmsTime}
-        />
+        <StaticControl position='bottomleft'>
+          <MapFooter
+            start_date={this.state.start_date}
+            end_date={this.state.end_date}
+            run={this.state.run}
+            variable={this.state.variable}
+            variableTimes={this.state.variableTimes}
+            variableWmsTime={this.state.variableWmsTime}
+            hasValidComparand={this.hasComparand()}
+            comparand={this.state.comparand}
+            comparandWmsTime={this.state.comparandWmsTime}
+          />
+        </StaticControl>
 
       </DataMap>
     );

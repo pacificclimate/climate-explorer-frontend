@@ -4,7 +4,6 @@ import React from 'react';
 import _ from 'underscore';
 
 import './MapFooter.css';
-import StaticControl from '../StaticControl';
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
 
 
@@ -36,11 +35,9 @@ class MapFooter extends React.Component {
     }
 
     return (
-      <StaticControl position='bottomleft'>
         <h5>
           Dataset {dataset} {this.props.run}: {vTime} {this.props.variable} {comp}
         </h5>
-      </StaticControl>
     );
   }
 }
