@@ -39,6 +39,7 @@ import { timestampToTimeOfYear,
          nestedAttributeIsDefined,
          sameYear,
          getVariableOptions} from '../../core/util';
+import { getTimeMetadata } from '../../data-services/metadata';
 
 import styles from './MapController.css';
 
@@ -170,17 +171,6 @@ var MapController = createReactClass({
            props[dataLocation].length > 0;
   },
 
-  //returns a promise for the "metadata" API call, used to fetch a list
-  //of timestamps inside a particular file.
-  requestTimeMetadata: function (uniqueId) {
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
-      params: {
-        model_id: uniqueId,
-      },
-    });
-  },
-
   //returns true if the timestamps available for the variable
   //and the timestamps available for the comparand match
   timesMatch: function (vTimes = this.state.variableTimes, cTimes = this.state.comparandTimes) {
@@ -223,7 +213,7 @@ var MapController = createReactClass({
       }
 
     for(var i = 0; i < datasets.length; i++) {
-      timesPromises.push(this.requestTimeMetadata(datasets[i].unique_id));
+      timesPromises.push(getTimeMetadata(datasets[i].unique_id));
     }
 
     Promise.all(timesPromises).then(responses => {
