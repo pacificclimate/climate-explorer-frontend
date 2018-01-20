@@ -31,7 +31,7 @@ var g = {
   },
 
   toWKT: function () {
-    return stringify(this.feature);
+    return this.feature ? stringify(this.feature) : undefined;
   },
 
   kml: function (k) {
@@ -134,5 +134,6 @@ var g = {
   },
 
 };
+
 
 module.exports = g;
