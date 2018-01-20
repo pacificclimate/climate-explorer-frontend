@@ -6,6 +6,7 @@ import MapController from '../MapController';
 import MotiDataController from '../MotiDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
+import g from "../../core/geo";
 
 
 var App = createReactClass({
@@ -48,6 +49,7 @@ var App = createReactClass({
             <div>
               <MapController
                 meta = {this.getfilteredMeta()}
+                area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
             </div>
@@ -57,7 +59,7 @@ var App = createReactClass({
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
-              area={this.state.area}
+              area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
             />
           </Col>

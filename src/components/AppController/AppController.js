@@ -17,6 +17,7 @@ import MapController from '../MapController';
 import DataController from '../DataController/DataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
+import g from '../../core/geo';
 
 var App = createReactClass({
   displayName: 'App',
@@ -61,14 +62,19 @@ var App = createReactClass({
             <div>
               <MapController
                 meta = {this.getfilteredMeta()}
+                area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
             </div>
           </Col>
           <Col lg={6}>
             <DataController
-              // ensemble_name, model_id, variable_id, experiment, area
-              {...this.state}
+              ensemble_name={this.state.ensemble_name}
+              model_id={this.state.model_id}
+              variable_id={this.state.variable_id}
+              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
+              experiment={this.state.experiment}
+              area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
             />
           </Col>

@@ -34,7 +34,6 @@ import { CanadaMap } from '../Map/CanadaMap';
 import Selector from '../Selector/Selector';
 import GeoExporter from '../GeoExporter';
 import GeoLoader from '../GeoLoader';
-import g from '../../core/geo';
 import ModalMixin from '../ModalMixin';
 import { timestampToTimeOfYear,
          nestedAttributeIsDefined,
@@ -53,6 +52,7 @@ var MapController = createReactClass({
   propTypes: {
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
+    area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   },
 
@@ -326,13 +326,6 @@ var MapController = createReactClass({
   //uses the same dataset settings.
   updateDataset: function (dataset) {
     this.loadMap(this.props, JSON.parse(dataset));
-  },
-
-  //Passes an area selected by the user on the map up to MapController's
-  //parent, to calculate numeric informtion about the area.
-  handleSetArea: function (geojson) {
-    this.setState({ area: geojson });
-    this.props.onSetArea(geojson ? g.geojson(geojson).toWKT() : undefined);
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
@@ -688,8 +681,8 @@ var MapController = createReactClass({
           time={this.state.variableWmsTime}
           rasterTime={this.state.variableWmsTime}
           isolineTime={this.state.comparandWmsTime}
-          onSetArea={this.handleSetArea}
-          area={this.state.area}
+          onSetArea={this.props.onSetArea}
+          area={this.props.area}
           updateMinmax={this.updateLayerMinmax}
           // oldschool
         />
@@ -734,8 +727,8 @@ var MapController = createReactClass({
               <div className={styles.controls}>
                 <ButtonGroup vertical>
                   <Button onClick={this.open} title='Map Settings'><Glyphicon glyph='menu-hamburger' /></Button>
-                  <GeoExporter.Modal area={this.state.area} title='Export polygon' />
-                  <GeoLoader onLoadArea={this.handleSetArea} title='Import polygon' />
+                  <GeoExporter.Modal area={this.props.area} title='Export polygon' />
+                  <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
                 </ButtonGroup>
               </div>
               <div className={styles.footer}>

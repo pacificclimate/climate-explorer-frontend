@@ -24,6 +24,7 @@ import MapController from '../MapController';
 import DualDataController from '../DualDataController/DualDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
+import g from '../../core/geo';
 
 var App = createReactClass({
   displayName: 'App',
@@ -64,7 +65,7 @@ var App = createReactClass({
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
     var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
         this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
- 
+
     return (
       <Grid fluid>
         <Row>
@@ -87,6 +88,7 @@ var App = createReactClass({
               <MapController
                 meta = {this.getfilteredMeta()}
                 comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}
+                area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
             </div>
@@ -98,7 +100,7 @@ var App = createReactClass({
               variable_id={this.state.variable_id}
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
-              area={this.state.area}
+              area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
               comparandMeta = {this.state.comparand_id ? this.getfilteredMeta(this.state.comparand_id) : this.getfilteredMeta()}
             />
