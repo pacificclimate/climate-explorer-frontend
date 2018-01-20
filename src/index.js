@@ -29,7 +29,7 @@ class App extends React.Component {
   }
 }
 
-const test = true;
+const test = !!process.env.CE_TEST_APP;
 
 if (test) {
   render((
