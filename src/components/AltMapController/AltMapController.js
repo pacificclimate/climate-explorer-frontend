@@ -222,6 +222,8 @@ class AltMapController extends React.Component {
     });
   }
 
+  // Handlers for dataset change
+
   updateDataset = (encodedDataset) => {
     // FIXME: This is bad! See TODO in DatasetSelector
     // const { start_date, end_date, ensemble_member } = JSON.parse(encodedDataset);
@@ -257,6 +259,33 @@ class AltMapController extends React.Component {
       isolineDatasetId: this.getDatasetId('comparand', this.props.comparandMeta, this.state.comparandTimeIdx),
     };
   }
+
+  // Handlers for time selection change
+
+  updateTime(symbol, timeidx) {
+    // update the timestamp in state
+    // timeidx is a stringified object with a resolution  (monthly, annual, seasonal)
+    // and an index denoting the timestamp's position with the file
+    // symbol is either "variable" or "comparand"
+    var update = {};
+    update[`${symbol}TimeIdx`] = timeidx;
+    update[`${symbol}WmsTime`] = this.state[`${symbol}Times`][timeidx];
+
+    // if the user has set the variable and comparand to match times,
+    // update the comparand too
+    if(this.hasValidData("comparand") &&
+      this.state.linkTimes &&
+      symbol == "variable") {
+      update.comparandTimeIdx = timeidx;
+      update.comparandWmsTime = this.state.comparandTimes[timeidx];
+    }
+    this.setState(update);
+  }
+
+  handleChangeVariableTime = this.updateTime.bind(this, 'variable');
+  handleChangeComparandTime = this.updateTime.bind(this, 'comparand');
+
+  // React lifecycle event handlers
 
   componentWillReceiveProps(nextProps) {
     // Load initial map, based on a list of available data files passed
@@ -373,11 +402,11 @@ class AltMapController extends React.Component {
                   onDatasetChange={this.updateDataset}
                   variableTimes={this.state.variableTimes}
                   variableTimeIdx={this.state.variableTimeIdx}
-                  onChangeVariableTime={() => alert('onChangeVariableTime')}
+                  onChangeVariableTime={this.handleChangeVariableTime}
                   hasComparand={this.hasComparand()}
                   comparandTimes={this.state.comparandTimes}
                   comparandTimeIdx={this.state.comparandTimeIdx}
-                  onChangeComparandTime={() => alert('onChangeComparandTime')}
+                  onChangeComparandTime={this.handleChangeComparandTime}
                 />
               </StaticControl>
 
