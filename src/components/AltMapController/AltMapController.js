@@ -1,4 +1,5 @@
 /* eslint-disable no-trailing-spaces */
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
@@ -14,6 +15,7 @@ import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
 import { getTimeMetadata } from '../../data-services/metadata';
+import { getVariableOptions } from '../../core/util';
 
 
 // This class is the counterpart of MapController and will ultimately become
@@ -30,26 +32,25 @@ class AltMapController extends React.Component {
   constructor(props) {
     super(props);
 
-    // Set up test state.
     this.state = {
-      run: 'r1i1p1',
-      start_date: '1950',
-      end_date: '2100',
+      run: undefined,
+      start_date: undefined,
+      end_date: undefined,
 
-      variable: 'tasmax',
-      variableTimes: { '{"timescale": "foo"}': '1977-07-02T00:00:00Z' },
-      variableTimeIdx: '{"timescale": "foo"}', // ??
-      variableWmsTime: '1977-07-02T00:00:00Z',
+      variable: undefined,
+      variableTimes: undefined,
+      variableTimeIdx: undefined,
+      variableWmsTime: undefined,
 
       comparand: undefined,
       comparandTimes: undefined,
       comparandTimeIdx: undefined,
       comparandWmsTime: undefined,
 
-      rasterLogscale: false,
+      rasterLogscale: 'false',
       rasterPalette: 'x-Occam',
 
-      isolineLogscale: false,
+      isolineLogscale: 'false',
       isolinePalette: undefined,
       numberOfContours: 10,
     };
@@ -57,7 +58,7 @@ class AltMapController extends React.Component {
 
   // TODO: Extract to a utility module?
   hasValidData(symbol, props = this.props) {
-    var dataLocation = symbol == "variable" ? "meta" : "comparandMeta";
+    var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
 
     return !_.isUndefined(props[dataLocation]) &&
       props[dataLocation].length > 0;
@@ -82,9 +83,9 @@ class AltMapController extends React.Component {
     // });
   }
 
-  //returns true if the timestamps available for the variable
-  //and the timestamps available for the comparand match
   timesMatch(vTimes = this.state.variableTimes, cTimes = this.state.comparandTimes) {
+    // Returns true if the timestamps available for the variable
+    // and the timestamps available for the comparand match
     return !_.isUndefined(vTimes) &&
       !_.isUndefined(cTimes) &&
       _.isEqual(vTimes, cTimes);
@@ -113,6 +114,8 @@ class AltMapController extends React.Component {
     // var start_date = dataset.start_date;
     // var end_date = dataset.end_date;
     const { start_date, end_date, ensemble_member } = dataset;
+    // TODO: Remove console.log
+    console.log('loadMap', dataset);
 
     // generate the list of available times for one or two variable+run+period combinations.
     // which may include multiple files of different time resolutions
@@ -132,10 +135,11 @@ class AltMapController extends React.Component {
     //   timesPromises.push(this.requestTimeMetadata(datasets[i].unique_id));
     // }
 
-    let variableTimes = {};
-    let comparandTimes = {};
-
     Promise.all(timesPromises).then(responses => {
+      console.log('loadMap: timesPromises responses', responses)
+      let variableTimes = {};
+      let comparandTimes = {};
+
       for (let i = 0; i < responses.length; i++) {
         let id = Object.keys(responses[i].data)[0];
         for (let timeidx in responses[i].data[id].times) {
@@ -146,22 +150,27 @@ class AltMapController extends React.Component {
 
           // This assumes only one variable per file.
           const variable = Object.keys(responses[i].data[id].variables)[0];
-          if (variable == props.meta[0].variable_id) {
+          if (variable === props.meta[0].variable_id) {
             variableTimes[idxString] = responses[i].data[id].times[timeidx];
           }
           if (this.hasValidData('comparand', props) &&
-            variable == props.comparandMeta[0].variable_id
+            variable === props.comparandMeta[0].variable_id
           ) {
             comparandTimes[idxString] = responses[i].data[id].times[timeidx];
           }
         }
       }
+      // TODO: Remove console.log
+      console.log('loadMap: timesPromises variableTimes', variableTimes)
+      console.log('loadMap: timesPromises comparandTimes', comparandTimes)
 
       // select a 0th index to display initially. It could be January,
       // Winter, or Annual - there's no guarentee any given dataset
       // will have monthly, seasonal, or yearly data available, but it
       // will have at least one of them.
-      const is0thIndex = timestamp => JSON.parse(timestamp).timeidx == 0;
+
+      // Warning: Weirdness: If `===` comparison is used, the `_.find` fails.
+      const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
 
       const variableStartingIndex = _.find(Object.keys(variableTimes), is0thIndex);
       const comparandStartingIndex = _.find(Object.keys(comparandTimes), is0thIndex);
@@ -173,6 +182,25 @@ class AltMapController extends React.Component {
 
       const linkTimes = this.timesMatch(variableTimes, comparandTimes);
 
+      // TODO: Remove console.log
+      console.log('loadMap: setState', {
+        variable,
+        comparand,
+        run: ensemble_member,
+        start_date,
+        end_date,
+        variableTimes,
+        variableTimeIdx: variableStartingIndex,
+        variableWmsTime: variableTimes[variableStartingIndex],
+        comparandTimes,
+        comparandTimeIdx: comparandStartingIndex,
+        comparandWmsTime: comparandTimes[comparandStartingIndex],
+        linkTimes,
+        rasterPalette,
+        isolinePalette,
+        rasterLogscale: newVariable ? "false" : this.state.rasterLogscale,
+        isolineLogscale: newComparand ? "false" : this.state.isolineLogscale,
+      })
       this.setState({
         variable,
         comparand,
@@ -194,16 +222,118 @@ class AltMapController extends React.Component {
     });
   }
 
-  updateDataset = (dataset) => {
+  updateDataset = (encodedDataset) => {
     // FIXME: This is bad! See TODO in DatasetSelector
-    // const { start_date, end_date, ensemble_member } = JSON.parse(dataset);
+    // const { start_date, end_date, ensemble_member } = JSON.parse(encodedDataset);
     // this.setState({ start_date, end_date, run: ensemble_member });
-    this.loadMap(this.props, JSON.parse(dataset));
+    console.log('updateDataset', encodedDataset);
+    this.loadMap(this.props, JSON.parse(encodedDataset));
   };
+  
+  getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
+    console.log('getDatasetId', varSymbol, varMeta, encodedVarTimeIdx);
+    let dataset = undefined;
+    if (encodedVarTimeIdx) {
+      if (this.hasValidData(varSymbol)) {
+        const timeIndex = JSON.parse(encodedVarTimeIdx);
+        dataset = _.findWhere(varMeta, {
+          ensemble_member: this.state.run,
+          start_date: this.state.start_date,
+          end_date: this.state.end_date,
+          timescale: timeIndex.timescale,
+        });
+      }
+    }
+    // isolineDataset may not exist if generating a map for a
+    // single-variable portal
+    return dataset && dataset.unique_id;
+  }
+  
+  getDatasetIds() {
+    // const rasterDatasetID = 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada';
+    // const isolineDatasetID = undefined;
+    return {
+      rasterDatasetId: this.getDatasetId('variable', this.props.meta, this.state.variableTimeIdx),
+      isolineDatasetId: this.getDatasetId('comparand', this.props.comparandMeta, this.state.comparandTimeIdx),
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // Load initial map, based on a list of available data files passed
+    // as props from its parent
+    // the first dataset representing a 0th time index (January, Winter, or Annual)
+    // will be displayed.
+
+    if (this.hasValidData('variable', nextProps)) {
+      var newVariableId = nextProps.meta[0].variable_id;
+      var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
+      var hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+      if (hasComparand) {
+        var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
+        var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+      }
+      var defaultDataset = nextProps.meta[0];
+      this.layerRange = {};
+
+      // clear stored layer value ranges.
+      _.each(['raster', 'isoline'], layer => {
+        this.layerRange[layer] = undefined;
+      });
+
+      // check to see whether the variables displayed have been switched.
+      // if so, unset logarithmic display; default is linear.
+      var switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
+
+      // set display colours. In order of preference:
+      // 1. colours received by prop
+      // 2. colours from state (set by the user or this function previously)
+      // 3. colours specified in variables.yaml, if applicable (raster only)
+      // 4. defaults (raster rainbow if a single dataset,
+      //             raster greyscale and isolines rainbow for 2)
+      var sPalette, cPalette;
+      if (nextProps.rasterPalette) {
+        sPalette = nextProps.rasterPalette;
+        cPalette = nextProps.isolinePalette;
+      } else if (this.state.rasterPalette && !switchVariable) {
+        sPalette = this.state.rasterPalette;
+        cPalette = this.state.isolinePalette;
+      } else if (!_.isUndefined(getVariableOptions(newVariableId, 'defaultRasterPalette'))) {
+        sPalette = getVariableOptions(newVariableId, 'defaultRasterPalette');
+        if (this.hasValidData('comparand', nextProps)) {
+          cPalette = 'x-Occam';
+        }
+      } else if (this.hasValidData('comparand', nextProps)) {
+        sPalette = 'seq-Greys';
+        cPalette = 'x-Occam';
+      } else {
+        sPalette = 'x-Occam';
+      }
+
+      this.loadMap(nextProps, defaultDataset, sPalette, cPalette, switchVariable, switchComparand);
+    } else {
+      // haven't received any displayable data. Probably means user has selected
+      // parameters for a dataset that isn't in the database.
+      // Clear the map to prevent the previously-generated map causing confusion
+      // if the user doesn't notice the footer.
+      this.setState({
+        variableTimes: undefined,
+        variableTimeIdx: undefined,
+        comparandTimes: undefined,
+        comparandTimeIdx: undefined
+      });
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // This guards against re-rendering before we have required data
+    return !_.isEqual(nextState, this.state);
+  }
+
 
   render() {
-    const rasterDatasetID = 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada';
-    const isolineDatasetID = undefined;
+    console.log('AltMapController', this.props.meta);
+    const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
 
     return (
       <div style={{ width: 800, height: 600 }}>
@@ -212,11 +342,11 @@ class AltMapController extends React.Component {
             <DataMap
               rasterLogscale={this.state.rasterLogscale}
               rasterPalette={this.state.rasterPalette}
-              rasterDataset={rasterDatasetID}
+              rasterDataset={rasterDatasetId}
               rasterVariable={this.state.variable}
               isolineLogscale={this.state.isolineLogscale}
               isolinePalette={this.state.isolinePalette}
-              isolineDataset={isolineDatasetID}
+              isolineDataset={isolineDatasetId}
               isolineVariable={this.state.comparand}
               numberOfContours={this.state.numberOfContours}
               time={this.state.variableWmsTime}
