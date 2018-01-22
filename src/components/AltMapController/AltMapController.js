@@ -56,7 +56,6 @@ class AltMapController extends React.Component {
     };
   }
 
-  // TODO: Extract to a utility module?
   hasValidData(symbol, props = this.props) {
     var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
 
@@ -101,9 +100,9 @@ class AltMapController extends React.Component {
   ) {
     // update state with all the information needed to display
     // maps for specific datasets.
-    // a "dataset" in this case is not a specific file. It is a
+    // a 'dataset' in this case is not a specific file. It is a
     // variable + emissions + model + period + run combination. Timestamps for
-    // a "dataset" may be spread across up to three files (one annual, one
+    // a 'dataset' may be spread across up to three files (one annual, one
     // seasonal, one monthly). MapController stores the parameters of the dataset
     // in state, but doesn't select (or store in state) a specific file with a
     // specific unique_id until rendering, when it needs to pass an exact file
@@ -198,8 +197,8 @@ class AltMapController extends React.Component {
         linkTimes,
         rasterPalette,
         isolinePalette,
-        rasterLogscale: newVariable ? "false" : this.state.rasterLogscale,
-        isolineLogscale: newComparand ? "false" : this.state.isolineLogscale,
+        rasterLogscale: newVariable ? 'false' : this.state.rasterLogscale,
+        isolineLogscale: newComparand ? 'false' : this.state.isolineLogscale,
       })
       this.setState({
         variable,
@@ -216,8 +215,8 @@ class AltMapController extends React.Component {
         linkTimes,
         rasterPalette,
         isolinePalette,
-        rasterLogscale: newVariable ? "false" : this.state.rasterLogscale,
-        isolineLogscale: newComparand ? "false" : this.state.isolineLogscale,
+        rasterLogscale: newVariable ? 'false' : this.state.rasterLogscale,
+        isolineLogscale: newComparand ? 'false' : this.state.isolineLogscale,
       });
     });
   }
@@ -226,9 +225,6 @@ class AltMapController extends React.Component {
 
   updateDataset = (encodedDataset) => {
     // FIXME: This is bad! See TODO in DatasetSelector
-    // const { start_date, end_date, ensemble_member } = JSON.parse(encodedDataset);
-    // this.setState({ start_date, end_date, run: ensemble_member });
-    console.log('updateDataset', encodedDataset);
     this.loadMap(this.props, JSON.parse(encodedDataset));
   };
   
@@ -255,8 +251,10 @@ class AltMapController extends React.Component {
     // const rasterDatasetID = 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada';
     // const isolineDatasetID = undefined;
     return {
-      rasterDatasetId: this.getDatasetId('variable', this.props.meta, this.state.variableTimeIdx),
-      isolineDatasetId: this.getDatasetId('comparand', this.props.comparandMeta, this.state.comparandTimeIdx),
+      rasterDatasetId: this.getDatasetId(
+        'variable', this.props.meta, this.state.variableTimeIdx),
+      isolineDatasetId: this.getDatasetId(
+        'comparand', this.props.comparandMeta, this.state.comparandTimeIdx),
     };
   }
 
@@ -266,16 +264,17 @@ class AltMapController extends React.Component {
     // update the timestamp in state
     // timeidx is a stringified object with a resolution  (monthly, annual, seasonal)
     // and an index denoting the timestamp's position with the file
-    // symbol is either "variable" or "comparand"
+    // symbol is either 'variable' or 'comparand'
     var update = {};
     update[`${symbol}TimeIdx`] = timeidx;
     update[`${symbol}WmsTime`] = this.state[`${symbol}Times`][timeidx];
 
     // if the user has set the variable and comparand to match times,
     // update the comparand too
-    if(this.hasValidData("comparand") &&
-      this.state.linkTimes &&
-      symbol == "variable") {
+    if (this.hasValidData('comparand') &&
+        this.state.linkTimes &&
+        symbol === 'variable'
+    ) {
       update.comparandTimeIdx = timeidx;
       update.comparandWmsTime = this.state.comparandTimes[timeidx];
     }
@@ -294,12 +293,14 @@ class AltMapController extends React.Component {
     // will be displayed.
 
     if (this.hasValidData('variable', nextProps)) {
-      var newVariableId = nextProps.meta[0].variable_id;
-      var oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
-      var hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+      // TODO: DRY this up
+      const newVariableId = nextProps.meta[0].variable_id;
+      const oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
+      const hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+      let newComparandId, oldComparandId;
       if (hasComparand) {
-        var newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
-        var oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+        newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
+        oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
       }
       var defaultDataset = nextProps.meta[0];
       this.layerRange = {};
