@@ -23,7 +23,7 @@ class MapFooter extends React.Component {
   render() {
     const dataset = `${this.props.start_date}-${this.props.end_date}`;
     let resolution = _.invert(this.props.variableTimes)[this.props.variableWmsTime];
-    resolution = JSON.parse(resolution).timescale;
+    resolution = resolution && JSON.parse(resolution).timescale;
     const times = _.values(this.props.variableTimes);
     const disambiguateYears = !sameYear(_.first(times), _.last(times));
     const vTime = timestampToTimeOfYear(this.props.variableWmsTime, resolution, disambiguateYears);
