@@ -26,6 +26,12 @@ export default class MapSettings extends React.Component {
     comparandTimes: PropTypes.object,
     comparandTimeIdx: PropTypes.string,
     onChangeComparandTime: PropTypes.func.isRequired, // required???
+
+    rasterPalette: PropTypes.string,
+    onChangeRasterPalette: PropTypes.func.isRequired,
+
+    isolinePalette: PropTypes.string,
+    onChangeIsolinePalette: PropTypes.func.isRequired, // required???
   };
 
   constructor(props) {
@@ -69,6 +75,8 @@ export default class MapSettings extends React.Component {
                 times={this.props.variableTimes}
                 timeIdx={this.props.variableTimeIdx}
                 onChangeTime={this.props.onChangeVariableTime}
+                palette={this.props.rasterPalette}
+                onChangePalette={this.props.onChangeRasterPalette}
               />
             </Col>
             {
@@ -89,6 +97,8 @@ export default class MapSettings extends React.Component {
                   times={this.props.comparandTimes}
                   timeIdx={this.props.comparandTimeIdx}
                   onChangeTime={this.props.onChangeComparandTime}
+                  palette={this.props.isolinePalette}
+                  onChangePalette={this.props.onChangeIsolinePalette}
                 />
               </Col>
             }

@@ -56,6 +56,8 @@ class AltMapController extends React.Component {
     };
   }
 
+  // Support functions
+  
   hasValidData(symbol, props = this.props) {
     var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
 
@@ -89,6 +91,8 @@ class AltMapController extends React.Component {
       !_.isUndefined(cTimes) &&
       _.isEqual(vTimes, cTimes);
   }
+  
+  // Support functions for event/callback handlers
 
   loadMap(
     props,
@@ -221,6 +225,12 @@ class AltMapController extends React.Component {
     });
   }
 
+  updateSelection(param, selection) {
+    // Handles user selection of all the straightforward
+    // parameters like logscale or palette.
+    this.setState({ [param]: selection });
+  }
+
   // Handlers for dataset change
 
   updateDataset = (encodedDataset) => {
@@ -283,6 +293,11 @@ class AltMapController extends React.Component {
 
   handleChangeVariableTime = this.updateTime.bind(this, 'variable');
   handleChangeComparandTime = this.updateTime.bind(this, 'comparand');
+
+  // Handlers for palette change
+
+  handleChangeRasterPalette = this.updateSelection.bind(this, 'rasterPalette');
+  handleChangeIsolinePalette = this.updateSelection.bind(this, 'isolinePalette');
 
   // React lifecycle event handlers
 
@@ -408,6 +423,10 @@ class AltMapController extends React.Component {
                   comparandTimes={this.state.comparandTimes}
                   comparandTimeIdx={this.state.comparandTimeIdx}
                   onChangeComparandTime={this.handleChangeComparandTime}
+                  rasterPalette={this.state.rasterPalette}
+                  onChangeRasterPalette={this.handleChangeRasterPalette}
+                  isolinePalette={this.state.isolinePalette}
+                  onChangeIsolinePalette={this.handleChangeIsolinePalette}
                 />
               </StaticControl>
 

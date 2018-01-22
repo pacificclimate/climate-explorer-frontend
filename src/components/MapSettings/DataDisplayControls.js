@@ -14,6 +14,8 @@ export default class DataDisplayControls extends React.Component {
     times: PropTypes.object,
     timeIdx: PropTypes.string,
     onChangeTime: PropTypes.func.isRequired,
+    palette: PropTypes.string,
+    onChangePalette: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -35,6 +37,8 @@ export default class DataDisplayControls extends React.Component {
         />
         <PaletteSelector
           name={this.props.name}
+          value={this.props.palette}
+          onChange={this.props.onChangePalette}
         />
         <ScaleSelector
           name={this.props.name}
