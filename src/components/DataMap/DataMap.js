@@ -62,13 +62,13 @@ class DataMap extends React.Component {
     rasterDataset: PropTypes.string,
     rasterVariable: PropTypes.string,
     rasterPalette: PropTypes.string,
-    rasterLogscale: PropTypes.bool,
+    rasterLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
 
     isolineDataset: PropTypes.string,
     isolineVariable: PropTypes.string,
     isolinePalette: PropTypes.string,
     numberOfContours: PropTypes.number,
-    isolineLogscale: PropTypes.bool,
+    isolineLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
 
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
@@ -182,6 +182,13 @@ class DataMap extends React.Component {
     // (raster, isoline, or both).
     // A colour bar is created added for each layer present.
     // The autoscale control is always created and is registered to each layer present.
+
+    // Don't try to add controls if there's no map.
+    // This isn't really necessary if everything is working, but it guards
+    // against stupid or unexpected.
+    if (!this.map) {
+      return;
+    }
     
     // Create and register controls to layer(s)
     const rasterBar = rasterLayer &&
@@ -203,7 +210,7 @@ class DataMap extends React.Component {
       this.map.addControl(rasterBar);
       this.map.addControl(autoscale);
       this.map.addControl(isolineBar);
-    } else {
+    } else if (rasterBar || isolineBar) {
       this.map.addControl(rasterBar || isolineBar);
       this.map.addControl(autoscale);
     }
