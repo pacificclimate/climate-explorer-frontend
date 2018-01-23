@@ -461,7 +461,7 @@ class AltMapController extends React.Component {
 
                   isolineLayerMin={this.state.isolineRange.min}
                   isolineLogscale={this.state.isolineLogscale}
-                  onChangeRasterScale={this.handleChangeRasterScale}
+                  onChangeIsolineScale={this.handleChangeIsolineScale}
                 />
               </StaticControl>
 
