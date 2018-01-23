@@ -226,12 +226,12 @@ class AltMapController extends React.Component {
     });
   }
 
-  // TODO: Rename more generically (it's not just for selections)
-  updateSelection(param, selection) {
-    // Handles user selection of all the straightforward
-    // parameters like logscale or palette.
-    console.log('updateSelection', param, selection)
-    this.setState({ [param]: selection });
+  updateSingleState(name, value) {
+    // Sets a single state property.
+    // Typical usage is to bind `this` and `name` and use the resulting
+    // function as a callback handler:
+    //    handleChangeAState = this.updateSingleState.bind(this, 'aState');
+    this.setState({ [name]: value });
   }
 
   // Handlers for dataset change
@@ -299,13 +299,13 @@ class AltMapController extends React.Component {
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = this.updateSelection.bind(this, 'rasterPalette');
-  handleChangeIsolinePalette = this.updateSelection.bind(this, 'isolinePalette');
+  handleChangeRasterPalette = this.updateSingleState.bind(this, 'rasterPalette');
+  handleChangeIsolinePalette = this.updateSingleState.bind(this, 'isolinePalette');
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = this.updateSelection.bind(this, 'rasterRange');
-  handleChangeIsolineRange = this.updateSelection.bind(this, 'isolineRange');
+  handleChangeRasterRange = this.updateSingleState.bind(this, 'rasterRange');
+  handleChangeIsolineRange = this.updateSingleState.bind(this, 'isolineRange');
 
   // Handlers for scale change
 
@@ -314,8 +314,8 @@ class AltMapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = this.updateSelection.bind(this, 'rasterLogscale');
-  handleChangeIsolineScale = this.updateSelection.bind(this, 'isolineLogscale');
+  handleChangeRasterScale = this.updateSingleState.bind(this, 'rasterLogscale');
+  handleChangeIsolineScale = this.updateSingleState.bind(this, 'isolineLogscale');
 
   // React lifecycle event handlers
 
