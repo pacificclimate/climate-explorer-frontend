@@ -146,9 +146,7 @@ class DataMap extends React.Component {
     }
   };
 
-  // Handlers for area selection.
-  // TODO: Promote area components and handlers up a level when confirmed that
-  // area is not used at this level.
+  // Handlers for area selection. Converts area to GeoJSON.
 
   handleAreaCreatedOrEdited = (e) => {
     const area = e.layer.toGeoJSON();
@@ -156,7 +154,7 @@ class DataMap extends React.Component {
     this.props.onSetArea(area);
   };
 
-  handleAreaDeleted = (e) => {
+  handleAreaDeleted = () => {
     this.props.onSetArea(undefined);
   };
 
