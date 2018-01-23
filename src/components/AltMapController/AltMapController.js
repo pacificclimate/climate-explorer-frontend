@@ -416,7 +416,6 @@ class AltMapController extends React.Component {
               isolineRange={this.state.isolineRange}
               onChangeIsolineRange={this.handleChangeIsolineRange}
 
-              time={this.state.variableWmsTime}  // TODO: what is this??? Remove, I think!
               rasterTime={this.state.variableWmsTime}
               isolineTime={this.state.comparandWmsTime}
 
