@@ -10,12 +10,19 @@ import ScaleSelector from './ScaleSelector';
 export default class DataDisplayControls extends React.Component {
   static propTypes = {
     name: PropTypes.string, // 'Raster' | 'Isoline'
-    disabled: PropTypes.bool,
+    disabled: PropTypes.bool,  // is this the whole selector or just time?
+
     times: PropTypes.object,
     timeIdx: PropTypes.string,
     onChangeTime: PropTypes.func.isRequired,
+
     palette: PropTypes.string,
     onChangePalette: PropTypes.func.isRequired,
+
+    variableId: PropTypes.string,
+    layerMin: PropTypes.number,
+    logscale: PropTypes.string,
+    onChangeScale: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -42,6 +49,10 @@ export default class DataDisplayControls extends React.Component {
         />
         <ScaleSelector
           name={this.props.name}
+          variableId={this.props.variableId}
+          layerMin={this.props.layerMin}
+          value={this.props.logscale}
+          onChange={this.props.onChangeScale}
         />
       </div>
     );

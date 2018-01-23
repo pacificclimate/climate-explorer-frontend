@@ -14,6 +14,7 @@ export default class MapSettings extends React.Component {
     title: PropTypes.string,
     // TODO: Refactor according to comments in DatasetSelector
     meta: PropTypes.array,
+    comparandMeta: PropTypes.array,
 
     dataset: PropTypes.string,  // current dataset selection, encoded as JSON string
     onDatasetChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
@@ -32,6 +33,14 @@ export default class MapSettings extends React.Component {
 
     isolinePalette: PropTypes.string,
     onChangeIsolinePalette: PropTypes.func.isRequired, // required???
+
+    rasterLayerMin: PropTypes.number,
+    rasterLogscale: PropTypes.string,
+    onChangeRasterScale: PropTypes.func.isRequired,
+
+    isolineLayerMin: PropTypes.number,
+    isolineLogscale: PropTypes.string,
+    onChangeIsolineScale: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -40,6 +49,18 @@ export default class MapSettings extends React.Component {
     this.state = {
       linkTimes: false,  // Under control of LinkControls
     };
+  }
+
+  variableId(meta) {
+    return meta.length > 0 && meta[0].variable_id;
+  }
+
+  rasterVariableId() {
+    return this.variableId(this.props.meta);
+  }
+
+  isolineVariableId() {
+    return this.variableId(this.props.comparandMeta);
   }
 
   handleLinkTimes = linkTimes => this.setState({ linkTimes });
@@ -77,6 +98,10 @@ export default class MapSettings extends React.Component {
                 onChangeTime={this.props.onChangeVariableTime}
                 palette={this.props.rasterPalette}
                 onChangePalette={this.props.onChangeRasterPalette}
+                variableId={this.rasterVariableId()}
+                layerMin={this.props.rasterLayerMin}
+                logscale={this.props.rasterLogscale}
+                onChangeScale={this.props.onChangeRasterScale}
               />
             </Col>
             {
@@ -99,6 +124,9 @@ export default class MapSettings extends React.Component {
                   onChangeTime={this.props.onChangeComparandTime}
                   palette={this.props.isolinePalette}
                   onChangePalette={this.props.onChangeIsolinePalette}
+                  layerMin={this.props.isolineLayerMin}
+                  logscale={this.props.isolineLogscale}
+                  onChangeScale={this.props.onChangeIsolineScale}
                 />
               </Col>
             }
