@@ -11,23 +11,9 @@ import './DataMap.css';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 import { getLayerMinMax, getWMSParams } from '../../data-services/ncwms';
+import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
-
-
-// TODO: Probably better located in a leaflet-utils module
-function makeHandleLeafletRef(name, leafletAction = () => {}) {
-  // Return a handler that sets this[name] to the leaflet element of the component,
-  // then calls an optional action function on that leaflet element.
-  return function (c) {
-    console.log('handleLeafletRef:', name);
-    if (c) {
-      let leafletElement = c.leafletElement;
-      this[name] = leafletElement;
-      leafletAction(leafletElement);
-    }
-  };
-}
 
 
 class DataMap extends React.Component {
