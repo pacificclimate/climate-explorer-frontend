@@ -28,9 +28,9 @@ class DataMap extends React.Component {
   //    enormously.
 
   static propTypes = {
-    // TODO: Add props checking for rasterTime, isolineTime
     rasterDataset: PropTypes.string,
     rasterVariable: PropTypes.string,
+    rasterTime: PropTypes.string,
     rasterPalette: PropTypes.string,
     rasterLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
     rasterRange: PropTypes.object,
@@ -38,6 +38,7 @@ class DataMap extends React.Component {
 
     isolineDataset: PropTypes.string,
     isolineVariable: PropTypes.string,
+    isolineTime: PropTypes.string,
     isolinePalette: PropTypes.string,
     numberOfContours: PropTypes.number,
     isolineLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
