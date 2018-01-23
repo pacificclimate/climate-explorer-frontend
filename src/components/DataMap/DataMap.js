@@ -2,9 +2,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
-
-import { WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
+import { FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -14,6 +12,7 @@ import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 import { getLayerMinMax, getWMSParams } from '../../data-services/ncwms';
 import CanadaBaseMap from '../CanadaBaseMap';
+import DataLayer from './DataLayer';
 
 
 // TODO: Probably better located in a leaflet-utils module
@@ -28,24 +27,6 @@ function makeHandleLeafletRef(name, leafletAction = () => {}) {
       leafletAction(leafletElement);
     }
   };
-}
-
-
-// TODO: Extract to separate module
-function DataLayer(props) {
-  console.log('DataLayer', props);
-  const { dataset, onLayerRef, onNoLayer, ...wmsParams } = props;
-  if (dataset) {
-    return (
-      <WMSTileLayer
-        url={NCWMS_URL}
-        {...wmsParams}
-        ref={onLayerRef}
-      />
-    );
-  }
-  onNoLayer();
-  return null;
 }
 
 
