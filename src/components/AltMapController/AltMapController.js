@@ -53,6 +53,9 @@ class AltMapController extends React.Component {
       isolineLogscale: 'false',
       isolinePalette: undefined,
       numberOfContours: 10,
+
+      rasterRange: {},
+      isolineRange: {},
     };
   }
 
@@ -68,8 +71,6 @@ class AltMapController extends React.Component {
   hasComparand() {
     return this.hasValidData('comparand');
   }
-
-  updateLayerMinmax = () => {};
 
   currentDataset() {
     // Return encoding of currently selected dataset
@@ -225,9 +226,11 @@ class AltMapController extends React.Component {
     });
   }
 
+  // TODO: Rename more generically (it's not just for selections)
   updateSelection(param, selection) {
     // Handles user selection of all the straightforward
     // parameters like logscale or palette.
+    console.log('updateSelection', param, selection)
     this.setState({ [param]: selection });
   }
 
@@ -299,6 +302,21 @@ class AltMapController extends React.Component {
   handleChangeRasterPalette = this.updateSelection.bind(this, 'rasterPalette');
   handleChangeIsolinePalette = this.updateSelection.bind(this, 'isolinePalette');
 
+  // Handlers for layer range change
+
+  handleChangeRasterRange = this.updateSelection.bind(this, 'rasterRange');
+  handleChangeIsolineRange = this.updateSelection.bind(this, 'isolineRange');
+
+  // Handlers for scale change
+
+  // TODO: Naming and values inherited from original code are inconsistent;
+  // "scale" and "logscale" are actually synonyms right now for a boolean
+  // (represented by a string, argh), but "scale" logically could refer to a
+  // value selected from a list of values (which is currently limited to
+  // "linear", "logscale", hence the boolean). Fix this.
+  handleChangeRasterScale = this.updateSelection.bind(this, 'rasterLogscale');
+  handleChangeIsolineScale = this.updateSelection.bind(this, 'isolineLogscale');
+
   // React lifecycle event handlers
 
   componentWillReceiveProps(nextProps) {
@@ -318,12 +336,6 @@ class AltMapController extends React.Component {
         oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
       }
       var defaultDataset = nextProps.meta[0];
-      this.layerRange = {};
-
-      // clear stored layer value ranges.
-      _.each(['raster', 'isoline'], layer => {
-        this.layerRange[layer] = undefined;
-      });
 
       // check to see whether the variables displayed have been switched.
       // if so, unset logarithmic display; default is linear.
@@ -382,24 +394,34 @@ class AltMapController extends React.Component {
 
     return (
       <div style={{ width: 800, height: 600 }}>
+        <div>
+          <p>rasterRange {JSON.stringify(this.state.rasterRange)}</p>
+          <p>isolineRange {JSON.stringify(this.state.isolineRange)}</p>
+        </div>
         {
           this.state.variableTimes || this.state.comparandTimes ? (
             <DataMap
-              rasterLogscale={this.state.rasterLogscale}
-              rasterPalette={this.state.rasterPalette}
               rasterDataset={rasterDatasetId}
               rasterVariable={this.state.variable}
-              isolineLogscale={this.state.isolineLogscale}
-              isolinePalette={this.state.isolinePalette}
+              rasterPalette={this.state.rasterPalette}
+              rasterLogscale={this.state.rasterLogscale}
+              rasterRange={this.state.rasterRange}
+              onChangeRasterRange={this.handleChangeRasterRange}
+
               isolineDataset={isolineDatasetId}
               isolineVariable={this.state.comparand}
+              isolinePalette={this.state.isolinePalette}
               numberOfContours={this.state.numberOfContours}
-              time={this.state.variableWmsTime}
+              isolineLogscale={this.state.isolineLogscale}
+              isolineRange={this.state.isolineRange}
+              onChangeIsolineRange={this.handleChangeIsolineRange}
+
+              time={this.state.variableWmsTime}  // TODO: what is this??? Remove, I think!
               rasterTime={this.state.variableWmsTime}
               isolineTime={this.state.comparandWmsTime}
+
               onSetArea={this.props.onSetArea}
               area={this.props.area}
-              updateMinmax={this.updateLayerMinmax}
             >
 
               <StaticControl position='topleft'>
@@ -414,19 +436,33 @@ class AltMapController extends React.Component {
                 <MapSettings
                   title='Map Settings'
                   meta={this.props.meta}
+                  comparandMeta={this.props.comparandMeta}
+
                   dataset={this.currentDataset()}
                   onDatasetChange={this.updateDataset}
+
                   variableTimes={this.state.variableTimes}
                   variableTimeIdx={this.state.variableTimeIdx}
                   onChangeVariableTime={this.handleChangeVariableTime}
+
                   hasComparand={this.hasComparand()}
                   comparandTimes={this.state.comparandTimes}
                   comparandTimeIdx={this.state.comparandTimeIdx}
                   onChangeComparandTime={this.handleChangeComparandTime}
+
                   rasterPalette={this.state.rasterPalette}
                   onChangeRasterPalette={this.handleChangeRasterPalette}
+
                   isolinePalette={this.state.isolinePalette}
                   onChangeIsolinePalette={this.handleChangeIsolinePalette}
+
+                  rasterLayerMin={this.state.rasterRange.min}
+                  rasterLogscale={this.state.rasterLogscale}
+                  onChangeRasterScale={this.handleChangeRasterScale}
+
+                  isolineLayerMin={this.state.isolineRange.min}
+                  isolineLogscale={this.state.isolineLogscale}
+                  onChangeRasterScale={this.handleChangeRasterScale}
                 />
               </StaticControl>
 

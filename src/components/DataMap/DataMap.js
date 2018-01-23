@@ -12,9 +12,11 @@ import { EditControl } from 'react-leaflet-draw';
 import './DataMap.css';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
+import { getLayerMinMax, getWMSParams } from '../../data-services/ncwms';
 import CanadaBaseMap from '../CanadaBaseMap';
 
 
+// TODO: Probably better located in a leaflet-utils module
 function makeHandleLeafletRef(name, leafletAction = () => {}) {
   // Return a handler that sets this[name] to the leaflet element of the component,
   // then calls an optional action function on that leaflet element.
@@ -59,64 +61,24 @@ class DataMap extends React.Component {
   //    enormously.
 
   static propTypes = {
+    // TODO: Add props checking for rasterTime, isolineTime
     rasterDataset: PropTypes.string,
     rasterVariable: PropTypes.string,
     rasterPalette: PropTypes.string,
     rasterLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
+    rasterRange: PropTypes.object,
+    onChangeRasterRange: PropTypes.func.isRequired,
 
     isolineDataset: PropTypes.string,
     isolineVariable: PropTypes.string,
     isolinePalette: PropTypes.string,
     numberOfContours: PropTypes.number,
     isolineLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
+    isolineRange: PropTypes.object,
+    onChangeIsolineRange: PropTypes.func.isRequired,
 
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
-  };
-
-  // TODO: Extract to a utility module?
-  getWMSParams = (layer, props = this.props) => {
-    var layerName = props[`${layer}Dataset`] + "/" + props[`${layer}Variable`];
-
-    var params = {
-      layers: layerName,
-      noWrap: true,
-      format: "image/png",
-      transparent: true,
-      time: props[`${layer}Time`],
-      numcolorbands: 249,
-      version: "1.1.1",
-      srs: "EPSG:4326",
-      logscale: "false"
-    };
-    if(layer == "raster") {
-      params.styles = `default-scalar/${props.rasterPalette}`;
-      params.opacity = .7;
-      if (props.rasterLogscale=="true" && false && !_.isUndefined(this.layerRange.raster)) {
-        // clip the dataset to > 0, values of 0 or less do not have a
-        // non-complex logarithm
-        params.logscale = props.rasterLogscale;
-        var min = Math.max(this.layerRange.raster.min, Number.EPSILON);
-        var max = Math.max(this.layerRange.raster.max, Number.EPSILON * 2);
-        params.colorscalerange = `${min},${max}`;
-        params.abovemaxcolor="transparent";
-        params.belowmincolor="transparent";
-      }
-    } else if (layer == "isoline") {
-      params.styles = `colored_contours/${props.isolinePalette}`;
-      params.numContours = props.numberOfContours;
-      params.opacity = 1;
-      if (props.isolineLogscale=="true" && !_.isUndefined(this.layerRange.isoline)) {
-        // clip the dataset to > 0
-        params.logscale = props.isolineLogscale;
-        var min = Math.max(this.layerRange.isoline.min, Number.EPSILON);
-        var max = Math.max(this.layerRange.isoline.max, Number.EPSILON * 2);
-        params.colorscalerange = `${min},${max}`;
-        params.abovemaxcolor="transparent";
-        params.belowmincolor="transparent";
-      }
-    }
-    return params;
   };
 
   // Handlers for wrangling base map, data layers, and data rendering controls.
@@ -230,6 +192,66 @@ class DataMap extends React.Component {
     this.props.onSetArea(undefined);
   };
 
+  // TODO: Rename
+  // TODO: Push into DataLayer
+  updateLayerMinmax = (layer, props, onChangeRange) => {
+    try {
+      var bounds = this.map.getBounds();
+      if (bounds.getWest() == bounds.getEast()) {
+        // This netCDF file has an invalid bounding box, presumably because it has been
+        // through a longitude normalization process.
+        // See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
+        // As a result, longitudes in the file go from 0 to 180, then -180 to
+        // 0. This means the westmost boundary and the eastmost boundary
+        // are both zero (actually -.5675 or something like that, the center of a cell
+        // with one edge at 0.)
+        // Passing a bounding box with identical eastmost and westmost bounds to
+        // ncWMS results in an error, so create a new Canada-only bounding box and
+        // ignore the worldwide extent of this map.
+        var corner1 = L.latLng(90, -50);
+        var corner2 = L.latLng(40, -150);
+        bounds = L.latLngBounds(corner1, corner2);
+      }
+      getLayerMinMax(layer, props, bounds).then(response => {
+        onChangeRange(response.data);
+      });
+    } catch (err) {
+      // Because the map loads data asynchronously, it may not be ready yet,
+      // throwing an error on this.map.getBounds(). This error can be safely
+      // ignored: the minmax data only needs to be available by the time the
+      // user opens the map options menu, and by then it should be, unless
+      // something is wrong with the ncWMS server and no map rasters are
+      // generated at all.
+      // Any other error should be rethrown so it can be noticed and debugged.
+      // NOTE: rethrowing errors loses stacktrace in Chrome, see
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=60240
+      if (err.message != "Set map center and zoom first.") {
+        throw err;
+      }
+    }
+  };
+
+  updateLayerRanges() {
+    // TODO: Push into DataLayer
+    if (this.props.rasterDataset) {
+      this.updateLayerMinmax('raster', this.props, this.props.onChangeRasterRange);
+    }
+    if (this.props.isolineDataset) {
+      this.updateLayerMinmax('isoline', this.props, this.props.onChangeIsolineRange);
+    }
+  }
+
+  // Lifecycle event handlers
+
+  componentDidMount() {
+    // TODO: Push into DataLayer
+    this.updateLayerRanges();
+  }
+
+  componentDidUpdate() {
+    // TODO: Push into DataLayer
+    this.updateLayerRanges();
+  }
 
   render() {
     return (
@@ -240,13 +262,14 @@ class DataMap extends React.Component {
           dataset={this.props.rasterDataset}
           onLayerRef={this.handleRasterLayerRef}
           onNoLayer={this.handleNoRasterLayer}
-          {...this.getWMSParams('raster')}
+          {...getWMSParams('raster', this.props)}
         />
+        // TODO: Don't render the isoline data layer if no isoline dataset
         <DataLayer
           dataset={this.props.isolineDataset}
           onLayerRef={this.handleIsolineLayerRef}
           onNoLayer={this.handleNoIsolineLayer}
-          {...this.getWMSParams('isoline')}
+          {...getWMSParams('isoline', this.props)}
         />
         <FeatureGroup>
           <EditControl
