@@ -1,61 +1,84 @@
 // Data service for ncWMS HTTP API requests.
-// Includes both request functions and supporting functions.
+// Includes both HTTP request functions and supporting functions.
 
 import axios from 'axios/index';
 import _ from 'underscore';
 
 
-function getWMSParams(layer, props) {
-  // Return parameters required for a call to the ncWMS tile layer API.
-  // TODO: Refactor into separate raster and isoline functions
-  // TODO: `props` param is sloppy; instead break out into explicitly named
-  // params (use destructuring param syntax).
-  console.log('getWMSParams', layer, props);
-
-  const layerName = props[`${layer}Dataset`] + '/' + props[`${layer}Variable`];
-
-  let params = {
-    layers: layerName,
+function getBaseWMSParams({ dataset, variable, time, logscale, range }) {
+  const fixedParams = {
+    layers: `${dataset}/${variable}`,
+    time,
     noWrap: true,
     format: 'image/png',
     transparent: true,
-    time: props[`${layer}Time`],
     numcolorbands: 249,
     version: '1.1.1',
     srs: 'EPSG:4326',
-    logscale: 'false',
+    logscale,
   };
 
-  if (layer == 'raster') {
-    params.styles = `default-scalar/${props.rasterPalette}`;
-    params.opacity = 0.7;
-    if (props.rasterLogscale=='true' && !_.isUndefined(props.rasterRange)) {
-      console.log('getWMSParams', 'RASTER LOGSCALE')
-      // clip the dataset to > 0, values of 0 or less do not have a
-      // non-complex logarithm
-      params.logscale = props.rasterLogscale;
-      const min = Math.max(props.rasterRange.min, Number.EPSILON);
-      const max = Math.max(props.rasterRange.max, Number.EPSILON * 2);
-      params.colorscalerange = `${min},${max}`;
-      params.abovemaxcolor = 'transparent';
-      params.belowmincolor = 'transparent';
-    }
-  } else if (layer == 'isoline') {
-    params.styles = `colored_contours/${props.isolinePalette}`;
-    params.numContours = props.numberOfContours;
-    params.opacity = 1;
-    if (props.isolineLogscale=='true' && !_.isUndefined(props.isolineRange)) {
-      // clip the dataset to > 0
-      params.logscale = props.isolineLogscale;
-      const min = Math.max(props.isolineRange.min, Number.EPSILON);
-      const max = Math.max(props.isolineRange.max, Number.EPSILON * 2);
-      params.colorscalerange = `${min},${max}`;
-      params.abovemaxcolor = 'transparent';
-      params.belowmincolor = 'transparent';
-    }
+  if (logscale !== 'true' || _.isUndefined(range)) {
+    return fixedParams;
   }
 
-  return params;
+  const min = Math.max(range.min, Number.EPSILON);
+  const max = Math.max(range.max, Number.EPSILON * 2);
+  return Object.assign(
+    fixedParams,
+    {
+      colorscalerange: `${min},${max}`,
+      abovemaxcolor: 'transparent',
+      belowmincolor: 'transparent',
+    }
+  );
+}
+
+
+function getRasterWMSParams({ dataset, variable, time, palette, logscale, range }) {
+  return Object.assign(
+    getBaseWMSParams({ dataset, variable, time, logscale, range }),
+    {
+      styles: `default-scalar/${palette}`,
+      opacity: 0.7,
+    }
+  );
+}
+
+
+function getIsolineWMSParams({ dataset, variable, time, palette, logscale, range }) {
+  return Object.assign(
+    getBaseWMSParams({ dataset, variable, time, logscale, range }),
+    {
+      styles: `colored_contours/${palette}`,
+      opacity: 1.0,
+    }
+  );
+}
+
+function getWMSParams(layerType, props) {
+  // Return parameters required for a call to the ncWMS tile layer API.
+  console.log('getWMSParams', layerType, props);
+
+  if (layerType === 'raster') {
+    return getRasterWMSParams({
+      dataset: props.rasterDataset,
+      variable: props.rasterVariable,
+      time: props.rasterTime,
+      palette: props.rasterPalette,
+      logscale: props.rasterLogscale,
+      range: props.rasterRange,
+    });
+  } else if (layerType === 'isoline') {
+    return getIsolineWMSParams({
+      dataset: props.isolineDataset,
+      variable: props.isolineVariable,
+      time: props.isolineTime,
+      palette: props.isolinePalette,
+      logscale: props.isolineLogscale,
+      range: props.isolineRange,
+    });
+  }
 }
 
 
@@ -87,4 +110,7 @@ function getLayerMinMax(layer, props, bounds) {
 }
 
 
-export { getWMSParams, getLayerMinMax };
+export {
+  getRasterWMSParams, getIsolineWMSParams, getWMSParams,
+  getLayerMinMax
+};
