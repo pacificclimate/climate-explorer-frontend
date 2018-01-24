@@ -10,7 +10,7 @@ import { EditControl } from 'react-leaflet-draw';
 import './DataMap.css';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
-import { getLayerMinMax, getWMSParams } from '../../data-services/ncwms';
+import { getLayerMinMax } from '../../data-services/ncwms';
 import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
@@ -76,6 +76,7 @@ class DataMap extends React.Component {
 
   handleMapRef = makeHandleLeafletRef('map', (map) => {
     console.log('handleMapRef', map);
+
     // Set up the promises for the raster and isoline layers.
     // Each promise is resolved with either the layer or null if the layer is
     // not created (according to props). The resolve callback for each promise
@@ -116,6 +117,8 @@ class DataMap extends React.Component {
     // Don't try to add controls if there's no map.
     // This isn't really necessary if everything is working, but it guards
     // against stupid or unexpected.
+    console.log('addDataControls: layers', rasterLayer, isolineLayer)
+    console.log('addDataControls: map', this.map)
     if (!this.map) {
       return;
     }
@@ -225,17 +228,32 @@ class DataMap extends React.Component {
         mapRef={this.handleMapRef}
       >
         <DataLayer
+          layerType='raster'
           dataset={this.props.rasterDataset}
+          variable={this.props.rasterVariable}
+          time={this.props.rasterTime}
+          palette={this.props.rasterPalette}
+          logscale={this.props.rasterLogscale}
+          range={this.props.rasterRange}
+
           onLayerRef={this.handleRasterLayerRef}
           onNoLayer={this.handleNoRasterLayer}
-          {...getWMSParams('raster', this.props)}
+          // {...getWMSParams('raster', this.props)}
+          onChangeRange={this.props.onChangeRasterRange}
         />
-        // TODO: Don't render the isoline data layer if no isoline dataset
         <DataLayer
+          layerType='isoline'
           dataset={this.props.isolineDataset}
+          variable={this.props.isolineVariable}
+          time={this.props.isolineTime}
+          palette={this.props.isolinePalette}
+          logscale={this.props.isolineLogscale}
+          range={this.props.isolineRange}
+
           onLayerRef={this.handleIsolineLayerRef}
           onNoLayer={this.handleNoIsolineLayer}
-          {...getWMSParams('isoline', this.props)}
+          // {...getWMSParams('isoline', this.props)}
+          onChangeRange={this.props.onChangeIsolineRange}
         />
         <FeatureGroup>
           <EditControl
