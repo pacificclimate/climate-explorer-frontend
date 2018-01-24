@@ -28,6 +28,8 @@ export default class DataLayer extends React.Component {
     const {
       onLayerRef, onNoLayer, onChangeRange, layerType, ...layerParams,
     } = this.props;
+
+    // TODO: This dispatcher belongs in data-services/ncwms
     const wmsParams = {
       raster: getRasterWMSParams,
       isoline: getIsolineWMSParams,
