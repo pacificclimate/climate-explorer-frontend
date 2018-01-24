@@ -16,6 +16,7 @@ import GeoExporter from '../GeoExporter';
 
 import { getTimeMetadata } from '../../data-services/metadata';
 import { getVariableOptions } from '../../core/util';
+import { shallowDiffStr } from '../../core/debug-utils';
 
 
 // This class is the counterpart of MapController and will ultimately become
@@ -384,7 +385,14 @@ class AltMapController extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before we have required data
-    return !_.isEqual(nextState, this.state);
+    const propChange = !_.isEqual(nextProps, this.props);
+    const stateChange = !_.isEqual(nextState, this.state);
+    const b = propChange || stateChange;
+    console.log('AltMapController.shouldComponentUpdate: propChange', propChange)
+    console.log('AltMapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
+    console.log('AltMapController.shouldComponentUpdate: stateChange', stateChange)
+    console.log('AltMapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
+    return b;
   }
 
 
