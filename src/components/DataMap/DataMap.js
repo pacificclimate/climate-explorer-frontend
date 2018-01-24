@@ -128,14 +128,12 @@ class DataMap extends React.Component {
       new LeafletNcWMSColorbarControl(rasterLayer, { position: 'bottomright' });
     const isolineBar = isolineLayer &&
       new LeafletNcWMSColorbarControl(isolineLayer, { position: 'bottomright' });
-    let autoscale;
-    autoscale = rasterLayer &&
-      new LeafletNcWMSAutoscaleControl(rasterLayer, { position: 'bottomright' });
-    if (autoscale && isolineLayer) {
+
+    const autoscale =
+      new LeafletNcWMSAutoscaleControl(
+        rasterLayer || isolineLayer, { position: 'bottomright' });
+    if (rasterLayer && isolineLayer) {
       autoscale.addLayer(isolineLayer);
-    } else {
-      autoscale = new LeafletNcWMSAutoscaleControl(
-        isolineLayer, { position: 'bottomright' });
     }
 
     // Add controls to map. Ordering depends on which of the controls is present.
