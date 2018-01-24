@@ -393,7 +393,8 @@ class AltMapController extends React.Component {
     const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
 
     return (
-      <div style={{ width: 800, height: 600 }}>
+      // FIXME: This sizing div really shouldn't be part of the controller.
+      <div style={{ width: 890, height: 700 }}>
         <div>
           <p>rasterRange {JSON.stringify(this.state.rasterRange)}</p>
           <p>isolineRange {JSON.stringify(this.state.isolineRange)}</p>
