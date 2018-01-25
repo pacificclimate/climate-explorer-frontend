@@ -124,13 +124,13 @@ class DataMap extends React.Component {
   // };
 
   handleRasterLayerRef = (layer) => {
-    this.setState({ rasterLayer: layer.leafletElement });
+    this.setState({ rasterLayer: layer && layer.leafletElement });
   };
 
   handleNoRasterLayer = () => {}; // Leave it null; TODO: eliminate
 
   handleIsolineLayerRef = (layer) => {
-    this.setState({ isolineLayer: layer.leafletElement });
+    this.setState({ isolineLayer: layer && layer.leafletElement });
   };
 
   handleNoIsolineLayer = () => {}; // Leave it null; TODO: eliminate
@@ -291,10 +291,14 @@ class DataMap extends React.Component {
         </StaticControl>
 
         <NcWMSColorbarControl
-          position='topright'
           layer={this.state.rasterLayer}
-        >
-        </NcWMSColorbarControl>
+          // update when any raster prop changes
+          dataset={this.state.rasterDataset}
+          variable={this.props.rasterVariable}
+          time={this.props.rasterTime}
+          palette={this.props.rasterPalette}
+          logscale={this.props.rasterLogscale}
+        />
 
         <DataLayer
           layerType='isoline'
