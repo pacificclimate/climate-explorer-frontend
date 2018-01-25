@@ -8,7 +8,7 @@ import './StaticControl.css';
 
 class StaticControl extends MapControl {
     createLeafletElement(props) {
-      const leafletElement = L.control({ position: props.position });
+      const leafletElement = L.control({ position: props && props.position });
 
       leafletElement.onAdd = map => {
         this.container = L.DomUtil.create(
