@@ -1,0 +1,6 @@
+{
+  "name": "NcWMSColorbarControl",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./NcWMSColorbarControl.js"
+}

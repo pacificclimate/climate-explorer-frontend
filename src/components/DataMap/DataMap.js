@@ -2,6 +2,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import _ from 'underscore';
+
 import { FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
@@ -14,6 +16,9 @@ import { getLayerMinMax } from '../../data-services/ncwms';
 import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
+import StaticControl from '../StaticControl';
+import NcWMSColorbarControl from '../NcWMSColorbarControl';
+import { shallowDiff, shallowDiffStr } from '../../core/debug-utils';
 
 
 class DataMap extends React.Component {
@@ -49,6 +54,16 @@ class DataMap extends React.Component {
     onSetArea: PropTypes.func.isRequired,
   };
 
+  constructor(props) {
+    console.log('DataMap.constructor')
+    super(props);
+
+    this.state = {
+      rasterLayer: null,
+      isolineLayer: null,
+    };
+  }
+
   // Handlers for wrangling base map, data layers, and data rendering controls.
   //
   // Responsibilities:
@@ -75,38 +90,50 @@ class DataMap extends React.Component {
   //      the data rendering controls.
 
   handleMapRef = makeHandleLeafletRef('map', (map) => {
-    console.log('handleMapRef', map);
-
-    // Set up the promises for the raster and isoline layers.
-    // Each promise is resolved with either the layer or null if the layer is
-    // not created (according to props). The resolve callback for each promise
-    // is cached on `this` so that it can be invoked by the layer callbacks
-    // later.
-    const rasterLayerPromise = new Promise((resolve) => {
-      this.rasterLayerResolve = resolve;
-    });
-    const isolineLayerPromise = new Promise((resolve) => {
-      this.isolineLayerResolve = resolve;
-    });
-    this.layersPromise = Promise.all([rasterLayerPromise, isolineLayerPromise])
-      .then(this.addDataControls);
+    // console.log('handleMapRef', map);
+    //
+    // // Set up the promises for the raster and isoline layers.
+    // // Each promise is resolved with either the layer or null if the layer is
+    // // not created (according to props). The resolve callback for each promise
+    // // is cached on `this` so that it can be invoked by the layer callbacks
+    // // later.
+    // const rasterLayerPromise = new Promise((resolve) => {
+    //   this.rasterLayerResolve = resolve;
+    // });
+    // const isolineLayerPromise = new Promise((resolve) => {
+    //   this.isolineLayerResolve = resolve;
+    // });
+    // this.layersPromise = Promise.all([rasterLayerPromise, isolineLayerPromise])
+    //   .then(this.addDataControls);
   }).bind(this);
 
-  handleRasterLayerRef = makeHandleLeafletRef('rasterLayer', (layer) => {
-    this.rasterLayerResolve(layer);
-  }).bind(this);
+  // handleRasterLayerRef = makeHandleLeafletRef('rasterLayer', (layer) => {
+  //   this.rasterLayerResolve(layer);
+  // }).bind(this);
+  //
+  // handleNoRasterLayer = () => {
+  //   this.rasterLayerResolve(undefined);
+  // };
+  //
+  // handleIsolineLayerRef = makeHandleLeafletRef('isolineLayer', (layer) => {
+  //   this.isolineLayerResolve(layer);
+  // }).bind(this);
+  //
+  // handleNoIsolineLayer = () => {
+  //   this.isolineLayerResolve(undefined);
+  // };
 
-  handleNoRasterLayer = () => {
-    this.rasterLayerResolve(undefined);
+  handleRasterLayerRef = (layer) => {
+    this.setState({ rasterLayer: layer.leafletElement });
   };
 
-  handleIsolineLayerRef = makeHandleLeafletRef('isolineLayer', (layer) => {
-    this.isolineLayerResolve(layer);
-  }).bind(this);
+  handleNoRasterLayer = () => {}; // Leave it null; TODO: eliminate
 
-  handleNoIsolineLayer = () => {
-    this.isolineLayerResolve(undefined);
+  handleIsolineLayerRef = (layer) => {
+    this.setState({ isolineLayer: layer.leafletElement });
   };
+
+  handleNoIsolineLayer = () => {}; // Leave it null; TODO: eliminate
 
   addDataControls = ([rasterLayer, isolineLayer]) => {
     // Create and add the corresponding colour bar controls and the autoscale control for the layers
@@ -145,6 +172,10 @@ class DataMap extends React.Component {
       this.map.addControl(rasterBar || isolineBar);
       this.map.addControl(autoscale);
     }
+
+    this.rasterBar = rasterBar;
+    this.isolineBar = isolineBar;
+    this.autoscale = autoscale;
   };
 
   // Handlers for area selection. Converts area to GeoJSON.
@@ -215,9 +246,24 @@ class DataMap extends React.Component {
     this.updateLayerRanges();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    // console.log('DataMap.componentDidUpdate: props', shallowDiff(prevProps, this.props))
+    // console.log('DataMap.componentDidUpdate: props', prevProps, this.props)
+
+    // console.log('DataMap.componentDidUpdate: state', shallowDiffStr(prevState, this.state))
     // TODO: Push into DataLayer
     this.updateLayerRanges();
+    // if (!this.autoscale) {
+    //   this.addDataControls([this.rasterLayer, this.isolineLayer]);
+    // }
+    // if (!_.isEqual(prevProps.rasterRange, this.props.rasterRange)) {
+    //   console.log('DataMap.componentDidUpdate: autoscaling')
+    //   this.rasterBar.refreshValues();
+    //   this.autoscale.autoscale();
+    // }
+    // if (this.rasterLayer) {
+    //   this.rasterBar.refreshValues();
+    // }
   }
 
   render() {
@@ -239,6 +285,17 @@ class DataMap extends React.Component {
           // {...getWMSParams('raster', this.props)}
           onChangeRange={this.props.onChangeRasterRange}
         />
+
+        <StaticControl position='topright'>
+          <div>Raster layer: {this.state.rasterLayer ? 'yes' : 'no'}</div>
+        </StaticControl>
+
+        <NcWMSColorbarControl
+          position='topright'
+          layer={this.state.rasterLayer}
+        >
+        </NcWMSColorbarControl>
+
         <DataLayer
           layerType='isoline'
           dataset={this.props.isolineDataset}
