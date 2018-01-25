@@ -18,6 +18,7 @@ import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import StaticControl from '../StaticControl';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
+import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
 import { shallowDiff, shallowDiffStr } from '../../core/debug-utils';
 
 
@@ -298,6 +299,10 @@ class DataMap extends React.Component {
           time={this.props.rasterTime}
           palette={this.props.rasterPalette}
           logscale={this.props.rasterLogscale}
+        />
+
+        <NcWMSAutosetColorscaleControl
+          layers={[this.state.rasterLayer, this.state.isolineLayer]}
         />
 
         <DataLayer
