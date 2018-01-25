@@ -161,7 +161,7 @@ class DataMap extends React.Component {
   }
 
   render() {
-    // TODO: Add isoline colourbar and add positioning for autoset
+    // TODO: Add positioning for autoset
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
@@ -179,6 +179,19 @@ class DataMap extends React.Component {
           onChangeRange={this.props.onChangeRasterRange}
         />
 
+        <DataLayer
+          layerType='isoline'
+          dataset={this.props.isolineDataset}
+          variable={this.props.isolineVariable}
+          time={this.props.isolineTime}
+          palette={this.props.isolinePalette}
+          logscale={this.props.isolineLogscale}
+          range={this.props.isolineRange}
+
+          onLayerRef={this.handleIsolineLayerRef}
+          onChangeRange={this.props.onChangeIsolineRange}
+        />
+
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
           // update when any raster prop changes
@@ -193,17 +206,14 @@ class DataMap extends React.Component {
           layers={[this.state.rasterLayer, this.state.isolineLayer]}
         />
 
-        <DataLayer
-          layerType='isoline'
-          dataset={this.props.isolineDataset}
+        <NcWMSColorbarControl
+          layer={this.state.isolineLayer}
+          // update when any isoline prop changes
+          dataset={this.state.isolineDataset}
           variable={this.props.isolineVariable}
           time={this.props.isolineTime}
           palette={this.props.isolinePalette}
           logscale={this.props.isolineLogscale}
-          range={this.props.isolineRange}
-
-          onLayerRef={this.handleIsolineLayerRef}
-          onChangeRange={this.props.onChangeIsolineRange}
         />
 
         <FeatureGroup>
