@@ -50,10 +50,10 @@ class AltMapController extends React.Component {
       comparandWmsTime: undefined,
 
       rasterLogscale: 'false',
-      rasterPalette: 'x-Occam',
+      rasterPalette: this.props.comparandMeta ? 'seq-Greys' : 'x-Occam',
 
       isolineLogscale: 'false',
-      isolinePalette: undefined,
+      isolinePalette: 'x-Occam',
       numberOfContours: 10,
 
       rasterRange: {},
