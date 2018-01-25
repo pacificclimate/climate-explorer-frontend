@@ -16,4 +16,13 @@ function makeHandleLeafletRef(name, leafletAction = () => {}) {
   };
 }
 
-export { makeHandleLeafletRef };
+function updateSingleStateLeaflet(name, value) {
+  // Sets a single state property to the leaflet element associated with value.
+  // Typical usage is to bind `this` and `name` and use the resulting
+  // function as a callback handler:
+  //    handleChangeALeafletState =
+  //      this.updateSingleStateLeaflet.bind(this, 'aLeafletState');
+  this.setState({ [name]: value && value.leafletElement });
+}
+
+export { makeHandleLeafletRef, updateSingleStateLeaflet };

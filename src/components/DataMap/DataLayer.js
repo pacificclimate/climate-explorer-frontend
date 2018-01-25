@@ -3,6 +3,7 @@ import React from 'react';
 
 import { WMSTileLayer } from 'react-leaflet';
 import { getIsolineWMSParams, getRasterWMSParams } from '../../data-services/ncwms';
+import _ from "underscore";
 
 
 export default class DataLayer extends React.Component {
@@ -17,16 +18,20 @@ export default class DataLayer extends React.Component {
     range: PropTypes.object,
 
     onLayerRef: PropTypes.func,
-    onNoLayer: PropTypes.func.isRequired,
-
     onChangeRange: PropTypes.func.isRequired,
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const propChange = !_.isEqual(nextProps, this.props);
+    const stateChange = !_.isEqual(nextState, this.state);
+    const b = propChange || stateChange;
+    return b;
+  }
 
   render() {
     console.log('DataLayer', this.props);
     const {
-      onLayerRef, onNoLayer, onChangeRange, layerType, ...layerParams,
+      onLayerRef, onChangeRange, layerType, ...layerParams,
     } = this.props;
 
     // TODO: This dispatcher belongs in data-services/ncwms
@@ -45,7 +50,7 @@ export default class DataLayer extends React.Component {
       );
     }
 
-    onNoLayer();
+    onLayerRef(null);
     return null;
   }
 }
