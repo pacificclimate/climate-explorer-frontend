@@ -117,8 +117,6 @@ class AltMapController extends React.Component {
     // The variable and the comparand may have  different available timestamps.
 
     const { start_date, end_date, ensemble_member } = dataset;
-    // TODO: Remove console.log
-    console.log('loadMap', dataset);
 
     // generate the list of available times for one or two variable+run+period combinations.
     // which may include multiple files of different time resolutions
@@ -159,7 +157,6 @@ class AltMapController extends React.Component {
           }
         }
       }
-      // TODO: Remove console.log
 
       // select a 0th index to display initially. It could be January,
       // Winter, or Annual - there's no guarentee any given dataset
@@ -206,7 +203,6 @@ class AltMapController extends React.Component {
   };
   
   getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
-    console.log('getDatasetId', varSymbol, varMeta, encodedVarTimeIdx);
     let dataset = undefined;
     if (encodedVarTimeIdx) {
       if (this.hasValidData(varSymbol)) {
@@ -345,25 +341,20 @@ class AltMapController extends React.Component {
     const propChange = !_.isEqual(nextProps, this.props);
     const stateChange = !_.isEqual(nextState, this.state);
     const b = propChange || stateChange;
-    console.log('AltMapController.shouldComponentUpdate: propChange', propChange)
-    console.log('AltMapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
-    console.log('AltMapController.shouldComponentUpdate: stateChange', stateChange)
-    console.log('AltMapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
+    // console.log('AltMapController.shouldComponentUpdate: propChange', propChange)
+    // console.log('AltMapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
+    // console.log('AltMapController.shouldComponentUpdate: stateChange', stateChange)
+    // console.log('AltMapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
     return b;
   }
 
 
   render() {
-    console.log('AltMapController', this.props.meta);
     const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
 
     return (
       // FIXME: This sizing div really shouldn't be part of the controller.
       <div style={{ width: 890, height: 700 }}>
-        <div>
-          <p>rasterRange {JSON.stringify(this.state.rasterRange)}</p>
-          <p>isolineRange {JSON.stringify(this.state.isolineRange)}</p>
-        </div>
         {
           this.state.variableTimes || this.state.comparandTimes ? (
             <DataMap
