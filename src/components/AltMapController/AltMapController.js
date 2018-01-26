@@ -116,9 +116,6 @@ class AltMapController extends React.Component {
     // and timestamp to the viewer component CanadaMap.
     // The variable and the comparand may have  different available timestamps.
 
-    // var run = dataset.ensemble_member;
-    // var start_date = dataset.start_date;
-    // var end_date = dataset.end_date;
     const { start_date, end_date, ensemble_member } = dataset;
     // TODO: Remove console.log
     console.log('loadMap', dataset);
@@ -137,12 +134,8 @@ class AltMapController extends React.Component {
 
     const timesPromises =
       datasets.map(ds => getTimeMetadata(ds.unique_id));
-    // for(var i = 0; i < datasets.length; i++) {
-    //   timesPromises.push(this.requestTimeMetadata(datasets[i].unique_id));
-    // }
 
     Promise.all(timesPromises).then(responses => {
-      console.log('loadMap: timesPromises responses', responses)
       let variableTimes = {};
       let comparandTimes = {};
 
@@ -167,8 +160,6 @@ class AltMapController extends React.Component {
         }
       }
       // TODO: Remove console.log
-      console.log('loadMap: timesPromises variableTimes', variableTimes)
-      console.log('loadMap: timesPromises comparandTimes', comparandTimes)
 
       // select a 0th index to display initially. It could be January,
       // Winter, or Annual - there's no guarentee any given dataset
@@ -176,6 +167,7 @@ class AltMapController extends React.Component {
       // will have at least one of them.
 
       // Warning: Weirdness: If `===` comparison is used, the `_.find` fails.
+      // TODO: Why? Fix.
       const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
 
       const variableStartingIndex = _.find(Object.keys(variableTimes), is0thIndex);
@@ -188,25 +180,6 @@ class AltMapController extends React.Component {
 
       const linkTimes = this.timesMatch(variableTimes, comparandTimes);
 
-      // TODO: Remove console.log
-      console.log('loadMap: setState', {
-        variable,
-        comparand,
-        run: ensemble_member,
-        start_date,
-        end_date,
-        variableTimes,
-        variableTimeIdx: variableStartingIndex,
-        variableWmsTime: variableTimes[variableStartingIndex],
-        comparandTimes,
-        comparandTimeIdx: comparandStartingIndex,
-        comparandWmsTime: comparandTimes[comparandStartingIndex],
-        linkTimes,
-        rasterPalette,
-        isolinePalette,
-        rasterLogscale: newVariable ? 'false' : this.state.rasterLogscale,
-        isolineLogscale: newComparand ? 'false' : this.state.isolineLogscale,
-      })
       this.setState({
         variable,
         comparand,
@@ -249,8 +222,7 @@ class AltMapController extends React.Component {
         });
       }
     }
-    // isolineDataset may not exist if generating a map for a
-    // single-variable portal
+    // dataset may not exist if generating a map for a single-variable portal
     return dataset && dataset.unique_id;
   }
   
@@ -378,6 +350,11 @@ class AltMapController extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before we have required data
+    // TODO: Make more efficient?
+    // Currently doing deep comparison on big objects (meta, comparandMeta).
+    // Deep comparison matters on rasterRange, isolineRange, but not on
+    // meta, comparandMeta, which are likely new objects every time (response
+    // from HTTP requests). That could be a lot faster.
     const propChange = !_.isEqual(nextProps, this.props);
     const stateChange = !_.isEqual(nextState, this.state);
     const b = propChange || stateChange;

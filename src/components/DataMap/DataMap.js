@@ -12,15 +12,12 @@ import './DataMap.css';
 import { getLayerMinMax } from '../../data-services/ncwms';
 import {
   makeHandleLeafletRef,
-  updateSingleStateLeaflet
+  updateSingleStateLeaflet,
 } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
-import StaticControl from '../StaticControl';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-
-import { shallowDiff, shallowDiffStr } from '../../core/debug-utils';
 
 
 class DataMap extends React.Component {
@@ -52,7 +49,6 @@ class DataMap extends React.Component {
   };
 
   constructor(props) {
-    console.log('DataMap.constructor')
     super(props);
 
     this.state = {
@@ -85,7 +81,7 @@ class DataMap extends React.Component {
   updateLayerMinmax = (layer, props, onChangeRange) => {
     try {
       var bounds = this.map.getBounds();
-      if (bounds.getWest() == bounds.getEast()) {
+      if (bounds.getWest() === bounds.getEast()) {
         // This netCDF file has an invalid bounding box, presumably because it has been
         // through a longitude normalization process.
         // See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
@@ -113,7 +109,7 @@ class DataMap extends React.Component {
       // Any other error should be rethrown so it can be noticed and debugged.
       // NOTE: rethrowing errors loses stacktrace in Chrome, see
       // https://bugs.chromium.org/p/chromium/issues/detail?id=60240
-      if (err.message != "Set map center and zoom first.") {
+      if (err.message !== 'Set map center and zoom first.') {
         throw err;
       }
     }
@@ -144,20 +140,8 @@ class DataMap extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log('DataMap.componentDidUpdate: props', shallowDiff(prevProps, this.props))
-    // console.log('DataMap.componentDidUpdate: props', prevProps, this.props)
-
-    // console.log('DataMap.componentDidUpdate: state', shallowDiffStr(prevState, this.state))
     // TODO: Push into DataLayer
     this.updateLayerRanges();
-    // if (!_.isEqual(prevProps.rasterRange, this.props.rasterRange)) {
-    //   console.log('DataMap.componentDidUpdate: autoscaling')
-    //   this.rasterBar.refreshValues();
-    //   this.autoscale.autoscale();
-    // }
-    // if (this.rasterLayer) {
-    //   this.rasterBar.refreshValues();
-    // }
   }
 
   render() {
