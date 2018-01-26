@@ -28,6 +28,8 @@ export default class MapSettings extends React.Component {
     comparandTimeIdx: PropTypes.string,
     onChangeComparandTime: PropTypes.func.isRequired, // required???
 
+    timesLinkable: PropTypes.bool,
+
     rasterPalette: PropTypes.string,
     onChangeRasterPalette: PropTypes.func.isRequired,
 
@@ -47,7 +49,7 @@ export default class MapSettings extends React.Component {
     super(props);
 
     this.state = {
-      linkTimes: false,  // Under control of LinkControls
+      linkTimes: this.props.timesLinkable,
     };
   }
 
@@ -123,7 +125,8 @@ export default class MapSettings extends React.Component {
               this.props.hasComparand &&
               <Col lg={1}>
                 <LinkControls
-                  active={this.state.linkTimes}
+                  timesLinkable={this.props.timesLinkable}
+                  linkTimes={this.state.linkTimes}
                   onClick={this.toggleLinkTimes}
                 />
               </Col>

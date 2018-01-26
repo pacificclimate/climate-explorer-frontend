@@ -178,8 +178,6 @@ class AltMapController extends React.Component {
         props.comparandMeta[0].variable_id :
         undefined;
 
-      const linkTimes = this.timesMatch(variableTimes, comparandTimes);
-
       this.setState({
         variable,
         comparand,
@@ -192,7 +190,6 @@ class AltMapController extends React.Component {
         comparandTimes,
         comparandTimeIdx: comparandStartingIndex,
         comparandWmsTime: comparandTimes[comparandStartingIndex],
-        linkTimes,
         rasterPalette,
         isolinePalette,
         rasterLogscale: newVariable ? 'false' : this.state.rasterLogscale,
@@ -427,6 +424,8 @@ class AltMapController extends React.Component {
                   comparandTimes={this.state.comparandTimes}
                   comparandTimeIdx={this.state.comparandTimeIdx}
                   onChangeComparandTime={this.handleChangeComparandTime}
+
+                  timesLinkable={this.timesMatch()}
 
                   rasterPalette={this.state.rasterPalette}
                   onChangeRasterPalette={this.handleChangeRasterPalette}
