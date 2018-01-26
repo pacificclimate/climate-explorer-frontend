@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -10,9 +11,9 @@ import Selector from '../Selector';
 export default class TimeSelector extends React.Component {
   static propTypes = {
     name: PropTypes.string, // 'Raster' | 'Isoline'
-    disabled: PropTypes.bool,
     times: PropTypes.object,
     timeIdx: PropTypes.string,
+    timeLinked: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -36,6 +37,9 @@ export default class TimeSelector extends React.Component {
     );
   }
 
+  static timeLinkedTooltip = <Tooltip>Timestamp matching is activated</Tooltip>;
+  static testTooltip = <Tooltip>TEST</Tooltip>;
+
   render() {
     if (!this.props.times) {
       // Code smell:
@@ -45,24 +49,16 @@ export default class TimeSelector extends React.Component {
       return <NullTimeSelector/>;
     }
 
-    // TODO: Why not just return the fully populated selector with disabled set and eliminate this special case?
-    // Alternatively, still simpler, fully populated with null onChange handler.
-    if (this.props.disabled) {
-      return (
-        <Selector
-          disabled
-          label={this.temporalLabelPart()}
-        />
-      );
-    }
-
     return (
-      <Selector
-        label={`${this.props.name} ${this.temporalLabelPart()}`}
-        items={this.timeOptions()}
-        value={this.props.timeIdx}
-        onChange={this.props.onChange}
-      />
+      <OverlayTrigger placement='right' overlay={TimeSelector.testTooltip}>
+        <Selector
+          disabled={this.props.timeLinked}
+          label={`${this.props.name} ${this.temporalLabelPart()}`}
+          items={this.timeOptions()}
+          value={this.props.timeIdx}
+          onChange={this.props.onChange}
+        />
+      </OverlayTrigger>
     );
   }
 }
