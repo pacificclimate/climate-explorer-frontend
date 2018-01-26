@@ -57,30 +57,19 @@ class DataMap extends React.Component {
     };
   }
 
-  // Handlers for wrangling base map and data layer refs.
+  // Handler for base map ref.
 
   handleMapRef = makeHandleLeafletRef('map').bind(this);
 
-  handleRasterLayerRef = updateSingleStateLeaflet.bind(this, 'rasterLayer');
-  handleIsolineLayerRef = updateSingleStateLeaflet.bind(this, 'isolineLayer');
+  // Handlers for data layer refs.
 
-  // Handlers for area selection. Converts area to GeoJSON.
-
-  handleAreaCreatedOrEdited = (e) => {
-    const area = e.layer.toGeoJSON();
-    area.properties.source = 'PCIC Climate Explorer';
-    this.props.onSetArea(area);
-  };
-
-  handleAreaDeleted = () => {
-    this.props.onSetArea(undefined);
-  };
-
-  // TODO: Rename
-  // TODO: Push into DataLayer
-  updateLayerMinmax = (layer, props, onChangeRange) => {
+  // TODO: Push into DataLayer? Difficulty because map isn't in React
+  // context of DataLayer, despite what one might expect from React Leaflet
+  // documentation.
+  // It's not so bad here, but would be better there.
+  updateLayerRange = (layerType, props, onChangeRange) => {
     try {
-      var bounds = this.map.getBounds();
+      let bounds = this.map.getBounds();
       if (bounds.getWest() === bounds.getEast()) {
         // This netCDF file has an invalid bounding box, presumably because it has been
         // through a longitude normalization process.
@@ -92,14 +81,16 @@ class DataMap extends React.Component {
         // Passing a bounding box with identical eastmost and westmost bounds to
         // ncWMS results in an error, so create a new Canada-only bounding box and
         // ignore the worldwide extent of this map.
-        var corner1 = L.latLng(90, -50);
-        var corner2 = L.latLng(40, -150);
+        const corner1 = L.latLng(90, -50);
+        const corner2 = L.latLng(40, -150);
         bounds = L.latLngBounds(corner1, corner2);
       }
-      getLayerMinMax(layer, props, bounds).then(response => {
+      getLayerMinMax(layerType, props, bounds).then(response => {
         onChangeRange(response.data);
       });
     } catch (err) {
+      // TODO: This whole try-catch block might be unnecessary now
+      // that this function is invoked only on layer load event.
       // Because the map loads data asynchronously, it may not be ready yet,
       // throwing an error on this.map.getBounds(). This error can be safely
       // ignored: the minmax data only needs to be available by the time the
@@ -115,15 +106,34 @@ class DataMap extends React.Component {
     }
   };
 
-  updateLayerRanges() {
-    // TODO: Push into DataLayer
-    if (this.props.rasterDataset) {
-      this.updateLayerMinmax('raster', this.props, this.props.onChangeRasterRange);
+  handleLayerRef(layerType, layer) {
+    const leafletElement = layer && layer.leafletElement;
+    if (leafletElement) {
+      const onChangeRange = {
+        raster: this.props.onChangeRasterRange,
+        isoline: this.props.onChangeIsolineRange,
+      }[layerType];
+      leafletElement.on('load', () => {
+        this.updateLayerRange(layerType, this.props, onChangeRange);
+      });
     }
-    if (this.props.isolineDataset) {
-      this.updateLayerMinmax('isoline', this.props, this.props.onChangeIsolineRange);
-    }
+    this.setState({ [`${layerType}Layer`]: leafletElement });  // Ewww
   }
+
+  handleRasterLayerRef = this.handleLayerRef.bind(this, 'raster');
+  handleIsolineLayerRef = this.handleLayerRef.bind(this, 'isoline');
+
+  // Handlers for area selection. Converts area to GeoJSON.
+
+  handleAreaCreatedOrEdited = (e) => {
+    const area = e.layer.toGeoJSON();
+    area.properties.source = 'PCIC Climate Explorer';
+    this.props.onSetArea(area);
+  };
+
+  handleAreaDeleted = () => {
+    this.props.onSetArea(undefined);
+  };
 
   // Lifecycle event handlers
 
@@ -135,13 +145,9 @@ class DataMap extends React.Component {
   }
 
   componentDidMount() {
-    // TODO: Push into DataLayer
-    this.updateLayerRanges();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    // TODO: Push into DataLayer
-    this.updateLayerRanges();
+  componentDidUpdate() {
   }
 
   render() {
