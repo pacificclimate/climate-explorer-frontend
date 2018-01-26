@@ -433,7 +433,7 @@ class AltMapController extends React.Component {
                 <GeoExporter.Modal area={this.props.area} title='Export polygon' />
               </StaticControl>
 
-              <StaticControl position='topright'>
+              <StaticControl position='topright' style={{ marginRight: '70px' }}>
                 <MapSettings
                   title='Map Settings'
                   meta={this.props.meta}
