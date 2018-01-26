@@ -16,27 +16,34 @@ class MapFooter extends React.Component {
     variableTimes: PropTypes.object,
     variableWmsTime: PropTypes.string,
     hasValidComparand: PropTypes.bool,
+    comparandTimes: PropTypes.object,
     comparand: PropTypes.string,
     comparandWmsTime: PropTypes.string,
   };
+  
+  timeOfYear(times, wmsTime) {
+    const resolution = _.invert(times)[wmsTime];
+    const timescale = resolution && JSON.parse(resolution).timescale;
+    const timeValues = _.values(times);
+    const disambiguateYears = !sameYear(_.first(timeValues), _.last(timeValues));
+    return timestampToTimeOfYear(wmsTime, timescale, disambiguateYears);
+  }
+  
+  timeAndSymbol(times, wmsTime, symbol) {
+    return `${this.timeOfYear(times, wmsTime)} ${symbol}`;
+  }
 
   render() {
-    const dataset = `${this.props.start_date}-${this.props.end_date}`;
-    let resolution = _.invert(this.props.variableTimes)[this.props.variableWmsTime];
-    resolution = resolution && JSON.parse(resolution).timescale;
-    const times = _.values(this.props.variableTimes);
-    const disambiguateYears = !sameYear(_.first(times), _.last(times));
-    const vTime = timestampToTimeOfYear(this.props.variableWmsTime, resolution, disambiguateYears);
-
-    let comp = null;
-    if (this.props.hasValidComparand) {
-      var cTime = timestampToTimeOfYear(this.props.comparandWmsTime, resolution, disambiguateYears);
-      comp = `vs. ${cTime} ${this.props.comparand}`;
-    }
-
     return (
         <h5>
-          Dataset {dataset} {this.props.run}: {vTime} {this.props.variable} {comp}
+          Dataset {`${this.props.start_date}-${this.props.end_date}`} {this.props.run}:
+          {' '}
+          {this.timeAndSymbol(this.props.variableTimes, this.props.variableWmsTime, this.props.variable)}
+          {' '}
+          {
+            this.props.hasValidComparand && 
+            `vs. ${this.timeAndSymbol(this.props.comparandTimes, this.props.comparandWmsTime, this.props.comparand)}`
+          }
         </h5>
     );
   }
