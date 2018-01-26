@@ -66,7 +66,11 @@ export default class MapSettings extends React.Component {
   }
 
   toggleLinkTimes = () => {
-    this.setState({ linkTimes: !this.state.linkTimes });
+    const toggledlinkTimes = !this.state.linkTimes;
+    if (toggledlinkTimes) {
+      this.props.onChangeComparandTime(this.props.variableTimeIdx);
+    }
+    this.setState({ linkTimes: toggledlinkTimes });
   };
 
   handleChangeVariableTime = (time) => {
@@ -136,9 +140,9 @@ export default class MapSettings extends React.Component {
               <Col lg={5}>
                 <DataDisplayControls
                   name='Isoline'
-                  disabled={this.state.linkTimes}
                   times={this.props.comparandTimes}
                   timeIdx={this.props.comparandTimeIdx}
+                  timeLinked={this.state.linkTimes}
                   onChangeTime={this.handleChangeComparandTime}
                   palette={this.props.isolinePalette}
                   onChangePalette={this.props.onChangeIsolinePalette}

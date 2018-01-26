@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
 import TimeSelector from './TimeSelector';
 import PaletteSelector from './PaletteSelector';
 import ScaleSelector from './ScaleSelector';
@@ -14,6 +13,7 @@ export default class DataDisplayControls extends React.Component {
 
     times: PropTypes.object,
     timeIdx: PropTypes.string,
+    timeLinked: PropTypes.bool,
     onChangeTime: PropTypes.func.isRequired,
 
     palette: PropTypes.string,
@@ -23,6 +23,10 @@ export default class DataDisplayControls extends React.Component {
     layerMin: PropTypes.number,
     logscale: PropTypes.string,
     onChangeScale: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    timeLinked: false,
   };
 
   constructor(props) {
@@ -37,9 +41,9 @@ export default class DataDisplayControls extends React.Component {
       <div>
         <TimeSelector
           name={this.props.name}
-          disabled={this.props.disabled}
           times={this.props.times}
           timeIdx={this.props.timeIdx}
+          timeLinked={this.props.timeLinked}
           onChange={this.props.onChangeTime}
         />
         <PaletteSelector

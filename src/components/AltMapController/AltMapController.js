@@ -241,19 +241,20 @@ class AltMapController extends React.Component {
     // timeidx is a stringified object with a resolution  (monthly, annual, seasonal)
     // and an index denoting the timestamp's position with the file
     // symbol is either 'variable' or 'comparand'
+    alert(`updateTime(${symbol}, ${timeidx}`)
     var update = {};
     update[`${symbol}TimeIdx`] = timeidx;
     update[`${symbol}WmsTime`] = this.state[`${symbol}Times`][timeidx];
 
-    // if the user has set the variable and comparand to match times,
-    // update the comparand too
-    if (this.hasValidData('comparand') &&
-        this.state.linkTimes &&
-        symbol === 'variable'
-    ) {
-      update.comparandTimeIdx = timeidx;
-      update.comparandWmsTime = this.state.comparandTimes[timeidx];
-    }
+    // // if the user has set the variable and comparand to match times,
+    // // update the comparand too
+    // if (this.hasValidData('comparand') &&
+    //     this.state.linkTimes &&
+    //     symbol === 'variable'
+    // ) {
+    //   update.comparandTimeIdx = timeidx;
+    //   update.comparandWmsTime = this.state.comparandTimes[timeidx];
+    // }
     this.setState(update);
   }
 
@@ -453,6 +454,7 @@ class AltMapController extends React.Component {
                   variableWmsTime={this.state.variableWmsTime}
                   hasValidComparand={this.hasComparand()}
                   comparand={this.state.comparand}
+                  comparandTimes={this.state.comparandTimes}
                   comparandWmsTime={this.state.comparandWmsTime}
                 />
               </StaticControl>
