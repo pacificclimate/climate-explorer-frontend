@@ -15,6 +15,7 @@ class StaticControl extends MapControl {
           'div',
           'StaticControl leaflet-control'
         );
+        Object.assign(this.container.style, props.style);
         ReactDom.render(props.children, this.container);
         return this.container;
       };
