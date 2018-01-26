@@ -1,24 +1,23 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Glyphicon, } from 'react-bootstrap';
-
-import _ from 'underscore';
+import { Button, Glyphicon } from 'react-bootstrap';
 
 
 export default class LinkControls extends React.Component {
   static propTypes = {
+    active: PropTypes.bool,
+    onClick: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-    };
-  }
+  static defaultProps = {
+    active: false,
+  };
 
   render() {
     return (
-      <Button><Glyphicon glyph='transfer' /></Button>
+      <Button {...this.props}>
+        <Glyphicon glyph='transfer' />
+      </Button>
     );
   }
 }

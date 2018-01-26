@@ -63,7 +63,22 @@ export default class MapSettings extends React.Component {
     return this.variableId(this.props.comparandMeta);
   }
 
-  handleLinkTimes = linkTimes => this.setState({ linkTimes });
+  toggleLinkTimes = () => {
+    this.setState({ linkTimes: !this.state.linkTimes });
+  };
+
+  handleChangeVariableTime = (time) => {
+    this.props.onChangeVariableTime(time);
+    if (this.state.linkTimes) {
+      this.props.onChangeComparandTime(time);
+    }
+  };
+
+  handleChangeComparandTime = (time) => {
+    if (!this.state.linkTimes) {
+      this.props.onChangeComparandTime(time);
+    }
+  };
 
   MapSettingsButton = (props) =>
     <Button onClick={props.open} title={this.props.title}>
@@ -95,7 +110,7 @@ export default class MapSettings extends React.Component {
                 name='Raster'
                 times={this.props.variableTimes}
                 timeIdx={this.props.variableTimeIdx}
-                onChangeTime={this.props.onChangeVariableTime}
+                onChangeTime={this.handleChangeVariableTime}
                 palette={this.props.rasterPalette}
                 onChangePalette={this.props.onChangeRasterPalette}
                 variableId={this.rasterVariableId()}
@@ -108,8 +123,8 @@ export default class MapSettings extends React.Component {
               this.props.hasComparand &&
               <Col lg={1}>
                 <LinkControls
-                  value={this.state.linkTimes}
-                  onChange={this.handleLinkTimes}
+                  active={this.state.linkTimes}
+                  onClick={this.toggleLinkTimes}
                 />
               </Col>
             }
@@ -121,7 +136,7 @@ export default class MapSettings extends React.Component {
                   disabled={this.state.linkTimes}
                   times={this.props.comparandTimes}
                   timeIdx={this.props.comparandTimeIdx}
-                  onChangeTime={this.props.onChangeComparandTime}
+                  onChangeTime={this.handleChangeComparandTime}
                   palette={this.props.isolinePalette}
                   onChangePalette={this.props.onChangeIsolinePalette}
                   layerMin={this.props.isolineLayerMin}
