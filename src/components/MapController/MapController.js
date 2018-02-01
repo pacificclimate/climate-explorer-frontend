@@ -90,6 +90,7 @@ var MapController = createReactClass({
   //the first dataset representing a 0th time index (January, Winter, or Annual)
   //will be displayed.
   componentWillReceiveProps: function (nextProps) {
+    console.log('MapController.componentWillReceiveProps', this.props.area, nextProps.area)
     
     if(this.hasValidData("variable", nextProps)) {
       var newVariableId = nextProps.meta[0].variable_id;
@@ -320,7 +321,10 @@ var MapController = createReactClass({
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before we have required data
-    return !_.isEqual(nextState, this.state);
+    console.log('MapController.shouldComponentUpdate props', this.props, nextProps)
+    console.log('MapController.shouldComponentUpdate state', this.state, nextState)
+    console.log('MapController.shouldComponentUpdate value', !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state))
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
   },
 
   //toggle whether or not the two map layers are locked to the same timestamp
@@ -706,6 +710,7 @@ var MapController = createReactClass({
         </Col>
         );
 
+    console.log('MapController.render', this.props)
     return (
       <div>
         <Row>
