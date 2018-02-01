@@ -717,7 +717,7 @@ var MapController = createReactClass({
               <div className={styles.controls}>
                 <ButtonGroup vertical>
                   <Button onClick={this.open} title='Map Settings'><Glyphicon glyph='menu-hamburger' /></Button>
-                  <GeoExporter.Modal area={this.props.area} title='Export polygon' />
+                  <GeoExporter area={this.props.area} title='Export polygon' />
                   <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
                 </ButtonGroup>
               </div>
