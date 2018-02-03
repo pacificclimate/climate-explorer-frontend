@@ -45,9 +45,6 @@ var App = createReactClass({
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
 
-    const alternate = process.env.CE_ALT_MAP_CONTROLLER;
-    const TheMapController = alternate ? AltMapController : MapController;
-
     return (
       <Grid fluid>
         <Row>
@@ -64,7 +61,7 @@ var App = createReactClass({
         <Row>
           <Col lg={6}>
             <div>
-              <TheMapController
+              <AltMapController
                 meta = {this.getfilteredMeta()}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
