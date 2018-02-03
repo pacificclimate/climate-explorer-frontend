@@ -29,22 +29,14 @@ class App extends React.Component {
   }
 }
 
-const test = !!process.env.CE_TEST_APP;
-
-if (test) {
-  render((
-    <TestAppController/>
-  ), document.getElementById('wrapper'));
-} else {
-  render((
-    <Router history={hashHistory}>
-      <Route path='/' component={App}>
-        <Route path='/moti' component={MotiController} />
-        <Route path='/climo/:ensemble_name' component={AppController} />
-        <Route path='/compare/:ensemble_name' component={DualController} />
-      </Route>
-    </Router>
-  ), document.getElementById('wrapper'));
-}
+render((
+  <Router history={hashHistory}>
+    <Route path='/' component={App}>
+      <Route path='/moti' component={MotiController} />
+      <Route path='/climo/:ensemble_name' component={AppController} />
+      <Route path='/compare/:ensemble_name' component={DualController} />
+    </Route>
+  </Router>
+), document.getElementById('wrapper'));
 
 
