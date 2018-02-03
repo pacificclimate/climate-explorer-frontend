@@ -6,7 +6,7 @@ import Loader from 'react-loader';
 
 import _ from 'underscore';
 
-import './AltMapController.css';
+import './MapController.css';
 import DataMap from '../DataMap';
 import MapFooter from '../MapFooter';
 import MapSettings from '../MapSettings';
@@ -20,10 +20,7 @@ import { getVariableOptions } from '../../core/util';
 import { shallowDiffStr } from '../../core/debug-utils';
 
 
-// This class is the counterpart of MapController and will ultimately become
-// a drop-in replacement for it to transition over to the new architecture.
-
-class AltMapController extends React.Component {
+export default class MapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
@@ -341,10 +338,10 @@ class AltMapController extends React.Component {
     const propChange = !_.isEqual(nextProps, this.props);
     const stateChange = !_.isEqual(nextState, this.state);
     const b = propChange || stateChange;
-    // console.log('AltMapController.shouldComponentUpdate: propChange', propChange)
-    // console.log('AltMapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
-    // console.log('AltMapController.shouldComponentUpdate: stateChange', stateChange)
-    // console.log('AltMapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
+    // console.log('MapController.shouldComponentUpdate: propChange', propChange)
+    // console.log('MapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
+    // console.log('MapController.shouldComponentUpdate: stateChange', stateChange)
+    // console.log('MapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
     return b;
   }
 
@@ -448,5 +445,3 @@ class AltMapController extends React.Component {
     );
   }
 }
-
-export default AltMapController;

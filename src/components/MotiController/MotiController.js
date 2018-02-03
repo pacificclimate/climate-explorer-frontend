@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import AltMapController from '../AltMapController';
+import MapController from '../MapController';
 import MotiDataController from '../MotiDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
@@ -47,7 +47,7 @@ var App = createReactClass({
         <Row>
           <Col lg={6}>
             <div>
-              <AltMapController
+              <MapController
                 meta = {this.getfilteredMeta()}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
