@@ -6,7 +6,6 @@ import { Router, Route, hashHistory } from 'react-router';
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
 import DualController from './components/DualController';
-import TestAppController from './components/TestAppController';
 
 import Header from './components/Header';
 

@@ -13,7 +13,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import MapController from '../MapController';
 import AltMapController from '../AltMapController';
 import DataController from '../DataController/DataController';
 import Selector from '../Selector';
