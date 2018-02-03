@@ -1,6 +1,0 @@
-{
-  "name": "TestAppController",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./TestAppController.js"
-}
