@@ -35,10 +35,10 @@ class Header extends React.Component {
             </Col>
             <Col lg={8}>
               <Nav bsStyle="tabs" justified activeKey={this.state.activeKey} onSelect={handleSelect}>
-                <NavItem eventKey={1} href="/climo/all_downscale_files">Standard climatologies</NavItem>
-                <NavItem eventKey={2} href="/climo/all_CLIMDEX_files">ClimDEX climatologies</NavItem>
-                <NavItem eventKey={3} href="/compare/all_downscale_files">Standard comparison</NavItem>
-                <NavItem eventKey={4} href="/compare/all_CLIMDEX_files">ClimDEX comparison</NavItem>
+                <NavItem eventKey={1} href="/#/climo/all_downscale_files">Standard climatologies</NavItem>
+                <NavItem eventKey={2} href="/#/climo/all_CLIMDEX_files">ClimDEX climatologies</NavItem>
+                <NavItem eventKey={3} href="/#/compare/all_downscale_files">Standard comparison</NavItem>
+                <NavItem eventKey={4} href="/#/compare/all_CLIMDEX_files">ClimDEX comparison</NavItem>
               </Nav>
             </Col>
           </Row>
