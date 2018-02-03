@@ -11,7 +11,7 @@ import { EditControl } from 'react-leaflet-draw';
 
 import StaticControl from '../StaticControl';
 import './CanadaBaseMap.css';
-import utils from '../Map/utils';
+import utils from '../../core/map-utils';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
