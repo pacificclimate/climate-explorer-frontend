@@ -6,8 +6,6 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 const GLOBALS = {
   'process.env.NODE_ENV' : (process.env.NODE_ENV !== 'production') ? '"development"'
       : '"production"',
-  'process.env.CE_ALT_MAP_CONTROLLER': `${!!process.env.CE_ALT_MAP_CONTROLLER}`,
-  'process.env.CE_TEST_APP': `${!!process.env.CE_TEST_APP}`,
   CE_BACKEND_URL : JSON.stringify(process.env.CE_BACKEND_URL
       || ((process.env.NODE_ENV !== 'production') ? 'http://localhost:8000/api'
           : 'http://tools.pacificclimate.org/climate-data')),
