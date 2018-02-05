@@ -1,3 +1,5 @@
+// Selector for colour palette used on data maps.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 

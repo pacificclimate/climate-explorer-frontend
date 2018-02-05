@@ -1,11 +1,4 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-
-import Selector from '../Selector';
-import { getVariableOptions } from '../../core/util';
-
-
-// Renders a selector for selecting whether a map's colours are scaled
+// Selector for determining whether a map's colours are scaled
 // logarithmically or linearly.
 // The logscale option is disabled if logscale colouring is not supported for
 // the variable.
@@ -13,6 +6,13 @@ import { getVariableOptions } from '../../core/util';
 // 1) all its values are > 0, or
 // 2) the variable is marked "overrideLogarithmicScale: true" in the
 //    variable-options.yaml config file (but values will be clipped to > 0)
+
+import PropTypes from 'prop-types';
+import React from 'react';
+
+import Selector from '../Selector';
+import { getVariableOptions } from '../../core/util';
+
 
 export default class ScaleSelector extends React.Component {
   static propTypes = {
