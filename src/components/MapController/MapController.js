@@ -1,4 +1,6 @@
-/* eslint-disable no-trailing-spaces */
+// Wires up components of overall map display for CE.
+// Also contains some legacy code that should be further refactored, primarily
+// `loadMap` and the handling of datasets (see TODOs/FIXMEs).
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -17,7 +19,6 @@ import GeoExporter from '../GeoExporter';
 import { updateSingleState } from '../../core/react-utils';
 import { getTimeMetadata } from '../../data-services/metadata';
 import { getVariableOptions } from '../../core/util';
-import { shallowDiffStr } from '../../core/debug-utils';
 
 
 export default class MapController extends React.Component {
@@ -266,6 +267,9 @@ export default class MapController extends React.Component {
   // React lifecycle event handlers
 
   componentWillReceiveProps(nextProps) {
+    // TODO: This stuff, particularly loadMap, may be better placed in
+    // componentWillUpdate.
+
     // Load initial map, based on a list of available data files passed
     // as props from its parent
     // the first dataset representing a 0th time index (January, Winter, or Annual)
