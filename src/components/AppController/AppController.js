@@ -59,7 +59,7 @@ var App = createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div>
+            <div style={{ width: 890, height: 700 }}>
               <MapController
                 meta = {this.getfilteredMeta()}
                 area={this.state.area}

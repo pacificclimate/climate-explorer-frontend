@@ -84,7 +84,7 @@ var App = createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div>
+            <div style={{ width: 890, height: 700 }}>
               <MapController
                 meta = {this.getfilteredMeta()}
                 comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}

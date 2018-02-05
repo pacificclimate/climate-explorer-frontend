@@ -354,98 +354,93 @@ export default class MapController extends React.Component {
     const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
 
     return (
-      // FIXME: This sizing div really shouldn't be part of the controller.
-      <div style={{ width: 890, height: 700 }}>
-        {
-          this.state.variableTimes || this.state.comparandTimes ? (
-            <DataMap
-              rasterDataset={rasterDatasetId}
-              rasterVariable={this.state.variable}
+      this.state.variableTimes || this.state.comparandTimes ? (
+        <DataMap
+          rasterDataset={rasterDatasetId}
+          rasterVariable={this.state.variable}
+          rasterPalette={this.state.rasterPalette}
+          rasterLogscale={this.state.rasterLogscale}
+          rasterRange={this.state.rasterRange}
+          onChangeRasterRange={this.handleChangeRasterRange}
+
+          isolineDataset={isolineDatasetId}
+          isolineVariable={this.state.comparand}
+          isolinePalette={this.state.isolinePalette}
+          numberOfContours={this.state.numberOfContours}
+          isolineLogscale={this.state.isolineLogscale}
+          isolineRange={this.state.isolineRange}
+          onChangeIsolineRange={this.handleChangeIsolineRange}
+
+          rasterTime={this.state.variableWmsTime}
+          isolineTime={this.state.comparandWmsTime}
+
+          onSetArea={this.props.onSetArea}
+          area={this.props.area}
+        >
+
+          <StaticControl position='topleft'>
+            <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
+          </StaticControl>
+
+          <StaticControl position='topleft'>
+            <GeoExporter area={this.props.area} title='Export polygon' />
+          </StaticControl>
+
+          <StaticControl position='topright' style={{ marginRight: '70px' }}>
+            <MapSettings
+              title='Map Settings'
+              meta={this.props.meta}
+              comparandMeta={this.props.comparandMeta}
+
+              dataset={this.currentDataset()}
+              onDatasetChange={this.updateDataset}
+
+              variableTimes={this.state.variableTimes}
+              variableTimeIdx={this.state.variableTimeIdx}
+              onChangeVariableTime={this.handleChangeVariableTime}
+
+              hasComparand={this.hasComparand()}
+              comparandTimes={this.state.comparandTimes}
+              comparandTimeIdx={this.state.comparandTimeIdx}
+              onChangeComparandTime={this.handleChangeComparandTime}
+
+              timesLinkable={this.timesMatch()}
+
               rasterPalette={this.state.rasterPalette}
-              rasterLogscale={this.state.rasterLogscale}
-              rasterRange={this.state.rasterRange}
-              onChangeRasterRange={this.handleChangeRasterRange}
+              onChangeRasterPalette={this.handleChangeRasterPalette}
 
-              isolineDataset={isolineDatasetId}
-              isolineVariable={this.state.comparand}
               isolinePalette={this.state.isolinePalette}
-              numberOfContours={this.state.numberOfContours}
+              onChangeIsolinePalette={this.handleChangeIsolinePalette}
+
+              rasterLayerMin={this.state.rasterRange.min}
+              rasterLogscale={this.state.rasterLogscale}
+              onChangeRasterScale={this.handleChangeRasterScale}
+
+              isolineLayerMin={this.state.isolineRange.min}
               isolineLogscale={this.state.isolineLogscale}
-              isolineRange={this.state.isolineRange}
-              onChangeIsolineRange={this.handleChangeIsolineRange}
+              onChangeIsolineScale={this.handleChangeIsolineScale}
+            />
+          </StaticControl>
 
-              rasterTime={this.state.variableWmsTime}
-              isolineTime={this.state.comparandWmsTime}
+          <StaticControl position='bottomleft'>
+            <MapFooter
+              start_date={this.state.start_date}
+              end_date={this.state.end_date}
+              run={this.state.run}
+              variable={this.state.variable}
+              variableTimes={this.state.variableTimes}
+              variableWmsTime={this.state.variableWmsTime}
+              hasValidComparand={this.hasComparand()}
+              comparand={this.state.comparand}
+              comparandTimes={this.state.comparandTimes}
+              comparandWmsTime={this.state.comparandWmsTime}
+            />
+          </StaticControl>
 
-              onSetArea={this.props.onSetArea}
-              area={this.props.area}
-            >
-
-              <StaticControl position='topleft'>
-                <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-              </StaticControl>
-
-              <StaticControl position='topleft'>
-                <GeoExporter area={this.props.area} title='Export polygon' />
-              </StaticControl>
-
-              <StaticControl position='topright' style={{ marginRight: '70px' }}>
-                <MapSettings
-                  title='Map Settings'
-                  meta={this.props.meta}
-                  comparandMeta={this.props.comparandMeta}
-
-                  dataset={this.currentDataset()}
-                  onDatasetChange={this.updateDataset}
-
-                  variableTimes={this.state.variableTimes}
-                  variableTimeIdx={this.state.variableTimeIdx}
-                  onChangeVariableTime={this.handleChangeVariableTime}
-
-                  hasComparand={this.hasComparand()}
-                  comparandTimes={this.state.comparandTimes}
-                  comparandTimeIdx={this.state.comparandTimeIdx}
-                  onChangeComparandTime={this.handleChangeComparandTime}
-
-                  timesLinkable={this.timesMatch()}
-
-                  rasterPalette={this.state.rasterPalette}
-                  onChangeRasterPalette={this.handleChangeRasterPalette}
-
-                  isolinePalette={this.state.isolinePalette}
-                  onChangeIsolinePalette={this.handleChangeIsolinePalette}
-
-                  rasterLayerMin={this.state.rasterRange.min}
-                  rasterLogscale={this.state.rasterLogscale}
-                  onChangeRasterScale={this.handleChangeRasterScale}
-
-                  isolineLayerMin={this.state.isolineRange.min}
-                  isolineLogscale={this.state.isolineLogscale}
-                  onChangeIsolineScale={this.handleChangeIsolineScale}
-                />
-              </StaticControl>
-
-              <StaticControl position='bottomleft'>
-                <MapFooter
-                  start_date={this.state.start_date}
-                  end_date={this.state.end_date}
-                  run={this.state.run}
-                  variable={this.state.variable}
-                  variableTimes={this.state.variableTimes}
-                  variableWmsTime={this.state.variableWmsTime}
-                  hasValidComparand={this.hasComparand()}
-                  comparand={this.state.comparand}
-                  comparandTimes={this.state.comparandTimes}
-                  comparandWmsTime={this.state.comparandWmsTime}
-                />
-              </StaticControl>
-
-            </DataMap>
-          ) : (
-            <Loader/>
-          )
-        }
-      </div>
+        </DataMap>
+      ) : (
+        <Loader/>
+      )
     );
   }
 }
