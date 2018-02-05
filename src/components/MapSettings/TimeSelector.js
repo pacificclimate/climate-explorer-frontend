@@ -1,3 +1,7 @@
+// Selector for times (month, season, and/or annual) available in multi-year
+// mean files. Disabled if `timeLinked` prop is true; this means it is
+// controlled externally (by another selector) and is only used to display.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -42,7 +46,7 @@ export default class TimeSelector extends React.Component {
 
   render() {
     if (!this.props.times) {
-      // Code smell:
+      // FIXME: Code smell:
       // metadata API call hasn't finished loading yet; return disabled selector.
       // (user shouldn't see this unless something is off with backend -
       // metadata query should be loaded by the time the user opens this menu.)
