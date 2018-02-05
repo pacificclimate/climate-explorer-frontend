@@ -5,7 +5,7 @@ import React from 'react';
 import { Button, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 
-export default class LinkControls extends React.PureComponent {
+export default class TimeLinkButton extends React.PureComponent {
   static propTypes = {
     timesLinkable: PropTypes.bool,
     linkTimes: PropTypes.bool,

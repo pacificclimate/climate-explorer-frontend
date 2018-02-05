@@ -4,7 +4,7 @@ import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
 
 import DatasetSelector from './DatasetSelector';
 import DataDisplayControls from './DataDisplayControls';
-import LinkControls from './LinkControls';
+import TimeLinkButton from './TimeLinkButton';
 
 
 export default class MapSettingsDialog extends React.Component {
@@ -126,7 +126,7 @@ export default class MapSettingsDialog extends React.Component {
               {
                 this.props.hasComparand &&
                 <Col lg={1}>
-                  <LinkControls
+                  <TimeLinkButton
                     timesLinkable={this.props.timesLinkable}
                     linkTimes={this.state.linkTimes}
                     onClick={this.toggleLinkTimes}
