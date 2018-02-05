@@ -1,9 +1,11 @@
+// Button with tooltip for linking/unlinking time selectors in MapSettings.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 
-export default class LinkControls extends React.Component {
+export default class LinkControls extends React.PureComponent {
   static propTypes = {
     timesLinkable: PropTypes.bool,
     linkTimes: PropTypes.bool,
@@ -20,11 +22,11 @@ export default class LinkControls extends React.Component {
     }
   }
 
-  tooltip = <Tooltip>{this.tooltipContent()}</Tooltip>;
+  tooltip = () => <Tooltip>{this.tooltipContent()}</Tooltip>;
 
   render() {
     return (
-      <OverlayTrigger placement='bottom' overlay={this.tooltip}>
+      <OverlayTrigger placement='bottom' overlay={this.tooltip()}>
         <Button
           disabled={!this.props.timesLinkable}
           active={this.props.linkTimes}
