@@ -9,7 +9,6 @@ import ScaleSelector from './ScaleSelector';
 export default class DataDisplayControls extends React.Component {
   static propTypes = {
     name: PropTypes.string, // 'Raster' | 'Isoline'
-    disabled: PropTypes.bool,  // is this the whole selector or just time?
 
     times: PropTypes.object,
     timeIdx: PropTypes.string,
