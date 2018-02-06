@@ -392,3 +392,23 @@ describe('hideSeriesInLegend', function () {
     expect(graph.legend.hide.length).toBe(0);
   });
 });
+
+describe('sortSeriesByRank', function (){
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var rankByTimeResolution = function (series) {
+    var resolutions = ["Yearly", "Seasonal", "Monthly"];
+    for(let i = 0; i < 3; i++) {
+      if(series[0].search(resolutions[i]) != -1) {
+        return i;
+      }
+    }
+  }
+  it('orders series by ranking', function () {
+    var ranked = chart.sortSeriesByRank(graph, rankByTimeResolution);
+    expect(ranked.data.columns[0][0]).toBe("Yearly Mean");
+    expect(ranked.data.columns[1][0]).toBe("Seasonal Mean");
+    expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
+  });
+});

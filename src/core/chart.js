@@ -829,8 +829,25 @@ var hideSeriesInLegend = function(graph, predicate) {
   return graph;
 };
 
+/*
+ * Post-processing graph function that sets the order of the data series.
+ * The last-drawn series is the most clearly visible; its points and lines
+ * will be on top where they intersect with other series.
+ *
+ * Accepts a C3 graph and a ranking function. The ranking function will be
+ * applied to each series in the graph, and the series will be sorted by the
+ * ranking function's results. The higher a series is ranked, the later it
+ * will be drawn and the more prominent it will appear.
+ */
+var sortSeriesByRank = function(graph, ranker) {
+  var sorter = function(a, b) {return ranker(a) - ranker(b);}
+  graph.data.columns = graph.data.columns.sort(sorter);
+  return graph;
+}
+
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
-    timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank, hideSeriesInLegend,
+    timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
+    hideSeriesInLegend, sortSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

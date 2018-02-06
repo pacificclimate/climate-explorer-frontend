@@ -46,7 +46,8 @@ import {timeseriesToAnnualCycleGraph,
         timeseriesToTimeseriesGraph,
         assignColoursByGroup,
         fadeSeriesByRank,
-        hideSeriesInLegend} from '../../core/chart';
+        hideSeriesInLegend,
+        sortSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -217,8 +218,22 @@ var DataController = createReactClass({
 
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, "data");
+      var graph = timeseriesToAnnualCycleGraph(props.meta, ...data);
+
+      //arrange the graph so that the highest-resolution data is most visible.
+      var rankByTimeResolution = function (series) {
+        var resolutions = ["Yearly", "Seasonal", "Monthly"];
+        for(let i = 0; i < 3; i++) {
+          if(series[0].search(resolutions[i]) != -1) {
+            return i;
+          }
+        }
+        return 0;
+      }
+      graph = sortSeriesByRank(graph, rankByTimeResolution);
+
       this.setState({
-        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        annualCycleData: graph,
         annualCycleInstance: {
           start_date: monthlyMetadata.start_date,
           end_date: monthlyMetadata.end_date,
@@ -323,36 +338,11 @@ var DataController = createReactClass({
    * (multi year means).
    */
   loadContextGraph: function (props) {
-    this.setContextGraphNoDataMessage("Loading Data");
 
-    var dataPromises = [];
-    var dataQueryParams = [];
-    var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
-    var params = _.pick(props, 'experiment', 'variable_id', 'ensemble_name');
-    params.timescale = 'yearly';
-    params.multi_year_mean = true;
-
-    //determine which models have data that matches this variable and experiment
-    for(let i = 0; i < contextModels.length; i++ ) {
-      params.model_id = contextModels[i];
-      if(_.where(props.contextMeta, _.omit(params, 'ensemble_name')).length > 0){
-        dataPromises.push(this.getDataPromise(params, "yearly", 0));
-        dataQueryParams.push(_.extend({}, params));
-      }
-    }
-
-    //add the selected model last, so it stands out
-    params.model_id = props.model_id;
-    dataPromises.push(this.getDataPromise(params, "yearly", 0));
-    dataQueryParams.push(_.extend({}, params));
-
-    //fetch data from the backend and assemble the graph
-    Promise.all(dataPromises).then(responses=> {
-      var data = _.pluck(responses, "data");
-      var graph = dataToLongTermAverageGraph(data, dataQueryParams);
-
-      //process graph to highlight selected model de-emphasize others
-
+    //Graph formatting function used to emphasize the current model and
+    //deemphasize all others.
+    var emphasizeCurrentModel = function(graph) {
+      //Helper function used to classify data series by which model generated them
       var makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
         return function(dataseries) {
           return dataseries[0].search(props.model_id) != -1 ? selectedModelOutput : otherModelOutput;
@@ -361,18 +351,63 @@ var DataController = createReactClass({
       graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
       graph = fadeSeriesByRank(graph, makeModelSegmentor(1, .35));
       graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
+      graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
 
       //simplify graph by turning off tooltip and missing data gaps
       graph.line.connectNull = true;
       graph.tooltip = {show: false};
+      return graph;
+    };
+
+    //If the only thing changed since the last time the graph was rendered
+    //is the model, we already have all the data fetched, we just need to
+    //reformat the graph.
+    if(this.state.contextData &&
+        this.state.contextData.data.columns.length > 0 &&
+        _.isEqual(props.variable_id, this.props.variable_id) &&
+        _.isEqual(props.experiment, this.props.experiment)) {
+      var graph = emphasizeCurrentModel(this.state.contextData);
 
       this.setState({
         contextData: graph
       });
-    }).catch(error => {
-      this.displayError(error, this.setContextGraphNoDataMessage);
-    });
+    }
+    else {
+      this.setContextGraphNoDataMessage("Loading Data");
 
+      var dataPromises = [];
+      var dataQueryParams = [];
+      var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
+      var params = _.pick(props, 'experiment', 'variable_id', 'ensemble_name');
+      params.timescale = 'yearly';
+      params.multi_year_mean = true;
+
+      params.model_id = props.model_id;
+      dataPromises.push(this.getDataPromise(params, "yearly", 0));
+      dataQueryParams.push(_.extend({}, params));
+
+      //determine which models have data that matches this variable and experiment
+      for(let i = 0; i < contextModels.length; i++ ) {
+        params.model_id = contextModels[i];
+        if(_.where(props.contextMeta, _.omit(params, 'ensemble_name')).length > 0){
+          dataPromises.push(this.getDataPromise(params, "yearly", 0));
+          dataQueryParams.push(_.extend({}, params));
+        }
+      }
+
+
+      //fetch data from the backend and assemble the graph
+      Promise.all(dataPromises).then(responses=> {
+        var data = _.pluck(responses, "data");
+        var graph = emphasizeCurrentModel(dataToLongTermAverageGraph(data, dataQueryParams));
+
+        this.setState({
+          contextData: graph
+        });
+      }).catch(error => {
+        this.displayError(error, this.setContextGraphNoDataMessage);
+      });
+    }
   },
 
   render: function () {
