@@ -247,7 +247,7 @@ var DualDataController = createReactClass({
 
     var timeseriesPromises = [];
     
-    var variableTimeseriesParams = {variable_id: props.variable_id, area: props.area};
+    var variableTimeseriesParams = _.pick(props, "variable_id", "area", "meta");
     timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id));
     
     //determine whether seasonal and annual resolution data are available for
@@ -263,7 +263,9 @@ var DualDataController = createReactClass({
     //but it is not guarenteed to exist for the comparison variable, so fall back to only
     //showing one variable in that case.
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
-      var comparandTimeseriesParams = {variable_id: props.comparand_id, area: props.area};
+      var comparandTimeseriesParams = _.pick(props, "area");
+      comparandTimeseriesParams.variable_id = props.comparand_id;
+      comparandTimeseriesParams.meta = props.comparandMeta;
       timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
 
       //check availability of seasonal and annual data on the comparand,
@@ -353,6 +355,7 @@ var DualDataController = createReactClass({
     //add data from the comparand, if it exists
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
       params.area = props.area;
+      params.meta = props.comparandMeta;
       timeseriesPromises.push(this.getTimeseriesPromise(params, comparandMetadata.unique_id));
     }
 
