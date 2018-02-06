@@ -328,14 +328,14 @@ var DataController = createReactClass({
     var dataPromises = [];
     var dataQueryParams = [];
     var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
-    var params = _.pick(props, 'experiment', 'variable_id', "ensemble_name");
+    var params = _.pick(props, 'experiment', 'variable_id', 'ensemble_name');
     params.timescale = 'yearly';
     params.multi_year_mean = true;
 
     //determine which models have data that matches this variable and experiment
     for(let i = 0; i < contextModels.length; i++ ) {
       params.model_id = contextModels[i];
-      if(_.where(props.contextMeta, params)){
+      if(_.where(props.contextMeta, _.omit(params, 'ensemble_name')).length > 0){
         dataPromises.push(this.getDataPromise(params, "yearly", 0));
         dataQueryParams.push(_.extend({}, params));
       }
