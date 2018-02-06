@@ -139,7 +139,7 @@ var ModalMixin = {
   //Fetches and validates data from a call to the backend's
   //"timeseries" endpoint
   getTimeseriesPromise: function (props, timeseriesDatasetId) {
-    var validate = this.multiYearMeanSelected() ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
+    var validate = this.multiYearMeanSelected(props) ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
     return axios({
       baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
       params: {
