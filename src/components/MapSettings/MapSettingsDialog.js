@@ -25,24 +25,19 @@ export default class MapSettingsDialog extends React.Component {
     variableTimes: PropTypes.object,
     variableTimeIdx: PropTypes.string,
     onChangeVariableTime: PropTypes.func.isRequired,
-
-    hasComparand: PropTypes.bool,
-    comparandTimes: PropTypes.object,
-    comparandTimeIdx: PropTypes.string,
-    onChangeComparandTime: PropTypes.func.isRequired, // required???
-
-    timesLinkable: PropTypes.bool,
-
     rasterPalette: PropTypes.string,
     onChangeRasterPalette: PropTypes.func.isRequired,
-
-    isolinePalette: PropTypes.string,
-    onChangeIsolinePalette: PropTypes.func.isRequired, // required???
-
     rasterLayerMin: PropTypes.number,
     rasterLogscale: PropTypes.string,
     onChangeRasterScale: PropTypes.func.isRequired,
 
+    hasComparand: PropTypes.bool,
+    timesLinkable: PropTypes.bool,
+    comparandTimes: PropTypes.object,
+    comparandTimeIdx: PropTypes.string,
+    onChangeComparandTime: PropTypes.func.isRequired, // required???
+    isolinePalette: PropTypes.string,
+    onChangeIsolinePalette: PropTypes.func.isRequired, // required???
     isolineLayerMin: PropTypes.number,
     isolineLogscale: PropTypes.string,
     onChangeIsolineScale: PropTypes.func.isRequired,

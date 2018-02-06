@@ -349,7 +349,6 @@ export default class MapController extends React.Component {
     return b;
   }
 
-
   render() {
     const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
 
@@ -358,6 +357,7 @@ export default class MapController extends React.Component {
         <DataMap
           rasterDataset={rasterDatasetId}
           rasterVariable={this.state.variable}
+          rasterTime={this.state.variableWmsTime}
           rasterPalette={this.state.rasterPalette}
           rasterLogscale={this.state.rasterLogscale}
           rasterRange={this.state.rasterRange}
@@ -365,14 +365,12 @@ export default class MapController extends React.Component {
 
           isolineDataset={isolineDatasetId}
           isolineVariable={this.state.comparand}
+          isolineTime={this.state.comparandWmsTime}
           isolinePalette={this.state.isolinePalette}
           numberOfContours={this.state.numberOfContours}
           isolineLogscale={this.state.isolineLogscale}
           isolineRange={this.state.isolineRange}
           onChangeIsolineRange={this.handleChangeIsolineRange}
-
-          rasterTime={this.state.variableWmsTime}
-          isolineTime={this.state.comparandWmsTime}
 
           onSetArea={this.props.onSetArea}
           area={this.props.area}
@@ -398,24 +396,19 @@ export default class MapController extends React.Component {
               variableTimes={this.state.variableTimes}
               variableTimeIdx={this.state.variableTimeIdx}
               onChangeVariableTime={this.handleChangeVariableTime}
-
-              hasComparand={this.hasComparand()}
-              comparandTimes={this.state.comparandTimes}
-              comparandTimeIdx={this.state.comparandTimeIdx}
-              onChangeComparandTime={this.handleChangeComparandTime}
-
-              timesLinkable={this.timesMatch()}
-
               rasterPalette={this.state.rasterPalette}
               onChangeRasterPalette={this.handleChangeRasterPalette}
-
-              isolinePalette={this.state.isolinePalette}
-              onChangeIsolinePalette={this.handleChangeIsolinePalette}
-
               rasterLayerMin={this.state.rasterRange.min}
               rasterLogscale={this.state.rasterLogscale}
               onChangeRasterScale={this.handleChangeRasterScale}
 
+              hasComparand={this.hasComparand()}
+              timesLinkable={this.timesMatch()}
+              comparandTimes={this.state.comparandTimes}
+              comparandTimeIdx={this.state.comparandTimeIdx}
+              onChangeComparandTime={this.handleChangeComparandTime}
+              isolinePalette={this.state.isolinePalette}
+              onChangeIsolinePalette={this.handleChangeIsolinePalette}
               isolineLayerMin={this.state.isolineRange.min}
               isolineLogscale={this.state.isolineLogscale}
               onChangeIsolineScale={this.handleChangeIsolineScale}
