@@ -196,7 +196,7 @@ var DualDataController = createReactClass({
     //for the second variable. This query will always return a result, but
     //the result may be an empty object {}.
     if(props.comparand_id && props.comparand_id != props.variable_id) {
-      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area');
+      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'ensemble_name');
       comparandDataParams.variable_id = props.comparand_id;
       dataPromises.push(this.getDataPromise(comparandDataParams, timeres, timeidx));
       dataParams.push(comparandDataParams);
