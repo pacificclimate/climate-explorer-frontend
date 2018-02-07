@@ -20,6 +20,7 @@ import { getTimeMetadata } from '../../data-services/metadata';
 import { getVariableOptions } from '../../core/util';
 
 
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class MapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array.isRequired,
@@ -72,9 +73,9 @@ export default class MapController extends React.Component {
     return this.hasValidData('comparand');
   }
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   currentDataset() {
     // Return encoding of currently selected dataset
-    // FIXME: This is bad! See TODO in DatasetSelector
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
     // WAAT? The below code is copied from existing MapController, but it
     // doesn't drive Selector correctly. *&*#$@*
@@ -119,6 +120,7 @@ export default class MapController extends React.Component {
 
   // Support functions for event/callback handlers
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
     dataset,
@@ -227,11 +229,13 @@ export default class MapController extends React.Component {
 
   // Handlers for dataset change
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   updateDataset = (encodedDataset) => {
-    // FIXME: This is bad! See TODO in DatasetSelector
     this.loadMap(this.props, JSON.parse(encodedDataset));
   };
-  
+
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
+  // TODO: There may also be a second issue to do with encoding timeVarIdx
   getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
     let dataset = undefined;
     if (encodedVarTimeIdx) {

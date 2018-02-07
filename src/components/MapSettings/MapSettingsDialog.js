@@ -19,6 +19,7 @@ const layerPropTypes = PropTypes.shape({
   onChangeScale: PropTypes.func.isRequired,
 });
 
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
 export default class MapSettingsDialog extends React.Component {
   static propTypes = {
     // props for controlling dialog visibility
@@ -27,7 +28,6 @@ export default class MapSettingsDialog extends React.Component {
     close: PropTypes.func.isRequired,
 
     title: PropTypes.string,
-    // TODO: Refactor according to comments in DatasetSelector
     meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,
 

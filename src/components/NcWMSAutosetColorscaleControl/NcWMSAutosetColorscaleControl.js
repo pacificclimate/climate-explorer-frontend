@@ -4,7 +4,7 @@ import { MapControl } from 'react-leaflet';
 
 import LeafletNcWMSAutosetColorscaleControl from './LeafletNcWMSAutosetColorscaleControl';
 
-// TODO: Replace with a StaticControl like MapSettings?
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 class NcWMSAutosetColorscaleControl extends MapControl {
   createLeafletElement(props) {
     return new LeafletNcWMSAutosetColorscaleControl(props);

@@ -103,6 +103,7 @@ var ModalMixin = {
     return data;
   },
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
   //Fetches and validates data from a call to the backend's
   //"data" API endpoint
   getDataPromise: function (props, timeres, timeidx) {
@@ -120,6 +121,7 @@ var ModalMixin = {
     }).then(validateLongTermAverageData);
   },
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
   //Fetches and validates data from a call to the backend's
   //"multistat" API endpoint
   getStatsPromise: function (props, timeidx) {
@@ -136,6 +138,7 @@ var ModalMixin = {
     }).then(validateStatsData);
   },
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
   //Fetches and validates data from a call to the backend's
   //"timeseries" endpoint
   getTimeseriesPromise: function (props, timeseriesDatasetId) {

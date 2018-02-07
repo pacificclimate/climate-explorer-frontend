@@ -16,6 +16,7 @@ class ExperimentSelector extends React.Component {
   };
 
   componentDidMount() {
+    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'models'),
     }).then(response => {

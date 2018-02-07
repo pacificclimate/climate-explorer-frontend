@@ -2,6 +2,7 @@ import L from 'leaflet';
 import axios from 'axios';
 
 
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 const LeafletNcWMSAutosetColorscaleControl = L.Control.extend({
   options: {
     position: 'bottomright',
@@ -39,7 +40,7 @@ const LeafletNcWMSAutosetColorscaleControl = L.Control.extend({
     /*
      * Get min/max for current view then update layer params
      */
-    // TODO: Extract to data services module
+    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
     this.layers.forEach(layer => {
       if (layer) {
         axios(layer._url, {

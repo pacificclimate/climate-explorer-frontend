@@ -8,6 +8,7 @@ function round(number, places) {
 }
 
 
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 const LeafletNcWMSColorbarControl = L.Control.extend({
   options: {
     position: 'bottomright',
@@ -108,7 +109,7 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
       this.redraw();
     } else {
       //  Get layer bounds from `layerDetails`
-      // TODO: Extract to data services module
+      // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
       var getLayerInfo = axios(this.layer._url, {
         dataType: 'json',
         params: {
@@ -133,7 +134,7 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
           // of this file.
           bbox = [-150, 40, -50, 90];
         }
-        // TODO: Extract to data services module
+        // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
         return axios(this.layer._url, {
           params: {
             request: 'GetMetadata',
