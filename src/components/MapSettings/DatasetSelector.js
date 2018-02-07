@@ -4,12 +4,7 @@ import Selector from '../Selector';
 import _ from 'underscore';
 
 export default class DatasetSelector extends React.Component {
-  //TODO: Refactor so that the list of datasets is constructed in a parent
-  // component (LCA of those which need this info), and selection is made
-  // by index into this list, rather than by JSON.stringify encoding of list
-  // elements. Simpler and less fragile.
-  // Display string (ids[][1]) will still be constructed here, from datasets list.
-  // props.meta will be replaced by props.datasets.
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   static propTypes = {
     meta: PropTypes.array,
     value: PropTypes.string,

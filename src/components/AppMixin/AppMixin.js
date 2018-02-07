@@ -47,6 +47,7 @@ var AppMixin = {
     var models = [];
     var vars;
 
+    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: this.state.ensemble_name },

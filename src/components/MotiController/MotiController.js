@@ -26,6 +26,8 @@ var App = createReactClass({
     return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
   },
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
     //hierarchical selections: model (implicit), then variable, then emission
     var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
