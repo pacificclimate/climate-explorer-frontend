@@ -2,7 +2,7 @@ jest.dontMock('../DataTable');
 jest.dontMock('../../../core/util');
 
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 
 const DataTable = require('../DataTable');
 

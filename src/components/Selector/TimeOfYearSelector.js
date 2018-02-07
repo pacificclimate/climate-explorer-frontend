@@ -22,18 +22,19 @@
  * the TimeOfYearSelector component.
  ******************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import Selector from './Selector';
 import {timeKeyToTimeOfYear} from '../../core/util';
 
-var TimeOfYearSelector = React.createClass({
+class TimeOfYearSelector extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.any, // Using 'function' logs warnings
+    value: PropTypes.any,
+  };
 
-  propTypes: {
-    onChange: React.PropTypes.any, // Using 'function' logs warnings
-    value: React.PropTypes.any,
-  },
-
-  render: function () {
+  render() {
 
     var timesofyear = [];
     for(var index = 0; index < 17; index++) {
@@ -48,7 +49,7 @@ var TimeOfYearSelector = React.createClass({
         value={this.props.value}
       />
     );
-  },
-});
+  }
+}
 
 export default TimeOfYearSelector;

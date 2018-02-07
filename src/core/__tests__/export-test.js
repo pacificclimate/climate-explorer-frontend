@@ -18,8 +18,8 @@ jest.dontMock('xlsx');
 var _ = require('underscore');
 var xlsx = require('xlsx');
 var exportdata = require('../export');
-var validate = require('./test-validators');
-var mockAPI = require('./sample-API-results');
+var validate = require('../__test_data__/test-validators');
+var mockAPI = require('../__test_data__/sample-API-results');
 var util = require('../util');
 var chart = require('../chart');
 

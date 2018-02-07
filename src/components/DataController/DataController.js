@@ -24,9 +24,11 @@
  * climatology period or timeseries is also generated. 
  *******************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
+import createReactClass from 'create-react-class';
+import { Button, Row, Col, ControlLabel, Tab, Tabs } from 'react-bootstrap';
 import Loader from 'react-loader';
 import _ from 'underscore';
 
@@ -45,15 +47,16 @@ import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
 
-var DataController = React.createClass({
+var DataController = createReactClass({
+  displayName: 'DataController',
 
   propTypes: {
-    model_id: React.PropTypes.string,
-    variable_id: React.PropTypes.string,
-    experiment: React.PropTypes.string,
-    area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    ensemble_name: React.PropTypes.string,
+    model_id: PropTypes.string,
+    variable_id: PropTypes.string,
+    experiment: PropTypes.string,
+    area: PropTypes.string,
+    meta: PropTypes.array,
+    ensemble_name: PropTypes.string,
   },
 
   mixins: [DataControllerMixin],
@@ -160,7 +163,7 @@ var DataController = React.createClass({
   updateAnnualCycleDataset: function (instance) {
     this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
   },
-  
+
   /*
    * This function retrieves fetches monthly, seasonal, and yearly resolution
    * annual cycle data and displays them on the graph. If instance (an object 
@@ -209,7 +212,7 @@ var DataController = React.createClass({
       this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });    
   },
-  
+
   /*
    * This function fetches and loads data  for the Long Term Average graphs.
    * If passed a time of year(resolution and index), it will load
@@ -233,7 +236,7 @@ var DataController = React.createClass({
       this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
-  
+
   /*
    * This function fetches and loads data for the Timeseries graph.
    * As the Timeseries graph shows all data points at once, there's no
@@ -322,12 +325,11 @@ var DataController = React.createClass({
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
-    var annualTab, longTermTab, timeseriesTab, annualTabPanel, longTermTabPanel, timeseriesTabPanel;
-    if(this.multiYearMeanSelected()) {
-      //Annual Cycle Graph
-      annualTab = (<Tab>Annual Cycle</Tab>);
-      annualTabPanel = (
-          <TabPanel>
+    var annualTab = null, longTermTab = null, timeseriesTab = null;
+    if (this.multiYearMeanSelected()) {
+      // Annual Cycle Graph
+      annualTab = (
+        <Tab eventKey={1} title='Annual Cycle'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
               <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
@@ -341,13 +343,12 @@ var DataController = React.createClass({
             </Col>
           </Row>
           <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
-        </TabPanel>
-        );
+        </Tab>
+      );
 
-      //Long Term Average Graph
-      longTermTab = (<Tab>Long Term Averages</Tab>);
-      longTermTabPanel = (
-          <TabPanel>
+      // Long Term Average Graph
+      longTermTab = (
+        <Tab eventKey={2} title='Long Term Averages'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
               <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
@@ -361,17 +362,15 @@ var DataController = React.createClass({
             </Col>
           </Row>
           <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-        </TabPanel>
-        );
-    }
-    else {
-      //Time Series Graph
-      timeseriesTab = (<Tab>Time Series</Tab>);
-      timeseriesTabPanel = (
-        <TabPanel>
+        </Tab>
+      );
+    } else {
+      // Time Series Graph
+      timeseriesTab = (
+        <Tab eventKey={3} title='Time Series'>
           <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
           <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
-        </TabPanel>  
+        </Tab>
       );
     }
 
@@ -379,14 +378,9 @@ var DataController = React.createClass({
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         <Tabs>
-          <TabList>
-            {annualTab}
-            {longTermTab}
-            {timeseriesTab}
-          </TabList>
-          {annualTabPanel}
-          {longTermTabPanel}
-          {timeseriesTabPanel}
+          {annualTab}
+          {longTermTab}
+          {timeseriesTab}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>

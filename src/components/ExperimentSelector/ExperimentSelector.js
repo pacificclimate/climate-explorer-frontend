@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import urljoin from 'url-join';
 import _ from 'underscore';
@@ -5,32 +6,29 @@ import axios from 'axios';
 
 import styles from './ExperimentSelector.css';
 
-var ExperimentSelector = React.createClass({
+class ExperimentSelector extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.function,
+  };
 
-  propTypes: {
-    onChange: React.PropTypes.function,
-  },
+  state = {
+    items: [],
+  };
 
-  getInitialState: function () {
-    return {
-      items: [],
-    };
-  },
-
-  componentDidMount: function () {
+  componentDidMount() {
     axios({
       baseURL: urljoin(CE_BACKEND_URL, 'models'),
     }).then(response => {
       this.setState({ items: _.uniq(response.data) });
     });
-  },
+  }
 
-  onChange: function (event) {
+  onChange = (event) => {
     this.setState({ value: event.target.value });
     this.props.onChange(event.target.value);
-  },
+  };
 
-  render: function () {
+  render() {
     return (
       <div className={styles.selector}>
         <select onChange={this.onChange} value={this.state.value}>
@@ -38,7 +36,7 @@ var ExperimentSelector = React.createClass({
         </select>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ExperimentSelector;

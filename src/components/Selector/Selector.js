@@ -17,36 +17,35 @@
  *               whether this choice is disabled
  **********************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
-import { DropdownButton, Input, ControlLabel, MenuItem, Dropdown} from 'react-bootstrap';
+import { ControlLabel, MenuItem, Dropdown } from 'react-bootstrap';
 import _ from 'underscore';
 import styles from './Selector.css';
 
-var Selector = React.createClass({
+class Selector extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.any, // Using 'function' logs warnings
+    label: PropTypes.string,
+    items: PropTypes.array,
+    value: PropTypes.node,
+    disabled: PropTypes.bool
+  };
 
-  propTypes: {
-    onChange: React.PropTypes.any, // Using 'function' logs warnings
-    label: React.PropTypes.string,
-    items: React.PropTypes.array,
-    value: React.PropTypes.node,
-    disabled: React.PropTypes.bool
-  },
+  static defaultProps = {
+    label: 'Selection',
+    items: [],
+    value: '',
+    disabled: false,
+  };
 
-  getDefaultProps: function () {
-    return {
-      label: 'Selection',
-      items: [],
-      value: '',
-      disabled: false,
-    };
-  },
-
-  componentWillReceiveProps: function (newProps) {
+  componentWillReceiveProps(newProps) {
     this.updateDisplayValue(newProps.value, newProps.items);
-  },
+  }
 
   //store the display string for the already-selected value
-  updateDisplayValue: function (value, items=this.props.items) {
+  updateDisplayValue = (value, items=this.props.items) => {
     if(_.indexOf(items, value) != -1) {
       //display string is the same as value string.
       this.displayString = value;
@@ -58,45 +57,45 @@ var Selector = React.createClass({
       var item = _.findWhere(items, {0: value});
       this.displayString = item ? item[1] : value;
     }
-  },
+  };
 
-  handleChange: function (event) {
+  handleChange = (event) => {
     this.props.onChange(event);
-  },
+  };
 
   //renders an item into a react.bootstrap MenuItem
   //if item is an atom, it is used for both user text and event key
   //otherwise, the 0th item is event key, the 1st user text, and the 2rd,
   //if present, whether the item is disabled.
-  createMenuItem: function (item) {
+  createMenuItem = (item) => {
     var choice = _.isArray(item) ? item[1] : item;
     var eventKey = _.isArray(item) ? item[0] : item;
     var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
 
     return (
-      <MenuItem eventKey={eventKey} disabled={disabled} block className={styles.selectoritem}>
+      <MenuItem key={choice} eventKey={eventKey} disabled={disabled} className={styles.selectoritem}>
         {choice}
       </MenuItem>
     );
-  },
+  };
 
-  render: function () {
+  render() {
     return (
         <div className={styles.selectorframe}>
           <div>
             <ControlLabel className={styles.selectorlabel}>{this.props.label}</ControlLabel>
           </div>
-          <Dropdown block vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
+          <Dropdown vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
             <Dropdown.Toggle className={styles.selectortitle}>
               {this.displayString}
             </Dropdown.Toggle>
-            <Dropdown.Menu block className={styles.selectormenu}>
+            <Dropdown.Menu className={styles.selectormenu}>
               {this.props.items.map(this.createMenuItem)}
             </Dropdown.Menu>
           </Dropdown>
         </div>
     );
-  },
-});
+  }
+}
 
 export default Selector;

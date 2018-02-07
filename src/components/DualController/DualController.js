@@ -17,14 +17,17 @@
  ************************************************************************/
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import MapController from '../MapController';
 import DualDataController from '../DualDataController/DualDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
+import g from '../../core/geo';
+import MapController from '../MapController';
 
-var App = React.createClass({
+var App = createReactClass({
+  displayName: 'App',
 
   /*
    * Initial state is set after the multimeta API query run in AppMixin.componentDidMount()
@@ -36,7 +39,7 @@ var App = React.createClass({
    */
 
   mixins: [AppMixin],
-  
+
   //This function filters out datasets inappropriate for this portal. A dataset
   //the filter returns "false" on will be removed.
   //Filters out multi-year monthly datasets; too noisy to be useful.
@@ -62,7 +65,7 @@ var App = React.createClass({
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
     var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
         this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
- 
+
     return (
       <Grid fluid>
         <Row>
@@ -81,10 +84,11 @@ var App = React.createClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div>
+            <div style={{ width: 890, height: 700 }}>
               <MapController
                 meta = {this.getfilteredMeta()}
                 comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}
+                area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
             </div>
@@ -96,7 +100,7 @@ var App = React.createClass({
               variable_id={this.state.variable_id}
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
-              area={this.state.area}
+              area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
               comparandMeta = {this.state.comparand_id ? this.getfilteredMeta(this.state.comparand_id) : this.getfilteredMeta()}
             />

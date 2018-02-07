@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, hashHistory } from 'react-router';
@@ -8,13 +9,12 @@ import DualController from './components/DualController';
 
 import Header from './components/Header';
 
-var App = React.createClass({
+class App extends React.Component {
+  static propTypes = {
+    children: PropTypes.element,
+  };
 
-  propTypes: {
-    children: React.PropTypes.element,
-  },
-
-  render: function () {
+  render() {
     return (
       <div>
         <div>
@@ -25,8 +25,8 @@ var App = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 render((
   <Router history={hashHistory}>
@@ -37,3 +37,5 @@ render((
     </Route>
   </Router>
 ), document.getElementById('wrapper'));
+
+

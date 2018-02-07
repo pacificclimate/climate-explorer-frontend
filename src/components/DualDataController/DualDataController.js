@@ -27,10 +27,11 @@
  * Also allows downloading of the data displayed in the graphs.
  *********************************************************************/
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
-import Loader from 'react-loader';
+import createReactClass from 'create-react-class';
+import { Button, Row, Col, ControlLabel, Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
 
@@ -48,17 +49,18 @@ import DataControllerMixin from '../DataControllerMixin';
 
 import styles from './DualDataController.css';
 
-var DualDataController = React.createClass({
+var DualDataController = createReactClass({
+  displayName: 'DualDataController',
 
   propTypes: {
-    ensemble_name: React.PropTypes.string,
-    model_id: React.PropTypes.string,
-    variable_id: React.PropTypes.string,
-    comparand_id: React.PropTypes.string,
-    experiment: React.PropTypes.string,
-    area: React.PropTypes.string,
-    meta: React.PropTypes.array,
-    comparandMeta: React.PropTypes.array,
+    ensemble_name: PropTypes.string,
+    model_id: PropTypes.string,
+    variable_id: PropTypes.string,
+    comparand_id: PropTypes.string,
+    experiment: PropTypes.string,
+    area: PropTypes.string,
+    meta: PropTypes.array,
+    comparandMeta: PropTypes.array,
   },
 
   mixins: [DataControllerMixin],
@@ -163,7 +165,7 @@ var DualDataController = React.createClass({
   updateAnnualCycleDataset: function (instance) {
     this.loadDualAnnualCycleGraph(this.props, JSON.parse(instance));
   },
-  
+
   /*
    * Fetches and loads data for the Long Term Average graph.
    * Loads data for two variables if both props.variable_id and 
@@ -200,7 +202,7 @@ var DualDataController = React.createClass({
       this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
     });
   },
-  
+
   /*
    * Fetches and loads data for the Annual Cycle graph. Loads data for
    * two variables if props.variable_id and props.comparand_id are both
@@ -377,12 +379,11 @@ var DualDataController = React.createClass({
       }
     });
     
-    var annualTab, longTermTab, timeseriesTab, annualTabPanel, longTermTabPanel, timeseriesTabPanel;
-    if(this.multiYearMeanSelected()) {
-      //Annual Cycle Graph
-      annualTab = (<Tab>Annual Cycle</Tab>);
-      annualTabPanel = (
-          <TabPanel>
+    var annualTab = null, longTermTab = null, timeseriesTab = null;
+    if (this.multiYearMeanSelected()) {
+      // Annual Cycle Graph
+      annualTab = (
+        <Tab eventKey={1} title='Annual Cycle'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
               <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
@@ -396,13 +397,12 @@ var DualDataController = React.createClass({
             </Col>
           </Row>
           <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
-        </TabPanel>
-        );
+        </Tab>
+      );
 
-      //Long Term Average Graph
-      longTermTab = (<Tab>Long Term Averages</Tab>);
-      longTermTabPanel = (
-          <TabPanel>
+      // Long Term Average Graph
+      longTermTab = (
+        <Tab eventKey={2} title='Long Term Averages'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
               <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
@@ -416,17 +416,15 @@ var DualDataController = React.createClass({
             </Col>
           </Row>
           <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-        </TabPanel>
-        );
-    }
-    else {
-      //Time Series Graph
-      timeseriesTab = (<Tab>Time Series</Tab>);
-      timeseriesTabPanel = (
-        <TabPanel>
+        </Tab>
+      );
+    } else {
+      // Time Series Graph
+      timeseriesTab = (
+        <Tab eventKey={3} title='Time Series'>
           <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} line={timeseriesData.line} />
           <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
-        </TabPanel>
+        </Tab>
       );
     }
 
@@ -434,14 +432,9 @@ var DualDataController = React.createClass({
       <div>
         <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
         <Tabs>
-          <TabList>
-            {annualTab}
-            {longTermTab}
-            {timeseriesTab}
-          </TabList>
-            {annualTabPanel}
-            {longTermTabPanel}
-            {timeseriesTabPanel}
+          {annualTab}
+          {longTermTab}
+          {timeseriesTab}
         </Tabs>
       </div>
     );

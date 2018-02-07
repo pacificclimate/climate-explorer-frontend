@@ -1,47 +1,45 @@
+var PropTypes = require('prop-types');
 var React = require('react');
 var ReactDOM = require('react-dom');
 var BootstrapSlider = require('bootstrap-slider');
 
-var Slider = React.createClass({
+class Slider extends React.Component {
+  static propTypes = {
+    id: PropTypes.string,
+    min: PropTypes.number,
+    max: PropTypes.number,
+    step: PropTypes.number,
+    value: PropTypes.number.isRequired,
+    ticks: PropTypes.array,
+    ticksLabels: PropTypes.array,
+    ticksPositions: PropTypes.array,
+    toolTip: PropTypes.bool,
+    selection: PropTypes.string,
+    onSlide: PropTypes.func,
+    onSlideStop: PropTypes.func,
+  };
 
-  propTypes: {
-    id: React.PropTypes.string,
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
-    step: React.PropTypes.number,
-    value: React.PropTypes.number.isRequired,
-    ticks: React.PropTypes.array,
-    ticksLabels: React.PropTypes.array,
-    ticksPositions: React.PropTypes.array,
-    toolTip: React.PropTypes.bool,
-    selection: React.PropTypes.string,
-    onSlide: React.PropTypes.func,
-    onSlideStop: React.PropTypes.func,
-  },
+  static defaultProps = {
+    id: '',
+    min: 0,
+    max: 100,
+    step: 1,
+    value: 50,
+    ticks: [],
+    ticksLabels: [],
+    ticksPositions: [],
+    toolTip: false,
+    selection: 'none',
+    onSlideStop: function (event) {
+      console.log(event);
+    },
+  };
 
-  getDefaultProps: function () {
-    return {
-      id: '',
-      min: 0,
-      max: 100,
-      step: 1,
-      value: 50,
-      ticks: [],
-      ticksLabels: [],
-      ticksPositions: [],
-      toolTip: false,
-      selection: 'none',
-      onSlideStop: function (event) {
-        console.log(event);
-      },
-    };
-  },
-
-  componentWillUpdate: function (nextProps, nextState) {
+  componentWillUpdate(nextProps, nextState) {
     this.slider.setValue(nextProps.value);
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     var toolTip = this.props.toolTip ? 'show' : 'hide';
     var slider = this.slider = new BootstrapSlider(ReactDOM.findDOMNode(this), {
       id: this.props.id,
@@ -60,13 +58,13 @@ var Slider = React.createClass({
       this.props.onSlideStop(event);
       this.slider.setValue(event);
     }.bind(this));
-  },
+  }
 
-  render: function () {
+  render() {
     return (
       <div style={{ width: '100%' }} />
     );
-  },
-});
+  }
+}
 
 module.exports = Slider;

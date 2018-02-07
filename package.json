@@ -25,11 +25,16 @@
   "jest": {
     "rootDir": "./src",
     "scriptPreprocessor": "../preprocessor.js",
+    "globals": {
+      "CE_BACKEND_URL": "http://tools.pacificclimate.org/climate-data",
+      "TILECACHE_URL": "http://tiles.pacificclimate.org/tilecache/tilecache.py",
+      "NCWMS_URL": "http://tools.pacificclimate.org/ncWMS-PCIC/wms",
+      "CE_ENSEMBLE_NAME": "ce"
+    },
     "unmockedModulePathPatterns": [
       "fbjs",
       "react",
-      "react-dom",
-      "react-addons-test-utils"
+      "react-dom"
     ]
   },
   "dependencies": {
@@ -38,13 +43,18 @@
     "bootstrap-slider": "^5.1.0",
     "c3": "~0.4.11-rc4",
     "chroma-js": "^1.3.4",
+    "create-react-class": "^15.6.2",
     "filesaver.js": "^0.2.0",
-    "leaflet": "0.7.3",
-    "leaflet-draw": "^0.3.0",
+    "leaflet": "^1.2.0",
+    "leaflet-draw": "^0.4.13",
     "moment": "^2.10.6",
-    "proj4": "^2.3.10",
-    "proj4leaflet": "^0.7.1",
-    "react-bootstrap-table": "^1.2.5",
+    "proj4": "^2.4.4",
+    "proj4leaflet": "^1.0.2",
+    "prop-types": "^15.6.0",
+    "react-bootstrap-table": "^4.3.1",
+    "react-leaflet": "^1.7.8",
+    "react-leaflet-draw": "^0.18.0",
+    "react-router-bootstrap": "^0.23.3",
     "xlsx": "^0.8.0"
   },
   "devDependencies": {
@@ -61,7 +71,7 @@
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
     "filesaver.js": "^0.2.0",
-    "jest-cli": "^0.5.1",
+    "jest-cli": "^22.0.6",
     "json-stable-stringify": "^1.0.0",
     "leaflet-image": "^0.1.0",
     "normalize.css": "^3.0.3",
@@ -69,14 +79,12 @@
     "postcss-cssnext": "^2.2.0",
     "postcss-import": "^7.1.0",
     "postcss-loader": "^0.7.0",
-    "react": "^0.14.2",
-    "react-addons-test-utils": "^0.14.3",
-    "react-bootstrap": "^0.29.5",
-    "react-dom": "^0.14.2",
+    "react": "^16.2.0",
+    "react-bootstrap": "^0.32.0",
+    "react-dom": "^16.2.0",
     "react-hot-loader": "^1.3.0",
     "react-loader": "^2.2.0",
-    "react-router": "^2.0.1",
-    "react-tabs": "^0.5.1",
+    "react-router": "^3.2.0",
     "shp-write": "^0.2.5",
     "shpjs": "^3.3.1",
     "style-loader": "^0.13.0",
@@ -86,9 +94,9 @@
     "underscore": "^1.8.3",
     "url-join": "0.0.1",
     "url-loader": "^0.5.6",
-    "yml-loader": ">=2.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1",
-    "wellknown": "^0.4.1"
+    "wellknown": "^0.4.1",
+    "yml-loader": ">=2.0"
   }
 }

@@ -15,8 +15,8 @@ jest.dontMock('../util');
 jest.dontMock('underscore');
 
 var chart = require('../chart'); 
-var validate = require('./test-validators');
-var mockAPI = require('./sample-API-results');
+var validate = require('../__test_data__/test-validators');
+var mockAPI = require('../__test_data__/sample-API-results');
 
 describe ('formatYAxis', function () {
   it('formats a c3 y axis with units label', function () {

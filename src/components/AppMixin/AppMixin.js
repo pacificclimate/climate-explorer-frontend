@@ -27,7 +27,7 @@ var AppMixin = {
       model_id: '',
       variable_id: '',
       experiment: '',
-      area: '',
+      area: undefined,  // geojson object
       meta: [],
     };
   },
@@ -106,8 +106,8 @@ var AppMixin = {
    * Called when user sets an area on the MapController. Propagates the area 
    * chosen to a DataController.
    */
-  handleSetArea: function (wkt) {
-    this.setState({ area: wkt });
+  handleSetArea: function (geojson) {
+    this.setState({ area: geojson });
   },
 
   /*

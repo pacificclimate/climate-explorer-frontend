@@ -1,7 +1,5 @@
-import Modal from './Modal';
-import Dropdown from './Dropdown';
+import compAcontrolsB from '../../HOCs/compAcontrolsB';
+import GeoExporterButton from './GeoExporterButton';
+import GeoExporterDialog from './GeoExporterDialog';
 
-export default {
-  Modal: Modal,
-  Dropdown: Dropdown,
-};
+export default compAcontrolsB(GeoExporterButton, GeoExporterDialog);

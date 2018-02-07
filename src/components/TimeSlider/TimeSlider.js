@@ -4,9 +4,8 @@ var Slider = require('../Slider');
 
 import styles from './TimeSlider.css';
 
-var TimeSlider = React.createClass({
-
-  render: function () {
+class TimeSlider extends React.Component {
+  render() {
     return (
       <div className={styles.timeslider}>
         <Slider step={1} value={17}
@@ -15,7 +14,7 @@ var TimeSlider = React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
 
 module.exports = TimeSlider;
