@@ -49,18 +49,6 @@ export default class MapSettingsDialog extends React.Component {
     };
   }
 
-  variableId(meta) {
-    return meta.length > 0 && meta[0].variable_id;
-  }
-
-  rasterVariableId() {
-    return this.variableId(this.props.meta);
-  }
-
-  isolineVariableId() {
-    return this.variableId(this.props.comparandMeta);
-  }
-
   toggleLinkTimes = () => {
     const toggledlinkTimes = !this.state.linkTimes;
     if (toggledlinkTimes) {

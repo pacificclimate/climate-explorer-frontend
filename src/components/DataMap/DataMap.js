@@ -135,12 +135,6 @@ class DataMap extends React.Component {
     return b;
   }
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
-
   render() {
     // TODO: Add positioning for autoset
     return (

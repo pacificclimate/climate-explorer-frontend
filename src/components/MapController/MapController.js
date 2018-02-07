@@ -119,7 +119,6 @@ export default class MapController extends React.Component {
 
   // Support functions for event/callback handlers
 
-  // TODO: Refactor; see issue #TODO
   loadMap(
     props,
     dataset,
@@ -304,9 +303,9 @@ export default class MapController extends React.Component {
       var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
 
       // set display colours. In order of preference:
-      // 2. colours from state (set by the user or this function previously)
-      // 3. colours specified in variables.yaml, if applicable (raster only)
-      // 4. defaults (raster rainbow if a single dataset,
+      // 1. colours from state (set by the user or this function previously)
+      // 2. colours specified in variables.yaml, if applicable (raster only)
+      // 3. defaults (raster rainbow if a single dataset,
       //             raster greyscale and isolines rainbow for 2)
       var sPalette, cPalette;
       if (this.state.raster.palette && !switchVariable) {
