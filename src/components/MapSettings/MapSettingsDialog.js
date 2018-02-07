@@ -1,11 +1,23 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
+import _ from 'underscore';
 
 import DatasetSelector from './DatasetSelector';
 import DataDisplayControls from './DataDisplayControls';
 import TimeLinkButton from './TimeLinkButton';
 
+
+const layerPropTypes = PropTypes.shape({
+  times: PropTypes.object,
+  timeIdx: PropTypes.string,
+  palette: PropTypes.string,
+  range: PropTypes.object,
+  logscale: PropTypes.string,
+  onChangeTime: PropTypes.func.isRequired,
+  onChangePalette: PropTypes.func.isRequired,
+  onChangeScale: PropTypes.func.isRequired,
+});
 
 export default class MapSettingsDialog extends React.Component {
   static propTypes = {
@@ -16,31 +28,17 @@ export default class MapSettingsDialog extends React.Component {
 
     title: PropTypes.string,
     // TODO: Refactor according to comments in DatasetSelector
-    meta: PropTypes.array,
+    meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,
 
     dataset: PropTypes.string,  // current dataset selection, encoded as JSON string
     onDatasetChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
 
-    variableTimes: PropTypes.object,
-    variableTimeIdx: PropTypes.string,
-    onChangeVariableTime: PropTypes.func.isRequired,
-    rasterPalette: PropTypes.string,
-    onChangeRasterPalette: PropTypes.func.isRequired,
-    rasterLayerMin: PropTypes.number,
-    rasterLogscale: PropTypes.string,
-    onChangeRasterScale: PropTypes.func.isRequired,
+    raster: layerPropTypes.isRequired,
 
     hasComparand: PropTypes.bool,
     timesLinkable: PropTypes.bool,
-    comparandTimes: PropTypes.object,
-    comparandTimeIdx: PropTypes.string,
-    onChangeComparandTime: PropTypes.func.isRequired, // required???
-    isolinePalette: PropTypes.string,
-    onChangeIsolinePalette: PropTypes.func.isRequired, // required???
-    isolineLayerMin: PropTypes.number,
-    isolineLogscale: PropTypes.string,
-    onChangeIsolineScale: PropTypes.func.isRequired,
+    isoline: layerPropTypes,
   };
 
   constructor(props) {
@@ -66,21 +64,21 @@ export default class MapSettingsDialog extends React.Component {
   toggleLinkTimes = () => {
     const toggledlinkTimes = !this.state.linkTimes;
     if (toggledlinkTimes) {
-      this.props.onChangeComparandTime(this.props.variableTimeIdx);
+      this.props.isoline.onChangeTime(this.props.raster.timeIdx);
     }
     this.setState({ linkTimes: toggledlinkTimes });
   };
 
   handleChangeVariableTime = (time) => {
-    this.props.onChangeVariableTime(time);
+    this.props.raster.onChangeTime(time);
     if (this.state.linkTimes) {
-      this.props.onChangeComparandTime(time);
+      this.props.isoline.onChangeTime(time);
     }
   };
 
   handleChangeComparandTime = (time) => {
     if (!this.state.linkTimes) {
-      this.props.onChangeComparandTime(time);
+      this.props.isoline.onChangeTime(time);
     }
   };
 
@@ -107,15 +105,8 @@ export default class MapSettingsDialog extends React.Component {
               <Col lg={this.props.hasComparand ? 6 : 12}>
                 <DataDisplayControls
                   name='Raster'
-                  times={this.props.variableTimes}
-                  timeIdx={this.props.variableTimeIdx}
+                  {..._.omit(this.props.raster, 'onChangeTime')}
                   onChangeTime={this.handleChangeVariableTime}
-                  palette={this.props.rasterPalette}
-                  onChangePalette={this.props.onChangeRasterPalette}
-                  variableId={this.rasterVariableId()}
-                  layerMin={this.props.rasterLayerMin}
-                  logscale={this.props.rasterLogscale}
-                  onChangeScale={this.props.onChangeRasterScale}
                 />
               </Col>
               {
@@ -133,15 +124,9 @@ export default class MapSettingsDialog extends React.Component {
                 <Col lg={5}>
                   <DataDisplayControls
                     name='Isoline'
-                    times={this.props.comparandTimes}
-                    timeIdx={this.props.comparandTimeIdx}
                     timeLinked={this.state.linkTimes}
+                    {..._.omit(this.props.isoline, 'onChangeTime')}
                     onChangeTime={this.handleChangeComparandTime}
-                    palette={this.props.isolinePalette}
-                    onChangePalette={this.props.onChangeIsolinePalette}
-                    layerMin={this.props.isolineLayerMin}
-                    logscale={this.props.isolineLogscale}
-                    onChangeScale={this.props.onChangeIsolineScale}
                   />
                 </Col>
               }

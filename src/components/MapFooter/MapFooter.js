@@ -12,13 +12,9 @@ class MapFooter extends React.Component {
     start_date: PropTypes.string,
     end_date: PropTypes.string,
     run: PropTypes.string,
-    variable: PropTypes.string,
-    variableTimes: PropTypes.object,
-    variableWmsTime: PropTypes.string,
+    raster: PropTypes.object,
+    isoline: PropTypes.object,
     hasValidComparand: PropTypes.bool,
-    comparandTimes: PropTypes.object,
-    comparand: PropTypes.string,
-    comparandWmsTime: PropTypes.string,
   };
   
   timeOfYear(times, wmsTime) {
@@ -29,8 +25,8 @@ class MapFooter extends React.Component {
     return timestampToTimeOfYear(wmsTime, timescale, disambiguateYears);
   }
   
-  timeAndSymbol(times, wmsTime, symbol) {
-    return `${this.timeOfYear(times, wmsTime)} ${symbol}`;
+  timeAndVariable({ times, wmsTime, variableId }) {
+    return `${this.timeOfYear(times, wmsTime)} ${variableId}`;
   }
 
   render() {
@@ -38,11 +34,11 @@ class MapFooter extends React.Component {
         <h5>
           Dataset {`${this.props.start_date}-${this.props.end_date}`} {this.props.run}:
           {' '}
-          {this.timeAndSymbol(this.props.variableTimes, this.props.variableWmsTime, this.props.variable)}
+          {this.timeAndVariable(this.props.raster)}
           {' '}
           {
-            this.props.hasValidComparand && 
-            `vs. ${this.timeAndSymbol(this.props.comparandTimes, this.props.comparandWmsTime, this.props.comparand)}`
+            this.props.hasValidComparand &&
+            `vs. ${this.timeAndVariable(this.props.isoline)}`
           }
         </h5>
     );

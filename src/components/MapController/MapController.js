@@ -16,17 +16,16 @@ import StaticControl from '../StaticControl';
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
-import { updateSingleState } from '../../core/react-utils';
 import { getTimeMetadata } from '../../data-services/metadata';
 import { getVariableOptions } from '../../core/util';
 
 
 export default class MapController extends React.Component {
   static propTypes = {
-    meta: PropTypes.array,
+    meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,
     area: PropTypes.object,
-    onSetArea: PropTypes.func,
+    onSetArea: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -37,25 +36,26 @@ export default class MapController extends React.Component {
       start_date: undefined,
       end_date: undefined,
 
-      variable: undefined,
-      variableTimes: undefined,
-      variableTimeIdx: undefined,
-      variableWmsTime: undefined,
+      raster: {
+        variableId: undefined, // formerly 'variable'
+        times: undefined,
+        timeIdx: undefined,
+        wmsTime: undefined,
+        palette: this.props.comparandMeta ? 'seq-Greys' : 'x-Occam',
+        logscale: 'false',
+        range: {},
+      },
 
-      comparand: undefined,
-      comparandTimes: undefined,
-      comparandTimeIdx: undefined,
-      comparandWmsTime: undefined,
-
-      rasterLogscale: 'false',
-      rasterPalette: this.props.comparandMeta ? 'seq-Greys' : 'x-Occam',
-
-      isolineLogscale: 'false',
-      isolinePalette: 'x-Occam',
-      numberOfContours: 10,
-
-      rasterRange: {},
-      isolineRange: {},
+      isoline: this.props.comparandMeta ? {
+        variableId: undefined, // formerly 'comparand'
+        times: undefined,
+        timeIdx: undefined,
+        wmsTime: undefined,
+        numberOfContours: 10,
+        palette: 'x-Occam',
+        logscale: 'false',
+        range: {},
+      } : {},
     };
   }
 
@@ -85,21 +85,46 @@ export default class MapController extends React.Component {
     // });
   }
 
-  timesMatch(vTimes = this.state.variableTimes, cTimes = this.state.comparandTimes) {
+  timesMatch(vTimes = this.state.raster.times, cTimes = this.state.isoline.times) {
     // Returns true if the timestamps available for the variable
     // and the timestamps available for the comparand match
     return !_.isUndefined(vTimes) &&
       !_.isUndefined(cTimes) &&
       _.isEqual(vTimes, cTimes);
   }
-  
+
+  // setState helpers
+
+  updateLayerSimpleState(layerType, name, value) {
+    this.setState(prevState => ({
+      [layerType]: {
+        ...prevState[layerType],
+        [name]: value,
+      },
+    }));
+  }
+
+  updateLayerTime(layerType, timeIdx) {
+    // update the timestamp in state
+    // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
+    // and an index denoting the timestamp's position with the file
+    this.setState((prevState) => ({
+      [layerType]: {
+        ...prevState[layerType],
+        timeIdx,
+        wmsTime: prevState[layerType].times[timeIdx],
+      },
+    }));
+  }
+
   // Support functions for event/callback handlers
 
+  // TODO: Refactor; see issue #TODO
   loadMap(
     props,
     dataset,
-    rasterPalette = this.state.rasterPalette,
-    isolinePalette = this.state.isolinePalette,
+    rasterPalette = this.state.raster.palette,
+    isolinePalette = this.state.isoline.palette,
     newVariable = false,
     newComparand = false
   ) {
@@ -172,24 +197,32 @@ export default class MapController extends React.Component {
       const comparand = this.hasValidData('comparand', props) ?
         props.comparandMeta[0].variable_id :
         undefined;
-
-      this.setState({
-        variable,
-        comparand,
+      
+      this.setState(prevState => ({
         run: ensemble_member,
         start_date,
         end_date,
-        variableTimes,
-        variableTimeIdx: variableStartingIndex,
-        variableWmsTime: variableTimes[variableStartingIndex],
-        comparandTimes,
-        comparandTimeIdx: comparandStartingIndex,
-        comparandWmsTime: comparandTimes[comparandStartingIndex],
-        rasterPalette,
-        isolinePalette,
-        rasterLogscale: newVariable ? 'false' : this.state.rasterLogscale,
-        isolineLogscale: newComparand ? 'false' : this.state.isolineLogscale,
-      });
+
+        raster: {
+          ...prevState.raster,
+          variableId: variable,
+          times: variableTimes,
+          timeIdx: variableStartingIndex,
+          wmsTime: variableTimes[variableStartingIndex],
+          palette: rasterPalette,
+          logscale: newVariable ? 'false' : prevState.raster.logscale,
+        },
+
+        isoline: {
+          ...prevState.isoline,
+          variableId: comparand,
+          times: comparandTimes,
+          timeIdx: comparandStartingIndex,
+          wmsTime: comparandTimes[comparandStartingIndex],
+          palette: isolinePalette,
+          logscale: newComparand ? 'false' : prevState.isoline.logscale,
+        },
+      }));
     });
   }
 
@@ -217,42 +250,20 @@ export default class MapController extends React.Component {
     return dataset && dataset.unique_id;
   }
   
-  getDatasetIds() {
-    // const rasterDatasetID = 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada';
-    // const isolineDatasetID = undefined;
-    return {
-      rasterDatasetId: this.getDatasetId(
-        'variable', this.props.meta, this.state.variableTimeIdx),
-      isolineDatasetId: this.getDatasetId(
-        'comparand', this.props.comparandMeta, this.state.comparandTimeIdx),
-    };
-  }
-
   // Handlers for time selection change
 
-  updateTime(symbol, timeidx) {
-    // update the timestamp in state
-    // timeidx is a stringified object with a resolution  (monthly, annual, seasonal)
-    // and an index denoting the timestamp's position with the file
-    // symbol is either 'variable' or 'comparand'
-    this.setState({
-      [`${symbol}TimeIdx`]: timeidx,
-      [`${symbol}WmsTime`]: this.state[`${symbol}Times`][timeidx],
-    });
-  }
-
-  handleChangeVariableTime = this.updateTime.bind(this, 'variable');
-  handleChangeComparandTime = this.updateTime.bind(this, 'comparand');
+  handleChangeVariableTime = this.updateLayerTime.bind(this, 'raster');
+  handleChangeComparandTime = this.updateLayerTime.bind(this, 'isoline');
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = updateSingleState.bind(this, 'rasterPalette');
-  handleChangeIsolinePalette = updateSingleState.bind(this, 'isolinePalette');
+  handleChangeRasterPalette = this.updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeIsolinePalette = this.updateLayerSimpleState.bind(this, 'isoline', 'palette');
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = updateSingleState.bind(this, 'rasterRange');
-  handleChangeIsolineRange = updateSingleState.bind(this, 'isolineRange');
+  handleChangeRasterRange = this.updateLayerSimpleState.bind(this, 'raster', 'range');
+  handleChangeIsolineRange = this.updateLayerSimpleState.bind(this, 'isoline', 'range');
 
   // Handlers for scale change
 
@@ -261,8 +272,8 @@ export default class MapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = updateSingleState.bind(this, 'rasterLogscale');
-  handleChangeIsolineScale = updateSingleState.bind(this, 'isolineLogscale');
+  handleChangeRasterScale = this.updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeIsolineScale = this.updateLayerSimpleState.bind(this, 'isoline', 'logscale');
 
   // React lifecycle event handlers
 
@@ -293,18 +304,14 @@ export default class MapController extends React.Component {
       var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
 
       // set display colours. In order of preference:
-      // 1. colours received by prop
       // 2. colours from state (set by the user or this function previously)
       // 3. colours specified in variables.yaml, if applicable (raster only)
       // 4. defaults (raster rainbow if a single dataset,
       //             raster greyscale and isolines rainbow for 2)
       var sPalette, cPalette;
-      if (nextProps.rasterPalette) {
-        sPalette = nextProps.rasterPalette;
-        cPalette = nextProps.isolinePalette;
-      } else if (this.state.rasterPalette && !switchVariable) {
-        sPalette = this.state.rasterPalette;
-        cPalette = this.state.isolinePalette;
+      if (this.state.raster.palette && !switchVariable) {
+        sPalette = this.state.raster.palette;
+        cPalette = this.state.isoline.palette;
       } else if (!_.isUndefined(getVariableOptions(newVariableId, 'defaultRasterPalette'))) {
         sPalette = getVariableOptions(newVariableId, 'defaultRasterPalette');
         if (this.hasValidData('comparand', nextProps)) {
@@ -342,35 +349,26 @@ export default class MapController extends React.Component {
     const propChange = !_.isEqual(nextProps, this.props);
     const stateChange = !_.isEqual(nextState, this.state);
     const b = propChange || stateChange;
-    // console.log('MapController.shouldComponentUpdate: propChange', propChange)
-    // console.log('MapController.shouldComponentUpdate: props diff', shallowDiffStr(this.props, nextProps))
-    // console.log('MapController.shouldComponentUpdate: stateChange', stateChange)
-    // console.log('MapController.shouldComponentUpdate: state diff', shallowDiffStr(this.state, nextState))
     return b;
   }
 
   render() {
-    const { rasterDatasetId, isolineDatasetId } = this.getDatasetIds();
-
     return (
-      this.state.variableTimes || this.state.comparandTimes ? (
+      this.state.raster.times || this.state.isoline.times ? (
         <DataMap
-          rasterDataset={rasterDatasetId}
-          rasterVariable={this.state.variable}
-          rasterTime={this.state.variableWmsTime}
-          rasterPalette={this.state.rasterPalette}
-          rasterLogscale={this.state.rasterLogscale}
-          rasterRange={this.state.rasterRange}
-          onChangeRasterRange={this.handleChangeRasterRange}
+          raster={{
+            dataset: this.getDatasetId(
+              'variable', this.props.meta, this.state.raster.timeIdx),
+            ...this.state.raster,
+            onChangeRange: this.handleChangeRasterRange,
+          }}
 
-          isolineDataset={isolineDatasetId}
-          isolineVariable={this.state.comparand}
-          isolineTime={this.state.comparandWmsTime}
-          isolinePalette={this.state.isolinePalette}
-          numberOfContours={this.state.numberOfContours}
-          isolineLogscale={this.state.isolineLogscale}
-          isolineRange={this.state.isolineRange}
-          onChangeIsolineRange={this.handleChangeIsolineRange}
+          isoline={{
+            dataset: this.getDatasetId(
+              'comparand', this.props.comparandMeta, this.state.isoline.timeIdx),
+            ...this.state.isoline,
+            onChangeRange: this.handleChangeIsolineRange,
+          }}
 
           onSetArea={this.props.onSetArea}
           area={this.props.area}
@@ -393,40 +391,28 @@ export default class MapController extends React.Component {
               dataset={this.currentDataset()}
               onDatasetChange={this.updateDataset}
 
-              variableTimes={this.state.variableTimes}
-              variableTimeIdx={this.state.variableTimeIdx}
-              onChangeVariableTime={this.handleChangeVariableTime}
-              rasterPalette={this.state.rasterPalette}
-              onChangeRasterPalette={this.handleChangeRasterPalette}
-              rasterLayerMin={this.state.rasterRange.min}
-              rasterLogscale={this.state.rasterLogscale}
-              onChangeRasterScale={this.handleChangeRasterScale}
+              raster={{
+                ...this.state.raster,
+                onChangeTime: this.handleChangeVariableTime,
+                onChangePalette: this.handleChangeRasterPalette,
+                onChangeScale: this.handleChangeRasterScale,
+              }}
 
               hasComparand={this.hasComparand()}
               timesLinkable={this.timesMatch()}
-              comparandTimes={this.state.comparandTimes}
-              comparandTimeIdx={this.state.comparandTimeIdx}
-              onChangeComparandTime={this.handleChangeComparandTime}
-              isolinePalette={this.state.isolinePalette}
-              onChangeIsolinePalette={this.handleChangeIsolinePalette}
-              isolineLayerMin={this.state.isolineRange.min}
-              isolineLogscale={this.state.isolineLogscale}
-              onChangeIsolineScale={this.handleChangeIsolineScale}
+              isoline={{
+                ...this.state.isoline,
+                onChangeTime: this.handleChangeComparandTime,
+                onChangePalette: this.handleChangeIsolinePalette,
+                onChangeScale: this.handleChangeIsolineScale,
+              }}
             />
           </StaticControl>
 
           <StaticControl position='bottomleft'>
             <MapFooter
-              start_date={this.state.start_date}
-              end_date={this.state.end_date}
-              run={this.state.run}
-              variable={this.state.variable}
-              variableTimes={this.state.variableTimes}
-              variableWmsTime={this.state.variableWmsTime}
+              {...this.state}
               hasValidComparand={this.hasComparand()}
-              comparand={this.state.comparand}
-              comparandTimes={this.state.comparandTimes}
-              comparandWmsTime={this.state.comparandWmsTime}
             />
           </StaticControl>
 

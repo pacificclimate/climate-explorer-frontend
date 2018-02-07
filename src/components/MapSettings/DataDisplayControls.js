@@ -19,7 +19,7 @@ export default class DataDisplayControls extends React.Component {
     onChangePalette: PropTypes.func.isRequired,
 
     variableId: PropTypes.string,
-    layerMin: PropTypes.number,
+    range: PropTypes.object,
     logscale: PropTypes.string,
     onChangeScale: PropTypes.func.isRequired,
   };
@@ -27,13 +27,6 @@ export default class DataDisplayControls extends React.Component {
   static defaultProps = {
     timeLinked: false,
   };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-    };
-  }
 
   render() {
     return (
@@ -53,7 +46,7 @@ export default class DataDisplayControls extends React.Component {
         <ScaleSelector
           name={this.props.name}
           variableId={this.props.variableId}
-          layerMin={this.props.layerMin}
+          layerMin={this.props.range.min}
           value={this.props.logscale}
           onChange={this.props.onChangeScale}
         />

@@ -9,16 +9,16 @@ import _ from "underscore";
 export default class DataLayer extends React.Component {
   static propTypes = {
     // Layer props
-    layerType: PropTypes.string, // 'raster' | 'isoline'
+    layerType: PropTypes.string.isRequired, // 'raster' | 'isoline'
     dataset: PropTypes.string,
-    variable: PropTypes.string,
-    time: PropTypes.string,
+    variableId: PropTypes.string,
+    wmsTime: PropTypes.string,
     palette: PropTypes.string,
     logscale: PropTypes.string,
     range: PropTypes.object,
+    onChangeRange: PropTypes.func.isRequired,
 
     onLayerRef: PropTypes.func,
-    onChangeRange: PropTypes.func.isRequired,
   };
 
   shouldComponentUpdate(nextProps, nextState) {
