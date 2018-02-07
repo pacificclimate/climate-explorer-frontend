@@ -10,9 +10,11 @@ it('renders without crashing', () => {
       start_date={'start'}
       end_date={'end'}
       run={'run'}
-      variable={'tasmax'}
-      variableTimes={times}
-      variableWmsTime={'1977-02-15T00:00:00Z'}
+      raster={{
+        variableId: 'tasmax',
+        times,
+        wmsTime: '1977-02-15T00:00:00Z',
+      }}
       hasValidComparand={false}
     />,
     div

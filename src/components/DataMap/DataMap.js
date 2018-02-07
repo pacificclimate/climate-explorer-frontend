@@ -19,6 +19,15 @@ import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
 
+const layerPropTypes = PropTypes.shape({
+  dataset: PropTypes.string,
+  variableId: PropTypes.string,
+  time: PropTypes.string,
+  palette: PropTypes.string,
+  logscale: PropTypes.string, // arg for ncwms: 'true' | 'false' (String)
+  range: PropTypes.object,
+  onChangeRange: PropTypes.func.isRequired,
+});
 
 class DataMap extends React.Component {
   // This component provides data display layers (DataLayer) for up to two
@@ -27,23 +36,8 @@ class DataMap extends React.Component {
   // Renders its children within the base map.
 
   static propTypes = {
-    rasterDataset: PropTypes.string,
-    rasterVariable: PropTypes.string,
-    rasterTime: PropTypes.string,
-    rasterPalette: PropTypes.string,
-    rasterLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
-    rasterRange: PropTypes.object,
-    onChangeRasterRange: PropTypes.func.isRequired,
-
-    isolineDataset: PropTypes.string,
-    isolineVariable: PropTypes.string,
-    isolineTime: PropTypes.string,
-    isolinePalette: PropTypes.string,
-    numberOfContours: PropTypes.number,
-    isolineLogscale: PropTypes.string, // arg for ncwms: 'true' | 'false'
-    isolineRange: PropTypes.object,
-    onChangeIsolineRange: PropTypes.func.isRequired,
-
+    raster: layerPropTypes,
+    isoline: layerPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -109,10 +103,7 @@ class DataMap extends React.Component {
   handleLayerRef(layerType, layer) {
     const leafletElement = layer && layer.leafletElement;
     if (leafletElement) {
-      const onChangeRange = {
-        raster: this.props.onChangeRasterRange,
-        isoline: this.props.onChangeIsolineRange,
-      }[layerType];
+      const onChangeRange = this.props[layerType].onChangeRange;
       leafletElement.on('load', () => {
         this.updateLayerRange(layerType, this.props, onChangeRange);
       });
@@ -144,12 +135,6 @@ class DataMap extends React.Component {
     return b;
   }
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
-
   render() {
     // TODO: Add positioning for autoset
     return (
@@ -158,38 +143,19 @@ class DataMap extends React.Component {
       >
         <DataLayer
           layerType='raster'
-          dataset={this.props.rasterDataset}
-          variable={this.props.rasterVariable}
-          time={this.props.rasterTime}
-          palette={this.props.rasterPalette}
-          logscale={this.props.rasterLogscale}
-          range={this.props.rasterRange}
-
+          {...this.props.raster}
           onLayerRef={this.handleRasterLayerRef}
-          onChangeRange={this.props.onChangeRasterRange}
         />
 
         <DataLayer
           layerType='isoline'
-          dataset={this.props.isolineDataset}
-          variable={this.props.isolineVariable}
-          time={this.props.isolineTime}
-          palette={this.props.isolinePalette}
-          logscale={this.props.isolineLogscale}
-          range={this.props.isolineRange}
-
+          {...this.props.isoline}
           onLayerRef={this.handleIsolineLayerRef}
-          onChangeRange={this.props.onChangeIsolineRange}
         />
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
-          // update when any raster prop changes
-          dataset={this.state.rasterDataset}
-          variable={this.props.rasterVariable}
-          time={this.props.rasterTime}
-          palette={this.props.rasterPalette}
-          logscale={this.props.rasterLogscale}
+          {...this.props.raster}  // update when any raster prop changes
         />
 
         <NcWMSAutosetColorscaleControl
@@ -198,12 +164,7 @@ class DataMap extends React.Component {
 
         <NcWMSColorbarControl
           layer={this.state.isolineLayer}
-          // update when any isoline prop changes
-          dataset={this.state.isolineDataset}
-          variable={this.props.isolineVariable}
-          time={this.props.isolineTime}
-          palette={this.props.isolinePalette}
-          logscale={this.props.isolineLogscale}
+          {...this.props.isoline}  // update when any isoline prop changes
         />
 
         <FeatureGroup>

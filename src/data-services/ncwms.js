@@ -5,10 +5,10 @@ import axios from 'axios/index';
 import _ from 'underscore';
 
 
-function getBaseWMSParams({ dataset, variable, time, logscale, range }) {
+function getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }) {
   const fixedParams = {
-    layers: `${dataset}/${variable}`,
-    time,
+    layers: `${dataset}/${variableId}`,
+    time: wmsTime,
     noWrap: true,
     format: 'image/png',
     transparent: true,
@@ -35,9 +35,9 @@ function getBaseWMSParams({ dataset, variable, time, logscale, range }) {
 }
 
 
-function getRasterWMSParams({ dataset, variable, time, palette, logscale, range }) {
+function getRasterWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
   return Object.assign(
-    getBaseWMSParams({ dataset, variable, time, logscale, range }),
+    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
     {
       styles: `default-scalar/${palette}`,
       opacity: 0.7,
@@ -46,9 +46,9 @@ function getRasterWMSParams({ dataset, variable, time, palette, logscale, range 
 }
 
 
-function getIsolineWMSParams({ dataset, variable, time, palette, logscale, range }) {
+function getIsolineWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
   return Object.assign(
-    getBaseWMSParams({ dataset, variable, time, logscale, range }),
+    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
     {
       styles: `colored_contours/${palette}`,
       opacity: 1.0,
@@ -59,25 +59,11 @@ function getIsolineWMSParams({ dataset, variable, time, palette, logscale, range
 function getWMSParams(layerType, props) {
   // Return parameters required for a call to the ncWMS tile layer API.
   console.log('getWMSParams', layerType, props);
-
+  // TODO: simplify
   if (layerType === 'raster') {
-    return getRasterWMSParams({
-      dataset: props.rasterDataset,
-      variable: props.rasterVariable,
-      time: props.rasterTime,
-      palette: props.rasterPalette,
-      logscale: props.rasterLogscale,
-      range: props.rasterRange,
-    });
+    return getRasterWMSParams(props);
   } else if (layerType === 'isoline') {
-    return getIsolineWMSParams({
-      dataset: props.isolineDataset,
-      variable: props.isolineVariable,
-      time: props.isolineTime,
-      palette: props.isolinePalette,
-      logscale: props.isolineLogscale,
-      range: props.isolineRange,
-    });
+    return getIsolineWMSParams(props);
   }
 }
 
@@ -86,7 +72,7 @@ function getLayerMinMax(layer, props, bounds) {
   // Request min and max values from ncWMS layer.
   // Returns a promise for the request response.
 
-  const { layers, version, srs, time } = getWMSParams(layer, props);
+  const { layers, version, srs, time } = getWMSParams(layer, props[layer]);
 
   return axios(
     NCWMS_URL,

@@ -19,7 +19,7 @@ it('renders without crashing', () => {
       onChangePalette={noop}
 
       variableId='tasmax'
-      layerMin={-23.34}
+      range={{ min: -23.34 }}
       logscale={'false'}
       onChangeScale={noop}
     />,
