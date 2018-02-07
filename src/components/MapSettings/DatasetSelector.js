@@ -24,8 +24,6 @@ export default class DatasetSelector extends React.Component {
       ]
     );
     ids = _.uniq(ids, false, item => item[1]);
-    console.log('makeDatasets meta', this.props.meta)
-    console.log('makeDatasets ids', ids)
     return ids;
   }
 

@@ -2,14 +2,12 @@ import L from 'leaflet';
 import axios from 'axios';
 
 
-// TODO: Remove console.log stmts
 const LeafletNcWMSAutosetColorscaleControl = L.Control.extend({
   options: {
     position: 'bottomright',
   },
 
   initialize: function ({ layers, options }) {
-    console.log('LeafletNcWMSAutosetColorscaleControl.initialize', layers)
     this.layers = layers;
     L.Util.setOptions(this, options);
   },
@@ -41,7 +39,6 @@ const LeafletNcWMSAutosetColorscaleControl = L.Control.extend({
     /*
      * Get min/max for current view then update layer params
      */
-    console.log('LeafletNcWMSAutosetColorscaleControl.autoscale', this.layers)
     // TODO: Extract to data services module
     this.layers.forEach(layer => {
       if (layer) {

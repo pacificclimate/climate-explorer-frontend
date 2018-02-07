@@ -29,7 +29,6 @@ export default class DataLayer extends React.Component {
   }
 
   render() {
-    console.log('DataLayer', this.props);
     const {
       onLayerRef, onChangeRange, layerType, ...layerParams,
     } = this.props;

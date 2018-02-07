@@ -8,7 +8,6 @@ function round(number, places) {
 }
 
 
-// TODO: Remove console.log stmts
 const LeafletNcWMSColorbarControl = L.Control.extend({
   options: {
     position: 'bottomright',
@@ -65,12 +64,10 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
       .addListener(this.container, 'click', L.DomEvent.stopPropagation)
       .addListener(this.container, 'click', L.DomEvent.preventDefault)
       .addListener(this.container, 'click', () => {
-        console.log('ncWMSColorbarControl: manual refresh values');
         this.refreshValues();
       }, this)
     ;
     this.layer.on('loading', function () {
-      console.log('ncWMSColorbarControl: onLoading refresh values');
       this.refreshValues();
     }.bind(this));
 
@@ -103,18 +100,14 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
      * Source new values from the ncWMS server. Possible future breakage due to
      * using layer._url and layer._map.
      */
-    console.log('ncWMSColorbarControl.refreshValues')
-
     const reuseColorscalerange = true;
     if (reuseColorscalerange && this.layer.wmsParams.colorscalerange) {
-      console.log('ncWMSColorbarControl.refreshValues: reusing colorscalerange')
       //  Use colorscalerange if defined on the layer
       this.min = +this.layer.wmsParams.colorscalerange.split(',')[0];
       this.max = +this.layer.wmsParams.colorscalerange.split(',')[1];
       this.redraw();
     } else {
       //  Get layer bounds from `layerDetails`
-      console.log('ncWMSColorbarControl.refreshValues: getting from layerDetails')
       // TODO: Extract to data services module
       var getLayerInfo = axios(this.layer._url, {
         dataType: 'json',
@@ -192,7 +185,6 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
   // uses the variable defined in the layer and the variable-options.yaml
   // config file to determine decimal precision. Defaults to util.PRECISION
   getDecimalPrecision: function (layer = this.layer) {
-    console.log('ncWMSColorbarControl.getDecimalPrecision', layer)
     var places = PRECISION;
     if (!layer) {
       return places;
@@ -206,8 +198,6 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
   },
 
   redraw: function () {
-    console.log('ncWMSColorbarControl.redraw')
-
     this.container.style.backgroundImage = 'url("' + this.graphicUrl() + '")';
     this.maxContainer.innerHTML = round(this.max, this.getDecimalPrecision());
     this.midContainer.innerHTML = round(this.getMidpoint(this.min, this.max, this.layer.wmsParams.logscale), this.getDecimalPrecision());
