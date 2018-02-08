@@ -436,6 +436,7 @@ var DataController = createReactClass({
     var annualTab = null, longTermTab = null, timeseriesTab = null, contextTab = null;
     if (this.multiYearMeanSelected()) {
       // Annual Cycle Graph
+      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
       annualTab = (
         <Tab eventKey={1} title='Annual Cycle'>
           <Row>
@@ -455,6 +456,7 @@ var DataController = createReactClass({
       );
 
       // Long Term Average Graph
+      var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
       longTermTab = (
         <Tab eventKey={2} title='Long Term Averages'>
           <Row>
@@ -472,10 +474,11 @@ var DataController = createReactClass({
           <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
         </Tab>
       );
+
       //Context Graph
       var contextData = this.state.contextData ? this.state.contextData : this.blankGraph;
-      var contextTab = (
-          <Tab> eventKey={3} title='Model Context'>
+      contextTab = (
+          <Tab eventKey={4} title='Model Context'>
             <DataGraph
               data={contextData.data}
               axis={contextData.axis}
@@ -487,6 +490,7 @@ var DataController = createReactClass({
       );
     } else {
       // Time Series Graph
+      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
       timeseriesTab = (
         <Tab eventKey={3} title='Time Series'>
           <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
