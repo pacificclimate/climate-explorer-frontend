@@ -36,7 +36,8 @@ import _ from 'underscore';
 
 
 import { parseBootstrapTableData,
-         timeKeyToResolutionIndex} from '../../core/util';
+         timeKeyToResolutionIndex,
+         resolutionIndexToTimeKey} from '../../core/util';
 import{ timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
         timeseriesToTimeseriesGraph,
@@ -104,9 +105,7 @@ var DualDataController = createReactClass({
     }
 
     var variableMYM = this.multiYearMeanSelected(props);
-    var comparandParams = _.pick(props, 'model_id', 'experiment');
-    comparandParams.variable_id = props.comparand_id;
-    var comparandMYM = _.findWhere(props.comparandMeta, comparandParams).multi_year_mean;
+    var comparandMYM = this.multiYearMeanSelected(this.mockUpComparandProps(props));
 
     if(variableMYM && comparandMYM) {
       this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
@@ -185,21 +184,28 @@ var DualDataController = createReactClass({
   loadDualLongTermAverageGraph: function (props, timeres, timeidx ) {
     this.setLongTermAverageGraphNoDataMessage("Loading Data");
 
-    //fetch and graph Long Term Average data
+    //The "data" API endpoint returns data from multiple files at a time,
+    //so the metadata needed to generate chart formatting and legends for
+    //each series doesn't exactly correspond with the one-file-each entries
+    //in props.meta. This function extracts the cross-file metadata
+    //corresponding to each query to the "data" endpoint.
+    var pickDataParamsFromProps = function(props) {
+      return _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
+    }
+
+    //fetch Long Term Average data for the primary variable
     var dataPromises = [];
-    var dataParams = [];
-    var variableDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
+    var dataParams = [];  //metadata objects for chart formatters
+
     dataPromises.push(this.getDataPromise(props, timeres, timeidx));
-    dataParams.push(variableDataParams);
+    dataParams.push(pickDataParamsFromProps(props));
 
     //if the user has selected two seperate variables to examine, fetch data
     //for the second variable. This query will always return a result, but
     //the result may be an empty object {}.
     if(props.comparand_id && props.comparand_id != props.variable_id) {
-      var comparandDataParams = _.pick(props, 'model_id', 'experiment', 'area', 'ensemble_name');
-      comparandDataParams.variable_id = props.comparand_id;
-      dataPromises.push(this.getDataPromise(comparandDataParams, timeres, timeidx));
-      dataParams.push(comparandDataParams);
+      dataPromises.push(this.getDataPromise(this.mockUpComparandProps(props), timeres, timeidx));
+      dataParams.push(pickDataParamsFromProps(this.mockUpComparandProps(props)));
     }
     
     Promise.all(dataPromises).then(values=> {
@@ -228,12 +234,12 @@ var DualDataController = createReactClass({
         experiment: props.experiment,
         timescale: "monthly"
     };
-    
+
     //If this functions is supplied with instance parameters
     //(an object with ensemble_member, start_date, and end_date attributes), 
     //it will select the matching dataset, otherwise (ie on initial load),
     //a dataset belonging to an arbitrary instance will be selected.
-    if(instance) {
+    if(!_.isEmpty(instance)) {
       _.extend(params, instance);
     }
     
@@ -263,9 +269,7 @@ var DualDataController = createReactClass({
     //but it is not guarenteed to exist for the comparison variable, so fall back to only
     //showing one variable in that case.
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
-      var comparandTimeseriesParams = _.pick(props, "area");
-      comparandTimeseriesParams.variable_id = props.comparand_id;
-      comparandTimeseriesParams.meta = props.comparandMeta;
+      var comparandTimeseriesParams = _.pick(this.mockUpComparandProps(props), "variable_id", "area", "meta");
       timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
 
       //check availability of seasonal and annual data on the comparand,
@@ -276,7 +280,6 @@ var DualDataController = createReactClass({
           timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, resolutionMetadata.unique_id));
         }
       });
-
     }
 
     Promise.all(timeseriesPromises).then(series=> {
@@ -346,17 +349,15 @@ var DualDataController = createReactClass({
     //primary variable
     var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
     var variableMetadata = _.findWhere(props.meta, params);
-
     timeseriesPromises.push(this.getTimeseriesPromise(props, variableMetadata.unique_id));
 
-    params.variable_id = props.comparand_id;
-    var comparandMetadata = _.findWhere(props.comparandMeta, params);
+    //secondary variable
+    var comparandParams = _.pick(this.mockUpComparandProps(props), 'model_id', 'variable_id', 'experiment');
+    var comparandMetadata = _.findWhere(props.comparandMeta, comparandParams);
 
-    //add data from the comparand, if it exists
+    //add data from the comparand, iff it exists
     if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
-      params.area = props.area;
-      params.meta = props.comparandMeta;
-      timeseriesPromises.push(this.getTimeseriesPromise(params, comparandMetadata.unique_id));
+      timeseriesPromises.push(this.getTimeseriesPromise(this.mockUpComparandProps(props), comparandMetadata.unique_id));
     }
 
     Promise.all(timeseriesPromises).then(responses => {
@@ -369,6 +370,22 @@ var DualDataController = createReactClass({
     }).catch(error => {
       this.displayError(error, this.setTimeseriesGraphNoDataMessage);
     });
+  },
+
+  /*
+   * This function creates an object that is similar to the props DualDataController
+   * receives from its parent, except that the "variable_id" and "meta" attributes
+   * describe the secondary variable (comparand) instead of the primary variable.
+   *
+   * It is passed to mixin functions that normally work with metadata about the
+   * primary variable stored from a DataController props object. It allows these methods
+   * to operate on DualController's secondary variable as well.
+   */
+  mockUpComparandProps: function (props = this.props) {
+    var mockup = _.omit(props, "meta", "comparandMeta", "variable_id", "comparand_id");
+    mockup.meta = props.comparandMeta;
+    mockup.variable_id = props.comparand_id;
+    return mockup;
   },
 
   render: function () {
@@ -415,11 +432,13 @@ var DualDataController = createReactClass({
       );
 
       // Long Term Average Graph
+      var longTermAverageSelected = resolutionIndexToTimeKey(this.state.longTermAverageTimeScale,
+          this.state.longTermAverageTimeOfYear);
       longTermTab = (
         <Tab eventKey={2} title='Long Term Averages'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
+              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} value={longTermAverageSelected}/>
             </Col>
             <Col>
               <div>
