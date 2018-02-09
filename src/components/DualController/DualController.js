@@ -25,6 +25,7 @@ import Selector from '../Selector';
 import AppMixin from '../AppMixin';
 import g from '../../core/geo';
 import MapController from '../MapController';
+import _ from 'underscore';
 
 var App = createReactClass({
   displayName: 'App',
@@ -48,10 +49,16 @@ var App = createReactClass({
   },
 
   //because componentDidMount() is shared by all three App Controllers via a 
-  //mixin, it doesn't set the initial state of the comparison variable 
-  //(comparand_id), so needs to be initialized seperately here.
+  //mixin, it doesn't set the initial state of DualController's unique comparison
+  //variable (comparand_id), which is handled seperately here.
   componentDidUpdate: function (prevProps, prevState) {
-    if(!this.state.comparand_id) {
+    if(!this.state.comparand_id) {//comparand uninitialized
+      this.setState({
+        comparand_id: this.state.variable_id
+      });
+    }
+    else if(!_.contains(_.pluck(this.state.meta, "variable_id"), this.state.comparand_id)) {
+      //comparand leftover from previous ensemble; not present in current one
       this.setState({
         comparand_id: this.state.variable_id
       });

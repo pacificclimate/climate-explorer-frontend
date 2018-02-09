@@ -98,7 +98,7 @@ var AppMixin = {
 
   componentDidUpdate: function(nextProps, nextState) {
     // The metadata needs to be updated if the ensemble has changed
-    if (nextState.ensemble_name !== this.state.ensmeble_name) {
+    if (nextState.ensemble_name !== this.state.ensemble_name) {
       this.updateMetadata();
     }
   },
