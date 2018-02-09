@@ -32,7 +32,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Button, Row, Col, ControlLabel, Tab, Tabs } from 'react-bootstrap';
-import Loader from 'react-loader';
 import _ from 'underscore';
 
 import styles from './DataController.css';
@@ -53,6 +52,7 @@ import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
+import AnnualCycleGraph from "../AnnualCycleGraph";
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -179,6 +179,7 @@ var DataController = createReactClass({
    * view on the Annual Cycle graph. Stores the selected run and period in state, 
    * fetches new data, and updates the graph.
    */
+  // TODO: Refactor to eliminate encoding of dataset.
   updateAnnualCycleDataset: function (instance) {
     this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
   },
@@ -396,7 +397,6 @@ var DataController = createReactClass({
         }
       }
 
-
       //fetch data from the backend and assemble the graph
       Promise.all(dataPromises).then(responses=> {
         var data = _.pluck(responses, "data");
@@ -414,23 +414,6 @@ var DataController = createReactClass({
   render: function () {
     var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
-    //make a list of all the unique combinations of run + climatological period
-    //a user could decide to view.
-    //Not sure JSON is the right way to do this, though.
-    //TODO: see if there's a more elegant way to handle the callback
-    var ids = this.props.meta.map(function (el) {
-        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
-            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
-    });
-    ids = _.uniq(ids, false, function(item){return item[1]});
-
-    var selectedInstance;
-    _.each(ids, id => {
-      if(_.isEqual(JSON.parse(id[0]), this.state.annualCycleInstance)) {
-        selectedInstance = id[0];
-      }
-    });
-
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
@@ -440,19 +423,14 @@ var DataController = createReactClass({
       var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
       annualTab = (
         <Tab eventKey={1} title='Annual Cycle'>
-          <Row>
-            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
-            </Col>
-            <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-              <div>
-                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
-                <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
-              </div>
-            </Col>
-          </Row>
-          <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
+          <AnnualCycleGraph
+            meta={this.props.meta}
+            dataset={this.state.annualCycleInstance}
+            onChangeDataset={this.updateAnnualCycleDataset}
+            graphSpec={annualCycleData}
+            onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
+            onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+          />
         </Tab>
       );
 
