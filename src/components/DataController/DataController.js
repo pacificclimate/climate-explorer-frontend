@@ -51,8 +51,9 @@ import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
-import AnnualCycleGraph from "../graphs/AnnualCycleGraph";
-import LongTermAveragesGraph from "../graphs/LongTermAveragesGraph";
+import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
+import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
+import ContextGraph from '../graphs/ContextGraph';
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -417,7 +418,7 @@ var DataController = createReactClass({
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
-    var timeseriesTab = null, contextTab = null;
+    var timeseriesTab = null;
     if (this.multiYearMeanSelected()) {
       // Long Term Average Graph
       var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
@@ -490,12 +491,21 @@ var DataController = createReactClass({
                   onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
                   graphSpec={this.state.longTermAverageData || this.blankGraph}
                   onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
-                  onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}/>
+                  onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
+                />
+              </Tab>
+          }
+
+          {
+            this.multiYearMeanSelected() &&
+              <Tab eventKey={4} title='Model Context'>
+                <ContextGraph
+                  graphSpec={this.state.contextData || this.blankGraph}
+                />
               </Tab>
           }
 
           {timeseriesTab}
-          {contextTab}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
