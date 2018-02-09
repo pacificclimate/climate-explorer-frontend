@@ -197,7 +197,7 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
   return {
     data: c3Data,
     tooltip: c3Tooltip,
-    axis: c3Axis
+    axis: c3Axis,
   }; 
 };
 
@@ -379,7 +379,7 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
   else {
     throw new Error("Error: no context provided for timeseries data");
   }
-  
+
   //get the list of all timestamps and add them to the chart
   //(C3 requires x-axis timestamps be added as a data column)
   var timestamps = getAllTimestamps(data);
@@ -437,6 +437,13 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
+  //The long term average graph doesn't require every series to have the exact
+  //same timestamps, since it's comparing long term trends anyway. Allow C3
+  //to smoothly connect series even if they're "missing" timestamps.
+  var c3Line = {
+      connectNull: true
+  };
+
   //Note: if context is empty (dataToLongTermAverageGraph was called with only
   //one time series), variable-determined precision will not be available and
   //numbers will be formatted with default precision.
@@ -448,7 +455,8 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
   return {
     data: c3Data,
     tooltip: c3Tooltip,
-    axis: c3Axis
+    axis: c3Axis,
+    line: c3Line
   }; 
 };
 
@@ -790,8 +798,56 @@ var fadeSeriesByRank = function (graph, ranker) {
   return graph;
 };
 
+/*
+ * Post-processing graph function that removes data series from the legend.
+ *
+ * Accepts a C3 graph and a predicate function. Applies the predicate to
+ * each data series. If the predicate returns true, the data series will
+ * be hidden from the legend. If the predicate returns false, the data series
+ * will appear in the legend as normal.
+ *
+ * By default, every data series appears in the legend; this postprocessor
+ * is only needed if at least one series should be hidden.
+ */
+var hideSeriesInLegend = function(graph, predicate) {
+  var hiddenSeries = [];
+
+  _.each(graph.data.columns, column => {
+    var seriesName = column[0];
+    if(!_.isEqual(seriesName, "x")) {
+      if(predicate(column)){
+        hiddenSeries.push(seriesName);
+      }
+    }
+  });
+
+  if(!graph.legend) {
+    graph.legend = {};
+  }
+
+  graph.legend.hide = hiddenSeries;
+  return graph;
+};
+
+/*
+ * Post-processing graph function that sets the order of the data series.
+ * The last-drawn series is the most clearly visible; its points and lines
+ * will be on top where they intersect with other series.
+ *
+ * Accepts a C3 graph and a ranking function. The ranking function will be
+ * applied to each series in the graph, and the series will be sorted by the
+ * ranking function's results. The higher a series is ranked, the later it
+ * will be drawn and the more prominent it will appear.
+ */
+var sortSeriesByRank = function(graph, ranker) {
+  var sorter = function(a, b) {return ranker(a) - ranker(b);}
+  graph.data.columns = graph.data.columns.sort(sorter);
+  return graph;
+}
+
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
+    hideSeriesInLegend, sortSeriesByRank,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

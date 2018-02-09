@@ -17,6 +17,9 @@
  *  - a Long Term Average Datagraph showing the mean of each climatology
  *    period as a seperate data point.
  *
+ *  - a Model Context Datagraph similar to the Long Term Average
+ *    Datagraph, but with a separate line for each model.
+ *
  * If the selected dataset is not a multi year mean:
  *  - a Time Series Datagraph showing each time point available.
  *
@@ -40,7 +43,11 @@ import { parseBootstrapTableData,
          resolutionIndexToTimeKey} from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
         dataToLongTermAverageGraph,
-        timeseriesToTimeseriesGraph} from '../../core/chart';
+        timeseriesToTimeseriesGraph,
+        assignColoursByGroup,
+        fadeSeriesByRank,
+        hideSeriesInLegend,
+        sortSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
@@ -56,6 +63,7 @@ var DataController = createReactClass({
     experiment: PropTypes.string,
     area: PropTypes.string,
     meta: PropTypes.array,
+    contextMeta: PropTypes.array,
     ensemble_name: PropTypes.string,
   },
 
@@ -72,6 +80,7 @@ var DataController = createReactClass({
       annualCycleData: undefined,
       timeseriesData: undefined,
       statsData: undefined,
+      contextData: undefined
     };
   },
 
@@ -87,6 +96,7 @@ var DataController = createReactClass({
       this.loadAnnualCycleGraph(props);
       this.loadLongTermAverageGraph(props);
       this.loadDataTable(props);
+      this.loadContextGraph(props);
     }
     else {
       this.loadTimeseriesGraph(props);
@@ -118,6 +128,14 @@ var DataController = createReactClass({
     });
   },
 
+  //Removes all data from the Context Graph and displays a message
+  setContextGraphNoDataMessage: function(message) {
+    this.setState({
+      contextData: { data: { columns: [], empty: { label: { text: message }, }, },
+        axis: {} },
+    });
+  },
+
   //Removes all data from the Timeseries Graph and displays a message
   setTimeseriesGraphNoDataMessage: function(message) {
     this.setState({
@@ -133,6 +151,7 @@ var DataController = createReactClass({
      _.isEqual(nextState.statsData, this.state.statsData) &&
      _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+     _.isEqual(nextState.contextData, this.state.contextData) &&
      _.isEqual(nextProps.meta, this.props.meta) &&
      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
   },
@@ -200,8 +219,22 @@ var DataController = createReactClass({
 
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, "data");
+      var graph = timeseriesToAnnualCycleGraph(props.meta, ...data);
+
+      //arrange the graph so that the highest-resolution data is most visible.
+      var rankByTimeResolution = function (series) {
+        var resolutions = ["Yearly", "Seasonal", "Monthly"];
+        for(let i = 0; i < 3; i++) {
+          if(series[0].search(resolutions[i]) != -1) {
+            return i;
+          }
+        }
+        return 0;
+      }
+      graph = sortSeriesByRank(graph, rankByTimeResolution);
+
       this.setState({
-        annualCycleData: timeseriesToAnnualCycleGraph(props.meta, ...data),
+        annualCycleData: graph,
         annualCycleInstance: {
           start_date: monthlyMetadata.start_date,
           end_date: monthlyMetadata.end_date,
@@ -296,14 +329,90 @@ var DataController = createReactClass({
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
     });
+  },
 
+  /*
+   * This function fetches and loads data for the Context Graph
+   * comparing several models. It calls the "data" (long term average)
+   * query for each model and composes the results into a single graph,
+   * so it is only available for datasets that support the "data" query
+   * (multi year means).
+   */
+  loadContextGraph: function (props) {
+
+    //Graph formatting function used to emphasize the current model and
+    //deemphasize all others.
+    var emphasizeCurrentModel = function(graph) {
+      //Helper function used to classify data series by which model generated them
+      var makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
+        return function(dataseries) {
+          return dataseries[0].search(props.model_id) != -1 ? selectedModelOutput : otherModelOutput;
+        }
+      };
+      graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
+      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, .35));
+      graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
+      graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
+
+      //simplify graph by turning off tooltip and missing data gaps
+      graph.line.connectNull = true;
+      graph.tooltip = {show: false};
+      return graph;
+    };
+
+    //If the only thing changed since the last time the graph was rendered
+    //is the model, we already have all the data fetched, we just need to
+    //reformat the graph.
+    if(this.state.contextData &&
+        this.state.contextData.data.columns.length > 0 &&
+        _.isEqual(props.variable_id, this.props.variable_id) &&
+        _.isEqual(props.experiment, this.props.experiment)) {
+      var graph = emphasizeCurrentModel(this.state.contextData);
+
+      this.setState({
+        contextData: graph
+      });
+    }
+    else {
+      this.setContextGraphNoDataMessage("Loading Data");
+
+      var dataPromises = [];
+      var dataQueryParams = [];
+      var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
+      var params = _.pick(props, 'experiment', 'variable_id', 'ensemble_name');
+      params.timescale = 'yearly';
+      params.multi_year_mean = true;
+
+      params.model_id = props.model_id;
+      dataPromises.push(this.getDataPromise(params, "yearly", 0));
+      dataQueryParams.push(_.extend({}, params));
+
+      //determine which models have data that matches this variable and experiment
+      for(let i = 0; i < contextModels.length; i++ ) {
+        params.model_id = contextModels[i];
+        if(_.where(props.contextMeta, _.omit(params, 'ensemble_name')).length > 0){
+          dataPromises.push(this.getDataPromise(params, "yearly", 0));
+          dataQueryParams.push(_.extend({}, params));
+        }
+      }
+
+
+      //fetch data from the backend and assemble the graph
+      Promise.all(dataPromises).then(responses=> {
+        var data = _.pluck(responses, "data");
+        var graph = emphasizeCurrentModel(dataToLongTermAverageGraph(data, dataQueryParams));
+
+        this.setState({
+          contextData: graph
+        });
+      }).catch(error => {
+        this.displayError(error, this.setContextGraphNoDataMessage);
+      });
+    }
   },
 
   render: function () {
-    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
-    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
-    var statsData = this.state.statsData ? this.state.statsData : [];
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
+    var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -325,9 +434,10 @@ var DataController = createReactClass({
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
-    var annualTab = null, longTermTab = null, timeseriesTab = null;
+    var annualTab = null, longTermTab = null, timeseriesTab = null, contextTab = null;
     if (this.multiYearMeanSelected()) {
       // Annual Cycle Graph
+      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
       annualTab = (
         <Tab eventKey={1} title='Annual Cycle'>
           <Row>
@@ -347,11 +457,14 @@ var DataController = createReactClass({
       );
 
       // Long Term Average Graph
+      var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
+      var longTermAverageSelected = resolutionIndexToTimeKey(this.state.longTermAverageTimeScale,
+          this.state.longTermAverageTimeOfYear);
       longTermTab = (
         <Tab eventKey={2} title='Long Term Averages'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
+              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} value={longTermAverageSelected} />
             </Col>
             <Col>
               <div>
@@ -364,8 +477,23 @@ var DataController = createReactClass({
           <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
         </Tab>
       );
+
+      //Context Graph
+      var contextData = this.state.contextData ? this.state.contextData : this.blankGraph;
+      contextTab = (
+          <Tab eventKey={4} title='Model Context'>
+            <DataGraph
+              data={contextData.data}
+              axis={contextData.axis}
+              legend={contextData.legend}
+              line={contextData.line}
+              tooltip={contextData.tooltip}
+            />
+          </Tab>
+      );
     } else {
       // Time Series Graph
+      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
       timeseriesTab = (
         <Tab eventKey={3} title='Time Series'>
           <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
@@ -381,6 +509,7 @@ var DataController = createReactClass({
           {annualTab}
           {longTermTab}
           {timeseriesTab}
+          {contextTab}
         </Tabs>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>

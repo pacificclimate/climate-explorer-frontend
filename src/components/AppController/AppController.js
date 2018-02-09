@@ -78,6 +78,7 @@ var App = createReactClass({
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
+              contextMeta={this.state.meta} //for Context Graph: metadata from all models
             />
           </Col>
         </Row>

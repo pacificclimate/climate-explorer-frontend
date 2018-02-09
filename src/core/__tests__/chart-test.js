@@ -356,8 +356,6 @@ describe('fadeSeriesByRank', function () {
   var metadata = mockAPI.metadataToArray();
   var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-  var segmentFunc = function (col) {return col[0];};
-  graph = chart.assignColoursByGroup(graph, segmentFunc);
   it('does not affect tier-1 series', function () {
     var ranker = function(series) {return 1};
     graph = chart.fadeSeriesByRank(graph, ranker);
@@ -377,4 +375,40 @@ describe('fadeSeriesByRank', function () {
     var faded = fader("#000000", series[i][0]);
     expect(faded).not.toMatch("#000000");
   }
+});
+
+describe('hideSeriesInLegend', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  it('removes data series from the lengend', function() {
+    var hideAll = function(series) {return true};
+    graph = chart.hideSeriesInLegend(graph, hideAll);
+    expect(graph.legend.hide.length).toBe(3);
+  });
+  it('retains data series in the legend', function() {
+    var showAll = function(series) {return false};
+    graph = chart.hideSeriesInLegend(graph, showAll);
+    expect(graph.legend.hide.length).toBe(0);
+  });
+});
+
+describe('sortSeriesByRank', function (){
+  var metadata = mockAPI.metadataToArray();
+  var graph = chart.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var rankByTimeResolution = function (series) {
+    var resolutions = ["Yearly", "Seasonal", "Monthly"];
+    for(let i = 0; i < 3; i++) {
+      if(series[0].search(resolutions[i]) != -1) {
+        return i;
+      }
+    }
+  }
+  it('orders series by ranking', function () {
+    var ranked = chart.sortSeriesByRank(graph, rankByTimeResolution);
+    expect(ranked.data.columns[0][0]).toBe("Yearly Mean");
+    expect(ranked.data.columns[1][0]).toBe("Seasonal Mean");
+    expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
+  });
 });
