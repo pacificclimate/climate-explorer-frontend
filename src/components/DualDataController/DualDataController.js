@@ -47,6 +47,10 @@ import DataGraph from '../DataGraph/DataGraph';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
+import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
+import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
+import ContextGraph from '../graphs/ContextGraph';
+import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 import styles from './DualDataController.css';
 
@@ -389,86 +393,47 @@ var DualDataController = createReactClass({
   },
 
   render: function () {
-    var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
-    var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
-    var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
-
-    //make a list of all the unique combinations of run + climatological period
-    //a user could decide to view.
-    //Not sure JSON is the right way to do this, though.
-    //TODO: see if there's a more elegant way to handle the callback
-    var ids = this.props.meta.map(function (el) {
-        return [JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
-            `${el.ensemble_member} ${el.start_date}-${el.end_date}`];
-    });
-    ids = _.uniq(ids, false, function(item){return item[1]});
-
-    var selectedInstance;
-    _.each(ids, id => {
-      if(_.isEqual(JSON.parse(id[0]), this.state.timeseriesInstance)) {
-        selectedInstance = id[0];
-      }
-    });
-    
-    var annualTab = null, longTermTab = null, timeseriesTab = null;
-    if (this.multiYearMeanSelected()) {
-      // Annual Cycle Graph
-      annualTab = (
-        <Tab eventKey={1} title='Annual Cycle'>
-          <Row>
-            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <Selector label={"Dataset"} onChange={this.updateAnnualCycleDataset} items={ids} value={selectedInstance}/>
-            </Col>
-            <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-              <div>
-                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
-                <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
-              </div>
-            </Col>
-          </Row>
-          <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
-        </Tab>
-      );
-
-      // Long Term Average Graph
-      var longTermAverageSelected = resolutionIndexToTimeKey(this.state.longTermAverageTimeScale,
-          this.state.longTermAverageTimeOfYear);
-      longTermTab = (
-        <Tab eventKey={2} title='Long Term Averages'>
-          <Row>
-            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} value={longTermAverageSelected}/>
-            </Col>
-            <Col>
-              <div>
-                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
-                <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
-              </div>
-            </Col>
-          </Row>
-          <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-        </Tab>
-      );
-    } else {
-      // Time Series Graph
-      timeseriesTab = (
-        <Tab eventKey={3} title='Time Series'>
-          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} line={timeseriesData.line} />
-          <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
-        </Tab>
-      );
-    }
+    const longTermAverageSelected = resolutionIndexToTimeKey(
+      this.state.longTermAverageTimeScale,
+      this.state.longTermAverageTimeOfYear
+    );
 
     return (
       <div>
         <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
-        <Tabs>
-          {annualTab}
-          {longTermTab}
-          {timeseriesTab}
-        </Tabs>
+        {
+          this.multiYearMeanSelected() ? (
+            <Tabs>
+              <Tab eventKey={1} title='Annual Cycle'>
+                <AnnualCycleGraph
+                  meta={this.props.meta}
+                  dataset={this.state.annualCycleInstance}
+                  onChangeDataset={this.updateAnnualCycleDataset}
+                  graphSpec={this.state.annualCycleData || this.blankGraph}
+                  onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
+                  onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+                />
+              </Tab>
+              <Tab eventKey={2} title='Long Term Averages'>
+                <LongTermAveragesGraph
+                  timeOfYear={longTermAverageSelected}
+                  onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
+                  graphSpec={this.state.longTermAverageData || this.blankGraph}
+                  onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
+                  onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
+                />
+              </Tab>
+            </Tabs>
+          ) : (
+            <Tabs>
+              <Tab eventKey={1} title='Time Series'>
+                <TimeSeriesGraph
+                  graphSpec={this.state.timeseriesData || this.blankGraph}
+                />
+              </Tab>
+            </Tabs>
+          )
+        }
       </div>
     );
   },
