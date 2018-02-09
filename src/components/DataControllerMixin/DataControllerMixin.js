@@ -246,7 +246,10 @@ var ModalMixin = {
         columns: []
       },
       axis: {}
-    }
+    },
+
+    //Used to render uninitialized stats tables
+    blankStatsData: []
 };
 
 export default ModalMixin;

@@ -155,11 +155,11 @@ var MotiDataController = createReactClass({
   },
 
   render: function () {
-    var statsData = this.state.statsData ? this.state.statsData : [];
+    var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
     var graph;
     if(this.multiYearMeanSelected(this.props)) {
-      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : { data: { columns: [] }, axis: {} };
+      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
       graph = (
           <div>
             <div>

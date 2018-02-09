@@ -63,6 +63,7 @@ var DataController = createReactClass({
     experiment: PropTypes.string,
     area: PropTypes.string,
     meta: PropTypes.array,
+    contextMeta: PropTypes.array,
     ensemble_name: PropTypes.string,
   },
 
@@ -411,7 +412,7 @@ var DataController = createReactClass({
   },
 
   render: function () {
-    var statsData = this.state.statsData ? this.state.statsData : [];
+    var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
     //make a list of all the unique combinations of run + climatological period
     //a user could decide to view.
@@ -457,11 +458,13 @@ var DataController = createReactClass({
 
       // Long Term Average Graph
       var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
+      var longTermAverageSelected = resolutionIndexToTimeKey(this.state.longTermAverageTimeScale,
+          this.state.longTermAverageTimeOfYear);
       longTermTab = (
         <Tab eventKey={2} title='Long Term Averages'>
           <Row>
             <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} />
+              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} value={longTermAverageSelected} />
             </Col>
             <Col>
               <div>
