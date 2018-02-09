@@ -49,10 +49,10 @@ import {timeseriesToAnnualCycleGraph,
         sortSeriesByRank} from '../../core/chart';
 import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
-import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
 import AnnualCycleGraph from "../graphs/AnnualCycleGraph";
+import LongTermAveragesGraph from "../graphs/LongTermAveragesGraph";
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -417,7 +417,7 @@ var DataController = createReactClass({
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
-    var longTermTab = null, timeseriesTab = null, contextTab = null;
+    var timeseriesTab = null, contextTab = null;
     if (this.multiYearMeanSelected()) {
       // Long Term Average Graph
       var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
@@ -471,19 +471,29 @@ var DataController = createReactClass({
         <Tabs>
           {
             this.multiYearMeanSelected() &&
-            <Tab eventKey={1} title='Annual Cycle'>
-              <AnnualCycleGraph
-                meta={this.props.meta}
-                dataset={this.state.annualCycleInstance}
-                onChangeDataset={this.updateAnnualCycleDataset}
-                graphSpec={this.state.annualCycleData || this.blankGraph}
-                onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
-                onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
-              />
-            </Tab>
+              <Tab eventKey={1} title='Annual Cycle'>
+                <AnnualCycleGraph
+                  meta={this.props.meta}
+                  dataset={this.state.annualCycleInstance}
+                  onChangeDataset={this.updateAnnualCycleDataset}
+                  graphSpec={this.state.annualCycleData || this.blankGraph}
+                  onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
+                  onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+                />
+              </Tab>
+          }
+          {
+            this.multiYearMeanSelected() &&
+              <Tab eventKey={2} title='Long Term Averages'>
+                <LongTermAveragesGraph
+                  timeOfYear={this.state.longTermAverageTimeOfYear}
+                  onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
+                  graphSpec={this.state.longTermAverageData || this.blankGraph}
+                  onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
+                  onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}/>
+              </Tab>
           }
 
-          {longTermTab}
           {timeseriesTab}
           {contextTab}
         </Tabs>
