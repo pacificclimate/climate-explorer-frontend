@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col, ControlLabel } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import DatasetSelector from '../../DatasetSelector/DatasetSelector';
-import styles from './AnnualCycleGraph.css';
 import DataGraph from '../../DataGraph/DataGraph';
+import ExportButtons from '../ExportButtons';
 
 
 export default class AnnualCycleGraph extends React.Component {
@@ -30,11 +30,10 @@ export default class AnnualCycleGraph extends React.Component {
             />
           </Col>
           <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
-            <div>
-              <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-              <Button onClick={this.props.onExportXslx}>XLSX</Button>
-              <Button onClick={this.props.onExportCsv}>CSV</Button>
-            </div>
+            <ExportButtons
+              onExportXslx={this.props.onExportXslx}
+              onExportCsv={this.props.onExportCsv}
+            />
           </Col>
         </Row>
         <Row>
