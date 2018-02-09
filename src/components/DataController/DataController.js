@@ -47,7 +47,6 @@ import {timeseriesToAnnualCycleGraph,
         fadeSeriesByRank,
         hideSeriesInLegend,
         sortSeriesByRank} from '../../core/chart';
-import DataGraph from '../DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
@@ -470,9 +469,9 @@ var DataController = createReactClass({
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
-        <Tabs>
-          {
-            this.multiYearMeanSelected() &&
+        {
+          this.multiYearMeanSelected() ? (
+            <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
                   meta={this.props.meta}
@@ -483,10 +482,6 @@ var DataController = createReactClass({
                   onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
                 />
               </Tab>
-          }
-
-          {
-            this.multiYearMeanSelected() &&
               <Tab eventKey={2} title='Long Term Averages'>
                 <LongTermAveragesGraph
                   timeOfYear={this.state.longTermAverageTimeOfYear}
@@ -496,26 +491,22 @@ var DataController = createReactClass({
                   onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
                 />
               </Tab>
-          }
-
-          {
-            this.multiYearMeanSelected() &&
-              <Tab eventKey={4} title='Model Context'>
+              <Tab eventKey={3} title='Model Context'>
                 <ContextGraph
                   graphSpec={this.state.contextData || this.blankGraph}
                 />
               </Tab>
-          }
-
-          {
-            !this.multiYearMeanSelected() &&
-              <Tab eventKey={3} title='Time Series'>
+            </Tabs>
+          ) : (
+            <Tabs>
+              <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
                   graphSpec={this.state.timeseriesData || this.blankGraph}
                 />
               </Tab>
-            }
-        </Tabs>
+            </Tabs>
+          )
+        }
 
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
