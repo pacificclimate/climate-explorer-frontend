@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import AnnualCycleGraph from '../AnnualCycleGraph';
 import { noop } from 'underscore';
-import { meta } from '../../../test_support/data';
+import { meta } from '../../../../test_support/data';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');

@@ -52,7 +52,7 @@ import DataTable from '../DataTable/DataTable';
 import Selector from '../Selector';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
-import AnnualCycleGraph from "../AnnualCycleGraph";
+import AnnualCycleGraph from "../graphs/AnnualCycleGraph";
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -417,7 +417,7 @@ var DataController = createReactClass({
     var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
       this.state.dataTableTimeOfYear);
 
-    var annualTab = null, longTermTab = null, timeseriesTab = null, contextTab = null;
+    var longTermTab = null, timeseriesTab = null, contextTab = null;
     if (this.multiYearMeanSelected()) {
       // Long Term Average Graph
       var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
