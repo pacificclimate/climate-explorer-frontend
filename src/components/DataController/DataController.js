@@ -54,6 +54,7 @@ import DataControllerMixin from '../DataControllerMixin';
 import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
+import TimeSeriesGraph from "../graphs/TimeSeriesGraph";
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -483,6 +484,7 @@ var DataController = createReactClass({
                 />
               </Tab>
           }
+
           {
             this.multiYearMeanSelected() &&
               <Tab eventKey={2} title='Long Term Averages'>
@@ -505,8 +507,16 @@ var DataController = createReactClass({
               </Tab>
           }
 
-          {timeseriesTab}
+          {
+            !this.multiYearMeanSelected() &&
+              <Tab eventKey={3} title='Time Series'>
+                <TimeSeriesGraph
+                  graphSpec={this.state.timeseriesData || this.blankGraph}
+                />
+              </Tab>
+            }
         </Tabs>
+
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
             <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
