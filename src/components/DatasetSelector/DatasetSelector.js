@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Selector from '../Selector';
+import Selector from '../Selector/Selector';
 import _ from 'underscore';
 
 export default class DatasetSelector extends React.Component {

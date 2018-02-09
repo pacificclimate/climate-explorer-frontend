@@ -3,7 +3,7 @@ import React from 'react';
 import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
 import _ from 'underscore';
 
-import DatasetSelector from './DatasetSelector';
+import DatasetSelector from '../DatasetSelector/DatasetSelector';
 import DataDisplayControls from './DataDisplayControls';
 import TimeLinkButton from './TimeLinkButton';
 
