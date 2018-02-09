@@ -31,7 +31,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, ControlLabel, Tab, Tabs } from 'react-bootstrap';
+import { Button, Row, Col, Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
 import styles from './DataController.css';
@@ -53,7 +53,7 @@ import DataControllerMixin from '../DataControllerMixin';
 import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
-import TimeSeriesGraph from "../graphs/TimeSeriesGraph";
+import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -413,58 +413,17 @@ var DataController = createReactClass({
   },
 
   render: function () {
-    var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
+    const statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
-    var dataTableSelected = resolutionIndexToTimeKey(this.state.dataTableTimeScale,
-      this.state.dataTableTimeOfYear);
+    const dataTableSelected = resolutionIndexToTimeKey(
+      this.state.dataTableTimeScale,
+      this.state.dataTableTimeOfYear
+    );
 
-    var timeseriesTab = null;
-    if (this.multiYearMeanSelected()) {
-      // Long Term Average Graph
-      var longTermAverageData = this.state.longTermAverageData ? this.state.longTermAverageData : this.blankGraph;
-      var longTermAverageSelected = resolutionIndexToTimeKey(this.state.longTermAverageTimeScale,
-          this.state.longTermAverageTimeOfYear);
-      longTermTab = (
-        <Tab eventKey={2} title='Long Term Averages'>
-          <Row>
-            <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-              <TimeOfYearSelector onChange={this.updateLongTermAverageTimeOfYear} value={longTermAverageSelected} />
-            </Col>
-            <Col>
-              <div>
-                <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-                <Button onClick={this.exportLongTermAverage.bind(this, 'xlsx')}>XLSX</Button>
-                <Button onClick={this.exportLongTermAverage.bind(this, 'csv')}>CSV</Button>
-              </div>
-            </Col>
-          </Row>
-          <DataGraph data={longTermAverageData.data} axis={longTermAverageData.axis} tooltip={longTermAverageData.tooltip} />
-        </Tab>
-      );
-
-      //Context Graph
-      var contextData = this.state.contextData ? this.state.contextData : this.blankGraph;
-      contextTab = (
-          <Tab eventKey={4} title='Model Context'>
-            <DataGraph
-              data={contextData.data}
-              axis={contextData.axis}
-              legend={contextData.legend}
-              line={contextData.line}
-              tooltip={contextData.tooltip}
-            />
-          </Tab>
-      );
-    } else {
-      // Time Series Graph
-      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
-      timeseriesTab = (
-        <Tab eventKey={3} title='Time Series'>
-          <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
-          <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
-        </Tab>
-      );
-    }
+    const longTermAverageSelected = resolutionIndexToTimeKey(
+      this.state.longTermAverageTimeScale,
+      this.state.longTermAverageTimeOfYear
+    );
 
     return (
       <div>
@@ -484,7 +443,7 @@ var DataController = createReactClass({
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
                 <LongTermAveragesGraph
-                  timeOfYear={this.state.longTermAverageTimeOfYear}
+                  timeOfYear={longTermAverageSelected}
                   onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
                   graphSpec={this.state.longTermAverageData || this.blankGraph}
                   onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
