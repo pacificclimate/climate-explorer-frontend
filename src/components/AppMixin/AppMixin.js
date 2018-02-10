@@ -68,7 +68,7 @@ var AppMixin = {
                 start_date: start,
                 end_date: end,
                 variable_name: response.data[key].variables[vars[v]],
-                }, _.omit(response.data[key], 'variables', 'start_date', 'end_date')));
+                }, _.omit(response.data[key], 'variables', 'start_date', 'end_date', 'modtime')));
             }
           }
         }
