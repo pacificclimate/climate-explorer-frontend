@@ -42,11 +42,20 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   //Removes all data from the Annual Cycle graph and displays a message
-  // TODO: Move into AnnualCycleGraph; set on either loading flag or empty data
+  // TODO: set on either loading flag or empty data
   setAnnualCycleGraphNoDataMessage = (message) => {
     this.setState({
-      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
-        axis: {} },
+      annualCycleData: {
+        data: {
+          columns: [],
+          empty: {
+            label: {
+              text: message,
+            },
+          },
+        },
+        axis: {}
+      },
     });
   };
 
@@ -69,20 +78,13 @@ export default class AnnualCycleGraph extends React.Component {
    */
   loadAnnualCycleGraph(props, instance) {
     // TODO: only props.meta is ever used
-    // TODO: It looks like this is never called with instance set; eliminate?
-    
+
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
 
     // TODO: This function should just load data. Remainder of it should go
     // into a combination of data service methods and methods in AnnualCycleGraph
 
-    // TODO: Can all of this go into AnnualCycleGraph?
-    // Is the state associated with this used anywhere else? If not, then yes.
-    // state:
-    //    annualCycleData
-    //    annualCycleInstance
-
-    // TODO: Set state flag instead
+    // TODO: Set state.loading flag instead?
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
 
     // TODO: Data retrieval setup
