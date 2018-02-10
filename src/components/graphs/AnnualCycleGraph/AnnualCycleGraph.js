@@ -35,17 +35,26 @@ export default class AnnualCycleGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    const { start_date, end_date, ensemble_member } =
+      this.firstMonthlyMetadata(this.props);
     this.state = {
-      annualCycleInstance: undefined,
-      annualCycleData: undefined,
+      instance: { start_date, end_date, ensemble_member },
+      graphSpec: undefined,
     };
+  }
+  
+  firstMonthlyMetadata({ meta, model_id, variable_id, experiment }) {
+    return _.findWhere(
+      meta,
+      { model_id, variable_id, experiment, timescale: 'monthly' }
+    );
   }
 
   //Removes all data from the Annual Cycle graph and displays a message
   // TODO: set on either loading flag or empty data
   setAnnualCycleGraphNoDataMessage = (message) => {
     this.setState({
-      annualCycleData: {
+      graphSpec: {
         data: {
           columns: [],
           empty: {
@@ -76,7 +85,7 @@ export default class AnnualCycleGraph extends React.Component {
    * matching those parameters will be selected; otherwise an arbitrary set
    * of data matching the other parameters.
    */
-  loadAnnualCycleGraph(props, instance) {
+  loadAnnualCycleGraph(props) {
     // TODO: only props.meta is ever used
 
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
@@ -87,18 +96,11 @@ export default class AnnualCycleGraph extends React.Component {
     // TODO: Set state.loading flag instead?
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
 
-    // TODO: Data retrieval setup
-    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
-    params.timescale = 'monthly';
-
-    // TODO: It looks like this is never called with instance set; eliminate?
-    if(instance) {
-      _.extend(params, instance);
-    }
-
-    var monthlyMetadata = _.findWhere(props.meta, params);
-    var seasonalMetadata = findMatchingMetadata(monthlyMetadata, {timescale: 'seasonal'}, props.meta);
-    var yearlyMetadata = findMatchingMetadata(monthlyMetadata, {timescale: 'yearly'}, props.meta);
+    var monthlyMetadata = _.findWhere(this.props.meta, {
+      ...this.state.instance, timescale: 'monthly',
+    });
+    var seasonalMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'seasonal' }, props.meta);
+    var yearlyMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'yearly' }, props.meta);
 
     var timeseriesPromises = [];
 
@@ -132,26 +134,16 @@ export default class AnnualCycleGraph extends React.Component {
       graph = sortSeriesByRank(graph, rankByTimeResolution);
 
       this.setState({
-        annualCycleData: graph,
-        annualCycleInstance: {
-          start_date: monthlyMetadata.start_date,
-          end_date: monthlyMetadata.end_date,
-          ensemble_member: monthlyMetadata.ensemble_member
-        },
+        graphSpec: graph,
       });
     }).catch(error => {
       displayError(error, this.setAnnualCycleGraphNoDataMessage);
     });
   }
 
-  /*
-   * Called when the user selects a specific instance (period & run) to 
-   * view on the Annual Cycle graph. Stores the selected run and period in state, 
-   * fetches new data, and updates the graph.
-   */
-  // TODO: Refactor to eliminate encoding of dataset.
-  updateAnnualCycleDataset = (instance) => {
-    this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
+  // TODO: Refactor to eliminate encoding of instance (dataset).
+  handleChangeInstance = (instance) => {
+    this.setState({ instance: JSON.parse(instance) });
   };
 
   blankGraph = {
@@ -169,18 +161,18 @@ export default class AnnualCycleGraph extends React.Component {
     //If the portal has only one active dataset at a time, run and period are 
     //extracted from that dataset's metadata.
     var instance;
-    if (this.state.annualCycleInstance) {
-      instance = this.state.annualCycleInstance;
+    if (this.state.instance) {
+      instance = this.state.instance;
     } else {
       // TODO: What?? What does timeseries have to do with annual cycle??
-      // This is for the Moti portal. In that case, annualCycleInstance is
+      // This is for the Moti portal. In that case, instance is
       // never defined and it defaults to this. We need to rewrite Moti portal
       // to not require this, because we aren't storing this information in
       // this component now. So there.
       instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
         'start_date', 'end_date', 'ensemble_member');
     }
-    exportDataToWorksheet('timeseries', this.props, this.state.annualCycleData, format, instance);
+    exportDataToWorksheet('timeseries', this.props, this.state.graphSpec, format, instance);
   }
   
   handleExportXslx = this.exportAnnualCycle.bind(this, 'xslx');
@@ -193,13 +185,16 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.meta !== this.props.meta) {
+    if (
+      prevProps.meta !== this.props.meta ||
+      !_.isEqual(prevState.instance, this.state.instance)
+    ) {
       this.loadAnnualCycleGraph(this.props);
     }
   }
 
   render() {
-    const graphSpec = this.state.annualCycleData || this.blankGraph;
+    const graphSpec = this.state.graphSpec || this.blankGraph;
     
     return (
       <React.Fragment>
@@ -208,8 +203,8 @@ export default class AnnualCycleGraph extends React.Component {
             <DatasetSelector
               meta={this.props.meta}
               // TODO: Refactor to eliminate encoding of dataset.
-              value={JSON.stringify(this.state.annualCycleInstance)}
-              onChange={this.updateAnnualCycleDataset}
+              value={JSON.stringify(this.state.instance)}
+              onChange={this.handleChangeInstance}
             />
           </Col>
           <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
