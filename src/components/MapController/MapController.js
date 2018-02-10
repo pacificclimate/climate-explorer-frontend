@@ -16,7 +16,7 @@ import StaticControl from '../StaticControl';
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
-import { getTimeMetadata } from '../../data-services/metadata';
+import { getTimeMetadata } from '../../data-services/ce-backend';
 import { getVariableOptions } from '../../core/util';
 
 

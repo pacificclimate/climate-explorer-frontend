@@ -76,9 +76,7 @@ var DataController = createReactClass({
       longTermAverageTimeScale: "monthly",
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      annualCycleInstance: undefined,
       longTermAverageData: undefined,
-      annualCycleData: undefined,
       timeseriesData: undefined,
       statsData: undefined,
       contextData: undefined
@@ -94,7 +92,6 @@ var DataController = createReactClass({
     //if the selected dataset is a multi-year mean, load annual cycle
     //and long term average graphs, otherwise load a timeseries graph
     if(this.multiYearMeanSelected(props)) {
-      this.loadAnnualCycleGraph(props);
       this.loadLongTermAverageGraph(props);
       this.loadDataTable(props);
       this.loadContextGraph(props);
@@ -103,14 +100,6 @@ var DataController = createReactClass({
       this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
-  },
-
-  //Removes all data from the Annual Cycle graph and displays a message
-  setAnnualCycleGraphNoDataMessage: function(message) {
-    this.setState({
-      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
-                        axis: {} },
-      });
   },
 
   //Removes all data from the Long Term Average graph and displays a message
@@ -173,79 +162,6 @@ var DataController = createReactClass({
    */
   updateDataTableTimeOfYear: function (timeidx) {
     this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
-    },
-
-  /*
-   * Called when the user selects a specific instance (period & run) to 
-   * view on the Annual Cycle graph. Stores the selected run and period in state, 
-   * fetches new data, and updates the graph.
-   */
-  // TODO: Refactor to eliminate encoding of dataset.
-  updateAnnualCycleDataset: function (instance) {
-    this.loadAnnualCycleGraph(this.props, JSON.parse(instance));
-  },
-
-  /*
-   * This function retrieves fetches monthly, seasonal, and yearly resolution
-   * annual cycle data and displays them on the graph. If instance (an object 
-   * with start_date, end_date, and ensemble_member attributes) is provided, data
-   * matching those parameters will be selected; otherwise an arbitrary set 
-   * of data matching the other parameters.
-   */
-  loadAnnualCycleGraph: function (props, instance) {
-    //load Annual Cycle graph - need monthly, seasonal, and yearly data
-    this.setAnnualCycleGraphNoDataMessage("Loading Data");
-    
-    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
-    params.timescale = "monthly";
-    
-    if(instance) {
-      _.extend(params, instance);
-    }
-    
-    var monthlyMetadata = _.findWhere(props.meta, params);
-
-    var seasonalMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "seasonal"}, props.meta);
-    var yearlyMetadata = this.findMatchingMetadata(monthlyMetadata, {timescale: "yearly"}, props.meta);
-    
-    var timeseriesPromises = [];
-    
-    //fetch data from the API for each time resolution that has a dataset. 
-    //the "monthly" time resolution is guarenteed to exist, but
-    //matching seasonal and yearly ones may not be in the database.
-    _.each([monthlyMetadata, seasonalMetadata, yearlyMetadata], function(timeseries) {
-      if(timeseries) {
-        timeseriesPromises.push(this.getTimeseriesPromise(props, timeseries.unique_id));
-      }
-    }, this);
-
-    Promise.all(timeseriesPromises).then(series => {
-      var data = _.pluck(series, "data");
-      var graph = timeseriesToAnnualCycleGraph(props.meta, ...data);
-
-      //arrange the graph so that the highest-resolution data is most visible.
-      var rankByTimeResolution = function (series) {
-        var resolutions = ["Yearly", "Seasonal", "Monthly"];
-        for(let i = 0; i < 3; i++) {
-          if(series[0].search(resolutions[i]) != -1) {
-            return i;
-          }
-        }
-        return 0;
-      }
-      graph = sortSeriesByRank(graph, rankByTimeResolution);
-
-      this.setState({
-        annualCycleData: graph,
-        annualCycleInstance: {
-          start_date: monthlyMetadata.start_date,
-          end_date: monthlyMetadata.end_date,
-          ensemble_member: monthlyMetadata.ensemble_member
-        },
-      });
-    }).catch(error => {
-      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
-    });    
   },
 
   /*
@@ -434,11 +350,9 @@ var DataController = createReactClass({
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
                   meta={this.props.meta}
-                  dataset={this.state.annualCycleInstance}
-                  onChangeDataset={this.updateAnnualCycleDataset}
-                  graphSpec={this.state.annualCycleData || this.blankGraph}
-                  onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
-                  onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+                  model_id={this.props.model_id}
+                  variable_id={this.props.variable_id}
+                  experiment={this.props.experiment}
                 />
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
