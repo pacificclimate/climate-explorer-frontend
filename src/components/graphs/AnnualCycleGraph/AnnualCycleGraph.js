@@ -115,25 +115,22 @@ export default class AnnualCycleGraph extends React.Component {
     // TODO: Set state.loading flag instead?
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
 
-    var monthlyMetadata = _.findWhere(this.props.meta, {
+    const monthlyMetadata = _.findWhere(props.meta, {
       ...this.state.instance, timescale: 'monthly',
     });
-    var seasonalMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'seasonal' }, props.meta);
-    var yearlyMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'yearly' }, props.meta);
-
-    var timeseriesPromises = [];
+    const seasonalMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'seasonal' }, props.meta);
+    const yearlyMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'yearly' }, props.meta);
 
     //fetch data from the API for each time resolution that has a dataset.
     //the 'monthly' time resolution is guarenteed to exist, but
     //matching seasonal and yearly ones may not be in the database.
-    // TODO: Rewrite this in a more functional style: filter, then map
-    _.each([monthlyMetadata, seasonalMetadata, yearlyMetadata], function(timeseries) {
-      if(timeseries) {
-        timeseriesPromises.push(
-          this.getAndValidateTimeseries(props, timeseries.unique_id)
-        );
-      }
-    }, this);
+    const timeseriesPromises = [
+      monthlyMetadata,
+      seasonalMetadata,
+      yearlyMetadata,
+    ]
+      .filter(tsMeta => !!tsMeta)
+      .map(tsMeta => this.getAndValidateTimeseries(props, tsMeta.unique_id));
 
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, 'data');
