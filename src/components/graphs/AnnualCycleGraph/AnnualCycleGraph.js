@@ -94,7 +94,7 @@ export default class AnnualCycleGraph extends React.Component {
     }
     graph = sortSeriesByRank(graph, rankByTimeResolution);
 
-
+    return graph;
   }
 
   /*
