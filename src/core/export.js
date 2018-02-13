@@ -93,19 +93,26 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
 
   // format workbook for either csv or xlsx
   var out_data;
-  if (format === 'csv') {
-    out_data = new Blob(
+  switch (format) {
+    case 'csv':
+      out_data = new Blob(
         [XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])],
         { type:'' }
-        );
-    }
-  else if (format === 'xlsx') {
-    var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
-    out_data = new Blob(
+      );
+      break;
+
+    case 'xslx':
+      var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
+      out_data = new Blob(
         [xml_to_binary_string(wbout)],
         { type:'' }
-        );
+      );
+      break;
+
+    default:
+      throw new Error(`Unknown export format: '${format}'`);
   }
+
   // serve file for download
   filesaver.saveAs(out_data, outputFilename);
 };
