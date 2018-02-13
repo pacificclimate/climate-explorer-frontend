@@ -105,14 +105,8 @@ export default class AnnualCycleGraph extends React.Component {
    * of data matching the other parameters.
    */
   loadAnnualCycleGraph(props) {
-    // TODO: only props.meta is ever used
-
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
 
-    // TODO: This function should just load data. Remainder of it should go
-    // into a combination of data service methods and methods in AnnualCycleGraph
-
-    // TODO: Set state.loading flag instead?
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
 
     const monthlyMetadata = _.findWhere(props.meta, {
