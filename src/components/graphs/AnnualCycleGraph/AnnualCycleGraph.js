@@ -96,7 +96,9 @@ export default class AnnualCycleGraph extends React.Component {
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
 
     const monthlyMetadata = _.findWhere(props.meta, {
-      ...this.state.instance, timescale: 'monthly',
+      ..._.pick(props, 'model_id', 'variable_id', 'experiment'),
+      ...this.state.instance,
+      timescale: 'monthly',
     });
     const seasonalMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'seasonal' }, props.meta);
     const yearlyMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'yearly' }, props.meta);
