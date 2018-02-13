@@ -78,6 +78,25 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
 
+  // TODO: This fn becomes a prop
+  dataToGraphSpec(meta, data) {
+    var graph = timeseriesToAnnualCycleGraph(meta, ...data);
+
+    //arrange the graph so that the highest-resolution data is most visible.
+    var rankByTimeResolution = function (series) {
+      var resolutions = ['Yearly', 'Seasonal', 'Monthly'];
+      for(let i = 0; i < 3; i++) {
+        if(series[0].search(resolutions[i]) != -1) {
+          return i;
+        }
+      }
+      return 0;
+    }
+    graph = sortSeriesByRank(graph, rankByTimeResolution);
+
+
+  }
+
   /*
    * This function retrieves fetches monthly, seasonal, and yearly resolution
    * annual cycle data and displays them on the graph. If instance (an object
@@ -118,23 +137,8 @@ export default class AnnualCycleGraph extends React.Component {
 
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, 'data');
-      // TODO: Separate data from graph specification
-      var graph = timeseriesToAnnualCycleGraph(props.meta, ...data);
-
-      //arrange the graph so that the highest-resolution data is most visible.
-      var rankByTimeResolution = function (series) {
-        var resolutions = ['Yearly', 'Seasonal', 'Monthly'];
-        for(let i = 0; i < 3; i++) {
-          if(series[0].search(resolutions[i]) != -1) {
-            return i;
-          }
-        }
-        return 0;
-      }
-      graph = sortSeriesByRank(graph, rankByTimeResolution);
-
       this.setState({
-        graphSpec: graph,
+        graphSpec: this.dataToGraphSpec(props.meta, data),
       });
     }).catch(error => {
       displayError(error, this.setAnnualCycleGraphNoDataMessage);
