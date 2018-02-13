@@ -164,6 +164,24 @@ var DataController = createReactClass({
     this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
   },
 
+  dataToAnnualCycleGraphSpec(meta, data) {
+    var graph = timeseriesToAnnualCycleGraph(meta, ...data);
+
+    //arrange the graph so that the highest-resolution data is most visible.
+    var rankByTimeResolution = function (series) {
+      var resolutions = ['Yearly', 'Seasonal', 'Monthly'];
+      for(let i = 0; i < 3; i++) {
+        if(series[0].search(resolutions[i]) != -1) {
+          return i;
+        }
+      }
+      return 0;
+    }
+    graph = sortSeriesByRank(graph, rankByTimeResolution);
+
+    return graph;
+  },
+
   /*
    * This function fetches and loads data  for the Long Term Average graphs.
    * If passed a time of year(resolution and index), it will load
@@ -353,6 +371,7 @@ var DataController = createReactClass({
                   model_id={this.props.model_id}
                   variable_id={this.props.variable_id}
                   experiment={this.props.experiment}
+                  dataToGraphSpec={this.dataToAnnualCycleGraphSpec}
                 />
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
