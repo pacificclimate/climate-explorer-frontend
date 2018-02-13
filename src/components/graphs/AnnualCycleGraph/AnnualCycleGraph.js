@@ -31,6 +31,10 @@ export default class AnnualCycleGraph extends React.Component {
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
     dataToGraphSpec: PropTypes.object,
+    // dataToGraphSpec converts data (monthly, seasonal, annual cycle data)
+    // to a graph spec. A different function is passed by different controllers
+    // specializing this general component to particular cases (single vs. dual
+    // controllers, etc.)
   };
 
   constructor(props) {
@@ -130,30 +134,18 @@ export default class AnnualCycleGraph extends React.Component {
     axis: {},
   };
 
-  exportAnnualCycle(format) {
-    //Determine period and run to export. Location varies depending on the portal and whether
-    //it displays a single datafile or multiple datafiles at once. 
-    //Period and run parameters describing a set of multiple displayed datafiles files are 
-    //stored as this.state.timeseriesInstance. 
-    //If the portal has only one active dataset at a time, run and period are 
-    //extracted from that dataset's metadata.
-    var instance;
-    if (this.state.instance) {
-      instance = this.state.instance;
-    } else {
-      // TODO: What?? What does timeseries have to do with annual cycle??
-      // This is for the Moti portal. In that case, instance is
-      // never defined and it defaults to this. We need to rewrite Moti portal
-      // to not require this, because we aren't storing this information in
-      // this component now. So there.
-      instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
-        'start_date', 'end_date', 'ensemble_member');
-    }
-    exportDataToWorksheet('timeseries', this.props, this.state.graphSpec, format, instance);
+  exportAnnualCycleData(format) {
+    exportDataToWorksheet(
+      'timeseries',
+      _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
+      this.state.graphSpec,
+      format,
+      this.state.instance
+    );
   }
   
-  handleExportXslx = this.exportAnnualCycle.bind(this, 'xslx');
-  handleExportCsv = this.exportAnnualCycle.bind(this, 'csv');
+  handleExportXslx = this.exportAnnualCycleData.bind(this, 'xslx');
+  handleExportCsv = this.exportAnnualCycleData.bind(this, 'csv');
   
   // Lifecycle hooks
 
