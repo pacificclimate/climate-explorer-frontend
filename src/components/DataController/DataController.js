@@ -185,21 +185,22 @@ var DataController = createReactClass({
     const yearlyVariableMetadata = findMatchingMetadata(
       monthlyVariableMetadata, { timescale: 'yearly' }, meta
     );
-    return [
+    const metadataSets = [
       monthlyVariableMetadata,
       seasonalVariablelMetadata,
       yearlyVariableMetadata,
     ];
+    return metadataSets;
   },
 
   dataToAnnualCycleGraphSpec(meta, data) {
-    var graph = timeseriesToAnnualCycleGraph(meta, ...data);
+    let graph = timeseriesToAnnualCycleGraph(meta, ...data);
 
-    //arrange the graph so that the highest-resolution data is most visible.
-    var rankByTimeResolution = function (series) {
+    // arrange the graph so that the highest-resolution data is most visible.
+    function rankByTimeResolution(series) {
       var resolutions = ['Yearly', 'Seasonal', 'Monthly'];
-      for(let i = 0; i < 3; i++) {
-        if(series[0].search(resolutions[i]) != -1) {
+      for (let i = 0; i < 3; i++) {
+        if (series[0].search(resolutions[i]) !== -1) {
           return i;
         }
       }
@@ -399,6 +400,7 @@ var DataController = createReactClass({
                   model_id={this.props.model_id}
                   variable_id={this.props.variable_id}
                   experiment={this.props.experiment}
+                  area={this.props.area}
                   getInstanceMetadata={this.getAnnualCycleInstanceMetadata}
                   dataToGraphSpec={this.dataToAnnualCycleGraphSpec}
                 />
