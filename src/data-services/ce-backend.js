@@ -13,11 +13,15 @@ function getTimeMetadata(uniqueId) {
   });
 }
 
-function getTimeseries({ variable_id, area, timeseriesDatasetId }) {
+// TODO: Find a better name than "timeseries"?
+function getTimeseries({ variable_id, unique_id }, area) {
+  // Get the timeseries for the specified `variable_id`, `unique_id` and
+  // `area`. (`variable_id` and `unique_id` are typically components of a
+  // metadata object, hence their grouping like this.)
   return axios({
     baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
     params: {
-      id_: timeseriesDatasetId || null,
+      id_: unique_id || null,
       variable: variable_id,
       area: area || '',  // TODO: WKT
     },

@@ -30,14 +30,17 @@ export default class AnnualCycleGraph extends React.Component {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
+    area: PropTypes.string,
     getInstanceMetadata: PropTypes.func,
     // `getInstanceMetadata` returns the metadata describing the datasets to
     // be displayed in this component.
+    // A different function is passed by different controllers to specialize
+    // this general component to particular cases (single vs. dual controller).
     dataToGraphSpec: PropTypes.func,
     // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
-    // to a graph spec. A different function is passed by different controllers
-    // specializing this general component to particular cases (single vs. dual
-    // controllers, etc.)
+    // to a graph spec.
+    // A different function is passed by different controllers to specialize
+    // this general component to particular cases (single vs. dual controller).
   };
 
   constructor(props) {
@@ -76,87 +79,38 @@ export default class AnnualCycleGraph extends React.Component {
     });
   };
 
-  getAndValidateTimeseries(props, timeseriesDatasetId) {
-    const validate = multiYearMeanSelected(props) ?
+  getAndValidateTimeseries(metadata, area) {
+    const validate = multiYearMeanSelected(this.props) ?
       validateAnnualCycleData :
       validateUnstructuredTimeseriesData;
     return (
-      getTimeseries({ ...props, timeseriesDatasetId })
+      getTimeseries(metadata, area)
         .then(validate)
+        .then(response => response.data)
     );
   }
 
-  /*
-   * This function retrieves fetches monthly, seasonal, and yearly resolution
-   * annual cycle data and displays them on the graph. If instance (an object
-   * with start_date, end_date, and ensemble_member attributes) is provided, data
-   * matching those parameters will be selected; otherwise an arbitrary set
-   * of data matching the other parameters.
-   */
   loadAnnualCycleGraph(props) {
-    //load Annual Cycle graph - need monthly, seasonal, and yearly data
+    // Fetch monthly, seasonal, and yearly resolution annual cycle data,
+    // then convert it to a graph spec and set state accordingly.
 
+    // TODO: When invoking only from componentDidMount and componentDidUpdate
+    // (as advised in documentation), `props` does not need to be an explicit
+    // argument; can use `this.props`.
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
-    
-    // const {
-    //   model_id, experiment,
-    //   variable_id, meta,
-    //   comparand_id, comparandMeta,
-    // } = props;
-    //
-    // // Set up metadata sets for variable
-    // const monthlyVariableMetadata = _.findWhere(props.meta, {
-    //   model_id, experiment, variable_id,
-    //   ...this.state.instance,
-    //   timescale: 'monthly',
-    // });
-    // const monthlyComparandMetadata = findMatchingMetadata(
-    //   monthlyVariableMetadata, { variable_id: comparand_id }, comparandMeta
-    // );
-    //
-    // const seasonalVariablelMetadata = findMatchingMetadata(
-    //   monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    // );
-    // const yearlyVariableMetadata = findMatchingMetadata(
-    //   monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    // );
-    //
-    // let metadataSets = [
-    //   monthlyVariableMetadata,
-    //   seasonalVariablelMetadata,
-    //   yearlyVariableMetadata,
-    // ];
-    //
-    // // Extend metadata sets with comparand, if present and different from variable
-    // if (
-    //   monthlyComparandMetadata &&
-    //   monthlyComparandMetadata.unique_id !== monthlyVariableMetadata.unique_id
-    // ) {
-    //   const seasonalComparandlMetadata = findMatchingMetadata(
-    //     monthlyComparandMetadata, { timescale: 'seasonal' }, comparandMeta
-    //   );
-    //   const yearlyComparandMetadata = findMatchingMetadata(
-    //     monthlyComparandMetadata, { timescale: 'yearly' }, comparandMeta
-    //   );
-    //   metadataSets = metadataSets.concat([
-    //     monthlyComparandMetadata,
-    //     seasonalComparandlMetadata,
-    //     yearlyComparandMetadata,
-    //   ]);
-    // }
 
-    //fetch data from the API for each time resolution that has a dataset.
-    //the 'monthly' time resolution is guarenteed to exist, but
-    //matching seasonal and yearly ones may not be in the database.
-    const timeseriesPromises =
+    const instanceMetadata =
       this.props.getInstanceMetadata(this.state.instance)
-        .filter(tsMeta => !!tsMeta)
-        .map(tsMeta => this.getAndValidateTimeseries(props, tsMeta.unique_id));
+        .filter(metadata => !!metadata);
+    const timeseriesPromises =
+      instanceMetadata.map(metadata =>
+        this.getAndValidateTimeseries(metadata, props.area)
+      );
 
-    Promise.all(timeseriesPromises).then(series => {
-      var data = _.pluck(series, 'data');
+    Promise.all(timeseriesPromises).then(data => {
       this.setState({
-        graphSpec: this.props.dataToGraphSpec(props.meta, data),
+        // TODO: Does instanceMetadata need to be reduced to unique elements?
+        graphSpec: this.props.dataToGraphSpec(instanceMetadata, data),
       });
     }).catch(error => {
       displayError(error, this.setAnnualCycleGraphNoDataMessage);
@@ -176,6 +130,8 @@ export default class AnnualCycleGraph extends React.Component {
   };
 
   exportAnnualCycleData(format) {
+    // TODO: Verify this works in case of dual graph --
+    // what about comparand_id and comparandMeta??
     exportDataToWorksheet(
       'timeseries',
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
