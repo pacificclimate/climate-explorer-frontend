@@ -53,6 +53,7 @@ import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 import styles from './DualDataController.css';
+import {findMatchingMetadata} from "../graphs/graph-helpers";
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -225,123 +226,6 @@ var DualDataController = createReactClass({
   },
 
   /*
-   * Fetches and loads data for the Annual Cycle graph. Loads data for
-   * two variables if props.variable_id and props.comparand_id are both
-   * set and different.
-   */
-  loadDualAnnualCycleGraph: function (props, instance = {}) {
-    this.setAnnualCycleGraphNoDataMessage("Loading Data");
-    
-    var params = {
-        model_id: props.model_id,
-        variable_id: props.variable_id,
-        experiment: props.experiment,
-        timescale: "monthly"
-    };
-
-    //If this functions is supplied with instance parameters
-    //(an object with ensemble_member, start_date, and end_date attributes), 
-    //it will select the matching dataset, otherwise (ie on initial load),
-    //a dataset belonging to an arbitrary instance will be selected.
-    if(!_.isEmpty(instance)) {
-      _.extend(params, instance);
-    }
-    
-    var variableMetadata = _.findWhere(props.meta, params);    
-    var comparandMetadata = this.findMatchingMetadata(variableMetadata, 
-        {variable_id: props.comparand_id}, props.comparandMeta);
-
-    if(_.isEmpty(instance)) {
-      instance = _.pick(variableMetadata, "start_date", "end_date", "ensemble_member");
-    }
-
-    var timeseriesPromises = [];
-    
-    var variableTimeseriesParams = _.pick(props, "variable_id", "area", "meta");
-    timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, variableMetadata.unique_id));
-    
-    //determine whether seasonal and annual resolution data are available for
-    //the variable; if so, load them as well.
-    _.each(["seasonal", "yearly"], resolution => {
-      var resolutionMetadata = this.findMatchingMetadata(variableMetadata, {"timescale": resolution}, props.meta);
-      if(resolutionMetadata) {
-        timeseriesPromises.push(this.getTimeseriesPromise(variableTimeseriesParams, resolutionMetadata.unique_id));
-      }
-    });
-
-    //we are assured that the required data exists for the primary variable + model + experiment, 
-    //but it is not guarenteed to exist for the comparison variable, so fall back to only
-    //showing one variable in that case.
-    if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
-      var comparandTimeseriesParams = _.pick(this.mockUpComparandProps(props), "variable_id", "area", "meta");
-      timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, comparandMetadata.unique_id));
-
-      //check availability of seasonal and annual data on the comparand,
-      //get data promises for them if they exist.
-      _.each(["seasonal", "yearly"], resolution => {
-        var resolutionMetadata = this.findMatchingMetadata(comparandMetadata, {"timescale": resolution}, props.comparandMeta);
-        if(resolutionMetadata) {
-          timeseriesPromises.push(this.getTimeseriesPromise(comparandTimeseriesParams, resolutionMetadata.unique_id));
-        }
-      });
-    }
-
-    Promise.all(timeseriesPromises).then(series=> {
-      var data = _.pluck(series, "data");
-
-      //generate the graph, then post process it to be a little easier to read.
-      var graphMetadata = _.union(props.comparandMeta, props.meta);
-      var graph = timeseriesToAnnualCycleGraph(graphMetadata, ...data);
-
-      //function that assigns each data series to one of two groups based on 
-      //which variable it represents. Passed to assignColoursByGroup to assign
-      //graph line colors.
-      var sortByVariable = function (dataSeries) {
-        var seriesName = dataSeries[0].toLowerCase();
-        if(seriesName.search(props.variable_id) != -1) {
-          return 0;
-        }
-        else if (seriesName.search(props.comparand_id) != -1) {
-          return 1;
-        }
-        else { //if only one variable is selected,
-          //it won't be in any series names.
-          return seriesName;
-        }
-      };
-
-      graph = assignColoursByGroup(graph, sortByVariable);
-
-      //function that assigns seasonal and annual timeseries lower "rank"
-      //then monthly timeseries. Passed to fadeSeries to make higher-resolution
-      //data stand out more.
-      var rankByTimeResolution = function(dataSeries) {
-        var seriesName = dataSeries[0].toLowerCase();
-        if(seriesName.search("monthly") != -1) {
-          return 1;
-        }
-        else if(seriesName.search("seasonal") != -1) {
-          return .6;
-        }
-        else if(seriesName.search("yearly") != -1) {
-          return .3;
-        }
-        //no time resolution indicated in timeseries. default to full rank.
-        return 1;
-      };
-
-      graph = fadeSeriesByRank(graph, rankByTimeResolution);
-
-      this.setState({
-        annualCycleInstance: instance,
-        annualCycleData: graph
-        });      
-    }).catch(error=>{
-      this.displayError(error, this.setAnnualCycleGraphNoDataMessage);
-    });    
-  },
-
-  /*
    * This function fetches and loads data for the Timeseries graph. Will
    * load data for two variables if variable_id and comparand_id are different.
    */
@@ -392,6 +276,103 @@ var DualDataController = createReactClass({
     return mockup;
   },
 
+  getDualAnnualCycleInstanceMetadata(instance) {
+    // Find and return metadata matching model_id, experiment, variable_id
+    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
+    // and annual timescales.
+    // Do the the same for comparand_id and comparandMeta.
+    const {
+      model_id, experiment,
+      variable_id, meta,
+      comparand_id, comparandMeta,
+    } = this.props;
+
+    // Set up metadata sets for variable
+    const monthlyVariableMetadata = _.findWhere(meta, {
+      model_id, experiment, variable_id,
+      ...instance,
+      timescale: 'monthly',
+    });
+    const seasonalVariablelMetadata = findMatchingMetadata(
+      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
+    );
+    const yearlyVariableMetadata = findMatchingMetadata(
+      monthlyVariableMetadata, { timescale: 'yearly' }, meta
+    );
+
+    let metadataSets = [
+      monthlyVariableMetadata,
+      seasonalVariablelMetadata,
+      yearlyVariableMetadata,
+    ];
+
+    // Extend metadata sets with comparand, if present and different from variable
+    const monthlyComparandMetadata = findMatchingMetadata(
+      monthlyVariableMetadata, { variable_id: comparand_id }, comparandMeta
+    );
+
+    if (
+      monthlyComparandMetadata &&
+      monthlyComparandMetadata.unique_id !== monthlyVariableMetadata.unique_id
+    ) {
+      const seasonalComparandlMetadata = findMatchingMetadata(
+        monthlyComparandMetadata, { timescale: 'seasonal' }, comparandMeta
+      );
+      const yearlyComparandMetadata = findMatchingMetadata(
+        monthlyComparandMetadata, { timescale: 'yearly' }, comparandMeta
+      );
+
+      metadataSets = metadataSets.concat([
+        monthlyComparandMetadata,
+        seasonalComparandlMetadata,
+        yearlyComparandMetadata,
+      ]);
+    }
+
+    return metadataSets;
+  },
+
+  dataToDualAnnualCycleGraphSpec(meta, data) {
+    let graph = timeseriesToAnnualCycleGraph(meta, ...data);
+
+    // function that assigns each data series to one of two groups based on
+    // which variable it represents. Passed to assignColoursByGroup to assign
+    // graph line colors.
+    const sortByVariable = dataSeries => {
+      const seriesName = dataSeries[0].toLowerCase();
+      if (seriesName.search(this.props.variable_id) !== -1) {
+        return 0;
+      } else if (seriesName.search(this.props.comparand_id) !== -1) {
+        return 1;
+      } else {
+        // if only one variable is selected, it won't be in any series names.
+        return seriesName;
+      }
+    }
+
+    graph = assignColoursByGroup(graph, sortByVariable);
+
+    //function that assigns seasonal and annual timeseries lower "rank"
+    //then monthly timeseries. Passed to fadeSeries to make higher-resolution
+    //data stand out more.
+    const rankByTimeResolution = (dataSeries) => {
+      var seriesName = dataSeries[0].toLowerCase();
+      if (seriesName.search('monthly') !== -1) {
+        return 1;
+      } else if (seriesName.search('seasonal') !== -1) {
+        return 0.6;
+      } else if (seriesName.search('yearly') !== -1) {
+        return 0.3;
+      }
+      //no time resolution indicated in timeseries. default to full rank.
+      return 1;
+    }
+
+    graph = fadeSeriesByRank(graph, rankByTimeResolution);
+
+    return graph;
+  },
+
   render: function () {
     const longTermAverageSelected = resolutionIndexToTimeKey(
       this.state.longTermAverageTimeScale,
@@ -407,11 +388,12 @@ var DualDataController = createReactClass({
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
                   meta={this.props.meta}
-                  dataset={this.state.annualCycleInstance}
-                  onChangeDataset={this.updateAnnualCycleDataset}
-                  graphSpec={this.state.annualCycleData || this.blankGraph}
-                  onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
-                  onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+                  model_id={this.props.model_id}
+                  variable_id={this.props.variable_id}
+                  experiment={this.props.experiment}
+                  area={this.props.area}
+                  getInstanceMetadata={this.getDualAnnualCycleInstanceMetadata}
+                  dataToGraphSpec={this.dataToDualAnnualCycleGraphSpec}
                 />
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
