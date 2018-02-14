@@ -54,6 +54,7 @@ import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
+import {findMatchingMetadata} from "../graphs/graph-helpers";
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -162,6 +163,33 @@ var DataController = createReactClass({
    */
   updateDataTableTimeOfYear: function (timeidx) {
     this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
+  },
+
+  getAnnualCycleInstanceMetadata(instance) {
+    // Find and return metadata matching model_id, experiment, variable_id
+    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
+    // and annual timescales.
+    const {
+      model_id, experiment,
+      variable_id, meta,
+    } = this.props;
+
+    const monthlyVariableMetadata = _.findWhere(meta, {
+      model_id, experiment, variable_id,
+      ...instance,
+      timescale: 'monthly',
+    });
+    const seasonalVariablelMetadata = findMatchingMetadata(
+      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
+    );
+    const yearlyVariableMetadata = findMatchingMetadata(
+      monthlyVariableMetadata, { timescale: 'yearly' }, meta
+    );
+    return [
+      monthlyVariableMetadata,
+      seasonalVariablelMetadata,
+      yearlyVariableMetadata,
+    ];
   },
 
   dataToAnnualCycleGraphSpec(meta, data) {
@@ -371,6 +399,7 @@ var DataController = createReactClass({
                   model_id={this.props.model_id}
                   variable_id={this.props.variable_id}
                   experiment={this.props.experiment}
+                  getInstanceMetadata={this.getAnnualCycleInstanceMetadata}
                   dataToGraphSpec={this.dataToAnnualCycleGraphSpec}
                 />
               </Tab>

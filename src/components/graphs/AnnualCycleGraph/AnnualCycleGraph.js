@@ -30,8 +30,11 @@ export default class AnnualCycleGraph extends React.Component {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
-    dataToGraphSpec: PropTypes.object,
-    // dataToGraphSpec converts data (monthly, seasonal, annual cycle data)
+    getInstanceMetadata: PropTypes.func,
+    // `getInstanceMetadata` returns the metadata describing the datasets to
+    // be displayed in this component.
+    dataToGraphSpec: PropTypes.func,
+    // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
     // to a graph spec. A different function is passed by different controllers
     // specializing this general component to particular cases (single vs. dual
     // controllers, etc.)
@@ -94,25 +97,61 @@ export default class AnnualCycleGraph extends React.Component {
     //load Annual Cycle graph - need monthly, seasonal, and yearly data
 
     this.setAnnualCycleGraphNoDataMessage('Loading Data');
-
-    const monthlyMetadata = _.findWhere(props.meta, {
-      ..._.pick(props, 'model_id', 'variable_id', 'experiment'),
-      ...this.state.instance,
-      timescale: 'monthly',
-    });
-    const seasonalMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'seasonal' }, props.meta);
-    const yearlyMetadata = findMatchingMetadata(monthlyMetadata, { timescale: 'yearly' }, props.meta);
+    
+    // const {
+    //   model_id, experiment,
+    //   variable_id, meta,
+    //   comparand_id, comparandMeta,
+    // } = props;
+    //
+    // // Set up metadata sets for variable
+    // const monthlyVariableMetadata = _.findWhere(props.meta, {
+    //   model_id, experiment, variable_id,
+    //   ...this.state.instance,
+    //   timescale: 'monthly',
+    // });
+    // const monthlyComparandMetadata = findMatchingMetadata(
+    //   monthlyVariableMetadata, { variable_id: comparand_id }, comparandMeta
+    // );
+    //
+    // const seasonalVariablelMetadata = findMatchingMetadata(
+    //   monthlyVariableMetadata, { timescale: 'seasonal' }, meta
+    // );
+    // const yearlyVariableMetadata = findMatchingMetadata(
+    //   monthlyVariableMetadata, { timescale: 'yearly' }, meta
+    // );
+    //
+    // let metadataSets = [
+    //   monthlyVariableMetadata,
+    //   seasonalVariablelMetadata,
+    //   yearlyVariableMetadata,
+    // ];
+    //
+    // // Extend metadata sets with comparand, if present and different from variable
+    // if (
+    //   monthlyComparandMetadata &&
+    //   monthlyComparandMetadata.unique_id !== monthlyVariableMetadata.unique_id
+    // ) {
+    //   const seasonalComparandlMetadata = findMatchingMetadata(
+    //     monthlyComparandMetadata, { timescale: 'seasonal' }, comparandMeta
+    //   );
+    //   const yearlyComparandMetadata = findMatchingMetadata(
+    //     monthlyComparandMetadata, { timescale: 'yearly' }, comparandMeta
+    //   );
+    //   metadataSets = metadataSets.concat([
+    //     monthlyComparandMetadata,
+    //     seasonalComparandlMetadata,
+    //     yearlyComparandMetadata,
+    //   ]);
+    // }
 
     //fetch data from the API for each time resolution that has a dataset.
     //the 'monthly' time resolution is guarenteed to exist, but
     //matching seasonal and yearly ones may not be in the database.
-    const timeseriesPromises = [
-      monthlyMetadata,
-      seasonalMetadata,
-      yearlyMetadata,
-    ]
-      .filter(tsMeta => !!tsMeta)
-      .map(tsMeta => this.getAndValidateTimeseries(props, tsMeta.unique_id));
+    const timeseriesPromises =
+      this.props.getInstanceMetadata(this.state.instance)
+        .filter(tsMeta => !!tsMeta)
+        .map(tsMeta => this.getAndValidateTimeseries(props, tsMeta.unique_id));
 
     Promise.all(timeseriesPromises).then(series => {
       var data = _.pluck(series, 'data');
