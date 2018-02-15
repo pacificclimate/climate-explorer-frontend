@@ -37,7 +37,6 @@ import _ from 'underscore';
 import styles from './DataController.css';
 
 import { parseBootstrapTableData,
-         timeResolutionIndexToTimeOfYear,
          timeKeyToResolutionIndex,
          resolutionIndexToTimeKey} from '../../core/util';
 import {timeseriesToAnnualCycleGraph,
@@ -54,7 +53,7 @@ import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
-import {findMatchingMetadata} from "../graphs/graph-helpers";
+import { findMatchingMetadata } from '../graphs/graph-helpers';
 
 var DataController = createReactClass({
   displayName: 'DataController',
@@ -73,11 +72,8 @@ var DataController = createReactClass({
 
   getInitialState: function () {
     return {
-      longTermAverageTimeOfYear: 0,
-      longTermAverageTimeScale: "monthly",
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      longTermAverageData: undefined,
       timeseriesData: undefined,
       statsData: undefined,
       contextData: undefined
@@ -93,7 +89,6 @@ var DataController = createReactClass({
     //if the selected dataset is a multi-year mean, load annual cycle
     //and long term average graphs, otherwise load a timeseries graph
     if(this.multiYearMeanSelected(props)) {
-      // this.loadLongTermAverageGraph(props);
       this.loadDataTable(props);
       this.loadContextGraph(props);
     }
@@ -101,14 +96,6 @@ var DataController = createReactClass({
       this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
-  },
-
-  //Removes all data from the Long Term Average graph and displays a message
-  setLongTermAverageGraphNoDataMessage: function(message) {
-    this.setState({
-      longTermAverageData: { data: { columns: [], empty: { label: { text: message }, }, },
-                         axis: {} },
-      });
   },
 
   //Removes all data from the Stats Table and displays a message
@@ -138,25 +125,16 @@ var DataController = createReactClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return !(_.isEqual(nextState.longTermAverageData, this.state.longTermAverageData) &&
-     _.isEqual(nextState.statsData, this.state.statsData) &&
-     _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
-     _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
-     _.isEqual(nextState.contextData, this.state.contextData) &&
-     _.isEqual(nextProps.meta, this.props.meta) &&
-     _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions));
+    return !(
+      _.isEqual(nextState.statsData, this.state.statsData) &&
+      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+      _.isEqual(nextState.contextData, this.state.contextData) &&
+      _.isEqual(nextProps.meta, this.props.meta) &&
+      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions)
+     );
   },
 
   /*
-   * Called when the user selects a time of year to display on the
-   * Long Term Average graph. Records the new time index and resolution
-   * in state, fetches new data, and redraws the Long Term Average graph.
-   */
-  updateLongTermAverageTimeOfYear: function (timeidx) {
-    this.loadLongTermAverageGraph(this.props, timeKeyToResolutionIndex(timeidx));
-  },
-
-  /* 
    * Called when the user selects a time of year to display on the stats
    * table. Fetches new data, records the new time index and resolution
    * in state, and updates the table.
@@ -210,32 +188,6 @@ var DataController = createReactClass({
 
     return graph;
   },
-
-
-  // TODO: Remove
-  // /*
-  //  * This function fetches and loads data  for the Long Term Average graphs.
-  //  * If passed a time of year(resolution and index), it will load
-  //  * data for that time of year. Otherwise, it defaults to January
-  //  * (resolution: "monthly", index 0).
-  //  */
-  // loadLongTermAverageGraph: function (props, time) {
-  //   var timescale = time ? time.timescale : this.state.longTermAverageTimeScale;
-  //   var timeidx = time ? time.timeidx : this.state.longTermAverageTimeOfYear;
-  //
-  //   this.setLongTermAverageGraphNoDataMessage("Loading Data");
-  //   var myDataPromise = this.getDataPromise(props, timescale, timeidx);
-  //
-  //   myDataPromise.then(response => {
-  //     this.setState({
-  //       longTermAverageTimeOfYear: timeidx,
-  //       longTermAverageTimeScale: timescale,
-  //       longTermAverageData: dataToLongTermAverageGraph([response.data]),
-  //     });
-  //   }).catch(error => {
-  //     this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
-  //   });
-  // },
 
   getLongTermAveragesMetadata(timeOfYear) {
     const metadataFromProps = _.pick(this.props,
@@ -399,12 +351,6 @@ var DataController = createReactClass({
       this.state.dataTableTimeOfYear
     );
 
-    // TODO: Remove
-    // const longTermAverageSelected = resolutionIndexToTimeKey(
-    //   this.state.longTermAverageTimeScale,
-    //   this.state.longTermAverageTimeOfYear
-    // );
-
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
@@ -431,11 +377,6 @@ var DataController = createReactClass({
                   area={this.props.area}
                   getMetadata={this.getLongTermAveragesMetadata}
                   dataToGraphSpec={this.longTermAveragesDataToGraphSpec}
-                  // timeOfYear={longTermAverageSelected}
-                  // onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
-                  // graphSpec={this.state.longTermAverageData || this.blankGraph}
-                  // onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
-                  // onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
                 />
               </Tab>
               <Tab eventKey={3} title='Model Context'>

@@ -31,7 +31,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, ControlLabel, Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
 
@@ -43,17 +43,13 @@ import{ timeseriesToAnnualCycleGraph,
         timeseriesToTimeseriesGraph,
         assignColoursByGroup,
         fadeSeriesByRank} from '../../core/chart';
-import DataGraph from '../DataGraph/DataGraph';
-import Selector from '../Selector';
-import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
 import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
-import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 import styles from './DualDataController.css';
-import {findMatchingMetadata} from "../graphs/graph-helpers";
+import { findMatchingMetadata } from '../graphs/graph-helpers';
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -73,11 +69,6 @@ var DualDataController = createReactClass({
 
   getInitialState: function () {
     return {
-      longTermAverageTimeOfYear: 0,
-      longTermAverageTimeScale: "monthly",
-      annualCycleDatasetId: '',
-      longTermAverageData: undefined,
-      annualCycleData: undefined,
       timeseriesData: undefined,
       statsData: undefined,
     };
@@ -103,8 +94,6 @@ var DualDataController = createReactClass({
     //but the comparand hasn't yet.
     if(props.meta.length > 0 && props.comparandMeta.length < 1) {
       var text = "Loading ensemble";
-      this.setLongTermAverageGraphNoDataMessage(text);
-      this.setAnnualCycleGraphNoDataMessage(text);
       this.setTimeseriesGraphNoDataMessage(text);
       return;
     }
@@ -113,35 +102,14 @@ var DualDataController = createReactClass({
     var comparandMYM = this.multiYearMeanSelected(this.mockUpComparandProps(props));
 
     if(variableMYM && comparandMYM) {
-      this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
-          this.state.longTermAverageTimeOfYear);
-      // this.loadDualAnnualCycleGraph(props);
     }
     else if(!variableMYM && !comparandMYM){
       this.loadDualTimeseriesGraph(props);
     }
     else { //can't compare a multi year mean to a regular timeseries.
       var errorMessage = "Error: this plot cannot compare climatologies to nominal time value datasets.";
-      this.setAnnualCycleGraphNoDataMessage(errorMessage);
-      this.setLongTermAverageGraphNoDataMessage(errorMessage);
       this.setTimeseriesGraphNoDataMessage(errorMessage);
     }
-  },
-
-  //Clear data from the Annual Cycle graph and display a message
-  setAnnualCycleGraphNoDataMessage: function(message) {
-    this.setState({
-      annualCycleData: { data: { columns: [], empty: { label: { text: message }, }, },
-                        axis: {} },
-      });
-  },
-
-  //Clear data from the Long Term Average graph and display a message
-  setLongTermAverageGraphNoDataMessage: function(message) {
-    this.setState({
-      longTermAverageData: { data: { columns: [], empty: { label: { text: message }, }, },
-                         axis: {} },
-      });
   },
 
   //Removes all data from the Timeseries Graph and displays a message
@@ -155,74 +123,10 @@ var DualDataController = createReactClass({
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
-     return !(_.isEqual(nextState.longTermAverageData, this.state.longTermAverageData) &&
-     _.isEqual(nextState.annualCycleData, this.state.annualCycleData) &&
-     _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
-     _.isEqual(nextProps.meta, this.props.meta) &&
-     _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
-  },
-
-  /*
-   * Called when the user selects a time of year to display on the 
-   * Long Term Average graph. Redraw the Long Term Average graph and
-   * store the selected time scale and index in state.
-   */
-  updateLongTermAverageTimeOfYear: function (index) {
-    var time = timeKeyToResolutionIndex(index);
-    this.loadDualLongTermAverageGraph(this.props, time.timescale, time.timeidx);
-  },
-
-  /*
-   * Called when the user selects a specific instance (run + period) to 
-   * view on the Annual Cycle graph. Stores the selected run and period 
-   * in state, fetches new data, and updates the graph.
-   */
-  updateAnnualCycleDataset: function (instance) {
-    this.loadDualAnnualCycleGraph(this.props, JSON.parse(instance));
-  },
-
-  /*
-   * Fetches and loads data for the Long Term Average graph.
-   * Loads data for two variables if both props.variable_id and 
-   * props.comparand_id are set, else only props.variable_id.  
-   */
-  loadDualLongTermAverageGraph: function (props, timeres, timeidx ) {
-    this.setLongTermAverageGraphNoDataMessage("Loading Data");
-
-    //The "data" API endpoint returns data from multiple files at a time,
-    //so the metadata needed to generate chart formatting and legends for
-    //each series doesn't exactly correspond with the one-file-each entries
-    //in props.meta. This function extracts the cross-file metadata
-    //corresponding to each query to the "data" endpoint.
-    var pickDataParamsFromProps = function(props) {
-      return _.pick(props, 'model_id', 'experiment', 'area', 'variable_id');
-    }
-
-    //fetch Long Term Average data for the primary variable
-    var dataPromises = [];
-    var dataParams = [];  //metadata objects for chart formatters
-
-    dataPromises.push(this.getDataPromise(props, timeres, timeidx));
-    dataParams.push(pickDataParamsFromProps(props));
-
-    //if the user has selected two seperate variables to examine, fetch data
-    //for the second variable. This query will always return a result, but
-    //the result may be an empty object {}.
-    if(props.comparand_id && props.comparand_id != props.variable_id) {
-      dataPromises.push(this.getDataPromise(this.mockUpComparandProps(props), timeres, timeidx));
-      dataParams.push(pickDataParamsFromProps(this.mockUpComparandProps(props)));
-    }
-    
-    Promise.all(dataPromises).then(values=> {
-      this.setState({
-        longTermAverageTimeScale: timeres,
-        longTermAverageTimeOfYear: timeidx,
-        longTermAverageData: dataToLongTermAverageGraph(_.map(values, function(v){return v.data;}), 
-            dataParams), 
-      });
-    }).catch(error => {
-      this.displayError(error, this.setLongTermAverageGraphNoDataMessage);
-    });
+    return !(
+      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+      _.isEqual(nextProps.meta, this.props.meta) &&
+      _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
   },
 
   getDualLongTermAveragesMetadata(timeOfYear) {
@@ -403,12 +307,6 @@ var DualDataController = createReactClass({
   },
 
   render: function () {
-    // TODO: Remove
-    // const longTermAverageSelected = resolutionIndexToTimeKey(
-    //   this.state.longTermAverageTimeScale,
-    //   this.state.longTermAverageTimeOfYear
-    // );
-
     return (
       <div>
         <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
@@ -435,11 +333,6 @@ var DualDataController = createReactClass({
                   area={this.props.area}
                   getMetadata={this.getDualLongTermAveragesMetadata}
                   dataToGraphSpec={this.dualLongTermAveragesDataToGraphSpec}
-                  // timeOfYear={longTermAverageSelected}
-                  // onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
-                  // graphSpec={this.state.longTermAverageData || this.blankGraph}
-                  // onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
-                  // onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
                 />
               </Tab>
             </Tabs>
