@@ -28,7 +28,7 @@ export default class TimeSeriesGraph extends React.Component {
     super(props);
 
     this.state = {
-      graphSpec: undefined,
+      graphSpec: blankGraphSpec,
     };
   }
 
@@ -86,16 +86,9 @@ export default class TimeSeriesGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || blankGraphSpec;
-
     return (
       <React.Fragment>
-        <DataGraph 
-          data={graphSpec.data}
-          axis={graphSpec.axis}
-          tooltip={graphSpec.tooltip}
-          subchart={graphSpec.subchart}
-        />
+        <DataGraph {...this.state.graphSpec}/>
         <ControlLabel className={styles.graphlabel}>
           Highlight a time span on lower graph to see more detail
         </ControlLabel>

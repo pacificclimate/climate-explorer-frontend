@@ -61,7 +61,7 @@ export default class AnnualCycleGraph extends React.Component {
       this.firstMonthlyMetadata(this.props);
     this.state = {
       instance: { start_date, end_date, ensemble_member },
-      graphSpec: undefined,
+      graphSpec: blankGraphSpec,
     };
   }
 
@@ -155,8 +155,6 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || blankGraphSpec;
-    
     return (
       <React.Fragment>
         <Row>
@@ -177,11 +175,7 @@ export default class AnnualCycleGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph
-              data={graphSpec.data}
-              axis={graphSpec.axis}
-              tooltip={graphSpec.tooltip}
-            />
+            <DataGraph {...this.state.graphSpec}/>
           </Col>
         </Row>
       </React.Fragment>

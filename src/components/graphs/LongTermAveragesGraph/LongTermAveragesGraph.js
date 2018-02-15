@@ -37,7 +37,7 @@ export default class LongTermAveragesGraph extends React.Component {
 
     this.state = {
       timeOfYear: 0,
-      graphSpec: undefined,
+      graphSpec: blankGraphSpec,
     };
   }
 
@@ -114,8 +114,6 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || blankGraphSpec;
-
     return (
       <React.Fragment>
         <Row>
@@ -134,11 +132,7 @@ export default class LongTermAveragesGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph
-              data={graphSpec.data}
-              axis={graphSpec.axis}
-              tooltip={graphSpec.tooltip}
-            />
+            <DataGraph {...this.state.graphSpec}/>
           </Col>
         </Row>
       </React.Fragment>
