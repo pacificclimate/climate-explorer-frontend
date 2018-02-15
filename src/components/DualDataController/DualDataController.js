@@ -349,31 +349,29 @@ var DualDataController = createReactClass({
   },
 
   render: function () {
-    // TODO: Factor out common props passed
+    const graphProps = _.pick(this.props,
+      'model_id', 'variable_id', 'experiment', 'meta', 'area'
+    );
+
     return (
       <div>
-        <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
+        <h3>
+          {`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}
+        </h3>
+
         {
           this.multiYearMeanSelected() ? (
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
-                  meta={this.props.meta}
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  area={this.props.area}
+                  {...graphProps}
                   getInstanceMetadata={this.getDualAnnualCycleInstanceMetadata}
                   dataToGraphSpec={this.dataToDualAnnualCycleGraphSpec}
                 />
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
                 <LongTermAveragesGraph
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  meta={this.props.meta}
-                  area={this.props.area}
+                  {...graphProps}
                   getMetadata={this.getDualLongTermAveragesMetadata}
                   dataToGraphSpec={this.dualLongTermAveragesDataToGraphSpec}
                 />
@@ -383,11 +381,7 @@ var DualDataController = createReactClass({
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  meta={this.props.meta}
-                  area={this.props.area}
+                  {...graphProps}
                   getMetadata={this.getDualTimeseriesMetadata}
                   dataToGraphSpec={this.dualTimeseriesDataToGraphSpec}
                 />

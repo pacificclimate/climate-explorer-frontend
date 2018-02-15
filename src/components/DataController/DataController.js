@@ -55,6 +55,8 @@ import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 import { findMatchingMetadata } from '../graphs/graph-helpers';
 
+// TODO: Remove DataControllerMixin and convert to class extension style when 
+// no more dependencies on DataControllerMixin remain
 var DataController = createReactClass({
   displayName: 'DataController',
 
@@ -74,7 +76,7 @@ var DataController = createReactClass({
     return {
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      // TODO: Remove
+      // TODO:Remove when TimeSeriesGraph tested
       // timeseriesData: undefined,
       statsData: undefined,
       contextData: undefined
@@ -94,7 +96,7 @@ var DataController = createReactClass({
       this.loadContextGraph(props);
     }
     else {
-      // TODO: Remove
+      // TODO: Remove when TimeSeriesGraph tested
       // this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
@@ -116,7 +118,7 @@ var DataController = createReactClass({
     });
   },
 
-  // TODO: Remove
+  // TODO:Remove when TimeSeriesGraph tested
   //Removes all data from the Timeseries Graph and displays a message
   // setTimeseriesGraphNoDataMessage: function(message) {
   //   this.setState({
@@ -130,7 +132,7 @@ var DataController = createReactClass({
     // state
     return !(
       _.isEqual(nextState.statsData, this.state.statsData) &&
-      // TODO: Remove
+      // TODO:Remove when TimeSeriesGraph tested
       // _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
       _.isEqual(nextState.contextData, this.state.contextData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
@@ -207,7 +209,7 @@ var DataController = createReactClass({
     return dataToLongTermAverageGraph(data);
   },
 
-  // TODO: Remove
+  // TODO:Remove when TimeSeriesGraph tested
   // /*
   //  * This function fetches and loads data for the Timeseries graph.
   //  * As the Timeseries graph shows all data points at once, there's no
@@ -374,31 +376,31 @@ var DataController = createReactClass({
       this.state.dataTableTimeOfYear
     );
 
+    const graphProps = _.pick(this.props,
+      'model_id', 'variable_id', 'experiment', 'meta', 'area'  
+    );
+    
     return (
-      // TODO: Factor out common props passed
       <div>
-        <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
+        <h3>
+          {this.props.model_id} {' '}
+          {this.props.variable_id} {' '}
+          {this.props.experiment}
+        </h3>
+        
         {
           this.multiYearMeanSelected() ? (
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
-                  meta={this.props.meta}
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  area={this.props.area}
+                  {...graphProps}
                   getInstanceMetadata={this.getAnnualCycleInstanceMetadata}
                   dataToGraphSpec={this.dataToAnnualCycleGraphSpec}
                 />
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
                 <LongTermAveragesGraph
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  meta={this.props.meta}
-                  area={this.props.area}
+                  {...graphProps}
                   getMetadata={this.getLongTermAveragesMetadata}
                   dataToGraphSpec={this.longTermAveragesDataToGraphSpec}
                 />
@@ -413,11 +415,7 @@ var DataController = createReactClass({
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
-                  model_id={this.props.model_id}
-                  variable_id={this.props.variable_id}
-                  experiment={this.props.experiment}
-                  meta={this.props.meta}
-                  area={this.props.area}
+                  {...graphProps}
                   getMetadata={this.getTimeseriesMetadata}
                   dataToGraphSpec={this.timeseriesDataToGraphSpec}
                 />
