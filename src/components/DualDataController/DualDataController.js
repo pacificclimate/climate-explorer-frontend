@@ -115,7 +115,7 @@ var DualDataController = createReactClass({
     if(variableMYM && comparandMYM) {
       this.loadDualLongTermAverageGraph(props, this.state.longTermAverageTimeScale,
           this.state.longTermAverageTimeOfYear);
-      this.loadDualAnnualCycleGraph(props);
+      // this.loadDualAnnualCycleGraph(props);
     }
     else if(!variableMYM && !comparandMYM){
       this.loadDualTimeseriesGraph(props);
