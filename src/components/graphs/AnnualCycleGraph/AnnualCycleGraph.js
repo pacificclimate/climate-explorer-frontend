@@ -23,8 +23,17 @@ import {
   displayError,
 } from '../../../core/data-controller-helpers';
 
-
+// This component renders a complete annual cycle graph, including a selector
+// for the instance (dataset) to display and export-data buttons.
+// The component is generalized by two function props, `getInstanceMetadata`
+// and `dataToGraphSpec`, which respectively return metadata describing the
+// the datasets to display, and return a graph spec for the graph proper.
 export default class AnnualCycleGraph extends React.Component {
+  // TODO: model_id, variable_id, and experiment are used only to set the
+  // initial instance. Could instead make `initialInstance` a prop, which
+  // the client computes according to their own recipe. Not sure whether
+  // this is a gain or not, since the same computation (`firstMonthlyMetadata`)
+  // would be done in each client.
   static propTypes = {
     meta: PropTypes.array,
     model_id: PropTypes.string,
@@ -122,6 +131,7 @@ export default class AnnualCycleGraph extends React.Component {
     this.setState({ instance: JSON.parse(instance) });
   };
 
+  // TODO: Extract to core/chart module, as it is common to all graphs.
   blankGraph = {
     data: {
       columns: [],
