@@ -10,6 +10,7 @@ import {
 } from "../../../core/util";
 import {getTimeseries} from "../../../data-services/ce-backend";
 import {
+  blankGraphSpec,
   displayError,
   multiYearMeanSelected,
   noDataMessageGraphSpec,
@@ -66,14 +67,6 @@ export default class TimeSeriesGraph extends React.Component {
     });
   }
 
-  // TODO: Extract to core/chart module, as it is common to all graphs.
-  blankGraph = {
-    data: {
-      columns: [],
-    },
-    axis: {},
-  };
-
   // TODO: Export handlers
 
   // Lifecycle hooks
@@ -93,7 +86,7 @@ export default class TimeSeriesGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || this.blankGraph;
+    const graphSpec = this.state.graphSpec || blankGraphSpec;
 
     return (
       <React.Fragment>

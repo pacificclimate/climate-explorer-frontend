@@ -16,7 +16,7 @@ function multiYearMeanSelected(props) {
 
 
 function displayError(error, displayMethod) {
-  if(error.response) {
+  if (error.response) {
     // axios error: data server sent a non-200 response
     displayMethod('Error: ' + error.response.status + ' received from data server.');
   } else if (error.request) {
@@ -35,6 +35,7 @@ function displayError(error, displayMethod) {
   }
 }
 
+
 function noDataMessageGraphSpec(message) {
   return {
     data: {
@@ -49,4 +50,17 @@ function noDataMessageGraphSpec(message) {
   };
 }
 
-export { multiYearMeanSelected, displayError, noDataMessageGraphSpec };
+
+const blankGraphSpec = {
+  data: {
+    columns: [],
+  },
+  axis: {},
+};
+
+export {
+  multiYearMeanSelected,
+  displayError,
+  noDataMessageGraphSpec,
+  blankGraphSpec,
+};

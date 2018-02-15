@@ -22,6 +22,7 @@ import {
   multiYearMeanSelected,
   displayError,
   noDataMessageGraphSpec,
+  blankGraphSpec,
 } from '../../../core/data-controller-helpers';
 
 // This component renders a complete annual cycle graph, including a selector
@@ -122,14 +123,6 @@ export default class AnnualCycleGraph extends React.Component {
     this.setState({ instance: JSON.parse(instance) });
   };
 
-  // TODO: Extract to core/chart module, as it is common to all graphs.
-  blankGraph = {
-    data: {
-      columns: [],
-    },
-    axis: {},
-  };
-
   exportAnnualCycleData(format) {
     // TODO: Verify this works in case of dual graph --
     // what about comparand_id and comparandMeta??
@@ -162,7 +155,7 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || this.blankGraph;
+    const graphSpec = this.state.graphSpec || blankGraphSpec;
     
     return (
       <React.Fragment>

@@ -9,6 +9,7 @@ import DataGraph from '../../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 
 import {
+  blankGraphSpec,
   displayError,
   noDataMessageGraphSpec,
 } from '../../../core/data-controller-helpers';
@@ -80,14 +81,6 @@ export default class LongTermAveragesGraph extends React.Component {
     });
   }
 
-  // TODO: Extract to core/chart module, as it is common to all graphs.
-  blankGraph = {
-    data: {
-      columns: [],
-    },
-    axis: {},
-  };
-
   exportLongTermAverage(format) {
     console.log('exportLongTermAverage', _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'))
     const { timescale: timeres, timeidx } = 
@@ -121,7 +114,7 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
-    const graphSpec = this.state.graphSpec || this.blankGraph;
+    const graphSpec = this.state.graphSpec || blankGraphSpec;
 
     return (
       <React.Fragment>
