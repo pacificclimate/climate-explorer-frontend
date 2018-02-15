@@ -69,29 +69,6 @@ var ModalMixin = {
         {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
   },
 
-  exportAnnualCycle: function(format) {
-   //Determine period and run to export. Location varies depending on the portal and whether
-   //it displays a single datafile or multiple datafiles at once. 
-   //Period and run parameters describing a set of multiple displayed datafiles files are 
-   //stored as this.state.timeseriesInstance. 
-   //If the portal has only one active dataset at a time, run and period are 
-   //extracted from that dataset's metadata.
-   var instance;
-   if(this.state.annualCycleInstance) {
-     instance = this.state.annualCycleInstance;
-   }
-   else {
-     instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
-         "start_date", "end_date", "ensemble_member");
-   }
-   exportDataToWorksheet("timeseries", this.props, this.state.annualCycleData, format, instance);
-  },
-
-  exportLongTermAverage: function(format) {
-    exportDataToWorksheet("climoseries", this.props, this.state.longTermAverageData, format, 
-        {timeidx: this.state.longTermAverageTimeOfYear, timeres:this.state.longTermAverageTimeScale});
-  },
-
   injectRunIntoStats: function (data) {
     // Injects model run information into object returned by stats call
     _.map(data, function (val, key) {
@@ -136,21 +113,6 @@ var ModalMixin = {
         time: timeidx,
       }
     }).then(validateStatsData);
-  },
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-  //Fetches and validates data from a call to the backend's
-  //"timeseries" endpoint
-  getTimeseriesPromise: function (props, timeseriesDatasetId) {
-    var validate = this.multiYearMeanSelected(props) ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
-      params: {
-        id_: timeseriesDatasetId || null,
-        variable: props.variable_id,
-        area: props.area || "",
-      }
-    }).then(validate);
   },
 
     /*
