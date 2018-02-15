@@ -225,6 +225,35 @@ var DualDataController = createReactClass({
     });
   },
 
+  getDualLongTermAveragesMetadata(timeOfYear) {
+    // Return metadata for variable_id and, if present and different, for
+    // comparand_id.
+    const commonMetadataFromProps = _.pick(this.props,
+      'ensemble_name', 'model_id', 'experiment', 'area'
+    );
+    const timeResolutionAndIndex = timeKeyToResolutionIndex(timeOfYear);
+
+    let result = [{
+      ...commonMetadataFromProps,
+      ...timeResolutionAndIndex,
+      variable_id: this.props.variable_id,
+    }];
+
+    if (this.props.comparand_id &&
+        this.props.comparand_id !== this.props.variable_id) {
+      result.push({
+        ...commonMetadataFromProps,
+        ...timeResolutionAndIndex,
+        variable_id: this.props.comparand_id,
+      });
+    }
+    return result;
+  },
+
+  dualLongTermAveragesDataToGraphSpec(data, context) {
+    return dataToLongTermAverageGraph(data, context);
+  },
+
   /*
    * This function fetches and loads data for the Timeseries graph. Will
    * load data for two variables if variable_id and comparand_id are different.
@@ -374,10 +403,11 @@ var DualDataController = createReactClass({
   },
 
   render: function () {
-    const longTermAverageSelected = resolutionIndexToTimeKey(
-      this.state.longTermAverageTimeScale,
-      this.state.longTermAverageTimeOfYear
-    );
+    // TODO: Remove
+    // const longTermAverageSelected = resolutionIndexToTimeKey(
+    //   this.state.longTermAverageTimeScale,
+    //   this.state.longTermAverageTimeOfYear
+    // );
 
     return (
       <div>
@@ -398,11 +428,18 @@ var DualDataController = createReactClass({
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
                 <LongTermAveragesGraph
-                  timeOfYear={longTermAverageSelected}
-                  onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
-                  graphSpec={this.state.longTermAverageData || this.blankGraph}
-                  onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
-                  onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
+                  model_id={this.props.model_id}
+                  variable_id={this.props.variable_id}
+                  experiment={this.props.experiment}
+                  meta={this.props.meta}
+                  area={this.props.area}
+                  getMetadata={this.getDualLongTermAveragesMetadata}
+                  dataToGraphSpec={this.dualLongTermAveragesDataToGraphSpec}
+                  // timeOfYear={longTermAverageSelected}
+                  // onChangeTimeOfYear={this.updateLongTermAverageTimeOfYear}
+                  // graphSpec={this.state.longTermAverageData || this.blankGraph}
+                  // onExportXslx={this.exportLongTermAverage.bind(this, 'xlsx')}
+                  // onExportCsv={this.exportLongTermAverage.bind(this, 'csv')}
                 />
               </Tab>
             </Tabs>
