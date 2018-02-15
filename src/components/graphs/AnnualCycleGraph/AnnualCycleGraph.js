@@ -62,7 +62,8 @@ export default class AnnualCycleGraph extends React.Component {
       graphSpec: undefined,
     };
   }
-  
+
+  // TODO: Remove explicit args
   firstMonthlyMetadata({ meta, model_id, variable_id, experiment }) {
     return _.findWhere(
       meta,
@@ -70,9 +71,10 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
 
-  //Removes all data from the Annual Cycle graph and displays a message
   // TODO: set on either loading flag or empty data
-  setAnnualCycleGraphNoDataMessage = (message) => {
+  // TODO: Extract: common to all graphs
+  setGraphNoDataMessage = (message) => {
+    //Removes all data from the graph and displays a message
     this.setState({
       graphSpec: {
         data: {
@@ -83,7 +85,7 @@ export default class AnnualCycleGraph extends React.Component {
             },
           },
         },
-        axis: {}
+        axis: {},
       },
     });
   };
@@ -106,7 +108,7 @@ export default class AnnualCycleGraph extends React.Component {
     // TODO: When invoking only from componentDidMount and componentDidUpdate
     // (as advised in documentation), `props` does not need to be an explicit
     // argument; can use `this.props`.
-    this.setAnnualCycleGraphNoDataMessage('Loading Data');
+    this.setGraphNoDataMessage('Loading Data');
 
     const instanceMetadata =
       this.props.getInstanceMetadata(this.state.instance)
@@ -122,7 +124,7 @@ export default class AnnualCycleGraph extends React.Component {
         graphSpec: this.props.dataToGraphSpec(instanceMetadata, data),
       });
     }).catch(error => {
-      displayError(error, this.setAnnualCycleGraphNoDataMessage);
+      displayError(error, this.setGraphNoDataMessage);
     });
   }
 
@@ -163,6 +165,7 @@ export default class AnnualCycleGraph extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (
       prevProps.meta !== this.props.meta ||
+      prevProps.area !== this.props.area ||
       !_.isEqual(prevState.instance, this.state.instance)
     ) {
       this.loadAnnualCycleGraph(this.props);
