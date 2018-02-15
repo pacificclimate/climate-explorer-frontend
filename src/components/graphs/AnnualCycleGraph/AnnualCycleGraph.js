@@ -7,17 +7,12 @@ import _ from 'underscore';
 import DatasetSelector from '../../DatasetSelector/DatasetSelector';
 import DataGraph from '../../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
-import {
-  sortSeriesByRank,
-  timeseriesToAnnualCycleGraph,
-} from '../../../core/chart';
-import { findMatchingMetadata } from '../graph-helpers';
 import { exportDataToWorksheet } from '../../../core/export';
-import { getTimeseries } from "../../../data-services/ce-backend";
+import { getTimeseries } from '../../../data-services/ce-backend';
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData
-} from "../../../core/util";
+} from '../../../core/util';
 import {
   multiYearMeanSelected,
   displayError,
@@ -91,7 +86,7 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
 
-  loadAnnualCycleGraph(props) {
+  loadGraph(props) {
     // Fetch monthly, seasonal, and yearly resolution annual cycle data,
     // then convert it to a graph spec and set state accordingly.
 
@@ -110,7 +105,6 @@ export default class AnnualCycleGraph extends React.Component {
 
     Promise.all(timeseriesPromises).then(data => {
       this.setState({
-        // TODO: Does instanceMetadata need to be reduced to unique elements?
         graphSpec: this.props.dataToGraphSpec(instanceMetadata, data),
       });
     }).catch(error => {
@@ -123,9 +117,7 @@ export default class AnnualCycleGraph extends React.Component {
     this.setState({ instance: JSON.parse(instance) });
   };
 
-  exportAnnualCycleData(format) {
-    // TODO: Verify this works in case of dual graph --
-    // what about comparand_id and comparandMeta??
+  exportData(format) {
     exportDataToWorksheet(
       'timeseries',
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
@@ -135,13 +127,13 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
   
-  handleExportXslx = this.exportAnnualCycleData.bind(this, 'xslx');
-  handleExportCsv = this.exportAnnualCycleData.bind(this, 'csv');
+  handleExportXslx = this.exportData.bind(this, 'xslx');
+  handleExportCsv = this.exportData.bind(this, 'csv');
   
   // Lifecycle hooks
 
   componentDidMount() {
-    this.loadAnnualCycleGraph(this.props);
+    this.loadGraph(this.props);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -150,7 +142,7 @@ export default class AnnualCycleGraph extends React.Component {
       prevProps.area !== this.props.area ||
       !_.isEqual(prevState.instance, this.state.instance)
     ) {
-      this.loadAnnualCycleGraph(this.props);
+      this.loadGraph(this.props);
     }
   }
 

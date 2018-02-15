@@ -7,8 +7,8 @@ import styles from './TimeSeriesGraph.css';
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData
-} from "../../../core/util";
-import {getTimeseries} from "../../../data-services/ce-backend";
+} from '../../../core/util';
+import { getTimeseries } from '../../../data-services/ce-backend';
 import {
   blankGraphSpec,
   displayError,
@@ -66,8 +66,6 @@ export default class TimeSeriesGraph extends React.Component {
       displayError(error, this.displayNoDataMessage);
     });
   }
-
-  // TODO: Export handlers
 
   // Lifecycle hooks
 

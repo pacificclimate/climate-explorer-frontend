@@ -60,7 +60,7 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  loadLongTermAveragesGraph() {
+  loadGraph() {
     // Fetch data for LTA graph, then convert it to a graph spec and set state
     // accordingly.
     this.displayNoDataMessage('Loading Data');
@@ -81,8 +81,8 @@ export default class LongTermAveragesGraph extends React.Component {
     });
   }
 
-  exportLongTermAverage(format) {
-    console.log('exportLongTermAverage', _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'))
+  exportData(format) {
+    console.log('exportData', _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'))
     const { timescale: timeres, timeidx } = 
       timeKeyToResolutionIndex(this.state.timeOfYear);
     exportDataToWorksheet(
@@ -94,13 +94,13 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  handleExportXslx = this.exportLongTermAverage.bind(this, 'xslx');
-  handleExportCsv = this.exportLongTermAverage.bind(this, 'csv');
+  handleExportXslx = this.exportData.bind(this, 'xslx');
+  handleExportCsv = this.exportData.bind(this, 'csv');
 
   // Lifecycle hooks
 
   componentDidMount() {
-    this.loadLongTermAveragesGraph();
+    this.loadGraph();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -109,7 +109,7 @@ export default class LongTermAveragesGraph extends React.Component {
       prevProps.area !== this.props.area ||
       prevState.timeOfYear !== this.state.timeOfYear
     ) {
-      this.loadLongTermAveragesGraph();
+      this.loadGraph();
     }
   }
 
