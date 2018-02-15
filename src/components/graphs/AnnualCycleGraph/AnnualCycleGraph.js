@@ -21,6 +21,7 @@ import {
 import {
   multiYearMeanSelected,
   displayError,
+  noDataMessageGraphSpec,
 } from '../../../core/data-controller-helpers';
 
 // This component renders a complete annual cycle graph, including a selector
@@ -71,22 +72,10 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
 
-  // TODO: set on either loading flag or empty data
-  // TODO: Extract: common to all graphs
-  setGraphNoDataMessage = (message) => {
+  displayNoDataMessage = (message) => {
     //Removes all data from the graph and displays a message
     this.setState({
-      graphSpec: {
-        data: {
-          columns: [],
-          empty: {
-            label: {
-              text: message,
-            },
-          },
-        },
-        axis: {},
-      },
+      graphSpec: noDataMessageGraphSpec(message),
     });
   };
 
@@ -108,7 +97,7 @@ export default class AnnualCycleGraph extends React.Component {
     // TODO: When invoking only from componentDidMount and componentDidUpdate
     // (as advised in documentation), `props` does not need to be an explicit
     // argument; can use `this.props`.
-    this.setGraphNoDataMessage('Loading Data');
+    this.displayNoDataMessage('Loading Data');
 
     const instanceMetadata =
       this.props.getInstanceMetadata(this.state.instance)
@@ -124,7 +113,7 @@ export default class AnnualCycleGraph extends React.Component {
         graphSpec: this.props.dataToGraphSpec(instanceMetadata, data),
       });
     }).catch(error => {
-      displayError(error, this.setGraphNoDataMessage);
+      displayError(error, this.displayNoDataMessage);
     });
   }
 

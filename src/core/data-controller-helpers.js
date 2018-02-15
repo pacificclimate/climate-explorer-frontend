@@ -35,4 +35,18 @@ function displayError(error, displayMethod) {
   }
 }
 
-export { multiYearMeanSelected, displayError };
+function noDataMessageGraphSpec(message) {
+  return {
+    data: {
+      columns: [],
+      empty: {
+        label: {
+          text: message,
+        },
+      },
+    },
+    axis: {},
+  };
+}
+
+export { multiYearMeanSelected, displayError, noDataMessageGraphSpec };

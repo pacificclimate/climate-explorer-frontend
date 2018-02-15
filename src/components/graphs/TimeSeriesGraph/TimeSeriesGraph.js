@@ -11,8 +11,9 @@ import {
 import {getTimeseries} from "../../../data-services/ce-backend";
 import {
   displayError,
-  multiYearMeanSelected
-} from "../../../core/data-controller-helpers";
+  multiYearMeanSelected,
+  noDataMessageGraphSpec,
+} from '../../../core/data-controller-helpers';
 
 export default class TimeSeriesGraph extends React.Component {
   static propTypes = {
@@ -30,22 +31,10 @@ export default class TimeSeriesGraph extends React.Component {
     };
   }
 
-  // TODO: set on either loading flag or empty data
-  // TODO: Extract: common to all graphs
-  setGraphNoDataMessage = (message) => {
+  displayNoDataMessage = (message) => {
     //Removes all data from the graph and displays a message
     this.setState({
-      graphSpec: {
-        data: {
-          columns: [],
-          empty: {
-            label: {
-              text: message,
-            },
-          },
-        },
-        axis: {},
-      },
+      graphSpec: noDataMessageGraphSpec(message),
     });
   };
 
@@ -61,7 +50,7 @@ export default class TimeSeriesGraph extends React.Component {
   }
 
   loadGraph(props) {
-    this.setGraphNoDataMessage('Loading Data');
+    this.displayNoDataMessage('Loading Data');
 
     const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
     const timeseriesPromises = metadatas.map(metadata =>
@@ -73,7 +62,7 @@ export default class TimeSeriesGraph extends React.Component {
         graphSpec: this.props.dataToGraphSpec(metadatas, data),
       });
     }).catch(error => {
-      displayError(error, this.setGraphNoDataMessage);
+      displayError(error, this.displayNoDataMessage);
     });
   }
 

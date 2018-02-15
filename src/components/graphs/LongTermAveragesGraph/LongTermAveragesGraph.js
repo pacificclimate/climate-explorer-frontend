@@ -8,7 +8,10 @@ import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
 import DataGraph from '../../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 
-import { displayError } from '../../../core/data-controller-helpers';
+import {
+  displayError,
+  noDataMessageGraphSpec,
+} from '../../../core/data-controller-helpers';
 import {
   timeKeyToResolutionIndex,
   validateLongTermAverageData,
@@ -41,22 +44,10 @@ export default class LongTermAveragesGraph extends React.Component {
     this.setState({ timeOfYear });
   };
 
-  //Removes all data from the graph and displays a message
-  // TODO: set on either loading flag or empty data
-  // TODO: Extract: common to all graphs
-  setGraphNoDataMessage = (message) => {
+  displayNoDataMessage = (message) => {
+    //Removes all data from the graph and displays a message
     this.setState({
-      graphSpec: {
-        data: {
-          columns: [],
-          empty: {
-            label: {
-              text: message,
-            },
-          },
-        },
-        axis: {},
-      },
+      graphSpec: noDataMessageGraphSpec(message),
     });
   };
 
@@ -71,7 +62,7 @@ export default class LongTermAveragesGraph extends React.Component {
   loadLongTermAveragesGraph() {
     // Fetch data for LTA graph, then convert it to a graph spec and set state
     // accordingly.
-    this.setGraphNoDataMessage('Loading Data');
+    this.displayNoDataMessage('Loading Data');
 
     const timeOfYearMetadatas =
       this.props.getMetadata(this.state.timeOfYear)
@@ -85,7 +76,7 @@ export default class LongTermAveragesGraph extends React.Component {
         graphSpec: this.props.dataToGraphSpec(data, timeOfYearMetadatas),
       });
     }).catch(error => {
-      displayError(error, this.setGraphNoDataMessage);
+      displayError(error, this.displayNoDataMessage);
     });
   }
 
