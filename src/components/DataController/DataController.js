@@ -74,7 +74,8 @@ var DataController = createReactClass({
     return {
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      timeseriesData: undefined,
+      // TODO: Remove
+      // timeseriesData: undefined,
       statsData: undefined,
       contextData: undefined
     };
@@ -93,7 +94,8 @@ var DataController = createReactClass({
       this.loadContextGraph(props);
     }
     else {
-      this.loadTimeseriesGraph(props);
+      // TODO: Remove
+      // this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
   },
@@ -114,20 +116,22 @@ var DataController = createReactClass({
     });
   },
 
+  // TODO: Remove
   //Removes all data from the Timeseries Graph and displays a message
-  setTimeseriesGraphNoDataMessage: function(message) {
-    this.setState({
-      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
-                         axis: {} },
-      });
-  },
+  // setTimeseriesGraphNoDataMessage: function(message) {
+  //   this.setState({
+  //     timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+  //                        axis: {} },
+  //     });
+  // },
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
     return !(
       _.isEqual(nextState.statsData, this.state.statsData) &&
-      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+      // TODO: Remove
+      // _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
       _.isEqual(nextState.contextData, this.state.contextData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions)
@@ -203,27 +207,46 @@ var DataController = createReactClass({
     return dataToLongTermAverageGraph(data);
   },
 
-  /*
-   * This function fetches and loads data for the Timeseries graph.
-   * As the Timeseries graph shows all data points at once, there's no
-   * filtering or selection done by this function.
-   */
-  loadTimeseriesGraph: function(props) {
+  // TODO: Remove
+  // /*
+  //  * This function fetches and loads data for the Timeseries graph.
+  //  * As the Timeseries graph shows all data points at once, there's no
+  //  * filtering or selection done by this function.
+  //  */
+  // loadTimeseriesGraph: function(props) {
+  //
+  //   this.setTimeseriesGraphNoDataMessage("Loading Data");
+  //
+  //   var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+  //
+  //   var metadata = _.findWhere(props.meta, params);
+  //
+  //   var timeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
+  //   timeseriesPromise.then(response => {
+  //     this.setState({
+  //       timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
+  //     });
+  //   }).catch(error => {
+  //     this.displayError(error, this.setTimeseriesGraphNoDataMessage);
+  //   });
+  // },
 
-    this.setTimeseriesGraphNoDataMessage("Loading Data");
+  getTimeseriesMetadata() {
+    const {
+      model_id, experiment,
+      variable_id, meta,
+    } = this.props;
 
-    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
-
-    var metadata = _.findWhere(props.meta, params);
-
-    var timeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
-    timeseriesPromise.then(response => {
-      this.setState({
-        timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
-      });
-    }).catch(error => {
-      this.displayError(error, this.setTimeseriesGraphNoDataMessage);
+    const primaryVariableMetadata = _.findWhere(meta, {
+      model_id, experiment, variable_id,
     });
+    // Yes, the value of this function is an array of one element.
+    const metadataSets = [primaryVariableMetadata];
+    return metadataSets;
+  },
+
+  timeseriesDataToGraphSpec(meta, data) {
+    return timeseriesToTimeseriesGraph(meta, ...data);
   },
 
   /*
@@ -352,6 +375,7 @@ var DataController = createReactClass({
     );
 
     return (
+      // TODO: Factor out common props passed
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
         {
@@ -389,7 +413,13 @@ var DataController = createReactClass({
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
-                  graphSpec={this.state.timeseriesData || this.blankGraph}
+                  model_id={this.props.model_id}
+                  variable_id={this.props.variable_id}
+                  experiment={this.props.experiment}
+                  meta={this.props.meta}
+                  area={this.props.area}
+                  getMetadata={this.getTimeseriesMetadata}
+                  dataToGraphSpec={this.timeseriesDataToGraphSpec}
                 />
               </Tab>
             </Tabs>

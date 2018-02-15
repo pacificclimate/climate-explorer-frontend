@@ -4,22 +4,119 @@ import { ControlLabel } from 'react-bootstrap';
 
 import DataGraph from '../../DataGraph/DataGraph';
 import styles from './TimeSeriesGraph.css';
+import {
+  validateAnnualCycleData,
+  validateUnstructuredTimeseriesData
+} from "../../../core/util";
+import {getTimeseries} from "../../../data-services/ce-backend";
+import {
+  displayError,
+  multiYearMeanSelected
+} from "../../../core/data-controller-helpers";
 
 export default class TimeSeriesGraph extends React.Component {
   static propTypes = {
-    graphSpec: PropTypes.object,
+    meta: PropTypes.array,
+    area: PropTypes.string,
+    getMetadata: PropTypes.func,
+    dataToGraphSpec: PropTypes.func,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      graphSpec: undefined,
+    };
+  }
+
+  // TODO: set on either loading flag or empty data
+  // TODO: Extract: common to all graphs
+  setGraphNoDataMessage = (message) => {
+    //Removes all data from the graph and displays a message
+    this.setState({
+      graphSpec: {
+        data: {
+          columns: [],
+          empty: {
+            label: {
+              text: message,
+            },
+          },
+        },
+        axis: {},
+      },
+    });
+  };
+
+  getAndValidateTimeseries(metadata, area) {
+    const validate = multiYearMeanSelected(this.props) ?
+      validateAnnualCycleData :
+      validateUnstructuredTimeseriesData;
+    return (
+      getTimeseries(metadata, area)
+        .then(validate)
+        .then(response => response.data)
+    );
+  }
+
+  loadGraph(props) {
+    this.setGraphNoDataMessage('Loading Data');
+
+    const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
+    const timeseriesPromises = metadatas.map(metadata =>
+      this.getAndValidateTimeseries(metadata, props.area)
+    );
+
+    Promise.all(timeseriesPromises).then(data => {
+      this.setState({
+        graphSpec: this.props.dataToGraphSpec(metadatas, data),
+      });
+    }).catch(error => {
+      displayError(error, this.setGraphNoDataMessage);
+    });
+  }
+
+  // TODO: Extract to core/chart module, as it is common to all graphs.
+  blankGraph = {
+    data: {
+      columns: [],
+    },
+    axis: {},
+  };
+
+  // TODO: Export handlers
+
+  // Lifecycle hooks
+
+  componentDidMount() {
+    this.loadGraph(this.props);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.meta !== this.props.meta ||
+      prevProps.area !== this.props.area ||
+      prevState.timeOfYear !== this.state.timeOfYear
+    ) {
+      this.loadGraph(this.props);
+    }
+  }
+
   render() {
+    const graphSpec = this.state.graphSpec || this.blankGraph;
+
     return (
       <React.Fragment>
         <DataGraph 
-          data={this.props.graphSpec.data} 
-          axis={this.props.graphSpec.axis} 
-          tooltip={this.props.graphSpec.tooltip} 
-          subchart={this.props.graphSpec.subchart} 
+          data={graphSpec.data}
+          axis={graphSpec.axis}
+          tooltip={graphSpec.tooltip}
+          subchart={graphSpec.subchart}
         />
-        <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
+        <ControlLabel className={styles.graphlabel}>
+          Highlight a time span on lower graph to see more detail
+        </ControlLabel>
       </React.Fragment>
     );
   }

@@ -69,7 +69,8 @@ var DualDataController = createReactClass({
 
   getInitialState: function () {
     return {
-      timeseriesData: undefined,
+      // TODO: Remove
+      // timeseriesData: undefined,
       statsData: undefined,
     };
   },
@@ -94,7 +95,8 @@ var DualDataController = createReactClass({
     //but the comparand hasn't yet.
     if(props.meta.length > 0 && props.comparandMeta.length < 1) {
       var text = "Loading ensemble";
-      this.setTimeseriesGraphNoDataMessage(text);
+      // TODO: Remove
+      // this.setTimeseriesGraphNoDataMessage(text);
       return;
     }
 
@@ -104,27 +106,31 @@ var DualDataController = createReactClass({
     if(variableMYM && comparandMYM) {
     }
     else if(!variableMYM && !comparandMYM){
-      this.loadDualTimeseriesGraph(props);
+      // TODO: Remove
+      // this.loadDualTimeseriesGraph(props);
     }
     else { //can't compare a multi year mean to a regular timeseries.
       var errorMessage = "Error: this plot cannot compare climatologies to nominal time value datasets.";
-      this.setTimeseriesGraphNoDataMessage(errorMessage);
+      // TODO: Remove
+      // this.setTimeseriesGraphNoDataMessage(errorMessage);
     }
   },
 
-  //Removes all data from the Timeseries Graph and displays a message
-  setTimeseriesGraphNoDataMessage: function(message) {
-    this.setState({
-      timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
-                         axis: {} },
-      });
-  },
+  // TODO: Remove
+  // //Removes all data from the Timeseries Graph and displays a message
+  // setTimeseriesGraphNoDataMessage: function(message) {
+  //   this.setState({
+  //     timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
+  //                        axis: {} },
+  //     });
+  // },
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
     return !(
-      _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
+      // TODO: Remove
+      // _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
   },
@@ -158,41 +164,77 @@ var DualDataController = createReactClass({
     return dataToLongTermAverageGraph(data, context);
   },
 
-  /*
-   * This function fetches and loads data for the Timeseries graph. Will
-   * load data for two variables if variable_id and comparand_id are different.
-   */
-  loadDualTimeseriesGraph: function(props) {
+  // TODO: Remove
+  // /*
+  //  * This function fetches and loads data for the Timeseries graph. Will
+  //  * load data for two variables if variable_id and comparand_id are different.
+  //  */
+  // loadDualTimeseriesGraph: function(props) {
+  //
+  //   this.setTimeseriesGraphNoDataMessage("Loading Data");
+  //   var timeseriesPromises = [];
+  //
+  //   //primary variable
+  //   var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
+  //   var variableMetadata = _.findWhere(props.meta, params);
+  //   timeseriesPromises.push(this.getTimeseriesPromise(props, variableMetadata.unique_id));
+  //
+  //   //secondary variable
+  //   var comparandParams = _.pick(this.mockUpComparandProps(props), 'model_id', 'variable_id', 'experiment');
+  //   var comparandMetadata = _.findWhere(props.comparandMeta, comparandParams);
+  //
+  //   //add data from the comparand, iff it exists
+  //   if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
+  //     timeseriesPromises.push(this.getTimeseriesPromise(this.mockUpComparandProps(props), comparandMetadata.unique_id));
+  //   }
+  //
+  //   Promise.all(timeseriesPromises).then(responses => {
+  //     var data = _.pluck(responses, "data");
+  //     var graphMetadata = _.union(props.comparandMeta, props.meta);
+  //
+  //     this.setState({
+  //       timeseriesData: timeseriesToTimeseriesGraph(graphMetadata, ...data)
+  //     });
+  //   }).catch(error => {
+  //     this.displayError(error, this.setTimeseriesGraphNoDataMessage);
+  //   });
+  // },
 
-    this.setTimeseriesGraphNoDataMessage("Loading Data");
-    var timeseriesPromises = [];
+  getDualTimeseriesMetadata() {
+    const {
+      model_id, experiment,
+      variable_id, meta,
+      comparand_id, comparandMeta,
+    } = this.props;
 
-    //primary variable
-    var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
-    var variableMetadata = _.findWhere(props.meta, params);
-    timeseriesPromises.push(this.getTimeseriesPromise(props, variableMetadata.unique_id));
+    // Set up metadata sets for primary variable
+    const primaryVariableMetadata = _.findWhere(meta, {
+      model_id, experiment, variable_id,
+    });
 
-    //secondary variable
-    var comparandParams = _.pick(this.mockUpComparandProps(props), 'model_id', 'variable_id', 'experiment');
-    var comparandMetadata = _.findWhere(props.comparandMeta, comparandParams);
+    let metadataSets = [primaryVariableMetadata];
 
-    //add data from the comparand, iff it exists
-    if(comparandMetadata && comparandMetadata.unique_id != variableMetadata.unique_id) {
-      timeseriesPromises.push(this.getTimeseriesPromise(this.mockUpComparandProps(props), comparandMetadata.unique_id));
+    // Extend metadata sets with comparand, if present and different from variable
+    const secondaryVariableMetadata = _.findWhere(comparandMeta, {
+      model_id,
+      experiment,
+      variable_id: comparand_id,
+    });
+    if (
+      primaryVariableMetadata &&
+      primaryVariableMetadata.unique_id !== secondaryVariableMetadata.unique_id
+    ) {
+      metadataSets = metadataSets.push(secondaryVariableMetadata);
     }
 
-    Promise.all(timeseriesPromises).then(responses => {
-      var data = _.pluck(responses, "data");
-      var graphMetadata = _.union(props.comparandMeta, props.meta);
-
-      this.setState({
-        timeseriesData: timeseriesToTimeseriesGraph(graphMetadata, ...data)
-      });
-    }).catch(error => {
-      this.displayError(error, this.setTimeseriesGraphNoDataMessage);
-    });
+    return metadataSets;
   },
 
+  dualTimeseriesDataToGraphSpec(meta, data) {
+    return timeseriesToTimeseriesGraph(meta, ...data);
+  },
+
+  // TODO: Remove
   /*
    * This function creates an object that is similar to the props DualDataController
    * receives from its parent, except that the "variable_id" and "meta" attributes
@@ -281,7 +323,7 @@ var DualDataController = createReactClass({
         // if only one variable is selected, it won't be in any series names.
         return seriesName;
       }
-    }
+    };
 
     graph = assignColoursByGroup(graph, sortByVariable);
 
@@ -299,7 +341,7 @@ var DualDataController = createReactClass({
       }
       //no time resolution indicated in timeseries. default to full rank.
       return 1;
-    }
+    };
 
     graph = fadeSeriesByRank(graph, rankByTimeResolution);
 
@@ -307,6 +349,7 @@ var DualDataController = createReactClass({
   },
 
   render: function () {
+    // TODO: Factor out common props passed
     return (
       <div>
         <h3>{`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}</h3>
@@ -340,7 +383,13 @@ var DualDataController = createReactClass({
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
-                  graphSpec={this.state.timeseriesData || this.blankGraph}
+                  model_id={this.props.model_id}
+                  variable_id={this.props.variable_id}
+                  experiment={this.props.experiment}
+                  meta={this.props.meta}
+                  area={this.props.area}
+                  getMetadata={this.getDualTimeseriesMetadata}
+                  dataToGraphSpec={this.dualTimeseriesDataToGraphSpec}
                 />
               </Tab>
             </Tabs>
