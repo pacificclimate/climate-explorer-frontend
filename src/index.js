@@ -8,6 +8,7 @@ import AppController from './components/AppController';
 import DualController from './components/DualController';
 
 import Header from './components/Header';
+import Footer from './components/Footer';
 
 class App extends React.Component {
   static propTypes = {
@@ -22,6 +23,9 @@ class App extends React.Component {
         </div>
         <div>
           {this.props.children || <AppController ensemble_name="all_downscale_files"/>}
+        </div>
+        <div>
+          <Footer />
         </div>
       </div>
     );
