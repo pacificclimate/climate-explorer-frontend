@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ControlLabel } from 'react-bootstrap';
+import { Row, Col, ControlLabel } from 'react-bootstrap';
 
 import DataGraph from '../../DataGraph/DataGraph';
 import styles from './TimeSeriesGraph.css';
@@ -85,12 +85,14 @@ export default class TimeSeriesGraph extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
-        <DataGraph {...this.state.graphSpec}/>
-        <ControlLabel className={styles.graphlabel}>
-          Highlight a time span on lower graph to see more detail
-        </ControlLabel>
-      </React.Fragment>
+      <Row>
+        <Col>
+          <DataGraph {...this.state.graphSpec}/>
+          <ControlLabel className={styles.graphlabel}>
+            Highlight a time span on lower graph to see more detail
+          </ControlLabel>
+        </Col>
+      </Row>
     );
   }
 }
