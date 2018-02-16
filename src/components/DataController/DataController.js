@@ -76,8 +76,6 @@ var DataController = createReactClass({
     return {
       dataTableTimeOfYear: 0,
       dataTableTimeScale: "monthly",
-      // TODO:Remove when TimeSeriesGraph tested
-      // timeseriesData: undefined,
       statsData: undefined,
     };
   },
@@ -94,8 +92,6 @@ var DataController = createReactClass({
       this.loadDataTable(props);
     }
     else {
-      // TODO: Remove when TimeSeriesGraph tested
-      // this.loadTimeseriesGraph(props);
       this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
     }
   },
@@ -108,22 +104,14 @@ var DataController = createReactClass({
     });
   },
 
-  // TODO:Remove when TimeSeriesGraph tested
-  //Removes all data from the Timeseries Graph and displays a message
-  // setTimeseriesGraphNoDataMessage: function(message) {
-  //   this.setState({
-  //     timeseriesData: { data: { columns: [], empty: { label: { text: message }, }, },
-  //                        axis: {} },
-  //     });
-  // },
-
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
+    // TODO: Consider making shallow comparisons. Deep ones are expensive.
+    // If immutable data objects are used (or functionally equivalently,
+    // new data objects each time), then shallow comparison works.
     return !(
       _.isEqual(nextState.statsData, this.state.statsData) &&
-      // TODO:Remove when TimeSeriesGraph tested
-      // _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions)
      );
@@ -197,30 +185,6 @@ var DataController = createReactClass({
   longTermAveragesDataToGraphSpec(data) {
     return dataToLongTermAverageGraph(data);
   },
-
-  // TODO:Remove when TimeSeriesGraph tested
-  // /*
-  //  * This function fetches and loads data for the Timeseries graph.
-  //  * As the Timeseries graph shows all data points at once, there's no
-  //  * filtering or selection done by this function.
-  //  */
-  // loadTimeseriesGraph: function(props) {
-  //
-  //   this.setTimeseriesGraphNoDataMessage("Loading Data");
-  //
-  //   var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
-  //
-  //   var metadata = _.findWhere(props.meta, params);
-  //
-  //   var timeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
-  //   timeseriesPromise.then(response => {
-  //     this.setState({
-  //       timeseriesData: timeseriesToTimeseriesGraph(props.meta, response.data)
-  //     });
-  //   }).catch(error => {
-  //     this.displayError(error, this.setTimeseriesGraphNoDataMessage);
-  //   });
-  // },
 
   getTimeseriesMetadata() {
     const {
@@ -354,6 +318,7 @@ var DataController = createReactClass({
         
         {
           this.multiYearMeanSelected() ? (
+
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
@@ -379,7 +344,9 @@ var DataController = createReactClass({
                 />
               </Tab>
             </Tabs>
+
           ) : (
+
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
@@ -389,6 +356,7 @@ var DataController = createReactClass({
                 />
               </Tab>
             </Tabs>
+
           )
         }
 
