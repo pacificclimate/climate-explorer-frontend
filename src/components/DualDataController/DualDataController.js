@@ -171,7 +171,7 @@ var DualDataController = createReactClass({
       variable_id: comparand_id,
     });
     if (
-      secondaryVariableMetadata &&
+      primaryVariableMetadata && secondaryVariableMetadata &&
       primaryVariableMetadata.unique_id !== secondaryVariableMetadata.unique_id
     ) {
       metadataSets.push(secondaryVariableMetadata);
