@@ -254,6 +254,9 @@ var getMonthlyData = function(data, timescale = "monthly") {
 //TODO: possibly cue descriptors to appear in a specific order?
 // "Tasmin Monthly Mean" sounds better than "Monthly Tasmin Mean".
 var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
+  if (metadata.length === 0) {
+    throw new Error('No data to show');
+  }
   
   //only one timeseries being graphed, simple label.
   if(data.length == 1) {
