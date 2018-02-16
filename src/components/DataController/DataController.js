@@ -79,7 +79,6 @@ var DataController = createReactClass({
       // TODO:Remove when TimeSeriesGraph tested
       // timeseriesData: undefined,
       statsData: undefined,
-      contextData: undefined
     };
   },
 
@@ -93,7 +92,6 @@ var DataController = createReactClass({
     //and long term average graphs, otherwise load a timeseries graph
     if(this.multiYearMeanSelected(props)) {
       this.loadDataTable(props);
-      this.loadContextGraph(props);
     }
     else {
       // TODO: Remove when TimeSeriesGraph tested
@@ -107,14 +105,6 @@ var DataController = createReactClass({
     this.setState({
       statsTableOptions: { noDataText: message },
       statsData: [],
-    });
-  },
-
-  //Removes all data from the Context Graph and displays a message
-  setContextGraphNoDataMessage: function(message) {
-    this.setState({
-      contextData: { data: { columns: [], empty: { label: { text: message }, }, },
-        axis: {} },
     });
   },
 
@@ -134,7 +124,6 @@ var DataController = createReactClass({
       _.isEqual(nextState.statsData, this.state.statsData) &&
       // TODO:Remove when TimeSeriesGraph tested
       // _.isEqual(nextState.timeseriesData, this.state.timeseriesData) &&
-      _.isEqual(nextState.contextData, this.state.contextData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions)
      );
@@ -289,83 +278,58 @@ var DataController = createReactClass({
     });
   },
 
-  /*
-   * This function fetches and loads data for the Context Graph
-   * comparing several models. It calls the "data" (long term average)
-   * query for each model and composes the results into a single graph,
-   * so it is only available for datasets that support the "data" query
-   * (multi year means).
-   */
-  loadContextGraph: function (props) {
+  getContextMetadata() {
+    const {
+      ensemble_name, experiment, variable_id, area, contextMeta,
+    } = this.props;
 
-    //Graph formatting function used to emphasize the current model and
-    //deemphasize all others.
-    var emphasizeCurrentModel = function(graph) {
+    // Array of unique model_id's
+    const uniqueContextModelIds = _.uniq(_.pluck(contextMeta, 'model_id'));
+    const baseMetadata = {
+      ensemble_name,
+      experiment,
+      variable_id,
+      area,
+      timescale: 'yearly',
+      timeidx: 0,
+      multi_year_mean: true,
+    };
+    const metadatas =
+      uniqueContextModelIds
+        .map(model_id => ({ ...baseMetadata, model_id }))
+        .filter(metadata =>
+          // Note: length > 0 guaranteed for first item
+          // (containing this.props.model_id)
+          _.where(contextMeta,
+            _.omit(metadata, 'ensemble_name', 'timeidx', 'area')
+          ).length > 0
+        );
+    return metadatas;
+  },
+
+  contextDataToGraphSpec(meta, data, selectedModelId) {
+    const emphasizeCurrentModel = function(graph) {
       //Helper function used to classify data series by which model generated them
-      var makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
+      const makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
         return function(dataseries) {
-          return dataseries[0].search(props.model_id) != -1 ? selectedModelOutput : otherModelOutput;
-        }
+          return dataseries[0].search(selectedModelId) !== -1 ?
+            selectedModelOutput :
+            otherModelOutput;
+        };
       };
+
       graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
-      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, .35));
+      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, 0.35));
       graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
       graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
 
       //simplify graph by turning off tooltip and missing data gaps
       graph.line.connectNull = true;
-      graph.tooltip = {show: false};
+      graph.tooltip = { show: false };
       return graph;
     };
 
-    //If the only thing changed since the last time the graph was rendered
-    //is the model, we already have all the data fetched, we just need to
-    //reformat the graph.
-    if(this.state.contextData &&
-        this.state.contextData.data.columns.length > 0 &&
-        _.isEqual(props.variable_id, this.props.variable_id) &&
-        _.isEqual(props.experiment, this.props.experiment)) {
-      var graph = emphasizeCurrentModel(this.state.contextData);
-
-      this.setState({
-        contextData: graph
-      });
-    }
-    else {
-      this.setContextGraphNoDataMessage("Loading Data");
-
-      var dataPromises = [];
-      var dataQueryParams = [];
-      var contextModels = _.without(_.uniq(_.pluck(props.contextMeta, "model_id")), props.model_id);
-      var params = _.pick(props, 'experiment', 'variable_id', 'ensemble_name');
-      params.timescale = 'yearly';
-      params.multi_year_mean = true;
-
-      params.model_id = props.model_id;
-      dataPromises.push(this.getDataPromise(params, "yearly", 0));
-      dataQueryParams.push(_.extend({}, params));
-
-      //determine which models have data that matches this variable and experiment
-      for(let i = 0; i < contextModels.length; i++ ) {
-        params.model_id = contextModels[i];
-        if(_.where(props.contextMeta, _.omit(params, 'ensemble_name')).length > 0){
-          dataPromises.push(this.getDataPromise(params, "yearly", 0));
-          dataQueryParams.push(_.extend({}, params));
-        }
-      }
-
-      //fetch data from the backend and assemble the graph
-      Promise.all(dataPromises).then(responses=> {
-        var data = _.pluck(responses, "data");
-        var graph = emphasizeCurrentModel(dataToLongTermAverageGraph(data, dataQueryParams));
-
-        this.setState({
-          contextData: graph
-        });
-      }).catch(error => {
-        this.displayError(error, this.setContextGraphNoDataMessage);
-      });
-    }
+    return emphasizeCurrentModel(dataToLongTermAverageGraph(data, meta));
   },
 
   render: function () {
@@ -407,7 +371,11 @@ var DataController = createReactClass({
               </Tab>
               <Tab eventKey={3} title='Model Context'>
                 <ContextGraph
-                  graphSpec={this.state.contextData || this.blankGraph}
+                  {..._.pick(this.props,
+                    'model_id', 'variable_id', 'experiment',
+                    'contextMeta', 'area')}
+                  getMetadata={this.getContextMetadata}
+                  dataToGraphSpec={this.contextDataToGraphSpec}
                 />
               </Tab>
             </Tabs>
