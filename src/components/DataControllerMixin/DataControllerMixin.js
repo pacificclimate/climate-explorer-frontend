@@ -40,9 +40,6 @@ var ModalMixin = {
 
   componentWillReceiveProps: function (nextProps) {
     if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
-      this.setState({
-        timeseriesDatasetId: nextProps.meta[0].unique_id,
-      });
       this.getData(nextProps);
     }
     else { //Didn't receive any valid data.
@@ -78,24 +75,6 @@ var ModalMixin = {
       _.extend(val, { run: selected[0].ensemble_member });
     }.bind(this));
     return data;
-  },
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-  //Fetches and validates data from a call to the backend's
-  //"data" API endpoint
-  getDataPromise: function (props, timeres, timeidx) {
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'data'),
-      params: {
-        ensemble_name: props.ensemble_name,
-        model: props.model_id,
-        variable: props.variable_id,
-        emission: props.experiment,
-        timescale: timeres,
-        area: props.area || "",
-        time: timeidx,
-      }
-    }).then(validateLongTermAverageData);
   },
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
@@ -139,27 +118,6 @@ var ModalMixin = {
       }
     },
     
-    /*
-     * Given a dataset's metadata and a "difference" listing of attribute values pairs, 
-     * returns metadata for another dataset that:
-     * - matches all attribute/value pairs in the "difference object"
-     * - matches the original dataset for any attributes not in "difference"
-     * (Unique_id is ignored for purposes of matching datasets.)
-     * 
-     * Example: findMatchingMetadata(monthlyDataset, {timescale: "annual"}) 
-     * would return the annual-resolution dataset that corresponds to a monthly one.
-     * Returns only one dataset's metadata even if multiple qualify.
-     */
-    findMatchingMetadata: function(example, difference, meta = this.props.meta) {
-      var template = {};
-      for(var att in example) {
-        if(att != "unique_id" && att != "variable_name") {
-          template[att] = difference[att] ? difference[att] : example[att];
-        }
-      }
-      return _.findWhere(meta, template);
-    },
-    
     //Returns the metadata object that corresponds to a unique_id
     getMetadata: function (id, meta = this.props.meta) {
       return _.find(meta, function(m) {return m.unique_id === id;} );
@@ -200,14 +158,6 @@ var ModalMixin = {
         }
       }
       return filtered;
-    },
-
-    //Used to render uninitialized C3 graphs.
-    blankGraph: {
-      data: {
-        columns: []
-      },
-      axis: {}
     },
 
     //Used to render uninitialized stats tables
