@@ -11,14 +11,16 @@ import { exportDataToWorksheet } from '../../../core/export';
 import { getTimeseries } from '../../../data-services/ce-backend';
 import {
   validateAnnualCycleData,
-  validateUnstructuredTimeseriesData
+  validateUnstructuredTimeseriesData,
 } from '../../../core/util';
 import {
   multiYearMeanSelected,
+} from '../../../core/data-controller-helpers';
+import {
   displayError,
   noDataMessageGraphSpec,
   blankGraphSpec,
-} from '../../../core/data-controller-helpers';
+} from '../graph-helpers';
 
 // This component renders a complete annual cycle graph, including a selector
 // for the instance (dataset) to display and export-data buttons.

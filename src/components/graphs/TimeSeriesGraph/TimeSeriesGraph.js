@@ -6,15 +6,18 @@ import DataGraph from '../../DataGraph/DataGraph';
 import styles from './TimeSeriesGraph.css';
 import {
   validateAnnualCycleData,
-  validateUnstructuredTimeseriesData
+  validateUnstructuredTimeseriesData,
 } from '../../../core/util';
 import { getTimeseries } from '../../../data-services/ce-backend';
 import {
+  multiYearMeanSelected,
+} from '../../../core/data-controller-helpers';
+import {
   blankGraphSpec,
   displayError,
-  multiYearMeanSelected,
   noDataMessageGraphSpec,
-} from '../../../core/data-controller-helpers';
+} from '../graph-helpers';
+
 
 export default class TimeSeriesGraph extends React.Component {
   static propTypes = {

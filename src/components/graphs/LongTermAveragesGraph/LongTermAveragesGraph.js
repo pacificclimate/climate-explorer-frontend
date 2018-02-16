@@ -12,7 +12,7 @@ import {
   blankGraphSpec,
   displayError,
   noDataMessageGraphSpec,
-} from '../../../core/data-controller-helpers';
+} from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
   validateLongTermAverageData,

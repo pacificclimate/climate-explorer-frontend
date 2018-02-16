@@ -3,10 +3,10 @@ import React from 'react';
 
 import DataGraph from '../../DataGraph/DataGraph';
 import {
-  blankGraphSpec,
   displayError,
   noDataMessageGraphSpec,
-} from '../../../core/data-controller-helpers';
+  blankGraphSpec,
+} from '../graph-helpers';
 import { validateLongTermAverageData } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
 
