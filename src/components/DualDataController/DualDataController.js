@@ -224,7 +224,7 @@ var DualDataController = createReactClass({
       primaryVariableMetadata &&
       primaryVariableMetadata.unique_id !== secondaryVariableMetadata.unique_id
     ) {
-      metadataSets = metadataSets.push(secondaryVariableMetadata);
+      metadataSets.push(secondaryVariableMetadata);
     }
 
     return metadataSets;
@@ -361,6 +361,7 @@ var DualDataController = createReactClass({
 
         {
           this.multiYearMeanSelected() ? (
+
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
                 <AnnualCycleGraph
@@ -377,7 +378,9 @@ var DualDataController = createReactClass({
                 />
               </Tab>
             </Tabs>
+
           ) : (
+
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <TimeSeriesGraph
@@ -387,6 +390,7 @@ var DualDataController = createReactClass({
                 />
               </Tab>
             </Tabs>
+
           )
         }
       </div>
