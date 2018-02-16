@@ -13,7 +13,7 @@ var Footer = createReactClass({
         <Grid fluid>
           <Row>
             <Col lg={4}>
-              PCIC {CE_CURRENT_VERSION}
+              PCIC Climate Explorer {CE_CURRENT_VERSION}
             </Col>
             <Col lg={4} />
             <Col lg={4} />
