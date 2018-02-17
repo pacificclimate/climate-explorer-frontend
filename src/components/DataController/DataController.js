@@ -54,6 +54,7 @@ import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 import {
+  displayError,
   findMatchingMetadata,
   multiYearMeanSelected,
 } from '../graphs/graph-helpers';
@@ -241,7 +242,7 @@ var DataController = createReactClass({
         this.setStatsTableNoDataMessage("Statistics unavailable for this time period.");
       }
     }).catch(error => {
-      this.displayError(error, this.setStatsTableNoDataMessage);
+      displayError(error, this.setStatsTableNoDataMessage);
     });
   },
 

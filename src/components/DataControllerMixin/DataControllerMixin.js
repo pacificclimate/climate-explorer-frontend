@@ -91,30 +91,6 @@ var ModalMixin = {
     }).then(validateStatsData);
   },
 
-    /*
-     * this function is called to display any error generated in the 
-     * process of showing a graph or table, so it handles networking
-     * errors thrown by axios calls and errors thrown by validators 
-     * and parsers, which have different formats.
-     */
-    displayError: function(error, displayMethod) {
-      if(error.response) { // axios error: data server sent a non-200 response
-        displayMethod("Error: " + error.response.status + " received from data server.");
-      }else if(error.request) { // axios error: data server didn't respond
-        displayMethod("Error: no response received from data server.");
-      }else {  
-        // either an error thrown by a data validation function,
-        // an error thrown by the DataGraph or DataTable parsers,
-        // or the generic and somewhat unhelpful "Network Error" from axios
-        // Testing turned up "Network Error" in two cases:
-        // the server is down, or the server has a 500 error.
-        // Other http error statuses tested were reflected in
-        // error.response.status as expected
-        // (see https://github.com/mzabriskie/axios/issues/383)
-        displayMethod(error.message);
-      }
-    },
-    
     //Returns the metadata object that corresponds to a unique_id
     getMetadata: function (id, meta = this.props.meta) {
       return _.find(meta, function(m) {return m.unique_id === id;} );

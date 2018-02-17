@@ -77,6 +77,10 @@ function findMatchingMetadata(example, difference, meta) {
 }
 
 function displayError(error, displayMethod) {
+  // Used to display any error (via `displayMethod`) generated in the
+  // process of showing a graph or table, so it handles networking
+  // errors thrown by axios calls and errors thrown by validators
+  // and parsers, which have different formats.
   if (error.response) {
     // axios error: data server sent a non-200 response
     displayMethod('Error: ' + error.response.status + ' received from data server.');
