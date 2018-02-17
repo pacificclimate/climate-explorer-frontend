@@ -12,6 +12,7 @@ import {
   blankGraphSpec,
   displayError,
   noDataMessageGraphSpec,
+  shouldLoadData,
 } from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
@@ -61,9 +62,12 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   loadGraph() {
-    // Fetch data for LTA graph, then convert it to a graph spec and set state
+    // Fetch data for graph, then convert it to a graph spec and set state
     // accordingly.
-    this.displayNoDataMessage('Loading Data');
+
+    if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
+      return;
+    }
 
     const timeOfYearMetadatas =
       this.props.getMetadata(this.state.timeOfYear)

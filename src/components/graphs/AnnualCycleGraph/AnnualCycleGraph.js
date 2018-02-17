@@ -14,12 +14,11 @@ import {
   validateUnstructuredTimeseriesData,
 } from '../../../core/util';
 import {
-  multiYearMeanSelected,
-} from '../../../core/data-controller-helpers';
-import {
   displayError,
   noDataMessageGraphSpec,
   blankGraphSpec,
+  multiYearMeanSelected,
+  shouldLoadData,
 } from '../graph-helpers';
 
 // This component renders a complete annual cycle graph, including a selector
@@ -94,8 +93,11 @@ export default class AnnualCycleGraph extends React.Component {
 
     // TODO: When invoking only from componentDidMount and componentDidUpdate
     // (as advised in documentation), `props` does not need to be an explicit
-    // argument; can use `this.props`.
-    this.displayNoDataMessage('Loading Data');
+    // argument; can use `this.props` throughout.
+
+    if (!shouldLoadData(props, this.displayNoDataMessage)) {
+      return;
+    }
 
     const instanceMetadata =
       this.props.getInstanceMetadata(this.state.instance)

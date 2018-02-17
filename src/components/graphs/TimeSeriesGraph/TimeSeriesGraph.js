@@ -10,12 +10,9 @@ import {
 } from '../../../core/util';
 import { getTimeseries } from '../../../data-services/ce-backend';
 import {
-  multiYearMeanSelected,
-} from '../../../core/data-controller-helpers';
-import {
   blankGraphSpec,
-  displayError,
-  noDataMessageGraphSpec,
+  displayError, multiYearMeanSelected,
+  noDataMessageGraphSpec, shouldLoadData,
 } from '../graph-helpers';
 
 
@@ -54,7 +51,12 @@ export default class TimeSeriesGraph extends React.Component {
   }
 
   loadGraph(props) {
-    this.displayNoDataMessage('Loading Data');
+    // Fetch data for graph, then convert it to a graph spec and set state
+    // accordingly.
+
+    if (!shouldLoadData(props, this.displayNoDataMessage)) {
+      return;
+    }
 
     const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
     const timeseriesPromises = metadatas.map(metadata =>

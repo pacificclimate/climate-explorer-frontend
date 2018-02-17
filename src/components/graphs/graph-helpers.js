@@ -1,6 +1,44 @@
 import _ from 'underscore';
 
 
+function multiYearMeanSelected({ model_id, variable_id, experiment, meta }) {
+  // Indicates whether the currently selected dataset is a multi-year-mean
+  if (meta.length === 0) {
+    return undefined;
+  }
+  var selectedMetadata = _.findWhere(meta, { model_id, variable_id, experiment });
+  return selectedMetadata.multi_year_mean;
+}
+
+
+function isVariableMYM(props) {
+  // Indicates whether the currently selected dataset for the (primary)
+  // variable is a multi-year-mean
+  return multiYearMeanSelected(props);
+}
+
+
+function isComparandMYM({ model_id, comparand_id, experiment, comparandMeta }) {
+  // Indicates whether the currently selected dataset for the (secondary)
+  // comparand is a multi-year-mean
+  return multiYearMeanSelected({
+    model_id,
+    variable_id: comparand_id,
+    experiment,
+    meta: comparandMeta,
+  });
+}
+
+
+function isEnsembleLoading(props) {
+  // When switching ensembles, DualDataController is sometimes rendered when
+  // the primary variable has been updated to reflect the new ensemble,
+  // but the comparand hasn't yet.
+  // This function evaluates that condition.
+  return props.meta.length > 0 && props.comparandMeta.length < 1;
+}
+
+
 function findMatchingMetadata(example, difference, meta) {
   // Given a dataset's metadata and a "difference" listing of attribute values pairs,
   // returns metadata for another dataset that:
@@ -65,9 +103,41 @@ const blankGraphSpec = {
 };
 
 
+const ensembleLoadingMessage = 'Ensemble loading...';
+const incomparableDataMessage = 
+  'Error: Cannot compare climatologies to nominal time value datasets.';
+
+
+function shouldLoadData(props, displayMessage) {
+  // Return true iff the current state, evaluated based on `props`, indicates
+  // that data should be loaded.
+  // As a side effect, display the appropriate data loading message via
+  // `displayMessage`.
+  if (isEnsembleLoading(props)) {
+    displayMessage(ensembleLoadingMessage);
+    return false;
+  }
+
+  if (isVariableMYM(props) !== isVariableMYM(props)) {
+    displayMessage(incomparableDataMessage);
+    return false;
+  }
+
+  displayMessage('Loading Data');
+  return true;
+}
+
+
 export {
+  multiYearMeanSelected,
+  isVariableMYM,
+  isComparandMYM,
+  isEnsembleLoading,
   findMatchingMetadata,
   displayError,
   noDataMessageGraphSpec,
   blankGraphSpec,
+  ensembleLoadingMessage,
+  incomparableDataMessage,
+  shouldLoadData,
 };
