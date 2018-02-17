@@ -49,7 +49,10 @@ import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 import styles from './DualDataController.css';
-import { findMatchingMetadata } from '../graphs/graph-helpers';
+import {
+  findMatchingMetadata,
+  multiYearMeanSelected,
+} from '../graphs/graph-helpers';
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -73,41 +76,23 @@ var DualDataController = createReactClass({
     };
   },
 
+  // TODO: Remove when DataControllerMixin is removed
   /*
-   * Called when Dual Data Controller is loaded. Loads initial data to 
-   * display in the Long Term Average graph, Timeseries graph, or the 
+   * Called when Dual Data Controller is loaded. Loads initial data to
+   * display in the Long Term Average graph, Timeseries graph, or the
    * Annual Cycle graph. Defaults to monthly resolution and January time index.
-   * 
+   *
    * If both datasets are multi year means, the annual cycle graph and
    * long-term average graph will be displayed. If neither dataset is
    * a multi year mean, the timeseries graph will be displayed instead.
-   * 
+   *
    * There's no default for start date, end date, or ensemble member
    * because there's no guarentee specific ones appear in any given
    * data ensemble. These parameters just set to whatever the value are
    * in the first qualifying dataset.
    */
   getData: function (props) {
-    //When switching ensembles, DualDataController is sometimes rendered when
-    //the primary variable has been updated to reflect the new ensemble,
-    //but the comparand hasn't yet.
-    if(props.meta.length > 0 && props.comparandMeta.length < 1) {
-      var text = "Loading ensemble";
-      return;
-    }
-
-    var variableMYM = this.multiYearMeanSelected(props);
-    var comparandMYM = this.multiYearMeanSelected(this.mockUpComparandProps(props));
-
-    if(variableMYM && comparandMYM) {
-    }
-    else if(!variableMYM && !comparandMYM){
-    }
-    else {
-      // TODO: Add this logic to graph components
-      //can't compare a multi year mean to a regular timeseries.
-      var errorMessage = "Error: this plot cannot compare climatologies to nominal time value datasets.";
-    }
+    // Legacy: NOOP
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
@@ -310,7 +295,7 @@ var DualDataController = createReactClass({
         </h3>
 
         {
-          this.multiYearMeanSelected() ? (
+          multiYearMeanSelected(this.props) ? (
 
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>

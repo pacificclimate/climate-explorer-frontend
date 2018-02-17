@@ -49,10 +49,7 @@ var ModalMixin = {
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
-      var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
-                                   this.setLongTermAverageGraphNoDataMessage,
-                                   this.setAnnualCycleGraphNoDataMessage,
-                                   this.setTimeseriesGraphNoDataMessage];
+      var viewerMessageDisplays = [this.setStatsTableNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
@@ -123,17 +120,6 @@ var ModalMixin = {
       return _.find(meta, function(m) {return m.unique_id === id;} );
     },
     
-    //Indicates whether or not the currently selected dataset is
-    //a multi-year-mean
-    multiYearMeanSelected: function(props = this.props) {
-      if(_.isUndefined(props) || props.meta.length == 0) {
-        return undefined;
-      }
-      var params = _.pick(props, "model_id", 'variable_id', 'experiment');
-      var selectedMetadata = _.findWhere(props.meta, params);
-      return selectedMetadata.multi_year_mean;
-    },
-
     /*
      * Filters data from any call to the API that returns an object with 
      * individual values keyed to unique_ids. It returns a new object 

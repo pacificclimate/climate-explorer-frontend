@@ -53,7 +53,10 @@ import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
 import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
 import ContextGraph from '../graphs/ContextGraph';
 import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
-import { findMatchingMetadata } from '../graphs/graph-helpers';
+import {
+  findMatchingMetadata,
+  multiYearMeanSelected,
+} from '../graphs/graph-helpers';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -88,7 +91,7 @@ var DataController = createReactClass({
   getData: function (props) {
     //if the selected dataset is a multi-year mean, load annual cycle
     //and long term average graphs, otherwise load a timeseries graph
-    if(this.multiYearMeanSelected(props)) {
+    if (multiYearMeanSelected(props)) {
       this.loadDataTable(props);
     }
     else {
@@ -317,7 +320,7 @@ var DataController = createReactClass({
         </h3>
         
         {
-          this.multiYearMeanSelected() ? (
+          multiYearMeanSelected(this.props) ? (
 
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
