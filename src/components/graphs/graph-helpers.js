@@ -1,13 +1,28 @@
 import _ from 'underscore';
 
 
+function areAllPropsValid(
+  { meta, model_id, variable_id, experiment }
+) {
+  console.log('areAllPropsValid', { meta, model_id, variable_id, experiment })
+  const propValues = _.values(
+    { meta, model_id, variable_id, experiment });
+  return (propValues.length > 0) && propValues.every(Boolean);
+}
+
+
 function multiYearMeanSelected({ model_id, variable_id, experiment, meta }) {
   // Indicates whether the currently selected dataset is a multi-year-mean
-  if (meta.length === 0) {
+  if (meta && meta.length === 0) {
     return undefined;
   }
   var selectedMetadata = _.findWhere(meta, { model_id, variable_id, experiment });
   return selectedMetadata.multi_year_mean;
+}
+
+
+function hasComparand(props) {
+  return !_.isUndefined(props.comparandMeta);
 }
 
 
@@ -35,7 +50,9 @@ function isEnsembleLoading(props) {
   // the primary variable has been updated to reflect the new ensemble,
   // but the comparand hasn't yet.
   // This function evaluates that condition.
-  return props.meta.length > 0 && props.comparandMeta.length < 1;
+  // False when there is no comparand to load!
+  return hasComparand(props) &&
+    props.meta.length > 0 && props.comparandMeta.length < 1;
 }
 
 
@@ -103,27 +120,28 @@ const blankGraphSpec = {
 };
 
 
-const ensembleLoadingMessage = 'Ensemble loading...';
-const incomparableDataMessage = 
-  'Error: Cannot compare climatologies to nominal time value datasets.';
-
-
 function shouldLoadData(props, displayMessage) {
   // Return true iff the current state, evaluated based on `props`, indicates
   // that data should be loaded.
   // As a side effect, display the appropriate data loading message via
   // `displayMessage`.
-  if (isEnsembleLoading(props)) {
-    displayMessage(ensembleLoadingMessage);
-    return false;
+  const tests = [
+    { failCondition: p => !areAllPropsValid(p),
+      message: 'Preparing to load data...' },
+    { failCondition: isEnsembleLoading,
+      message: 'Loading ensemble...' },
+    { failCondition: p =>
+        hasComparand(p) && (isVariableMYM(p) !== isVariableMYM(p)),
+      message:
+        'Error: Cannot compare climatologies to nominal time value datasets.' },
+  ];
+  for (const test of tests) {
+    if (test.failCondition(props)) {
+      displayMessage(test.message);
+      return false;
+    }
   }
-
-  if (isVariableMYM(props) !== isVariableMYM(props)) {
-    displayMessage(incomparableDataMessage);
-    return false;
-  }
-
-  displayMessage('Loading Data');
+  displayMessage('Loading data...');
   return true;
 }
 
@@ -137,7 +155,5 @@ export {
   displayError,
   noDataMessageGraphSpec,
   blankGraphSpec,
-  ensembleLoadingMessage,
-  incomparableDataMessage,
   shouldLoadData,
 };
