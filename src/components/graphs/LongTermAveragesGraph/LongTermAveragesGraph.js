@@ -86,8 +86,7 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   exportData(format) {
-    console.log('exportData', _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'))
-    const { timescale: timeres, timeidx } = 
+    const { timescale: timeres, timeidx } =
       timeKeyToResolutionIndex(this.state.timeOfYear);
     exportDataToWorksheet(
       'climoseries',
