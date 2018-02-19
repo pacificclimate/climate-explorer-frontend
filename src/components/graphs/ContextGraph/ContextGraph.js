@@ -11,6 +11,15 @@ import { validateLongTermAverageData } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
 
 
+// This component renders a "spaghetti plot" to provide context for the
+// selected dataset amongst all equivalent datasets from other models.
+// The context graph shows the same data as the long-term average graph,
+// but for all models.
+//
+// The component is generalized by two function props, `getMetadata`
+// and `dataToGraphSpec`, which respectively return metadata describing the
+// the datasets to display, and return a graph spec for the graph proper.
+
 export default class ContextGraph extends React.Component {
   static propTypes = {
     model_id: PropTypes.string,
@@ -18,8 +27,17 @@ export default class ContextGraph extends React.Component {
     experiment: PropTypes.string,
     area: PropTypes.string,
     contextMeta: PropTypes.array,
+    // It's not clear this prop is required, except possibly to inform
+    // `componentDidUpdate`.
     getMetadata: PropTypes.func,
+    // `getMetadata` returns the metadata describing the datasets to
+    // be displayed in this component.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
     dataToGraphSpec: PropTypes.func,
+    // `dataToGraphSpec` converts data a graph spec.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
   };
 
   constructor(props) {
@@ -67,7 +85,7 @@ export default class ContextGraph extends React.Component {
   // Lifecycle hooks
 
   componentDidMount() {
-    this.loadGraph(this.props);
+    this.loadGraph();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -91,18 +109,16 @@ export default class ContextGraph extends React.Component {
     }
   }
 
-  // TODO: Add shouldComponentUpdate? Logic from componentDidUpdate?
-
   componentDidUpdate(prevProps, prevState) {
     if (
       // Note omission of model_id: This graph doesn't need to reload if model
-      // doesn't change
+      // doesn't change. See `componentWillReceiveProps`.
       prevProps.variable_id !== this.props.variable_id ||
       prevProps.experiment !== this.props.experiment ||
       prevProps.contextMeta !== this.props.contextMeta ||  // TODO: Necessary?
       prevProps.area !== this.props.area
     ) {
-      this.loadGraph(this.props);
+      this.loadGraph();
     }
   }
 

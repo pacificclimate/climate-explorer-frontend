@@ -21,6 +21,14 @@ import {
 import { getData } from '../../../data-services/ce-backend';
 import { exportDataToWorksheet } from '../../../core/export';
 
+// This component renders a graph, over actual time points (as opposed to the
+// "average year" time points of an annual cycle graph), of spatially averaged
+// values of long-term average data for the selected model, variable, and
+// experiment.
+//
+// The component is generalized by two function props, `getMetadata`
+// and `dataToGraphSpec`, which respectively return metadata describing the
+// the datasets to display, and return a graph spec for the graph proper.
 
 export default class LongTermAveragesGraph extends React.Component {
   static propTypes = {
@@ -30,7 +38,15 @@ export default class LongTermAveragesGraph extends React.Component {
     meta: PropTypes.array,
     area: PropTypes.string,
     getMetadata: PropTypes.func,
+    // `getMetadata` returns the metadata describing the datasets to
+    // be displayed in this component.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
     dataToGraphSpec: PropTypes.func,
+    // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
+    // to a graph spec.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
   };
 
   constructor(props) {

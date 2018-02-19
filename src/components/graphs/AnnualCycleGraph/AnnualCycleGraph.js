@@ -22,10 +22,14 @@ import {
 } from '../graph-helpers';
 
 // This component renders a complete annual cycle graph, including a selector
-// for the instance (dataset) to display and export-data buttons.
+// for the instance (dataset) to display and export-data buttons. An annual
+// cycle graph presents spatially averaged values of a multi-year mean dataset
+// as points over a nominal year (representing the "average" year).
+//
 // The component is generalized by two function props, `getMetadata`
 // and `dataToGraphSpec`, which respectively return metadata describing the
 // the datasets to display, and return a graph spec for the graph proper.
+
 export default class AnnualCycleGraph extends React.Component {
   // TODO: model_id, variable_id, and experiment are used only to set the
   // initial instance. Could instead make `initialInstance` a prop, which

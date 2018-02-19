@@ -16,12 +16,27 @@ import {
 } from '../graph-helpers';
 
 
+// This component renders a graph of the spatially averaged values of a
+// non-temporally averaged dataset over time.
+//
+// The component is generalized by two function props, `getMetadata`
+// and `dataToGraphSpec`, which respectively return metadata describing the
+// the datasets to display, and return a graph spec for the graph proper.
+
 export default class TimeSeriesGraph extends React.Component {
   static propTypes = {
     meta: PropTypes.array,
     area: PropTypes.string,
     getMetadata: PropTypes.func,
+    // `getMetadata` returns the metadata describing the datasets to
+    // be displayed in this component.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
     dataToGraphSpec: PropTypes.func,
+    // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
+    // to a graph spec.
+    // A different function is passed by different clients to specialize
+    // this general component to particular cases (single vs. dual controller).
   };
 
   constructor(props) {
@@ -50,17 +65,17 @@ export default class TimeSeriesGraph extends React.Component {
     );
   }
 
-  loadGraph(props) {
+  loadGraph() {
     // Fetch data for graph, then convert it to a graph spec and set state
     // accordingly.
 
-    if (!shouldLoadData(props, this.displayNoDataMessage)) {
+    if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
       return;
     }
 
     const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
     const timeseriesPromises = metadatas.map(metadata =>
-      this.getAndValidateTimeseries(metadata, props.area)
+      this.getAndValidateTimeseries(metadata, this.props.area)
     );
 
     Promise.all(timeseriesPromises).then(data => {
@@ -75,7 +90,7 @@ export default class TimeSeriesGraph extends React.Component {
   // Lifecycle hooks
 
   componentDidMount() {
-    this.loadGraph(this.props);
+    this.loadGraph();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -84,7 +99,7 @@ export default class TimeSeriesGraph extends React.Component {
       prevProps.area !== this.props.area ||
       prevState.timeOfYear !== this.state.timeOfYear
     ) {
-      this.loadGraph(this.props);
+      this.loadGraph();
     }
   }
 
