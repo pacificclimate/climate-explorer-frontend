@@ -53,6 +53,9 @@ import {
   findMatchingMetadata,
   multiYearMeanSelected,
 } from '../graphs/graph-helpers';
+import DualAnnualCycleGraph from "../graphs/DualAnnualCycleGraph";
+import DualLongTermAveragesGraph from "../graphs/DualLongTermAveragesGraph";
+import DualTimeSeriesGraph from "../graphs/DualTimeSeriesGraph";
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -106,69 +109,6 @@ var DualDataController = createReactClass({
       _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
   },
 
-  getDualLongTermAveragesMetadata(timeOfYear) {
-    // Return metadata for variable_id and, if present and different, for
-    // comparand_id.
-    const commonMetadataFromProps = _.pick(this.props,
-      'ensemble_name', 'model_id', 'experiment', 'area'
-    );
-    const timeResolutionAndIndex = timeKeyToResolutionIndex(timeOfYear);
-
-    let result = [{
-      ...commonMetadataFromProps,
-      ...timeResolutionAndIndex,
-      variable_id: this.props.variable_id,
-    }];
-
-    if (this.props.comparand_id &&
-        this.props.comparand_id !== this.props.variable_id) {
-      result.push({
-        ...commonMetadataFromProps,
-        ...timeResolutionAndIndex,
-        variable_id: this.props.comparand_id,
-      });
-    }
-    return result;
-  },
-
-  dualLongTermAveragesDataToGraphSpec(data, context) {
-    return dataToLongTermAverageGraph(data, context);
-  },
-
-  getDualTimeseriesMetadata() {
-    const {
-      model_id, experiment,
-      variable_id, meta,
-      comparand_id, comparandMeta,
-    } = this.props;
-
-    // Set up metadata sets for primary variable
-    const primaryVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-    });
-
-    let metadataSets = [primaryVariableMetadata];
-
-    // Extend metadata sets with comparand, if present and different from variable
-    const secondaryVariableMetadata = _.findWhere(comparandMeta, {
-      model_id,
-      experiment,
-      variable_id: comparand_id,
-    });
-    if (
-      primaryVariableMetadata && secondaryVariableMetadata &&
-      primaryVariableMetadata.unique_id !== secondaryVariableMetadata.unique_id
-    ) {
-      metadataSets.push(secondaryVariableMetadata);
-    }
-
-    return metadataSets;
-  },
-
-  dualTimeseriesDataToGraphSpec(meta, data) {
-    return timeseriesToTimeseriesGraph(meta, ...data);
-  },
-
   // TODO: Remove when no longer used
   /*
    * This function creates an object that is similar to the props DualDataController
@@ -186,108 +126,7 @@ var DualDataController = createReactClass({
     return mockup;
   },
 
-  getDualAnnualCycleInstanceMetadata(instance) {
-    // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
-    // and annual timescales.
-    // Do the the same for comparand_id and comparandMeta.
-    const {
-      model_id, experiment,
-      variable_id, meta,
-      comparand_id, comparandMeta,
-    } = this.props;
-
-    // Set up metadata sets for variable
-    const monthlyVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-      ...instance,
-      timescale: 'monthly',
-    });
-    const seasonalVariablelMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    );
-    const yearlyVariableMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    );
-
-    let metadataSets = [
-      monthlyVariableMetadata,
-      seasonalVariablelMetadata,
-      yearlyVariableMetadata,
-    ];
-
-    // Extend metadata sets with comparand, if present and different from variable
-    const monthlyComparandMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { variable_id: comparand_id }, comparandMeta
-    );
-
-    if (
-      monthlyComparandMetadata &&
-      monthlyComparandMetadata.unique_id !== monthlyVariableMetadata.unique_id
-    ) {
-      const seasonalComparandlMetadata = findMatchingMetadata(
-        monthlyComparandMetadata, { timescale: 'seasonal' }, comparandMeta
-      );
-      const yearlyComparandMetadata = findMatchingMetadata(
-        monthlyComparandMetadata, { timescale: 'yearly' }, comparandMeta
-      );
-
-      metadataSets = metadataSets.concat([
-        monthlyComparandMetadata,
-        seasonalComparandlMetadata,
-        yearlyComparandMetadata,
-      ]);
-    }
-
-    return metadataSets;
-  },
-
-  dataToDualAnnualCycleGraphSpec(meta, data) {
-    let graph = timeseriesToAnnualCycleGraph(meta, ...data);
-
-    // function that assigns each data series to one of two groups based on
-    // which variable it represents. Passed to assignColoursByGroup to assign
-    // graph line colors.
-    const sortByVariable = dataSeries => {
-      const seriesName = dataSeries[0].toLowerCase();
-      if (seriesName.search(this.props.variable_id) !== -1) {
-        return 0;
-      } else if (seriesName.search(this.props.comparand_id) !== -1) {
-        return 1;
-      } else {
-        // if only one variable is selected, it won't be in any series names.
-        return seriesName;
-      }
-    };
-
-    graph = assignColoursByGroup(graph, sortByVariable);
-
-    //function that assigns seasonal and annual timeseries lower "rank"
-    //then monthly timeseries. Passed to fadeSeries to make higher-resolution
-    //data stand out more.
-    const rankByTimeResolution = (dataSeries) => {
-      var seriesName = dataSeries[0].toLowerCase();
-      if (seriesName.search('monthly') !== -1) {
-        return 1;
-      } else if (seriesName.search('seasonal') !== -1) {
-        return 0.6;
-      } else if (seriesName.search('yearly') !== -1) {
-        return 0.3;
-      }
-      //no time resolution indicated in timeseries. default to full rank.
-      return 1;
-    };
-
-    graph = fadeSeriesByRank(graph, rankByTimeResolution);
-
-    return graph;
-  },
-
   render: function () {
-    const graphProps = _.pick(this.props,
-      'model_id', 'variable_id', 'experiment', 'meta', 'area'
-    );
-
     return (
       <div>
         <h3>
@@ -299,18 +138,10 @@ var DualDataController = createReactClass({
 
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
-                <AnnualCycleGraph
-                  {...graphProps}
-                  getInstanceMetadata={this.getDualAnnualCycleInstanceMetadata}
-                  dataToGraphSpec={this.dataToDualAnnualCycleGraphSpec}
-                />
+                <DualAnnualCycleGraph {...this.props}/>
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
-                <LongTermAveragesGraph
-                  {...graphProps}
-                  getMetadata={this.getDualLongTermAveragesMetadata}
-                  dataToGraphSpec={this.dualLongTermAveragesDataToGraphSpec}
-                />
+                <DualLongTermAveragesGraph {...this.props}/>
               </Tab>
             </Tabs>
 
@@ -318,11 +149,7 @@ var DualDataController = createReactClass({
 
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
-                <TimeSeriesGraph
-                  {...graphProps}
-                  getMetadata={this.getDualTimeseriesMetadata}
-                  dataToGraphSpec={this.dualTimeseriesDataToGraphSpec}
-                />
+                <DualTimeSeriesGraph {...this.props}/>
               </Tab>
             </Tabs>
 

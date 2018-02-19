@@ -58,6 +58,10 @@ import {
   findMatchingMetadata,
   multiYearMeanSelected,
 } from '../graphs/graph-helpers';
+import SingleAnnualCycleGraph from '../graphs/SingleAnnualCycleGraph';
+import SingleLongTermAveragesGraph from '../graphs/SingleLongTermAveragesGraph';
+import SingleContextGraph from '../graphs/SingleContextGraph';
+import SingleTimeSeriesGraph from '../graphs/SingleTimeSeriesGraph';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -130,84 +134,6 @@ var DataController = createReactClass({
     this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
   },
 
-  getAnnualCycleInstanceMetadata(instance) {
-    // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
-    // and annual timescales.
-    const {
-      model_id, experiment,
-      variable_id, meta,
-    } = this.props;
-
-    const monthlyVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-      ...instance,
-      timescale: 'monthly',
-    });
-    const seasonalVariablelMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    );
-    const yearlyVariableMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    );
-    const metadataSets = [
-      monthlyVariableMetadata,
-      seasonalVariablelMetadata,
-      yearlyVariableMetadata,
-    ];
-    return metadataSets;
-  },
-
-  dataToAnnualCycleGraphSpec(meta, data) {
-    let graph = timeseriesToAnnualCycleGraph(meta, ...data);
-
-    // arrange the graph so that the highest-resolution data is most visible.
-    function rankByTimeResolution(series) {
-      var resolutions = ['Yearly', 'Seasonal', 'Monthly'];
-      for (let i = 0; i < 3; i++) {
-        if (series[0].search(resolutions[i]) !== -1) {
-          return i;
-        }
-      }
-      return 0;
-    }
-    graph = sortSeriesByRank(graph, rankByTimeResolution);
-
-    return graph;
-  },
-
-  getLongTermAveragesMetadata(timeOfYear) {
-    const metadataFromProps = _.pick(this.props,
-      'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'
-    );
-    // Yes, the value of this function is an array of one element.
-    return [
-      { ...metadataFromProps, ...timeKeyToResolutionIndex(timeOfYear) },
-    ];
-  },
-
-  longTermAveragesDataToGraphSpec(data) {
-    return dataToLongTermAverageGraph(data);
-  },
-
-  getTimeseriesMetadata() {
-    const {
-      model_id, experiment,
-      variable_id, meta,
-    } = this.props;
-
-    const primaryVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-    });
-    // Yes, the value of this function is an array of one element.
-    const metadataSets = [primaryVariableMetadata];
-    return metadataSets;
-  },
-
-  timeseriesDataToGraphSpec(meta, data) {
-    return timeseriesToTimeseriesGraph(meta, ...data);
-  },
-
   /*
    * This function fetches and loads data for the Stats Table. 
    * If passed a time of year(resolution and index), it will load
@@ -246,60 +172,6 @@ var DataController = createReactClass({
     });
   },
 
-  getContextMetadata() {
-    const {
-      ensemble_name, experiment, variable_id, area, contextMeta,
-    } = this.props;
-
-    // Array of unique model_id's
-    const uniqueContextModelIds = _.uniq(_.pluck(contextMeta, 'model_id'));
-    const baseMetadata = {
-      ensemble_name,
-      experiment,
-      variable_id,
-      area,
-      timescale: 'yearly',
-      timeidx: 0,
-      multi_year_mean: true,
-    };
-    const metadatas =
-      uniqueContextModelIds
-        .map(model_id => ({ ...baseMetadata, model_id }))
-        .filter(metadata =>
-          // Note: length > 0 guaranteed for first item
-          // (containing this.props.model_id)
-          _.where(contextMeta,
-            _.omit(metadata, 'ensemble_name', 'timeidx', 'area')
-          ).length > 0
-        );
-    return metadatas;
-  },
-
-  contextDataToGraphSpec(meta, data, selectedModelId) {
-    const emphasizeCurrentModel = function(graph) {
-      //Helper function used to classify data series by which model generated them
-      const makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
-        return function(dataseries) {
-          return dataseries[0].search(selectedModelId) !== -1 ?
-            selectedModelOutput :
-            otherModelOutput;
-        };
-      };
-
-      graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
-      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, 0.35));
-      graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
-      graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
-
-      //simplify graph by turning off tooltip and missing data gaps
-      graph.line.connectNull = true;
-      graph.tooltip = { show: false };
-      return graph;
-    };
-
-    return emphasizeCurrentModel(dataToLongTermAverageGraph(data, meta));
-  },
-
   render: function () {
     const statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
@@ -308,10 +180,6 @@ var DataController = createReactClass({
       this.state.dataTableTimeOfYear
     );
 
-    const graphProps = _.pick(this.props,
-      'model_id', 'variable_id', 'experiment', 'meta', 'area'  
-    );
-    
     return (
       <div>
         <h3>
@@ -325,27 +193,13 @@ var DataController = createReactClass({
 
             <Tabs>
               <Tab eventKey={1} title='Annual Cycle'>
-                <AnnualCycleGraph
-                  {...graphProps}
-                  getInstanceMetadata={this.getAnnualCycleInstanceMetadata}
-                  dataToGraphSpec={this.dataToAnnualCycleGraphSpec}
-                />
+                <SingleAnnualCycleGraph {...this.props}/>
               </Tab>
               <Tab eventKey={2} title='Long Term Averages'>
-                <LongTermAveragesGraph
-                  {...graphProps}
-                  getMetadata={this.getLongTermAveragesMetadata}
-                  dataToGraphSpec={this.longTermAveragesDataToGraphSpec}
-                />
+                <SingleLongTermAveragesGraph {...this.props}/>
               </Tab>
               <Tab eventKey={3} title='Model Context'>
-                <ContextGraph
-                  {..._.pick(this.props,
-                    'model_id', 'variable_id', 'experiment',
-                    'contextMeta', 'area')}
-                  getMetadata={this.getContextMetadata}
-                  dataToGraphSpec={this.contextDataToGraphSpec}
-                />
+                <SingleContextGraph {...this.props}/>
               </Tab>
             </Tabs>
 
@@ -353,11 +207,7 @@ var DataController = createReactClass({
 
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
-                <TimeSeriesGraph
-                  {...graphProps}
-                  getMetadata={this.getTimeseriesMetadata}
-                  dataToGraphSpec={this.timeseriesDataToGraphSpec}
-                />
+                <SingleTimeSeriesGraph {...this.props}/>
               </Tab>
             </Tabs>
 
