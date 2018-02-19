@@ -35,27 +35,13 @@ import { Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
 
-import { parseBootstrapTableData,
-         timeKeyToResolutionIndex,
-         resolutionIndexToTimeKey} from '../../core/util';
-import{ timeseriesToAnnualCycleGraph,
-        dataToLongTermAverageGraph,
-        timeseriesToTimeseriesGraph,
-        assignColoursByGroup,
-        fadeSeriesByRank} from '../../core/chart';
 import DataControllerMixin from '../DataControllerMixin';
-import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
-import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
-import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 
 import styles from './DualDataController.css';
-import {
-  findMatchingMetadata,
-  multiYearMeanSelected,
-} from '../graphs/graph-helpers';
-import DualAnnualCycleGraph from "../graphs/DualAnnualCycleGraph";
-import DualLongTermAveragesGraph from "../graphs/DualLongTermAveragesGraph";
-import DualTimeSeriesGraph from "../graphs/DualTimeSeriesGraph";
+import { multiYearMeanSelected } from '../graphs/graph-helpers';
+import DualAnnualCycleGraph from '../graphs/DualAnnualCycleGraph';
+import DualLongTermAveragesGraph from '../graphs/DualLongTermAveragesGraph';
+import DualTimeSeriesGraph from '../graphs/DualTimeSeriesGraph';
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -80,23 +66,7 @@ var DualDataController = createReactClass({
   },
 
   // TODO: Remove when DataControllerMixin is removed
-  /*
-   * Called when Dual Data Controller is loaded. Loads initial data to
-   * display in the Long Term Average graph, Timeseries graph, or the
-   * Annual Cycle graph. Defaults to monthly resolution and January time index.
-   *
-   * If both datasets are multi year means, the annual cycle graph and
-   * long-term average graph will be displayed. If neither dataset is
-   * a multi year mean, the timeseries graph will be displayed instead.
-   *
-   * There's no default for start date, end date, or ensemble member
-   * because there's no guarentee specific ones appear in any given
-   * data ensemble. These parameters just set to whatever the value are
-   * in the first qualifying dataset.
-   */
-  getData: function (props) {
-    // Legacy: NOOP
-  },
+  getData: function (props) {/* Legacy: NOOP*/},
 
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
@@ -107,23 +77,6 @@ var DualDataController = createReactClass({
     return !(
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
-  },
-
-  // TODO: Remove when no longer used
-  /*
-   * This function creates an object that is similar to the props DualDataController
-   * receives from its parent, except that the "variable_id" and "meta" attributes
-   * describe the secondary variable (comparand) instead of the primary variable.
-   *
-   * It is passed to mixin functions that normally work with metadata about the
-   * primary variable stored from a DataController props object. It allows these methods
-   * to operate on DualController's secondary variable as well.
-   */
-  mockUpComparandProps: function (props = this.props) {
-    var mockup = _.omit(props, "meta", "comparandMeta", "variable_id", "comparand_id");
-    mockup.meta = props.comparandMeta;
-    mockup.variable_id = props.comparand_id;
-    return mockup;
   },
 
   render: function () {

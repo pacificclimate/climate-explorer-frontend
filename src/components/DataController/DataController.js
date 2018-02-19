@@ -39,25 +39,10 @@ import styles from './DataController.css';
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
          resolutionIndexToTimeKey} from '../../core/util';
-import {timeseriesToAnnualCycleGraph,
-        dataToLongTermAverageGraph,
-        timeseriesToTimeseriesGraph,
-        assignColoursByGroup,
-        fadeSeriesByRank,
-        hideSeriesInLegend,
-        sortSeriesByRank} from '../../core/chart';
 import DataTable from '../DataTable/DataTable';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../DataControllerMixin';
-import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
-import LongTermAveragesGraph from '../graphs/LongTermAveragesGraph';
-import ContextGraph from '../graphs/ContextGraph';
-import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
-import {
-  displayError,
-  findMatchingMetadata,
-  multiYearMeanSelected,
-} from '../graphs/graph-helpers';
+import { displayError, multiYearMeanSelected } from '../graphs/graph-helpers';
 import SingleAnnualCycleGraph from '../graphs/SingleAnnualCycleGraph';
 import SingleLongTermAveragesGraph from '../graphs/SingleLongTermAveragesGraph';
 import SingleContextGraph from '../graphs/SingleContextGraph';
