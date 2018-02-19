@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DataGraph from '../../DataGraph/DataGraph';
+import DataGraph from '../DataGraph/DataGraph';
 import {
   displayError,
   noDataMessageGraphSpec,

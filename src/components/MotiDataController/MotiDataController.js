@@ -30,7 +30,7 @@ import createReactClass from 'create-react-class';
 import { Button, ControlLabel } from 'react-bootstrap';
 
 import { parseBootstrapTableData } from '../../core/util';
-import DataGraph from '../DataGraph/DataGraph';
+import DataGraph from '../graphs/DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,

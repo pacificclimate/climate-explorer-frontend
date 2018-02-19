@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 
 import DatasetSelector from '../../DatasetSelector/DatasetSelector';
-import DataGraph from '../../DataGraph/DataGraph';
+import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
 import { getTimeseries } from '../../../data-services/ce-backend';

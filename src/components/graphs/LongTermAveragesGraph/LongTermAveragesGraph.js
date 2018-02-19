@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 
 import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
-import DataGraph from '../../DataGraph/DataGraph';
+import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 
 import {
