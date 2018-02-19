@@ -40,9 +40,6 @@ var ModalMixin = {
 
   componentWillReceiveProps: function (nextProps) {
     if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
-      this.setState({
-        timeseriesDatasetId: nextProps.meta[0].unique_id,
-      });
       this.getData(nextProps);
     }
     else { //Didn't receive any valid data.
@@ -52,10 +49,7 @@ var ModalMixin = {
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
-      var viewerMessageDisplays = [this.setStatsTableNoDataMessage,
-                                   this.setLongTermAverageGraphNoDataMessage,
-                                   this.setAnnualCycleGraphNoDataMessage,
-                                   this.setTimeseriesGraphNoDataMessage];
+      var viewerMessageDisplays = [this.setStatsTableNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
@@ -69,29 +63,6 @@ var ModalMixin = {
         {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
   },
 
-  exportAnnualCycle: function(format) {
-   //Determine period and run to export. Location varies depending on the portal and whether
-   //it displays a single datafile or multiple datafiles at once. 
-   //Period and run parameters describing a set of multiple displayed datafiles files are 
-   //stored as this.state.timeseriesInstance. 
-   //If the portal has only one active dataset at a time, run and period are 
-   //extracted from that dataset's metadata.
-   var instance;
-   if(this.state.annualCycleInstance) {
-     instance = this.state.annualCycleInstance;
-   }
-   else {
-     instance = _.pick(this.getMetadata(this.state.timeseriesDatasetId),
-         "start_date", "end_date", "ensemble_member");
-   }
-   exportDataToWorksheet("timeseries", this.props, this.state.annualCycleData, format, instance);
-  },
-
-  exportLongTermAverage: function(format) {
-    exportDataToWorksheet("climoseries", this.props, this.state.longTermAverageData, format, 
-        {timeidx: this.state.longTermAverageTimeOfYear, timeres:this.state.longTermAverageTimeScale});
-  },
-
   injectRunIntoStats: function (data) {
     // Injects model run information into object returned by stats call
     _.map(data, function (val, key) {
@@ -101,24 +72,6 @@ var ModalMixin = {
       _.extend(val, { run: selected[0].ensemble_member });
     }.bind(this));
     return data;
-  },
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-  //Fetches and validates data from a call to the backend's
-  //"data" API endpoint
-  getDataPromise: function (props, timeres, timeidx) {
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'data'),
-      params: {
-        ensemble_name: props.ensemble_name,
-        model: props.model_id,
-        variable: props.variable_id,
-        emission: props.experiment,
-        timescale: timeres,
-        area: props.area || "",
-        time: timeidx,
-      }
-    }).then(validateLongTermAverageData);
   },
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
@@ -138,82 +91,11 @@ var ModalMixin = {
     }).then(validateStatsData);
   },
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-  //Fetches and validates data from a call to the backend's
-  //"timeseries" endpoint
-  getTimeseriesPromise: function (props, timeseriesDatasetId) {
-    var validate = this.multiYearMeanSelected(props) ? validateAnnualCycleData : validateUnstructuredTimeseriesData;
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
-      params: {
-        id_: timeseriesDatasetId || null,
-        variable: props.variable_id,
-        area: props.area || "",
-      }
-    }).then(validate);
-  },
-
-    /*
-     * this function is called to display any error generated in the 
-     * process of showing a graph or table, so it handles networking
-     * errors thrown by axios calls and errors thrown by validators 
-     * and parsers, which have different formats.
-     */
-    displayError: function(error, displayMethod) {
-      if(error.response) { // axios error: data server sent a non-200 response
-        displayMethod("Error: " + error.response.status + " received from data server.");
-      }else if(error.request) { // axios error: data server didn't respond
-        displayMethod("Error: no response received from data server.");
-      }else {  
-        // either an error thrown by a data validation function,
-        // an error thrown by the DataGraph or DataTable parsers,
-        // or the generic and somewhat unhelpful "Network Error" from axios
-        // Testing turned up "Network Error" in two cases:
-        // the server is down, or the server has a 500 error.
-        // Other http error statuses tested were reflected in
-        // error.response.status as expected
-        // (see https://github.com/mzabriskie/axios/issues/383)
-        displayMethod(error.message);
-      }
-    },
-    
-    /*
-     * Given a dataset's metadata and a "difference" listing of attribute values pairs, 
-     * returns metadata for another dataset that:
-     * - matches all attribute/value pairs in the "difference object"
-     * - matches the original dataset for any attributes not in "difference"
-     * (Unique_id is ignored for purposes of matching datasets.)
-     * 
-     * Example: findMatchingMetadata(monthlyDataset, {timescale: "annual"}) 
-     * would return the annual-resolution dataset that corresponds to a monthly one.
-     * Returns only one dataset's metadata even if multiple qualify.
-     */
-    findMatchingMetadata: function(example, difference, meta = this.props.meta) {
-      var template = {};
-      for(var att in example) {
-        if(att != "unique_id" && att != "variable_name") {
-          template[att] = difference[att] ? difference[att] : example[att];
-        }
-      }
-      return _.findWhere(meta, template);
-    },
-    
     //Returns the metadata object that corresponds to a unique_id
     getMetadata: function (id, meta = this.props.meta) {
       return _.find(meta, function(m) {return m.unique_id === id;} );
     },
     
-    //Indicates whether or not the currently selected dataset is
-    //a multi-year-mean
-    multiYearMeanSelected: function(props = this.props) {
-      if(_.isUndefined(props) || props.meta.length == 0) {
-        return undefined;
-      }
-      var params = _.pick(props, "model_id", 'variable_id', 'experiment');
-      var selectedMetadata = _.findWhere(props.meta, params);
-      return selectedMetadata.multi_year_mean;
-    },
-
     /*
      * Filters data from any call to the API that returns an object with 
      * individual values keyed to unique_ids. It returns a new object 
@@ -238,14 +120,6 @@ var ModalMixin = {
         }
       }
       return filtered;
-    },
-
-    //Used to render uninitialized C3 graphs.
-    blankGraph: {
-      data: {
-        columns: []
-      },
-      axis: {}
     },
 
     //Used to render uninitialized stats tables
