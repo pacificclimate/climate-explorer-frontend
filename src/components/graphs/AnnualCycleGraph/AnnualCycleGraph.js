@@ -23,7 +23,7 @@ import {
 
 // This component renders a complete annual cycle graph, including a selector
 // for the instance (dataset) to display and export-data buttons.
-// The component is generalized by two function props, `getInstanceMetadata`
+// The component is generalized by two function props, `getMetadata`
 // and `dataToGraphSpec`, which respectively return metadata describing the
 // the datasets to display, and return a graph spec for the graph proper.
 export default class AnnualCycleGraph extends React.Component {
@@ -38,15 +38,15 @@ export default class AnnualCycleGraph extends React.Component {
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
     area: PropTypes.string,
-    getInstanceMetadata: PropTypes.func,
-    // `getInstanceMetadata` returns the metadata describing the datasets to
+    getMetadata: PropTypes.func,
+    // `getMetadata` returns the metadata describing the datasets to
     // be displayed in this component.
-    // A different function is passed by different controllers to specialize
+    // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
     dataToGraphSpec: PropTypes.func,
     // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
     // to a graph spec.
-    // A different function is passed by different controllers to specialize
+    // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
   };
 
@@ -61,7 +61,6 @@ export default class AnnualCycleGraph extends React.Component {
     };
   }
 
-  // TODO: Remove explicit args
   firstMonthlyMetadata({ meta, model_id, variable_id, experiment }) {
     return _.findWhere(
       meta,
@@ -87,24 +86,20 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
 
-  loadGraph(props) {
+  loadGraph() {
     // Fetch monthly, seasonal, and yearly resolution annual cycle data,
     // then convert it to a graph spec and set state accordingly.
 
-    // TODO: When invoking only from componentDidMount and componentDidUpdate
-    // (as advised in documentation), `props` does not need to be an explicit
-    // argument; can use `this.props` throughout.
-
-    if (!shouldLoadData(props, this.displayNoDataMessage)) {
+    if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
       return;
     }
 
     const instanceMetadata =
-      this.props.getInstanceMetadata(this.state.instance)
+      this.props.getMetadata(this.state.instance)
         .filter(metadata => !!metadata);
     const timeseriesPromises =
       instanceMetadata.map(metadata =>
-        this.getAndValidateTimeseries(metadata, props.area)
+        this.getAndValidateTimeseries(metadata, this.props.area)
       );
 
     Promise.all(timeseriesPromises).then(data => {
@@ -137,7 +132,7 @@ export default class AnnualCycleGraph extends React.Component {
   // Lifecycle hooks
 
   componentDidMount() {
-    this.loadGraph(this.props);
+    this.loadGraph();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -146,7 +141,7 @@ export default class AnnualCycleGraph extends React.Component {
       prevProps.area !== this.props.area ||
       !_.isEqual(prevState.instance, this.state.instance)
     ) {
-      this.loadGraph(this.props);
+      this.loadGraph();
     }
   }
 

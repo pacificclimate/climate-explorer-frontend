@@ -118,7 +118,7 @@ export default function DualAnnualCycleGraph(props) {
   return (
     <AnnualCycleGraph
       {...graphProps}
-      getInstanceMetadata={getMetadata}
+      getMetadata={getMetadata}
       dataToGraphSpec={dataToGraphSpec}
     />
   );

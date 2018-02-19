@@ -65,7 +65,7 @@ export default function SingleAnnualCycleGraph(props) {
   return (
     <AnnualCycleGraph
       {...graphProps}
-      getInstanceMetadata={getMetadata}
+      getMetadata={getMetadata}
       dataToGraphSpec={dataToGraphSpec}
     />
   );
