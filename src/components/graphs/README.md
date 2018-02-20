@@ -37,6 +37,75 @@ shortly to be extended).
 as needed, and provides services previously incorporated into the graphs
 in the data controllers via `DataControllerMixin`.
 
+# Creating new graph components
+
+## Graph component pattern
+
+Currently, all graph components follow a common pattern, as follows:
+
+- props:
+    - `model_id`, `variable_id`, `experiment`: Characterize the context;
+    specifically, characterize what `meta` contains.
+    - `meta`: Array of metadata, collectively describing all available datasets 
+    matching the specified context of model, variable, experiment.
+    - `getMetadata` Function returning an array of promises for metadata 
+    (not necessarily the same kind as elements of `meta`) describing the 
+    specific datasets to display in this graph. This function may take an 
+    argument that controls what metadata is returned. 
+    This function is a 
+    prop so that different functions can be used to specialize the graph
+    component to different uses, typically to single or dual graphs.
+    - `dataToGraphSpec`: Function mapping arrays of metadata and of data
+    (corresponding element by element) to a graph specification consumable
+    by `DataGraph`.
+    This function is a 
+    prop so that different functions can be used to specialize the graph
+    component to different uses, typically to single or dual graphs.
+    
+- state:
+    - `graphSpec`: Specification of the current graph displayed, consumed
+    by `DataGraph`.
+    - `selection`: (optional, name varies) Present if the graph includes a 
+    data sub-selector component to control what values are displayed on graph.
+    Value passed to `getMetadata`.
+    
+- render:
+    - (optional) A data sub-selector component to control what values are 
+    displayed on the graph. This should be a controlled component whose 
+    `onChange` callback updates `state.selection`. 
+    - (optional) Data export buttons whose `onClick` callbacks cause the data 
+    in the graph to be exported in XLSX or CSV format.
+    - `<DataGraph {...this.state.graphSpec}/>`: The graph.
+    
+- lifecycle:
+    - Use of lifecycle hooks should follow standard recommendations, 
+    specifically for when to launch asynchronous data fetches, as follows:
+    - `componentDidMount`: `load()`
+    - `componentDidUpdate`: if relevant props or state change, `load()`
+    
+- data loading (`load()`):
+    - Get metadata for data to display: `metadatas = getMetadata(state.selection)`
+    - Map `metadatas` to array of promises `dataPromises` for data fetches
+    - When all data promises resolve, `Promise.all(dataPromises)`,
+    convert metadata and data fetched to graph spec: 
+    `dataToGraphSpec(metadatas, data)` and update `state.graphSpec`.
+    
+For examples, see the components `AnnualCycleGraph`, `ContextGraph`, 
+`LongTermAveragesGraph`, `TimeSeriesGraph`.
+
+## Important notes
+
+1. Component state should be limited to graph specification and (optionally)
+data (sub-)selection.
+1. Data (sub-)selector should be a controlled component, meaning that:
+    - it is stateless
+    - it is controlled by a value prop
+    - it communicates changes via an `onChange` callback
+    - the selection state is stored in the parent graph component
+1. Asynch data fetching should be done only in lifecycle hooks 
+`componentDidMount` and `componentDidUpdate`, as recommeded by 
+React documentation.
+
 # Testing issues
 
 `DataGraph` appears to pose some difficulties in testing.
