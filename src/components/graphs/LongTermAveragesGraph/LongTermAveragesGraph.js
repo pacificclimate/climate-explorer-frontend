@@ -21,10 +21,13 @@ import {
 import { getData } from '../../../data-services/ce-backend';
 import { exportDataToWorksheet } from '../../../core/export';
 
-// This component renders a graph, over actual time points (as opposed to the
-// "average year" time points of an annual cycle graph), of spatially averaged
-// values of long-term average data for the selected model, variable, and
-// experiment.
+// This component renders a complete long-term average graph, including a
+// selector for the averaged period of interest (e.g., January, Fall, Year).
+// A long-term average graph presents spatially averaged values of
+// climatological average data for the selected model, variable,
+// experiment, and the locally-selected period of interest,
+// for each available climatological averaging period (forming the time
+// axis, which typically extends from 1950 to 2100).
 //
 // The component is generalized by two function props, `getMetadata`
 // and `dataToGraphSpec`, which respectively return metadata describing the

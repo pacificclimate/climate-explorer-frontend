@@ -21,7 +21,7 @@ import {
   shouldLoadData,
 } from '../graph-helpers';
 
-// This component renders a complete annual cycle graph, including a selector
+// This component renders an annual cycle graph, including a selector
 // for the instance (dataset) to display and export-data buttons. An annual
 // cycle graph presents spatially averaged values of a multi-year mean dataset
 // as points over a nominal year (representing the "average" year).
