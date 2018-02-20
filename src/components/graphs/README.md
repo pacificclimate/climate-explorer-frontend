@@ -48,7 +48,7 @@ Currently, all graph components follow a common pattern, as follows:
     specifically, characterize what `meta` contains.
     - `meta`: Array of metadata, collectively describing all available datasets 
     matching the specified context of model, variable, experiment.
-    - `getMetadata` Function returning an array of promises for metadata 
+    - `getMetadata` Function returning an array of metadata 
     (not necessarily the same kind as elements of `meta`) describing the 
     specific datasets to display in this graph. This function may take an 
     argument that controls what metadata is returned. 
@@ -71,8 +71,9 @@ Currently, all graph components follow a common pattern, as follows:
     
 - render:
     - (optional) A data sub-selector component to control what values are 
-    displayed on the graph. This should be a controlled component whose 
-    `onChange` callback updates `state.selection`. 
+    displayed on the graph. This should be a 
+    [controlled component](https://reactjs.org/docs/forms.html#controlled-components) 
+    whose `onChange` callback updates `state.selection`. 
     - (optional) Data export buttons whose `onClick` callbacks cause the data 
     in the graph to be exported in XLSX or CSV format.
     - `<DataGraph {...this.state.graphSpec}/>`: The graph.
@@ -97,9 +98,11 @@ For examples, see the components `AnnualCycleGraph`, `ContextGraph`,
 
 1. Component state should be limited to graph specification and (optionally)
 data (sub-)selection.
-1. Data (sub-)selector should be a controlled component, meaning that:
+1. Data (sub-)selector should be a     
+[controlled component](https://reactjs.org/docs/forms.html#controlled-components) , 
+meaning that:
     - it is stateless
-    - it is controlled by a value prop
+    - it is controlled by a `value` prop
     - it communicates changes via an `onChange` callback
     - the selection state is stored in the parent graph component
 1. Asynch data fetching should be done only in lifecycle hooks 
