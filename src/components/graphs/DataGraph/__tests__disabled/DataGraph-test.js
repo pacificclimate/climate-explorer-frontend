@@ -39,7 +39,7 @@ describe('DataGraph', function () {
   });
 
   it('accepts data', function () {
-    var parseDataForC3 = require('../../../core/util').parseDataForC3;
+    var parseDataForC3 = require('../../../../core/util').parseDataForC3;
 
     var data = parseDataForC3(timeseriesTestData);
 

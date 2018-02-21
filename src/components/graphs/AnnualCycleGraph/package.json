@@ -1,0 +1,6 @@
+{
+  "name": "AnnualCycleGraph",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AnnualCycleGraph.js"
+}

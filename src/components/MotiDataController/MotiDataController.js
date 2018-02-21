@@ -30,13 +30,15 @@ import createReactClass from 'create-react-class';
 import { Button, ControlLabel } from 'react-bootstrap';
 
 import { parseBootstrapTableData } from '../../core/util';
-import DataGraph from '../DataGraph/DataGraph';
+import DataGraph from '../graphs/DataGraph/DataGraph';
 import DataTable from '../DataTable/DataTable';
 import DataControllerMixin from '../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,
         timeseriesToTimeseriesGraph} from '../../core/chart';
 import _ from 'underscore';
 
+import AnnualCycleGraph from '../graphs/AnnualCycleGraph';
+import TimeSeriesGraph from '../graphs/TimeSeriesGraph';
 import styles from './MotiDataController.css';
 
 var MotiDataController = createReactClass({
@@ -157,33 +159,26 @@ var MotiDataController = createReactClass({
   render: function () {
     var statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
-    var graph;
-    if(this.multiYearMeanSelected(this.props)) {
-      var annualCycleData = this.state.annualCycleData ? this.state.annualCycleData : this.blankGraph;
-      graph = (
-          <div>
-            <div>
-              <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-              <Button onClick={this.exportAnnualCycle.bind(this, 'xlsx')}>XLSX</Button>
-              <Button onClick={this.exportAnnualCycle.bind(this, 'csv')}>CSV</Button>
-            </div>
-            <DataGraph data={annualCycleData.data} axis={annualCycleData.axis} tooltip={annualCycleData.tooltip} />
-          </div>
-          );
-    }
-    else {
-      var timeseriesData = this.state.timeseriesData ? this.state.timeseriesData : this.blankGraph;
-      graph = (
-          <div>
-            <DataGraph data={timeseriesData.data} axis={timeseriesData.axis} tooltip={timeseriesData.tooltip} subchart={timeseriesData.subchart} />
-            <ControlLabel className={styles.graphlabel}>Highlight a time span on lower graph to see more detail</ControlLabel>
-          </div>);
-    }
-
     return (
       <div>
         <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
-        {graph}
+        {
+          this.multiYearMeanSelected() ? (
+            <AnnualCycleGraph
+              meta={this.props.meta}
+              dataset={this.state.annualCycleInstance}
+              onChangeDataset={this.updateAnnualCycleDataset}
+              graphSpec={this.state.annualCycleData || this.blankGraph}
+              onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
+              onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+            />
+          ) : (
+            <TimeSeriesGraph
+              graphSpec={this.state.timeseriesData || this.blankGraph}
+            />
+          )
+        }
+
         <DataTable data={statsData} options={this.state.statsTableOptions} />
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
