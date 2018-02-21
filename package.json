@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prestart": "if [ ! -f ./variable-options.yaml ]; then touch ./variable-options.yaml; fi",
-    "start": "webpack-dev-server --host 0.0.0.0 --history-api-fallback",
+    "start": "CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback",
     "build": "webpack --progress --colors",
     "test": "jest --verbose --runInBand",
     "lint": "eslint .",
@@ -29,7 +29,8 @@
       "CE_BACKEND_URL": "http://tools.pacificclimate.org/climate-data",
       "TILECACHE_URL": "http://tiles.pacificclimate.org/tilecache/tilecache.py",
       "NCWMS_URL": "http://tools.pacificclimate.org/ncWMS-PCIC/wms",
-      "CE_ENSEMBLE_NAME": "ce"
+      "CE_ENSEMBLE_NAME": "ce",
+      "CE_CURRENT_VERSION": "Climate Explorer test version"
     },
     "unmockedModulePathPatterns": [
       "fbjs",
