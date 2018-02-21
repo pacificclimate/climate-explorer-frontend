@@ -11,8 +11,10 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 
 export default function DualAnnualCycleGraph(props) {
   function getMetadata(instance) {
+    console.log("starting getMetadata");
+
     // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
+    // and instance (start_date, end_date, ensemble_member) for monthly, seasonal
     // and annual timescales.
     // Do the the same for comparand_id and comparandMeta.
 
@@ -22,49 +24,43 @@ export default function DualAnnualCycleGraph(props) {
       comparand_id, comparandMeta,
     } = props;
 
+    var findMetadataForInstance = function (variable, timeres, metadataList) {
+      return _.findWhere(metadataList, {
+        model_id, experiment,
+        ...instance,
+        timescale: timeres,
+        variable_id: variable
+        });
+    }
+  
     // Set up metadata sets for variable
-    const monthlyVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-      ...instance,
-      timescale: 'monthly',
-    });
-    const seasonalVariablelMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    );
-    const yearlyVariableMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    );
+    const monthlyVariableMetadata = findMetadataForInstance(variable_id, 'monthly', meta);
+    const seasonalVariableMetadata = findMetadataForInstance(variable_id, 'seasonal', meta);
+    const yearlyVariableMetadata = findMetadataForInstance(variable_id, 'yearly', meta);
 
-    let metadataSets = [
+    let metadataSets =[
       monthlyVariableMetadata,
-      seasonalVariablelMetadata,
+      seasonalVariableMetadata,
       yearlyVariableMetadata,
     ];
 
-    // Extend metadata sets with comparand, if present and different from variable
-    const monthlyComparandMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { variable_id: comparand_id }, comparandMeta
-    );
-
-    if (
-      monthlyVariableMetadata && monthlyComparandMetadata &&
-      monthlyComparandMetadata.unique_id !== monthlyVariableMetadata.unique_id
-    ) {
-      const seasonalComparandlMetadata = findMatchingMetadata(
-        monthlyComparandMetadata, { timescale: 'seasonal' }, comparandMeta
-      );
-      const yearlyComparandMetadata = findMatchingMetadata(
-        monthlyComparandMetadata, { timescale: 'yearly' }, comparandMeta
-      );
-
-      metadataSets = metadataSets.concat([
-        monthlyComparandMetadata,
-        seasonalComparandlMetadata,
-        yearlyComparandMetadata,
-      ]);
-    }
-
-    return metadataSets;
+    // Extend metadata sets with comparand, if different from variable
+    // Include only comparand time resolutions present for the variable.
+    if(variable_id !== comparand_id) {
+      if(monthlyVariableMetadata) {
+        metadataSets = metadataSets.concat(
+            findMetadataForInstance(comparand_id, 'monthly', comparandMeta));
+      }
+      if(seasonalVariableMetadata) {
+       metadataSets = metadataSets.concat(
+           findMetadataForInstance(comparand_id, 'seasonal', comparandMeta));
+      }
+      if(yearlyVariableMetadata) {
+        metadataSets = metadataSets.concat(
+            findMetadataForInstance(comparand_id, 'yearly', comparandMeta));
+      }
+    }    
+    return _.compact(metadataSets);
   }
 
   function dataToGraphSpec(meta, data) {
@@ -78,9 +74,9 @@ export default function DualAnnualCycleGraph(props) {
     // graph line colors.
     const sortByVariable = dataSeries => {
       const seriesName = dataSeries[0].toLowerCase();
-      if (seriesName.search(props.variable_id) !== -1) {
+      if (seriesName.search(props.variable_id.toLowerCase()) !== -1) {
         return 0;
-      } else if (seriesName.search(props.comparand_id) !== -1) {
+      } else if (seriesName.search(props.comparand_id.toLowerCase()) !== -1) {
         return 1;
       } else {
         // if only one variable is selected, it won't be in any series names.

@@ -17,23 +17,24 @@ export default function SingleAnnualCycleGraph(props) {
       model_id, experiment,
       variable_id, meta,
     } = props;
+    
+    var findMetadataForResolution = function (resolution) {
+      return _.findWhere(meta, {
+        model_id, experiment, variable_id,
+        ...instance,
+        timescale: resolution,
+        });
+    }
 
-    const monthlyVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-      ...instance,
-      timescale: 'monthly',
-    });
-    const seasonalVariablelMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    );
-    const yearlyVariableMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    );
-    const metadataSets = [
+    const monthlyVariableMetadata = findMetadataForResolution('monthly');
+    const seasonalVariableMetadata = findMetadataForResolution('seasonal');
+    const yearlyVariableMetadata = findMetadataForResolution('yearly');
+    
+    const metadataSets = _.compact([
       monthlyVariableMetadata,
-      seasonalVariablelMetadata,
+      seasonalVariableMetadata,
       yearlyVariableMetadata,
-    ];
+    ]);
     return metadataSets;
   }
 

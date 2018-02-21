@@ -34,7 +34,7 @@ export default class AnnualCycleGraph extends React.Component {
   // TODO: model_id, variable_id, and experiment are used only to set the
   // initial instance. Could instead make `initialInstance` a prop, which
   // the client computes according to their own recipe. Not sure whether
-  // this is a gain or not, since the same computation (`firstMonthlyMetadata`)
+  // this is a gain or not, since the same computation (`initialInstance`)
   // would be done in each client.
   static propTypes = {
     meta: PropTypes.array,
@@ -58,17 +58,22 @@ export default class AnnualCycleGraph extends React.Component {
     super(props);
 
     const { start_date, end_date, ensemble_member } =
-      this.firstMonthlyMetadata(this.props);
+      this.initialInstance(this.props);
     this.state = {
       instance: { start_date, end_date, ensemble_member },
       graphSpec: blankGraphSpec,
     };
   }
 
-  firstMonthlyMetadata({ meta, model_id, variable_id, experiment }) {
-    return _.findWhere(
-      meta,
-      { model_id, variable_id, experiment, timescale: 'monthly' }
+  initialInstance({ meta, model_id, variable_id, experiment }) {
+    //selects a starting instance, preferring the highest-resolution data available.
+    return (
+      _.findWhere(meta,
+          { model_id, variable_id, experiment, timescale: 'monthly' }) ||
+      _.findWhere(meta,
+          { model_id, variable_id, experiment, timescale: 'seasonal' }) ||
+      _.findWhere(meta,
+          { model_id, variable_id, experiment, timescale: 'yearly' })
     );
   }
 
