@@ -59,6 +59,14 @@ var AppMixin = {
             var start = timestampToYear(response.data[key].start_date);
             var end = timestampToYear(response.data[key].end_date);
 
+            // Stopgap measure to deal with the fact that experiment string formats
+            // vary between climdex files ("historical, rcp26") and GCM outputs
+            // ("historical,rcp26"). Formats experiment strings to include a space.
+            // This formatting is undone to run queries against the database by
+            // ce-backend.guessExperimentFormatFromVariable()
+            // TODO: remove this when no longer needed.
+            var normalizedExp = String(response.data[key].experiment).replace(',r', ', r');
+
             //If this app has a dataset filter defined, filter the data
             if(typeof this.datasetFilter == "undefined" ||
                 this.datasetFilter(response.data[key])) {
@@ -67,8 +75,10 @@ var AppMixin = {
                 variable_id: vars[v],
                 start_date: start,
                 end_date: end,
+                experiment: normalizedExp,
                 variable_name: response.data[key].variables[vars[v]],
-                }, _.omit(response.data[key], 'variables', 'start_date', 'end_date', 'modtime')));
+                }, _.omit(response.data[key], 'variables', 'start_date', 'end_date',
+                    'modtime', 'experiment')));
             }
           }
         }
