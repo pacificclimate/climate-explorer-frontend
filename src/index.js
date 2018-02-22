@@ -6,6 +6,7 @@ import { Router, Route, hashHistory } from 'react-router';
 import MotiController from './components/MotiController';
 import AppController from './components/AppController';
 import DualController from './components/DualController';
+import PrecipitationController from './components/PrecipitationController';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -38,6 +39,7 @@ render((
       <Route path='/moti' component={MotiController} />
       <Route path='/climo/:ensemble_name' component={AppController} />
       <Route path='/compare/:ensemble_name' component={DualController} />
+      <Route path='/precipitation/:ensemble_name' component={PrecipitationController} />
     </Route>
   </Router>
 ), document.getElementById('wrapper'));
