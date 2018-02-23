@@ -38,6 +38,7 @@ class DataMap extends React.Component {
   static propTypes = {
     raster: layerPropTypes,
     isoline: layerPropTypes,
+    annotated: layerPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -48,6 +49,7 @@ class DataMap extends React.Component {
     this.state = {
       rasterLayer: null,
       isolineLayer: null,
+      annotatedLayer: null,
     };
   }
 
@@ -113,6 +115,7 @@ class DataMap extends React.Component {
 
   handleRasterLayerRef = this.handleLayerRef.bind(this, 'raster');
   handleIsolineLayerRef = this.handleLayerRef.bind(this, 'isoline');
+  handleAnnotatedLayerRef = this.handleLayerRef.bind(this, 'annotated');
 
   // Handlers for area selection. Converts area to GeoJSON.
 
@@ -151,6 +154,12 @@ class DataMap extends React.Component {
           layerType='isoline'
           {...this.props.isoline}
           onLayerRef={this.handleIsolineLayerRef}
+        />
+
+        <DataLayer
+          layerType='annotated'
+          {...this.props.annotated}
+          onLayerRef={this.handleAnnotatedLayerRef}
         />
 
         <NcWMSColorbarControl

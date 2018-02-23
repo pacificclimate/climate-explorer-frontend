@@ -23,7 +23,7 @@ import DualDataController from '../DualDataController/DualDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
 import g from '../../core/geo';
-import MapController from '../MapController';
+import PrecipMapController from '../MapController/PrecipMapController';
 import _ from 'underscore';
 
 var App = createReactClass({
@@ -49,7 +49,7 @@ var App = createReactClass({
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  render: function () {    
+  render: function () {
 
     //hierarchical data selection: model, then experiment, then variable
     var modOptions = this.getMetadataItems('model_id');
@@ -75,7 +75,7 @@ var App = createReactClass({
         <Row>
           <Col lg={6}>
             <div style={{ width: 890, height: 700 }}>
-              <MapController
+              <PrecipMapController
                 meta = {this.getfilteredMeta()}
                 comparandMeta = {this.getfilteredMeta("pr")}
                 area={this.state.area}

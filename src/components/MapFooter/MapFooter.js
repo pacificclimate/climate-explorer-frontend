@@ -14,6 +14,7 @@ class MapFooter extends React.Component {
     run: PropTypes.string,
     raster: PropTypes.object,
     isoline: PropTypes.object,
+    annotated: PropTypes.object,
     hasValidComparand: PropTypes.bool,
   };
   
@@ -38,7 +39,7 @@ class MapFooter extends React.Component {
           {' '}
           {
             this.props.hasValidComparand &&
-            `vs. ${this.timeAndVariable(this.props.isoline)}`
+            `vs. ${this.timeAndVariable(this.props.isoline || this.props.annotated)}`
           }
         </h5>
     );

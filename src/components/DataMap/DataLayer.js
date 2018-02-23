@@ -2,14 +2,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { WMSTileLayer } from 'react-leaflet';
-import { getIsolineWMSParams, getRasterWMSParams } from '../../data-services/ncwms';
+import { getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams } from '../../data-services/ncwms';
 import _ from "underscore";
 
 
 export default class DataLayer extends React.Component {
   static propTypes = {
     // Layer props
-    layerType: PropTypes.string.isRequired, // 'raster' | 'isoline'
+    layerType: PropTypes.string.isRequired, // 'raster' | 'isoline' | 'annotated'
     dataset: PropTypes.string,
     variableId: PropTypes.string,
     wmsTime: PropTypes.string,
@@ -37,6 +37,7 @@ export default class DataLayer extends React.Component {
     const wmsParams = {
       raster: getRasterWMSParams,
       isoline: getIsolineWMSParams,
+      annotated: getAnnotatedWMSParams
     }[layerType](layerParams);
 
     if (layerParams.dataset) {

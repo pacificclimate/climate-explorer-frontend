@@ -56,14 +56,25 @@ function getIsolineWMSParams({ dataset, variableId, wmsTime, palette, logscale, 
   );
 }
 
+function getAnnotatedWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
+  return Object.assign(
+    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
+    {
+      styles: `contours`,
+      opacity: 1.0,
+    }
+  );
+}
+
 function getWMSParams(layerType, props) {
   // Return parameters required for a call to the ncWMS tile layer API.
-  console.log('getWMSParams', layerType, props);
   // TODO: simplify
   if (layerType === 'raster') {
     return getRasterWMSParams(props);
   } else if (layerType === 'isoline') {
     return getIsolineWMSParams(props);
+  } else if (layerType === 'annotated') {
+    return getAnnotatedWMSParams(props);
   }
 }
 
@@ -97,6 +108,6 @@ function getLayerMinMax(layer, props, bounds) {
 
 
 export {
-  getRasterWMSParams, getIsolineWMSParams, getWMSParams,
+  getRasterWMSParams, getIsolineWMSParams, getAnnotatedWMSParams, getWMSParams,
   getLayerMinMax
 };
