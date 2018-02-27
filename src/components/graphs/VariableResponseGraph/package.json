@@ -1,0 +1,6 @@
+{
+  "name": "VariableResponseGraph",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./VariableResponseGraph.js"
+}

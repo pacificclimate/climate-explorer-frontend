@@ -49,7 +49,8 @@ var App = createReactClass({
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  render: function () {
+  render: function () {    
+
     //hierarchical data selection: model, then experiment, then variable
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),

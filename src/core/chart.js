@@ -848,9 +848,110 @@ var sortSeriesByRank = function(graph, ranker) {
   return graph;
 }
 
+/*
+ * Post-processing graph function that accepts two keywords (x and y) and a graph
+ * containing one or more pairs of timeseries and combines pairs of matching time 
+ * series into a variable response graph.
+ * 
+ * Each data series should match exactly one other series. In order to match, two 
+ * data series must:
+ *   - have names that are identical except for the substitution of x for y
+ *   - have data at all the same timestamps
+ * 
+ * This function combines each pair of matching data series into a new data series. For
+ * each (time, data) tuple present in both original time series, it creates a new
+ * (data-x, data-y) tuple, using the series with the x keyword as the x coordinate
+ * and the series with the y keyword as the y coordinate.
+ * 
+ * Example:
+ * x: pr
+ * y: tasmax
+ * chart with data.columns:
+ * ["Monthly pr", 10, 20, 30, 40, 50 ]
+ * ["Monthly tasmax", 1, 2, 3, 4, 5 ]
+ * ["x", 1/1/15, 1/2/15, 1/3/15, 1/4/15, 1/5/15]
+ * 
+ * Would result in a new chart with data.columns:
+ * ["x", 10, 20, 30, 40, 50]
+ * ["pr", 1, 2, 3, 4, 5]
+ * 
+ * This is intended to graph the effect of one variable (x) on another (y).
+ */
+var makeVariableResponseGraph = function(x, y, graph) {
+  var seriesNameContains = function (series, keyword) {
+    return series[0].toLowerCase().search(keyword.toLowerCase()) != -1;
+  }
+  
+  let xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
+  let yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
+    
+  var tuples = [];
+  
+  for(let i = 0; i < xseries.length; i++) {
+    //Try to match each dependent variable series with an independent variable series
+    let dependent = xseries[i];
+    let independent = _.find(yseries, series => {
+      return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) == 
+        dependent[0].toLowerCase();
+      });
+    for(let d = 1; d < dependent.length; d++) {
+      if(!_.isNull(dependent[d]) && !_.isNull(independent[d])) {
+        tuples.push([independent[d], dependent[d]]);
+      }
+    }
+  }
+  //sort by x value, preperatory to putting on the graph.
+  tuples.sort((a, b) => a[0] - b[0]);  
+  var vrColumns = [["x"], [y]];
+
+
+  for(let i = 1; i < tuples.length; i++) {
+    vrColumns[0].push(tuples[i][0]);
+    vrColumns[1].push(tuples[i][1]);
+    //C3 doesn't really support scatterplots, but we can fake it by adding
+    //a missing data point between each actual data point, and instructing C3
+    //not to connect across missing data points with {connectNull: false} 
+    if(i < tuples.length - 1) {
+      vrColumns[0].push((tuples[i][0] + tuples[i+1][0])/2);
+      vrColumns[1].push(null);
+    }
+  }
+
+  //TODO: more flexible axis formatting.
+  return {
+    data: {
+      x: 'x',
+      columns: vrColumns
+    },
+    line: {
+      connectNull: false
+    },
+    axis: {
+      y: {
+        label: `${y} ${graph.axis.y.label.text}`
+      },
+      x: {
+        tick: {
+          count: 8,
+          fit: true,
+          format: fixedPrecision
+        },
+        label: `${x} ${graph.axis.y2.label.text}`
+      }
+    },
+    tooltip: {
+      show: false
+    },
+    legend: {
+      show: false
+    }
+  };
+}
+
+
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
-    hideSeriesInLegend, sortSeriesByRank,
+    hideSeriesInLegend, sortSeriesByRank, makeVariableResponseGraph,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,

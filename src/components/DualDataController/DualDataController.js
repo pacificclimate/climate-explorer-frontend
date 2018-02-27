@@ -42,6 +42,7 @@ import { multiYearMeanSelected } from '../graphs/graph-helpers';
 import DualAnnualCycleGraph from '../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../graphs/DualLongTermAveragesGraph';
 import DualTimeSeriesGraph from '../graphs/DualTimeSeriesGraph';
+import DualVariableResponseGraph from '../graphs/DualVariableResponseGraph';
 
 var DualDataController = createReactClass({
   displayName: 'DualDataController',
@@ -96,6 +97,9 @@ var DualDataController = createReactClass({
               <Tab eventKey={2} title='Long Term Averages'>
                 <DualLongTermAveragesGraph {...this.props}/>
               </Tab>
+              <Tab eventKey={3} title='Variable Response'>
+                <DualVariableResponseGraph {...this.props}/>
+              </Tab>
             </Tabs>
 
           ) : (
@@ -103,6 +107,9 @@ var DualDataController = createReactClass({
             <Tabs>
               <Tab eventKey={1} title='Time Series'>
                 <DualTimeSeriesGraph {...this.props}/>
+              </Tab>
+              <Tab eventKey={2} title='VariableResponse'>
+                <DualVariableResponseGraph {...this.props}/>
               </Tab>
             </Tabs>
 
