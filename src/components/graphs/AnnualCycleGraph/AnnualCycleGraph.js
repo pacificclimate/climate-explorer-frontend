@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
-import DatasetSelector from '../../DatasetSelector/DatasetSelector';
+import InstanceSelector from '../../InstanceSelector/InstanceSelector';
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
@@ -22,7 +22,7 @@ import {
 } from '../graph-helpers';
 
 // This component renders an annual cycle graph, including a selector
-// for the instance (dataset) to display and export-data buttons. An annual
+// for the instance to display and export-data buttons. An annual
 // cycle graph presents spatially averaged values of a multi-year mean dataset
 // as points over a nominal year (representing the "average" year).
 //
@@ -120,7 +120,7 @@ export default class AnnualCycleGraph extends React.Component {
     });
   }
 
-  // TODO: Refactor to eliminate encoding of instance (dataset).
+  // TODO: Refactor to eliminate encoding of instance
   handleChangeInstance = (instance) => {
     this.setState({ instance: JSON.parse(instance) });
   };
@@ -159,9 +159,9 @@ export default class AnnualCycleGraph extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <DatasetSelector
+            <InstanceSelector
               meta={this.props.meta}
-              // TODO: Refactor to eliminate encoding of dataset.
+              // TODO: Refactor to eliminate encoding of instance.
               value={JSON.stringify(this.state.instance)}
               onChange={this.handleChangeInstance}
             />

@@ -24,7 +24,7 @@ import DualDataController from '../DualDataController/DualDataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
 import g from '../../core/geo';
-import MapController from '../MapController';
+import DualMapController from '../MapController/DualMapController';
 import _ from 'underscore';
 
 var App = createReactClass({
@@ -94,7 +94,7 @@ var App = createReactClass({
         <Row>
           <Col lg={6}>
             <div style={{ width: 890, height: 700 }}>
-              <MapController
+              <DualMapController
                 meta = {this.getfilteredMeta()}
                 comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}
                 area={this.state.area}

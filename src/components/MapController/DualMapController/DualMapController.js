@@ -1,3 +1,22 @@
+/*************************************************************************
+ * DualMapController - displays two variables on the map at once
+ * 
+ * This controller coordinates a map displaying two layers at once:
+ *   * A raster layer with colour shading reflecting values
+ *   * A coloured isoline layer
+ * 
+ * The layers may display separate timestamps at once. The user may 
+ * configure map layer settings including colour pallete, period and run,
+ * whether colour to value mapping is logarithmic, and selected timestamp
+ * on a map settings menu.
+ * 
+ * Props: one or two arrays of metadata describing available files
+ * 
+ * Children:
+ *   * Datamap, which actually renders the map
+ *   * MapSettings, which allows user configuration of map layers
+ *************************************************************************/
+
 // Wires up components of overall map display for CE.
 // Also contains some legacy code that should be further refactored, primarily
 // `loadMap` and the handling of datasets (see TODOs/FIXMEs).
@@ -8,23 +27,23 @@ import Loader from 'react-loader';
 
 import _ from 'underscore';
 
-import './MapController.css';
-import DataMap from '../DataMap';
-import MapFooter from '../MapFooter';
-import MapSettings from '../MapSettings';
-import StaticControl from '../StaticControl';
-import GeoLoader from '../GeoLoader';
-import GeoExporter from '../GeoExporter';
+import '../MapController.css';
+import DataMap from '../../DataMap';
+import MapFooter from '../../MapFooter';
+import MapSettings from '../../MapSettings';
+import StaticControl from '../../StaticControl';
+import GeoLoader from '../../GeoLoader';
+import GeoExporter from '../../GeoExporter';
 
-import { getTimeMetadata } from '../../data-services/ce-backend';
-import { getVariableOptions } from '../../core/util';
+import { hasValidData, getRasterParamsPromise, 
+  getIsolineParamsPromise, selectedVariable } from '../map-helpers.js';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class MapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array.isRequired,
-    comparandMeta: PropTypes.array,
+    comparandMeta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -42,7 +61,7 @@ export default class MapController extends React.Component {
         times: undefined,
         timeIdx: undefined,
         wmsTime: undefined,
-        palette: this.props.comparandMeta ? 'seq-Greys' : 'x-Occam',
+        palette: 'seq-Greys',
         logscale: 'false',
         range: {},
       },
@@ -61,21 +80,10 @@ export default class MapController extends React.Component {
   }
 
   // Support functions
-  
-  hasValidData(symbol, props = this.props) {
-    var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
-
-    return !_.isUndefined(props[dataLocation]) &&
-      props[dataLocation].length > 0;
-  }
-
-  hasComparand() {
-    return this.hasValidData('comparand');
-  }
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentDataset() {
-    // Return encoding of currently selected dataset
+  currentInstance() {
+    // Return encoding of currently selected instance
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
     // WAAT? The below code is copied from existing MapController, but it
     // doesn't drive Selector correctly. *&*#$@*
@@ -123,115 +131,69 @@ export default class MapController extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
-    dataset,
-    rasterPalette = this.state.raster.palette,
-    isolinePalette = this.state.isoline.palette,
+    instance,
     newVariable = false,
     newComparand = false
   ) {
     // update state with all the information needed to display
-    // maps for specific datasets.
-    // a 'dataset' in this case is not a specific file. It is a
-    // variable + emissions + model + period + run combination. Timestamps for
-    // a 'dataset' may be spread across up to three files (one annual, one
-    // seasonal, one monthly). MapController stores the parameters of the dataset
-    // in state, but doesn't select (or store in state) a specific file with a
+    // maps for specific instances.
+    // an 'instance' is a variable + emissions + model + period + run combination. 
+    // Timestamps for an instance may be spread across up to three files 
+    // (one annual, one seasonal, one monthly). DualMapController implicitly receives
+    // the variable, emissions scenario, and model parameters via its metadata props,
+    // which have been filtered on those parameters. It selects a period and run and 
+    // stores them in state, but doesn't select (or store in state) a specific file with a
     // specific unique_id until rendering, when it needs to pass an exact file
-    // and timestamp to the viewer component CanadaMap.
-    // The variable and the comparand may have  different available timestamps.
+    // and timestamp to the viewer component DataMap.
+    // The variable and the comparand may have different available timestamps, but will
+    // (aside from variable_id) display the same instance.
 
-    const { start_date, end_date, ensemble_member } = dataset;
-
-    // generate the list of available times for one or two variable+run+period combinations.
-    // which may include multiple files of different time resolutions
-    // (annual, seasonal, or monthly).
-    let datasets = _.filter(props.meta,
-      { ensemble_member, start_date, end_date });
-
-    // if there is a comparison variable, get times from its datasets too
-    if (this.hasValidData('comparand', props)) {
-      datasets = datasets.concat(_.filter(props.comparandMeta,
-        { ensemble_member, start_date, end_date }));
-    }
-
-    const timesPromises =
-      datasets.map(ds => getTimeMetadata(ds.unique_id));
-
-    Promise.all(timesPromises).then(responses => {
-      let variableTimes = {};
-      let comparandTimes = {};
-
-      for (let i = 0; i < responses.length; i++) {
-        let id = Object.keys(responses[i].data)[0];
-        for (let timeidx in responses[i].data[id].times) {
-          var idxString = JSON.stringify({
-            timescale: responses[i].data[id].timescale,
-            timeidx,
-          });
-
-          // This assumes only one variable per file.
-          const variable = Object.keys(responses[i].data[id].variables)[0];
-          if (variable === props.meta[0].variable_id) {
-            variableTimes[idxString] = responses[i].data[id].times[timeidx];
-          }
-          if (this.hasValidData('comparand', props) &&
-            variable === props.comparandMeta[0].variable_id
-          ) {
-            comparandTimes[idxString] = responses[i].data[id].times[timeidx];
-          }
-        }
+    const { start_date, end_date, ensemble_member } = instance;
+    
+    let rasterParamsPromise = getRasterParamsPromise(instance, props.meta);
+    let isolineParamsPromise = getIsolineParamsPromise(instance, props.comparandMeta);
+    
+    Promise.all([rasterParamsPromise, isolineParamsPromise]).then(params => {
+            
+      let rasterParams = _.findWhere(params, {variableId: selectedVariable(props.meta)});
+      let isolineParams = _.findWhere(params, {variableId: selectedVariable(props.comparandMeta)});
+      
+      if(rasterParams === isolineParams) {
+        // needed when comparand and variable are the same
+        isolineParams = _.clone(rasterParams);
       }
-
-      // select a 0th index to display initially. It could be January,
-      // Winter, or Annual - there's no guarentee any given dataset
-      // will have monthly, seasonal, or yearly data available, but it
-      // will have at least one of them.
-
-      // Warning: Weirdness: If `===` comparison is used, the `_.find` fails.
-      // TODO: Why? Fix.
-      const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
-
-      const variableStartingIndex = _.find(Object.keys(variableTimes), is0thIndex);
-      const comparandStartingIndex = _.find(Object.keys(comparandTimes), is0thIndex);
-
-      const variable = props.meta[0].variable_id;
-      const comparand = this.hasValidData('comparand', props) ?
-        props.comparandMeta[0].variable_id :
-        undefined;
+      
+      // if the variable or comparand has changed, use the default values, otherwise
+      // the ones previously set by the user
+      if(!newVariable) {
+        rasterParams.palette = this.state.raster.palette;
+        rasterParams.logscale = this.state.raster.logscale;
+      }
+      if(!newComparand) {
+        isolineParams.palette = this.state.isoline.palette;
+        isolineParams.logscale = this.state.isoline.logscale;
+      }
+      
+      if(isolineParams.palette == 'x-Occam' && 
+          rasterParams.palette == 'x-Occam') {
+        rasterParams.palette = 'seq-Greys';
+      }
       
       this.setState(prevState => ({
         run: ensemble_member,
         start_date,
         end_date,
-
-        raster: {
-          ...prevState.raster,
-          variableId: variable,
-          times: variableTimes,
-          timeIdx: variableStartingIndex,
-          wmsTime: variableTimes[variableStartingIndex],
-          palette: rasterPalette,
-          logscale: newVariable ? 'false' : prevState.raster.logscale,
-        },
-
-        isoline: {
-          ...prevState.isoline,
-          variableId: comparand,
-          times: comparandTimes,
-          timeIdx: comparandStartingIndex,
-          wmsTime: comparandTimes[comparandStartingIndex],
-          palette: isolinePalette,
-          logscale: newComparand ? 'false' : prevState.isoline.logscale,
-        },
+        raster: rasterParams,
+        isoline: isolineParams
       }));
-    });
+    });  
   }
 
-  // Handlers for dataset change
+  // Handlers for instance and dataset change
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  updateDataset = (encodedDataset) => {
-    this.loadMap(this.props, JSON.parse(encodedDataset));
+  updateInstance = (encodedInstance) => {
+    this.loadMap(this.props, JSON.parse(encodedInstance));
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
@@ -239,7 +201,7 @@ export default class MapController extends React.Component {
   getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
     let dataset = undefined;
     if (encodedVarTimeIdx) {
-      if (this.hasValidData(varSymbol)) {
+      if (hasValidData(varSymbol, this.props)) {
         const timeIndex = JSON.parse(encodedVarTimeIdx);
         dataset = _.findWhere(varMeta, {
           ensemble_member: this.state.run,
@@ -289,45 +251,25 @@ export default class MapController extends React.Component {
     // the first dataset representing a 0th time index (January, Winter, or Annual)
     // will be displayed.
 
-    if (this.hasValidData('variable', nextProps)) {
+    if (hasValidData('variable', nextProps)) {
       // TODO: DRY this up
-      const newVariableId = nextProps.meta[0].variable_id;
-      const oldVariableId = this.props.meta.length > 0 ? this.props.meta[0].variable_id : undefined;
-      const hasComparand = nextProps.comparandMeta && nextProps.comparandMeta.length > 0;
+      const newVariableId = selectedVariable(nextProps.meta);
+      const oldVariableId = selectedVariable(this.props.meta);
+      const hasComparand = hasValidData('comparand', nextProps);
       let newComparandId, oldComparandId;
       if (hasComparand) {
-        newComparandId = nextProps.comparandMeta.length > 0 ? nextProps.comparandMeta[0].variable_id : undefined;
-        oldComparandId = this.props.comparandMeta.length > 0 ? this.props.comparandMeta[0].variable_id : undefined;
+        newComparandId = selectedVariable(nextProps.meta);
+        oldComparandId = selectedVariable(this.props.meta);
       }
       var defaultDataset = nextProps.meta[0];
+      var defaultInstance = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
-      // if so, unset logarithmic display; default is linear.
+      // if so, logarithmic display and palettes will be reset to defaults
       var switchVariable = !_.isEqual(newVariableId, oldVariableId);
       var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
 
-      // set display colours. In order of preference:
-      // 1. colours from state (set by the user or this function previously)
-      // 2. colours specified in variables.yaml, if applicable (raster only)
-      // 3. defaults (raster rainbow if a single dataset,
-      //             raster greyscale and isolines rainbow for 2)
-      var sPalette, cPalette;
-      if (this.state.raster.palette && !switchVariable) {
-        sPalette = this.state.raster.palette;
-        cPalette = this.state.isoline.palette;
-      } else if (!_.isUndefined(getVariableOptions(newVariableId, 'defaultRasterPalette'))) {
-        sPalette = getVariableOptions(newVariableId, 'defaultRasterPalette');
-        if (this.hasValidData('comparand', nextProps)) {
-          cPalette = 'x-Occam';
-        }
-      } else if (this.hasValidData('comparand', nextProps)) {
-        sPalette = 'seq-Greys';
-        cPalette = 'x-Occam';
-      } else {
-        sPalette = 'x-Occam';
-      }
-
-      this.loadMap(nextProps, defaultDataset, sPalette, cPalette, switchVariable, switchComparand);
+      this.loadMap(nextProps, defaultInstance, switchVariable, switchComparand);
     } else {
       // haven't received any displayable data. Probably means user has selected
       // parameters for a dataset that isn't in the database.
@@ -391,8 +333,8 @@ export default class MapController extends React.Component {
               meta={this.props.meta}
               comparandMeta={this.props.comparandMeta}
 
-              dataset={this.currentDataset()}
-              onDatasetChange={this.updateDataset}
+              instance={this.currentInstance()}
+              onInstanceChange={this.updateInstance}
 
               raster={{
                 ...this.state.raster,
@@ -401,7 +343,7 @@ export default class MapController extends React.Component {
                 onChangeScale: this.handleChangeRasterScale,
               }}
 
-              hasComparand={this.hasComparand()}
+              hasComparand={hasValidData('comparand', this.props)}
               timesLinkable={this.timesMatch()}
               isoline={{
                 ...this.state.isoline,
@@ -415,7 +357,7 @@ export default class MapController extends React.Component {
           <StaticControl position='bottomleft'>
             <MapFooter
               {...this.state}
-              hasValidComparand={this.hasComparand()}
+              hasValidComparand={hasValidData('comparand', this.props)}
             />
           </StaticControl>
 

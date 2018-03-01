@@ -1,13 +1,13 @@
 /************************************************************************
  * map-helpers.js - helper functions for MapControllers
  * 
- * Functions in this file fall into two general categories
+ * Functions in this file fall into two general categories:
  * 
  *   0. Data processing helper functions, which extract information from
  *      a MapController props object or piece of one.
  *   
  *   1. WMS parameter generation functions, which generate initial 
- *      parameters for ncWMS layers of various types. 
+ *      parameters for ncWMS layers of various types.
  ************************************************************************/
 import _ from 'underscore';
 
@@ -17,14 +17,6 @@ import { getVariableOptions } from '../../core/util';
 /************************************************************************
  * 0. Data processing helpers
  ************************************************************************/
-
-function timesMatch(vTimes, cTimes) {
-  // Returns true if the timestamps available for the variable
-  // and the timestamps available for the comparand match
-  return !_.isUndefined(vTimes) &&
-    !_.isUndefined(cTimes) &&
-    _.isEqual(vTimes, cTimes);
-}
 
 function hasValidData(symbol, props) {
   // Returns true if props contains enough information to generate a map
@@ -121,7 +113,7 @@ function getRasterParamsPromise(instance, meta) {
   return getScalarParamsPromise(instance, meta).then(params => {
     let palette = 'x-Occam';
     if (!_.isUndefined(getVariableOptions(params.variableId, 'defaultRasterPalette'))) {
-        palette = getVariableOptions(newVariableId, 'defaultRasterPalette');
+        palette = getVariableOptions(params.variableId, 'defaultRasterPalette');
     }
     params.palette = palette;
     return params;
@@ -142,9 +134,8 @@ function getAnnotatedParamsPromise(instance, meta) {
   // parameters, which are the same as the default scalar parameters.
   return getScalarParamsPromise(instance, meta);
 }
-  
+
   export {
-    timesMatch,
     hasValidData,
     hasComparand,
     getRasterParamsPromise,

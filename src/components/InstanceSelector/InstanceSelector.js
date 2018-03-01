@@ -2,8 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Selector from '../Selector/Selector';
 import _ from 'underscore';
+/******************************************************************
+ * InstanceSelector.js - Instance-selecting widget
+ * 
+ * This dropdown allows the user to select an "instance" of data
+ * to view, consisting of a start date, an end date, and a run.
+ * Data describing the instance may be spread over multiple files.
+ ******************************************************************/
 
-export default class DatasetSelector extends React.Component {
+
+export default class InstanceSelector extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   static propTypes = {
     meta: PropTypes.array,
@@ -11,7 +19,7 @@ export default class DatasetSelector extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  makeDatasets() {
+  makeInstances() {
     var ids = this.props.meta.map(el =>
       [
         JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
@@ -23,12 +31,12 @@ export default class DatasetSelector extends React.Component {
   }
 
   render() {
-    const datasets = this.makeDatasets();
+    const instances = this.makeInstances();
     return (
-      datasets.length > 0 &&
+      instances.length > 0 &&
       <Selector
         label='Select Dataset'
-        items={datasets}
+        items={instances}
         value={this.props.value}
         onChange={this.props.onChange}
       />

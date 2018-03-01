@@ -13,7 +13,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import MapController from '../MapController';
+import SingleMapController from '../MapController/SingleMapController';
 import DataController from '../DataController/DataController';
 import Selector from '../Selector';
 import AppMixin from '../AppMixin';
@@ -62,7 +62,7 @@ var App = createReactClass({
         <Row>
           <Col lg={6}>
             <div style={{ width: 890, height: 700 }}>
-              <MapController
+              <SingleMapController
                 meta = {this.getfilteredMeta()}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}

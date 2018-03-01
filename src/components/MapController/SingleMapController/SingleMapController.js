@@ -1,24 +1,19 @@
-/************************************************************************
- * PrecipMapController.js - Precipitation Map Controller
+/*******************************************************************
+ * SingleMapController.js - Raster display of map data
  * 
- * This controller coordinates a map with two layers, both of which are 
- * displayed with logarithmic scaling by default:
+ * This controller coordinates a map displaying data extracted from
+ * netCDF files as a colour-coded raster, as well as a menu of 
+ * viewing settings for the raster.
  * 
- *  - A climdex index rendered as a blue and white raster layer
- *  - A matching precipitation GCM output rendered as annotated isolines
- *  
- * Unlike the default MapController, both layers always display the same
- * timestamp; the precipitation is not intended for independant exploration,
- * just to provide context for the climdex layer. The user can configure
- * map settings for the climdex layer, but there's not much to configure
- * on the precipitation layer.
- *
- * It is also responsible for passing user-selected areas up to its parent.
- *
- * Children: 
+ * It is also responsible for passing user-drawn areas up to its 
+ * parent.
+ * 
+ * Children:
  *   * Datamap, which actually renders the map
- *   * MapSettings, which allows a user to configure the map
- ************************************************************************/
+ *   * MapSettings, which allows user configuration of map layers
+ *******************************************************************/
+
+
 // Wires up components of overall map display for CE.
 // Also contains some legacy code that should be further refactored, primarily
 // `loadMap` and the handling of instances (see TODOs/FIXMEs).
@@ -37,15 +32,13 @@ import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
 import GeoExporter from '../../GeoExporter';
 
-import { hasValidData, getRasterParamsPromise, 
-         getAnnotatedParamsPromise, selectedVariable } from '../map-helpers.js';
+import { hasValidData, getRasterParamsPromise, selectedVariable } from '../map-helpers.js';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-export default class PrecipMapController extends React.Component {
+export default class MapController extends React.Component {
   static propTypes = {
     meta: PropTypes.array.isRequired,
-    comparandMeta: PropTypes.array,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -63,27 +56,26 @@ export default class PrecipMapController extends React.Component {
         times: undefined,
         timeIdx: undefined,
         wmsTime: undefined,
-        palette: 'seq-Blues',
-        logscale: 'true',
+        palette: 'x-Occam',
+        logscale: 'false',
         range: {},
-      },
-
-      annotated: this.props.comparandMeta ? {
-        variableId: undefined, // formerly 'comparand'
-        times: undefined,
-        timeIdx: undefined,
-        wmsTime: undefined,
-        numberOfContours: 10,
-        logscale: 'true',
-        range: {},
-      } : {},
+      }
     };
   }
+
+  // Support functions
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   currentInstance() {
     // Return encoding of currently selected instance
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
+    // WAAT? The below code is copied from existing MapController, but it
+    // doesn't drive Selector correctly. *&*#$@*
+    // return JSON.stringify({
+    //   start_date: this.state.start_date,
+    //   end_date: this.state.end_date,
+    //   ensemble_member: this.state.run
+    // });
   }
 
   // setState helpers
@@ -97,85 +89,59 @@ export default class PrecipMapController extends React.Component {
     }));
   }
 
-  updateTime(timeIdx) {
-    // update the timestamp in state for both layers
+  updateLayerTime(layerType, timeIdx) {
+    // update the timestamp in state
     // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
     // and an index denoting the timestamp's position with the file
- 
-    // The user selects times from a list drawn from the climdex variable,
-    // so the climdex variable time should be present, but it's possible precipitation
-    // isn't, in which case, the annotated isolines won't show up.
-    let annotatedTime = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
-        this.state.annotated.times[timeIdx] : undefined;
-    
-    this.setState(prevState => ({
-      raster: {
-        ...prevState.raster,
+    this.setState((prevState) => ({
+      [layerType]: {
+        ...prevState[layerType],
         timeIdx,
-        wmsTime: prevState.raster.times[timeIdx],
-      },
-      annotated: {
-        ...prevState.annotated,
-        timeIdx,
-        wmsTime: annotatedTime,
+        wmsTime: prevState[layerType].times[timeIdx],
       },
     }));
   }
 
   // Support functions for event/callback handlers
 
-  // TODO: split loadmap into helpers?
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
     instance,
     newVariable = false,
   ) {
-    // Update state with all the information needed to display
-    // maps for the specified instance.
-    // An 'instance' represents a combination of a specific variable, 
-    // emissions scenario, model, period, and run. The variable, emissions, 
-    // and model are selected by the user, and implicitly encoded in meta and 
-    // comparandMeta, which are filtered to only relevant datasets by this 
-    // component's parent.
-    // The start date, end date, and run and selected by this component - either 
-    // defaults or user selection - and supplied as the "instance" variable.
-    // An instance may be spread across up to three data files (yearly, seasonal,
-    // monthly); the specific dataset needed to map a particular timestamp is 
-    // determined at render time and passed to the viewer component.
+    // update state with all the information needed to display
+    // maps for a specific instance.
+    // an 'instance' in this case is a variable + emissions + model + 
+    // period + run combination. Timestamps for an instance may be spread 
+    // across up to three files (one annual, one seasonal, one monthly). 
+    // SingleMapController receives the variable, emissions, and model parameters
+    // from its parent as props, and selects and stores the period and run 
+    // in state, but doesn't select a specific file with a
+    // specific unique_id until rendering, when it needs to pass an exact file
+    // and timestamp to the viewer component.
 
     const { start_date, end_date, ensemble_member } = instance;
     
     let rasterParamsPromise = getRasterParamsPromise(instance, props.meta);
-    let annotatedParamsPromise = getAnnotatedParamsPromise(instance, props.comparandMeta);
-    
-    Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(params => {
-      
-      let rasterParams = _.findWhere(params, {variableId: selectedVariable(props.meta)});
-      let annotatedParams = _.findWhere(params, {variableId: selectedVariable(props.comparandMeta)});
-      
-      // if the variable has changed, go back to the default palette and logscale,
-      // otherwise use the previous (user-selected) values in state.
-      if(newVariable) {
-        rasterParams.palette = 'seq-Blues';
-        rasterParams.logscale = "true";
-      }
-      else {
-        rasterParams.palette = this.state.raster.palette;
-        rasterParams.logscale = this.state.raster.logscale;
+    rasterParamsPromise.then(params => {
+      //if the variable has changed, use the default palette and logscale,
+      //otherwise use the previous (user-selected) values from state.
+      if(!newVariable) {
+        params.palette = this.state.raster.palette;
+        params.logscale = this.state.raster.logscale;
       }
       
       this.setState(prevState => ({
         run: ensemble_member,
         start_date,
         end_date,
-        raster: rasterParams,
-        annotated: annotatedParams
+        raster: params
       }));
     });  
   }
 
-  // Handlers for dataset and instance change
+  // Handlers for dataset change
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
   updateInstance = (encodedInstance) => {
@@ -201,15 +167,17 @@ export default class PrecipMapController extends React.Component {
     return dataset && dataset.unique_id;
   }
   
-  // Handlers for settings changes
+  // Handlers for time selection change
 
-  handleChangeTime = this.updateTime.bind(this);  
+  handleChangeVariableTime = this.updateLayerTime.bind(this, 'raster');
+
+  // Handlers for palette change
+
   handleChangeRasterPalette = this.updateLayerSimpleState.bind(this, 'raster', 'palette');
 
   // Handlers for layer range change
 
   handleChangeRasterRange = this.updateLayerSimpleState.bind(this, 'raster', 'range');
-  handleChangeAnnotatedRange = this.updateLayerSimpleState.bind(this, 'annotated', 'range');
 
   // Handlers for scale change
 
@@ -225,6 +193,7 @@ export default class PrecipMapController extends React.Component {
   componentWillReceiveProps(nextProps) {
     // TODO: This stuff, particularly loadMap, may be better placed in
     // componentWillUpdate.
+
     // Load initial map, based on a list of available data files passed
     // as props from its parent
     // the first dataset representing a 0th time index (January, Winter, or Annual)
@@ -233,16 +202,16 @@ export default class PrecipMapController extends React.Component {
     if (hasValidData('variable', nextProps)) {
       // TODO: DRY this up
       const newVariableId = selectedVariable(nextProps.meta);
-      const oldVariableId = this.props.meta.length > 0 ? selectedVariable(this.props.meta) : undefined;
-      const hasComparand = hasValidData('comparand', nextProps);
-
+      const oldVariableId = selectedVariable(this.props.meta);
+      
       var defaultDataset = nextProps.meta[0];
       var defaultInstance = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
-      // (if so, palette and logscale will be reset)
+      // if so, loadMap will reset palette and logarithmic dispay.
       var switchVariable = !_.isEqual(newVariableId, oldVariableId);
-      
+
+
       this.loadMap(nextProps, defaultInstance, switchVariable);
     } else {
       // haven't received any displayable data. Probably means user has selected
@@ -252,8 +221,6 @@ export default class PrecipMapController extends React.Component {
       this.setState({
         variableTimes: undefined,
         variableTimeIdx: undefined,
-        comparandTimes: undefined,
-        comparandTimeIdx: undefined
       });
     }
   }
@@ -261,9 +228,9 @@ export default class PrecipMapController extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before we have required data
     // TODO: Make more efficient?
-    // Currently doing deep comparison on big objects (meta, comparandMeta).
-    // Deep comparison matters on rasterRange, annotatedRange, but not on
-    // meta, comparandMeta, which are likely new objects every time (response
+    // Currently doing deep comparison on big objects (meta).
+    // Deep comparison matters on rasterRange, but not on
+    // meta, which is likely a new object every time (response
     // from HTTP requests). That could be a lot faster.
     const propChange = !_.isEqual(nextProps, this.props);
     const stateChange = !_.isEqual(nextState, this.state);
@@ -272,7 +239,6 @@ export default class PrecipMapController extends React.Component {
   }
 
   render() {
-
     return (
       this.state.raster.times ? (
         <DataMap
@@ -281,13 +247,6 @@ export default class PrecipMapController extends React.Component {
               'variable', this.props.meta, this.state.raster.timeIdx),
             ...this.state.raster,
             onChangeRange: this.handleChangeRasterRange,
-          }}
-
-          annotated={{
-            dataset: this.getDatasetId(
-              'comparand', this.props.comparandMeta, this.state.annotated.timeIdx),
-            ...this.state.annotated,
-            onChangeRange: this.handleChangeAnnotatedRange,
           }}
 
           onSetArea={this.props.onSetArea}
@@ -306,18 +265,17 @@ export default class PrecipMapController extends React.Component {
             <MapSettings
               title='Map Settings'
               meta={this.props.meta}
-              comparandMeta={this.props.comparandMeta}
 
               instance={this.currentInstance()}
               onInstanceChange={this.updateInstance}
 
               raster={{
                 ...this.state.raster,
-                onChangeTime: this.handleChangeTime,
+                onChangeTime: this.handleChangeVariableTime,
                 onChangePalette: this.handleChangeRasterPalette,
                 onChangeScale: this.handleChangeRasterScale,
               }}
-              //does have a comparand, but comparand has no user-configurable params.
+
               hasComparand={false}
               timesLinkable={false}
             />
@@ -326,7 +284,7 @@ export default class PrecipMapController extends React.Component {
           <StaticControl position='bottomleft'>
             <MapFooter
               {...this.state}
-              hasValidComparand={hasValidData('comparand', this.props)}
+              hasValidComparand={false}
             />
           </StaticControl>
 
