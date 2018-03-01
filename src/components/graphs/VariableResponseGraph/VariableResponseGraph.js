@@ -72,6 +72,10 @@ export default class VariableResponseGraph extends React.Component {
     if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
       return;
     }
+    if (this.props.comparand_id === this.props.variable_id) {
+      this.displayNoDataMessage("Variable response graph requires two selected variables");
+      return;
+    }
 
     const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
     const timeseriesPromises = metadatas.map(metadata =>

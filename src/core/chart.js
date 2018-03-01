@@ -22,6 +22,7 @@ import _ from 'underscore';
 import {PRECISION,
         extendedDateToBasicDate,
         capitalizeWords,
+        caseInsensitiveStringSearch,
         nestedAttributeIsDefined,
         getVariableOptions} from './util';
 import chroma from 'chroma-js';
@@ -862,7 +863,10 @@ var sortSeriesByRank = function(graph, ranker) {
  * each (time, data) tuple present in both original time series, it creates a new
  * (data-x, data-y) tuple, using the series with the x keyword as the x coordinate
  * and the series with the y keyword as the y coordinate.
- * 
+ *
+ * The axis labels of the new graph will be generated from the y axis label(s) of the
+ * old graph.
+ *
  * Example:
  * x: pr
  * y: tasmax
@@ -878,8 +882,10 @@ var sortSeriesByRank = function(graph, ranker) {
  * This is intended to graph the effect of one variable (x) on another (y).
  */
 var makeVariableResponseGraph = function(x, y, graph) {
+  var c3Data = {};
+
   var seriesNameContains = function (series, keyword) {
-    return series[0].toLowerCase().search(keyword.toLowerCase()) != -1;
+    return caseInsensitiveStringSearch(series[0], keyword);
   }
   
   let xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
@@ -902,52 +908,77 @@ var makeVariableResponseGraph = function(x, y, graph) {
   }
   //sort by x value, preperatory to putting on the graph.
   tuples.sort((a, b) => a[0] - b[0]);  
-  var vrColumns = [["x"], [y]];
+  c3Data.columns = [["x"], [y]];
 
 
   for(let i = 1; i < tuples.length; i++) {
-    vrColumns[0].push(tuples[i][0]);
-    vrColumns[1].push(tuples[i][1]);
+    c3Data.columns[0].push(tuples[i][0]);
+    c3Data.columns[1].push(tuples[i][1]);
     //C3 doesn't really support scatterplots, but we can fake it by adding
     //a missing data point between each actual data point, and instructing C3
     //not to connect across missing data points with {connectNull: false} 
     if(i < tuples.length - 1) {
-      vrColumns[0].push((tuples[i][0] + tuples[i+1][0])/2);
-      vrColumns[1].push(null);
+      c3Data.columns[0].push((tuples[i][0] + tuples[i+1][0])/2);
+      c3Data.columns[1].push(null);
     }
   }
 
-  //TODO: more flexible axis formatting.
-  return {
-    data: {
-      x: 'x',
-      columns: vrColumns
-    },
-    line: {
-      connectNull: false
-    },
-    axis: {
-      y: {
-        label: `${y} ${graph.axis.y.label.text}`
+  // Generate x and y axes. Reuse labels from source graph,
+  // but add variable names if not present.
+  var xAxisLabel = getAxisTextForVariable(graph, x);
+  xAxisLabel = xAxisLabel.search(x) == -1 ? `${x} ${xAxisLabel}` : xAxisLabel;
+  var xAxis = {
+      tick: {
+        count: 8,
+        fit: true,
+        format: fixedPrecision
       },
-      x: {
-        tick: {
-          count: 8,
-          fit: true,
-          format: fixedPrecision
-        },
-        label: `${x} ${graph.axis.y2.label.text}`
-      }
+      label: xAxisLabel
+    };
+
+  var yAxisLabel = getAxisTextForVariable(graph, y);
+  yAxisLabel = yAxisLabel.search(y) == -1 ? `${y} ${yAxisLabel}` : yAxisLabel;
+  var yAxis = {
+      tick: {
+        format: fixedPrecision
+      },
+      label: yAxisLabel
+  };
+
+  //Whole-graph formatting options
+  c3Data.x = 'x'; //use x series
+  var c3Line = {connectNull: false}; //don't connect point data
+  var c3Tooltip = {show: false}; //no tooltip or legend, simplify graph.
+  var c3Legend = {show: false};
+
+  return {
+    data: c3Data,
+    line: c3Line,
+    tooltip: c3Tooltip,
+    legend: c3Legend,
+    axis: {
+      y: yAxis,
+      x: xAxis
     },
-    tooltip: {
-      show: false
-    },
-    legend: {
-      show: false
-    }
   };
 }
 
+/*
+ * Helper function for makeVariableResponseGraph: given a graph and a
+ * variable name, returns the axis label text associated with that variable.
+ */
+var getAxisTextForVariable = function(graph, variable) {
+  var series = graph.data.columns.find(s => {
+    return caseInsensitiveStringSearch(s[0], variable);
+    })[0];
+
+  //see if this series has an explicit axis association, default to y if not.
+  var axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
+
+  return _.isString(graph.axis[axis].label) ?
+      graph.axis[axis].label :
+      graph.axis[axis].label.text;
+}
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,

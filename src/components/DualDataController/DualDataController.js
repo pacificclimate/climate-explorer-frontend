@@ -108,7 +108,7 @@ var DualDataController = createReactClass({
               <Tab eventKey={1} title='Time Series'>
                 <DualTimeSeriesGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title='VariableResponse'>
+              <Tab eventKey={2} title='Variable Response'>
                 <DualVariableResponseGraph {...this.props}/>
               </Tab>
             </Tabs>
