@@ -970,7 +970,12 @@ var makeVariableResponseGraph = function(x, y, graph) {
 var getAxisTextForVariable = function(graph, variable) {
   var series = graph.data.columns.find(s => {
     return caseInsensitiveStringSearch(s[0], variable);
-    })[0];
+    });
+  
+  if(_.isUndefined(series)) {
+    throw new Error("Cannot build variable response chart from single variable chart");
+  }
+  series = series[0];
 
   //see if this series has an explicit axis association, default to y if not.
   var axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
@@ -986,4 +991,4 @@ module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction};
+    getAllTimestamps, nameAPICallParametersFunction, getAxisTextForVariable};
