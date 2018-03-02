@@ -77,7 +77,8 @@ var DualDataController = createReactClass({
     // new data objects each time), then shallow comparison works.
     return !(
       _.isEqual(nextProps.meta, this.props.meta) &&
-      _.isEqual(nextProps.comparandMeta, this.props.comparandMeta));
+      _.isEqual(nextProps.comparandMeta, this.props.comparandMeta) &&
+      _.isEqual(nextProps.area, this.props.area));
   },
 
   render: function () {

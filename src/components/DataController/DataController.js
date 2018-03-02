@@ -106,7 +106,8 @@ var DataController = createReactClass({
     return !(
       _.isEqual(nextState.statsData, this.state.statsData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
-      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions)
+      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions) &&
+      _.isEqual(nextProps.area, this.props.area)
      );
   },
 
