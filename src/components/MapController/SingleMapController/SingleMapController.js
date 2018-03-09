@@ -16,7 +16,7 @@
 
 // Wires up components of overall map display for CE.
 // Also contains some legacy code that should be further refactored, primarily
-// `loadMap` and the handling of instances (see TODOs/FIXMEs).
+// `loadMap` and the handling of dataspecs (see TODOs/FIXMEs).
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -66,16 +66,9 @@ export default class MapController extends React.Component {
   // Support functions
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentInstance() {
-    // Return encoding of currently selected instance
+  currentDataSpec() {
+    // Return encoding of currently selected dataspec
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-    // WAAT? The below code is copied from existing MapController, but it
-    // doesn't drive Selector correctly. *&*#$@*
-    // return JSON.stringify({
-    //   start_date: this.state.start_date,
-    //   end_date: this.state.end_date,
-    //   ensemble_member: this.state.run
-    // });
   }
 
   // setState helpers
@@ -107,23 +100,23 @@ export default class MapController extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
-    instance,
+    dataSpec,
     newVariable = false,
   ) {
     // update state with all the information needed to display
-    // maps for a specific instance.
-    // an 'instance' in this case is a variable + emissions + model + 
-    // period + run combination. Timestamps for an instance may be spread 
-    // across up to three files (one annual, one seasonal, one monthly). 
+    // maps for a specific dataSpec.
+    // a 'dataspec' in this case is a variable + emissions + model + 
+    // period + run combination, which unique describes a set of data that may
+    // spread across up to three files (one annual, one seasonal, one monthly). 
     // SingleMapController receives the variable, emissions, and model parameters
-    // from its parent as props, and selects and stores the period and run 
-    // in state, but doesn't select a specific file with a
-    // specific unique_id until rendering, when it needs to pass an exact file
-    // and timestamp to the viewer component.
+    // from its parent as props. The period and run are selected by this component
+    // (by default) or adjusted by the user, and stored in state.
+    // An exact file for ncWMS to read is not selected until render time, when it 
+    // is passed to the viewer component.
 
-    const { start_date, end_date, ensemble_member } = instance;
+    const { start_date, end_date, ensemble_member } = dataSpec;
     
-    let rasterParamsPromise = getRasterParamsPromise(instance, props.meta);
+    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
     rasterParamsPromise.then(params => {
       //if the variable has changed, use the default palette and logscale,
       //otherwise use the previous (user-selected) values from state.
@@ -144,8 +137,8 @@ export default class MapController extends React.Component {
   // Handlers for dataset change
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  updateInstance = (encodedInstance) => {
-    this.loadMap(this.props, JSON.parse(encodedInstance));
+  updateDataSpec = (encodedDataSpec) => {
+    this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
@@ -204,15 +197,15 @@ export default class MapController extends React.Component {
       const newVariableId = selectedVariable(nextProps.meta);
       const oldVariableId = selectedVariable(this.props.meta);
       
-      var defaultDataset = nextProps.meta[0];
-      var defaultInstance = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataset = nextProps.meta[0];
+      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // if so, loadMap will reset palette and logarithmic dispay.
-      var switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
 
 
-      this.loadMap(nextProps, defaultInstance, switchVariable);
+      this.loadMap(nextProps, defaultDataSpec, switchVariable);
     } else {
       // haven't received any displayable data. Probably means user has selected
       // parameters for a dataset that isn't in the database.
@@ -266,8 +259,8 @@ export default class MapController extends React.Component {
               title='Map Settings'
               meta={this.props.meta}
 
-              instance={this.currentInstance()}
-              onInstanceChange={this.updateInstance}
+              dataSpec={this.currentDataSpec()}
+              onDataSpecChange={this.updateDataSpec}
 
               raster={{
                 ...this.state.raster,

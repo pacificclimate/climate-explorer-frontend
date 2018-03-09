@@ -10,12 +10,13 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 
 
 export default function DualAnnualCycleGraph(props) {
-  function getMetadata(instance) {
-    console.log("starting getMetadata");
+  function getMetadata(dataSpec) {
 
-    // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_member) for monthly, seasonal
-    // and annual timescales.
+    // Find and return metadata matching the data specification ("dataSpec"): 
+    // model_id, experiment, variable_id, start_date, end_date, ensemble_member
+    // for monthly, seasonal and annual timescales.
+    // Variable, model, and experiment are supplied by the graph's parent, but 
+    // start, end, and run are selected here.
     // Do the the same for comparand_id and comparandMeta.
 
     const {
@@ -24,19 +25,19 @@ export default function DualAnnualCycleGraph(props) {
       comparand_id, comparandMeta,
     } = props;
 
-    var findMetadataForInstance = function (variable, timeres, metadataList) {
+    var findMetadataForDataSpec = function (variable, timeres, metadataList) {
       return _.findWhere(metadataList, {
         model_id, experiment,
-        ...instance,
+        ...dataSpec,
         timescale: timeres,
         variable_id: variable
         });
     }
   
     // Set up metadata sets for variable
-    const monthlyVariableMetadata = findMetadataForInstance(variable_id, 'monthly', meta);
-    const seasonalVariableMetadata = findMetadataForInstance(variable_id, 'seasonal', meta);
-    const yearlyVariableMetadata = findMetadataForInstance(variable_id, 'yearly', meta);
+    const monthlyVariableMetadata = findMetadataForDataSpec(variable_id, 'monthly', meta);
+    const seasonalVariableMetadata = findMetadataForDataSpec(variable_id, 'seasonal', meta);
+    const yearlyVariableMetadata = findMetadataForDataSpec(variable_id, 'yearly', meta);
 
     let metadataSets =[
       monthlyVariableMetadata,
@@ -49,15 +50,15 @@ export default function DualAnnualCycleGraph(props) {
     if(variable_id !== comparand_id) {
       if(monthlyVariableMetadata) {
         metadataSets = metadataSets.concat(
-            findMetadataForInstance(comparand_id, 'monthly', comparandMeta));
+            findMetadataForDataSpec(comparand_id, 'monthly', comparandMeta));
       }
       if(seasonalVariableMetadata) {
        metadataSets = metadataSets.concat(
-           findMetadataForInstance(comparand_id, 'seasonal', comparandMeta));
+           findMetadataForDataSpec(comparand_id, 'seasonal', comparandMeta));
       }
       if(yearlyVariableMetadata) {
         metadataSets = metadataSets.concat(
-            findMetadataForInstance(comparand_id, 'yearly', comparandMeta));
+            findMetadataForDataSpec(comparand_id, 'yearly', comparandMeta));
       }
     }    
     return _.compact(metadataSets);

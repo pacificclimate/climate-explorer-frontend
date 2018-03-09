@@ -1,3 +1,8 @@
+/**************************************************************************
+ * VariableResponseGraph.js - scatterplot showing relationship between two 
+ *                            variables
+ **************************************************************************/
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, ControlLabel } from 'react-bootstrap';

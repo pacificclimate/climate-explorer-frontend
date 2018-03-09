@@ -3,7 +3,7 @@ import React from 'react';
 import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
 import _ from 'underscore';
 
-import InstanceSelector from '../InstanceSelector/InstanceSelector';
+import DataSpecSelector from '../DataSpecSelector/DataSpecSelector';
 import DataDisplayControls from './DataDisplayControls';
 import TimeLinkButton from './TimeLinkButton';
 
@@ -31,8 +31,8 @@ export default class MapSettingsDialog extends React.Component {
     meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,
 
-    instance: PropTypes.string,  // current instance (run + period) selection, encoded as JSON string
-    onInstanceChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
+    dataSpec: PropTypes.string,  // current dataSpec (run + period) selection, encoded as JSON string
+    onDataSpecChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
 
     raster: layerPropTypes.isRequired,
 
@@ -82,10 +82,10 @@ export default class MapSettingsDialog extends React.Component {
           <Grid fluid>
             <Row>
               <Col lg={12}>
-                <InstanceSelector
+                <DataSpecSelector
                   meta={this.props.meta}
-                  value={this.props.instance}
-                  onChange={this.props.onInstanceChange}
+                  value={this.props.dataSpec}
+                  onChange={this.props.onDataSpecChange}
                 />
               </Col>
             </Row>

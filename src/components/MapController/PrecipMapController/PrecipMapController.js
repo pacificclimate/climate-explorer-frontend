@@ -21,7 +21,7 @@
  ************************************************************************/
 // Wires up components of overall map display for CE.
 // Also contains some legacy code that should be further refactored, primarily
-// `loadMap` and the handling of instances (see TODOs/FIXMEs).
+// `loadMap` and the handling of dataSpecs (see TODOs/FIXMEs).
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -81,8 +81,8 @@ export default class PrecipMapController extends React.Component {
   }
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentInstance() {
-    // Return encoding of currently selected instance
+  currentDataSpec() {
+    // Return encoding of currently selected dataSpec
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
   }
 
@@ -105,7 +105,7 @@ export default class PrecipMapController extends React.Component {
     // The user selects times from a list drawn from the climdex variable,
     // so the climdex variable time should be present, but it's possible precipitation
     // isn't, in which case, the annotated isolines won't show up.
-    let annotatedTime = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
+    const annotatedTime = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
         this.state.annotated.times[timeIdx] : undefined;
     
     this.setState(prevState => ({
@@ -128,26 +128,26 @@ export default class PrecipMapController extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
-    instance,
+    dataSpec,
     newVariable = false,
   ) {
     // Update state with all the information needed to display
-    // maps for the specified instance.
-    // An 'instance' represents a combination of a specific variable, 
+    // maps for the specified dataspec.
+    // A 'dataSpec' represents a combination of a specific variable, 
     // emissions scenario, model, period, and run. The variable, emissions, 
-    // and model are selected by the user, and implicitly encoded in meta and 
-    // comparandMeta, which are filtered to only relevant datasets by this 
-    // component's parent.
+    // and model are selected by the user in a top level component, and implicitly
+    // encoded in meta and comparandMeta, which are filtered to only relevant 
+    // datasets by this component's parent.
     // The start date, end date, and run and selected by this component - either 
-    // defaults or user selection - and supplied as the "instance" variable.
-    // An instance may be spread across up to three data files (yearly, seasonal,
-    // monthly); the specific dataset needed to map a particular timestamp is 
-    // determined at render time and passed to the viewer component.
+    // defaults or user selection - and supplied as the "dataSpec" variable.
+    // The data described by a dataspec may be spread across up to three data files
+    // (yearly, seasonal, monthly); the specific file needed to map a particular
+    // timestamp is determined at render time and passed to the viewer component.
 
-    const { start_date, end_date, ensemble_member } = instance;
+    const { start_date, end_date, ensemble_member } = dataSpec;
     
-    let rasterParamsPromise = getRasterParamsPromise(instance, props.meta);
-    let annotatedParamsPromise = getAnnotatedParamsPromise(instance, props.comparandMeta);
+    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
+    const annotatedParamsPromise = getAnnotatedParamsPromise(dataSpec, props.comparandMeta);
     
     Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(params => {
       
@@ -175,11 +175,11 @@ export default class PrecipMapController extends React.Component {
     });  
   }
 
-  // Handlers for dataset and instance change
+  // Handlers for dataSpec change
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  updateInstance = (encodedInstance) => {
-    this.loadMap(this.props, JSON.parse(encodedInstance));
+  updateDataSpec = (encodedDataSpec) => {
+    this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
@@ -236,14 +236,14 @@ export default class PrecipMapController extends React.Component {
       const oldVariableId = this.props.meta.length > 0 ? selectedVariable(this.props.meta) : undefined;
       const hasComparand = hasValidData('comparand', nextProps);
 
-      var defaultDataset = nextProps.meta[0];
-      var defaultInstance = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataset = nextProps.meta[0];
+      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // (if so, palette and logscale will be reset)
-      var switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
       
-      this.loadMap(nextProps, defaultInstance, switchVariable);
+      this.loadMap(nextProps, defaultDataSpec, switchVariable);
     } else {
       // haven't received any displayable data. Probably means user has selected
       // parameters for a dataset that isn't in the database.
@@ -308,8 +308,8 @@ export default class PrecipMapController extends React.Component {
               meta={this.props.meta}
               comparandMeta={this.props.comparandMeta}
 
-              instance={this.currentInstance()}
-              onInstanceChange={this.updateInstance}
+              dataSpec={this.currentDataSpec()}
+              onDataSpecChange={this.updateDataSpec}
 
               raster={{
                 ...this.state.raster,

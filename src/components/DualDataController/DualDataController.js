@@ -91,7 +91,7 @@ var DualDataController = createReactClass({
         {
           multiYearMeanSelected(this.props) ? (
 
-            <Tabs>
+            <Tabs id={"Graphs"}>
               <Tab eventKey={1} title='Annual Cycle'>
                 <DualAnnualCycleGraph {...this.props}/>
               </Tab>
@@ -105,7 +105,7 @@ var DualDataController = createReactClass({
 
           ) : (
 
-            <Tabs>
+            <Tabs id={"Graphs"}>
               <Tab eventKey={1} title='Time Series'>
                 <DualTimeSeriesGraph {...this.props}/>
               </Tab>

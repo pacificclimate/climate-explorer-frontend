@@ -1,0 +1,6 @@
+{
+  "name": "DataSpecSelector",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./DataSpecSelector.js"
+}

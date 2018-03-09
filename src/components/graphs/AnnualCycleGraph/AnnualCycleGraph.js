@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
-import InstanceSelector from '../../InstanceSelector/InstanceSelector';
+import DataSpecSelector from '../../DataSpecSelector/DataSpecSelector';
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
@@ -22,7 +22,7 @@ import {
 } from '../graph-helpers';
 
 // This component renders an annual cycle graph, including a selector
-// for the instance to display and export-data buttons. An annual
+// for the specific set of data to display and export-data buttons. An annual
 // cycle graph presents spatially averaged values of a multi-year mean dataset
 // as points over a nominal year (representing the "average" year).
 //
@@ -32,9 +32,9 @@ import {
 
 export default class AnnualCycleGraph extends React.Component {
   // TODO: model_id, variable_id, and experiment are used only to set the
-  // initial instance. Could instead make `initialInstance` a prop, which
+  // initial data specification. Could instead make `initialDataSpec` a prop, which
   // the client computes according to their own recipe. Not sure whether
-  // this is a gain or not, since the same computation (`initialInstance`)
+  // this is a gain or not, since the same computation (`initialDataSpec`)
   // would be done in each client.
   static propTypes = {
     meta: PropTypes.array,
@@ -58,15 +58,15 @@ export default class AnnualCycleGraph extends React.Component {
     super(props);
 
     const { start_date, end_date, ensemble_member } =
-      this.initialInstance(this.props);
+      this.initialDataSpec(this.props);
     this.state = {
-      instance: { start_date, end_date, ensemble_member },
+      dataSpec: { start_date, end_date, ensemble_member },
       graphSpec: blankGraphSpec,
     };
   }
 
-  initialInstance({ meta, model_id, variable_id, experiment }) {
-    //selects a starting instance, preferring the highest-resolution data available.
+  initialDataSpec({ meta, model_id, variable_id, experiment }) {
+    //selects a starting dataspec, preferring one with the highest-resolution data available.
     return (
       _.findWhere(meta,
           { model_id, variable_id, experiment, timescale: 'monthly' }) ||
@@ -103,26 +103,26 @@ export default class AnnualCycleGraph extends React.Component {
       return;
     }
 
-    const instanceMetadata =
-      this.props.getMetadata(this.state.instance)
+    const dataSpecMetadata =
+      this.props.getMetadata(this.state.dataSpec)
         .filter(metadata => !!metadata);
     const timeseriesPromises =
-      instanceMetadata.map(metadata =>
+      dataSpecMetadata.map(metadata =>
         this.getAndValidateTimeseries(metadata, this.props.area)
       );
 
     Promise.all(timeseriesPromises).then(data => {
       this.setState({
-        graphSpec: this.props.dataToGraphSpec(instanceMetadata, data),
+        graphSpec: this.props.dataToGraphSpec(dataSpecMetadata, data),
       });
     }).catch(error => {
       displayError(error, this.displayNoDataMessage);
     });
   }
 
-  // TODO: Refactor to eliminate encoding of instance
-  handleChangeInstance = (instance) => {
-    this.setState({ instance: JSON.parse(instance) });
+  // TODO: Refactor to eliminate encoding of dataSpec
+  handleChangeDataSpec = (dataSpec) => {
+    this.setState({ dataSpec: JSON.parse(dataSpec) });
   };
 
   exportData(format) {
@@ -131,7 +131,7 @@ export default class AnnualCycleGraph extends React.Component {
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
       this.state.graphSpec,
       format,
-      this.state.instance
+      this.state.dataSpec
     );
   }
   
@@ -148,7 +148,7 @@ export default class AnnualCycleGraph extends React.Component {
     if (
       prevProps.meta !== this.props.meta ||
       prevProps.area !== this.props.area ||
-      !_.isEqual(prevState.instance, this.state.instance)
+      !_.isEqual(prevState.dataSpec, this.state.dataSpec)
     ) {
       this.loadGraph();
     }
@@ -159,11 +159,11 @@ export default class AnnualCycleGraph extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <InstanceSelector
+            <DataSpecSelector
               meta={this.props.meta}
-              // TODO: Refactor to eliminate encoding of instance.
-              value={JSON.stringify(this.state.instance)}
-              onChange={this.handleChangeInstance}
+              // TODO: Refactor to eliminate encoding of dataSpec.
+              value={JSON.stringify(this.state.dataSpec)}
+              onChange={this.handleChangeDataSpec}
             />
           </Col>
           <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>

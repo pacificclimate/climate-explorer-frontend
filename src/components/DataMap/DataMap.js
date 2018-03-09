@@ -137,31 +137,33 @@ class DataMap extends React.Component {
     const b = propChange || stateChange;
     return b;
   }
+  
+  // Helper function for render, generates JSX for DataLayer
+  dataLayerProps(layertype) {
+    if(_.isUndefined(this.props[layertype])) {
+      return "";
+    }
+    else {
+      const handlerName = `handle${layertype.charAt(0).toUpperCase() + layertype.slice(1)}LayerRef`;
+      return (
+          <DataLayer
+            layerType={layertype}
+            {...this.props[layertype]}
+            onLayerRef={this[handlerName]}
+          />
+      );
+    }
+  }
 
-  render() {
+  render() {    
     // TODO: Add positioning for autoset
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        <DataLayer
-          layerType='raster'
-          {...this.props.raster}
-          onLayerRef={this.handleRasterLayerRef}
-        />
-
-        <DataLayer
-          layerType='isoline'
-          {...this.props.isoline}
-          onLayerRef={this.handleIsolineLayerRef}
-        />
-
-        <DataLayer
-          layerType='annotated'
-          {...this.props.annotated}
-          onLayerRef={this.handleAnnotatedLayerRef}
-        />
-
+        {this.dataLayerProps('raster')}
+        {this.dataLayerProps('isoline')}
+        {this.dataLayerProps('annotated')}
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
           {...this.props.raster}  // update when any raster prop changes

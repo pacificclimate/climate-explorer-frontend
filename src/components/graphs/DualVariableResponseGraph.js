@@ -1,12 +1,23 @@
 /*********************************************************************
- * DualVariableResponseGraph.js - Variable Response Graph
+ * DualVariableResponseGraph.js - Variable Response Graph for variable
+ *                                comparison
  * 
  * This graph shows the influnce of the secondary variable ('comparand')
- * on the primary variable ('variable'). The x-axis represents the
- * comparand; the y-axis the primary variable. 
+ * on the primary variable ('variable') irrespective of time.
  * 
  * It is composed from timeseries data with matching availability for
- * both variables. Each point 
+ * both variables. Each point in time t with data from both variables
+ * (t, var(t)) and (t, comp(t)) will appears as the scatterplot point
+ * (comp(t), var(t)) instead.
+ * 
+ * The comparand will appear along the x axis as the explanatory
+ * variable; the primary variable will appear along the y axis as the
+ * response variable.
+ * 
+ * Can be constructed from any time series, including both nominal time 
+ * data and climatology data. Selects the highest time resolution
+ * available and skips lower time resolutions to avoid counting any 
+ * datum twice.
  *********************************************************************/
 import React from 'react';
 
@@ -25,8 +36,8 @@ export default function DualVariableResponseGraph(props) {
     } = props;
 
     //determine highest resolution data available.
-    let resolutionsAvailable = _.uniq(_.pluck(meta, 'timescale'));
-    let resolution = _.indexOf(resolutionsAvailable, 'monthly') != -1 ? 'monthly' : 
+    const resolutionsAvailable = _.uniq(_.pluck(meta, 'timescale'));
+    const resolution = _.indexOf(resolutionsAvailable, 'monthly') != -1 ? 'monthly' : 
                  _.indexOf(resolutionsAvailable, 'seasonal') != -1 ? 'seasonal' : 'yearly';
     
     // Set up metadata sets for primary variable
@@ -47,7 +58,7 @@ export default function DualVariableResponseGraph(props) {
   function dataToGraphSpec(meta, data, variable_id, comparand_id) {
     // Convert `data` (described by `meta`) to a graph specification compatible
     // with `DataGraph`.
-    var graphSpec = timeseriesToTimeseriesGraph(meta, ...data);
+    let graphSpec = timeseriesToTimeseriesGraph(meta, ...data);
     
     if(!_.isUndefined(graphSpec)) {
       graphSpec = makeVariableResponseGraph(comparand_id, variable_id, graphSpec);

@@ -882,22 +882,22 @@ var sortSeriesByRank = function(graph, ranker) {
  * This is intended to graph the effect of one variable (x) on another (y).
  */
 var makeVariableResponseGraph = function(x, y, graph) {
-  var c3Data = {};
+  let c3Data = {};
 
-  var seriesNameContains = function (series, keyword) {
+  const seriesNameContains = function (series, keyword) {
     return caseInsensitiveStringSearch(series[0], keyword);
   }
   
-  let xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
-  let yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
+  const xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
+  const yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
     
-  var tuples = [];
+  let tuples = [];
   
   for(let i = 0; i < xseries.length; i++) {
     //Try to match each dependent variable series with an independent variable series
     let dependent = xseries[i];
     let independent = _.find(yseries, series => {
-      return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) == 
+      return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) === 
         dependent[0].toLowerCase();
       });
     for(let d = 1; d < dependent.length; d++) {
@@ -925,9 +925,9 @@ var makeVariableResponseGraph = function(x, y, graph) {
 
   // Generate x and y axes. Reuse labels from source graph,
   // but add variable names if not present.
-  var xAxisLabel = getAxisTextForVariable(graph, x);
-  xAxisLabel = xAxisLabel.search(x) == -1 ? `${x} ${xAxisLabel}` : xAxisLabel;
-  var xAxis = {
+  let xAxisLabel = getAxisTextForVariable(graph, x);
+  xAxisLabel = xAxisLabel.search(x) === -1 ? `${x} ${xAxisLabel}` : xAxisLabel;
+  const xAxis = {
       tick: {
         count: 8,
         fit: true,
@@ -936,9 +936,9 @@ var makeVariableResponseGraph = function(x, y, graph) {
       label: xAxisLabel
     };
 
-  var yAxisLabel = getAxisTextForVariable(graph, y);
-  yAxisLabel = yAxisLabel.search(y) == -1 ? `${y} ${yAxisLabel}` : yAxisLabel;
-  var yAxis = {
+  let yAxisLabel = getAxisTextForVariable(graph, y);
+  yAxisLabel = yAxisLabel.search(y) === -1 ? `${y} ${yAxisLabel}` : yAxisLabel;
+  const yAxis = {
       tick: {
         format: fixedPrecision
       },
@@ -947,9 +947,9 @@ var makeVariableResponseGraph = function(x, y, graph) {
 
   //Whole-graph formatting options
   c3Data.x = 'x'; //use x series
-  var c3Line = {connectNull: false}; //don't connect point data
-  var c3Tooltip = {show: false}; //no tooltip or legend, simplify graph.
-  var c3Legend = {show: false};
+  const c3Line = {connectNull: false}; //don't connect point data
+  const c3Tooltip = {show: false}; //no tooltip or legend, simplify graph.
+  const c3Legend = {show: false};
 
   return {
     data: c3Data,
@@ -968,7 +968,7 @@ var makeVariableResponseGraph = function(x, y, graph) {
  * variable name, returns the axis label text associated with that variable.
  */
 var getAxisTextForVariable = function(graph, variable) {
-  var series = graph.data.columns.find(s => {
+  let series = graph.data.columns.find(s => {
     return caseInsensitiveStringSearch(s[0], variable);
     });
   
@@ -978,7 +978,7 @@ var getAxisTextForVariable = function(graph, variable) {
   series = series[0];
 
   //see if this series has an explicit axis association, default to y if not.
-  var axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
+  const axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
 
   return _.isString(graph.axis[axis].label) ?
       graph.axis[axis].label :

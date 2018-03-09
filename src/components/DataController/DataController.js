@@ -177,7 +177,7 @@ var DataController = createReactClass({
         {
           multiYearMeanSelected(this.props) ? (
 
-            <Tabs>
+            <Tabs id={"Graphs"}>
               <Tab eventKey={1} title='Annual Cycle'>
                 <SingleAnnualCycleGraph {...this.props}/>
               </Tab>
@@ -191,7 +191,7 @@ var DataController = createReactClass({
 
           ) : (
 
-            <Tabs>
+            <Tabs id={"Graphs"}>
               <Tab eventKey={1} title='Time Series'>
                 <SingleTimeSeriesGraph {...this.props}/>
               </Tab>

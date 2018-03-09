@@ -8,10 +8,11 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 
 
 export default function SingleAnnualCycleGraph(props) {
-  function getMetadata(instance) {
-    // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
-    // and annual timescales.
+  function getMetadata(dataSpec) {
+    // Find and return metadata matching the parameters in the dataSpec:
+    // model_id, experiment, variable_id (supplied by parent)
+    // start_date, end_date, ensemble_name (chosen by this component)
+    // for monthly, seasonal and annual timescales.
 
     const {
       model_id, experiment,
@@ -21,7 +22,7 @@ export default function SingleAnnualCycleGraph(props) {
     var findMetadataForResolution = function (resolution) {
       return _.findWhere(meta, {
         model_id, experiment, variable_id,
-        ...instance,
+        ...dataSpec,
         timescale: resolution,
         });
     }

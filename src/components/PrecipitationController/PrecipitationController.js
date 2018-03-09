@@ -44,7 +44,7 @@ var App = createReactClass({
   //the filter returns "false" on will be removed.
   //Filters out multi-year monthly datasets; too noisy to be useful.
   datasetFilter: function (datafile) {
-    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+    return !(datafile.multi_year_mean === false && datafile.timescale == "monthly");
   },
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
@@ -52,10 +52,10 @@ var App = createReactClass({
   render: function () {
 
     //hierarchical data selection: model, then experiment, then variable
-    var modOptions = this.getMetadataItems('model_id');
-    var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
+    const modOptions = this.getMetadataItems('model_id');
+    const expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
+    let varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
         this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
     varOptions = _.filter(varOptions, function(option) {return option[0] != "pr"});
 

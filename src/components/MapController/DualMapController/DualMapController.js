@@ -82,16 +82,9 @@ export default class MapController extends React.Component {
   // Support functions
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentInstance() {
-    // Return encoding of currently selected instance
+  currentDataSpec() {
+    // Return encoding of currently selected data specifier
     return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-    // WAAT? The below code is copied from existing MapController, but it
-    // doesn't drive Selector correctly. *&*#$@*
-    // return JSON.stringify({
-    //   start_date: this.state.start_date,
-    //   end_date: this.state.end_date,
-    //   ensemble_member: this.state.run
-    // });
   }
 
   timesMatch(vTimes = this.state.raster.times, cTimes = this.state.isoline.times) {
@@ -131,14 +124,14 @@ export default class MapController extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   loadMap(
     props,
-    instance,
+    dataSpec,
     newVariable = false,
     newComparand = false
   ) {
     // update state with all the information needed to display
-    // maps for specific instances.
-    // an 'instance' is a variable + emissions + model + period + run combination. 
-    // Timestamps for an instance may be spread across up to three files 
+    // maps for specific dataspecs.
+    // A 'dataspec' is a variable + emissions + model + period + run combination. 
+    // Timestamps for an dataspec may be spread across up to three files 
     // (one annual, one seasonal, one monthly). DualMapController implicitly receives
     // the variable, emissions scenario, and model parameters via its metadata props,
     // which have been filtered on those parameters. It selects a period and run and 
@@ -146,12 +139,12 @@ export default class MapController extends React.Component {
     // specific unique_id until rendering, when it needs to pass an exact file
     // and timestamp to the viewer component DataMap.
     // The variable and the comparand may have different available timestamps, but will
-    // (aside from variable_id) display the same instance.
+    // (aside from variable_id) display the same dataspec.
 
-    const { start_date, end_date, ensemble_member } = instance;
+    const { start_date, end_date, ensemble_member } = dataSpec;
     
-    let rasterParamsPromise = getRasterParamsPromise(instance, props.meta);
-    let isolineParamsPromise = getIsolineParamsPromise(instance, props.comparandMeta);
+    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
+    const isolineParamsPromise = getIsolineParamsPromise(dataSpec, props.comparandMeta);
     
     Promise.all([rasterParamsPromise, isolineParamsPromise]).then(params => {
             
@@ -174,8 +167,8 @@ export default class MapController extends React.Component {
         isolineParams.logscale = this.state.isoline.logscale;
       }
       
-      if(isolineParams.palette == 'x-Occam' && 
-          rasterParams.palette == 'x-Occam') {
+      if(isolineParams.palette === 'x-Occam' && 
+          rasterParams.palette === 'x-Occam') {
         rasterParams.palette = 'seq-Greys';
       }
       
@@ -189,11 +182,11 @@ export default class MapController extends React.Component {
     });  
   }
 
-  // Handlers for instance and dataset change
+  // Handlers for dataSpec change
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  updateInstance = (encodedInstance) => {
-    this.loadMap(this.props, JSON.parse(encodedInstance));
+  updateDataSpec = (encodedDataSpec) => {
+    this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
@@ -261,15 +254,15 @@ export default class MapController extends React.Component {
         newComparandId = selectedVariable(nextProps.meta);
         oldComparandId = selectedVariable(this.props.meta);
       }
-      var defaultDataset = nextProps.meta[0];
-      var defaultInstance = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataset = nextProps.meta[0];
+      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // if so, logarithmic display and palettes will be reset to defaults
-      var switchVariable = !_.isEqual(newVariableId, oldVariableId);
-      var switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
+      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      const switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
 
-      this.loadMap(nextProps, defaultInstance, switchVariable, switchComparand);
+      this.loadMap(nextProps, defaultDataSpec, switchVariable, switchComparand);
     } else {
       // haven't received any displayable data. Probably means user has selected
       // parameters for a dataset that isn't in the database.
@@ -333,8 +326,8 @@ export default class MapController extends React.Component {
               meta={this.props.meta}
               comparandMeta={this.props.comparandMeta}
 
-              instance={this.currentInstance()}
-              onInstanceChange={this.updateInstance}
+              dataSpec={this.currentDataSpec()}
+              onDataSpecChange={this.updateDataSpec}
 
               raster={{
                 ...this.state.raster,

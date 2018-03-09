@@ -77,7 +77,7 @@ function getTimesPromise(datafiles) {
   });
 }
 
-function getScalarParamsPromise(instance, meta) {
+function getScalarParamsPromise(dataSpec, meta) {
   // return a promise for an object containing initial parameters common to
   // all scalar WMS layers (raster, isoline, annotated isoline):
   //   * variableId (name of displayed variable)
@@ -86,10 +86,10 @@ function getScalarParamsPromise(instance, meta) {
   //   * wmsTime (the actual timestamp of the selected starting time)
   //   * logscale (boolean string, 'true' meaning logarithmic colour scaling)
   //   * range (empty object, as ncWMS won't have been queried yet)
-  // for this particular instance (start date + end date + run)
+  // for this particular data specification (start date + end date + run)
   // These are default parameters, not based on user selection or MapController
   // state, and will likely need to be tweaked by the calling MapController.
-  const { start_date, end_date, ensemble_member } = instance;
+  const { start_date, end_date, ensemble_member } = dataSpec;
   const variableId = selectedVariable(meta);
   const logscale = "false"; 
   
@@ -107,10 +107,10 @@ function getScalarParamsPromise(instance, meta) {
   });
 }
 
-function getRasterParamsPromise(instance, meta) {
+function getRasterParamsPromise(dataSpec, meta) {
   // return a promise for an object containing initial raster parameters:
   // scalar parameters plus a palette
-  return getScalarParamsPromise(instance, meta).then(params => {
+  return getScalarParamsPromise(dataSpec, meta).then(params => {
     let palette = 'x-Occam';
     if (!_.isUndefined(getVariableOptions(params.variableId, 'defaultRasterPalette'))) {
         palette = getVariableOptions(params.variableId, 'defaultRasterPalette');
@@ -120,19 +120,19 @@ function getRasterParamsPromise(instance, meta) {
   });  
 }
 
-function getIsolineParamsPromise(instance, meta) {
+function getIsolineParamsPromise(dataSpec, meta) {
   // return a promise for an object containing initial coloured isoline parameters:
   // scalar parameters plus a palette. 
-  return getScalarParamsPromise(instance, meta).then(params => {
+  return getScalarParamsPromise(dataSpec, meta).then(params => {
     params.palette = 'x-Occam';
     return params;
   });
 }
 
-function getAnnotatedParamsPromise(instance, meta) {
+function getAnnotatedParamsPromise(dataSpec, meta) {
   // return a promise for an object containing initial annotated isoline 
   // parameters, which are the same as the default scalar parameters.
-  return getScalarParamsPromise(instance, meta);
+  return getScalarParamsPromise(dataSpec, meta);
 }
 
   export {

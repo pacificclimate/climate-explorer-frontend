@@ -16,8 +16,8 @@ describe('with one variable', () => {
         title={'foo'}
 
         meta={meta}
-        instance='r1i1p1 1961-1990'
-        onInstanceChange={noop}
+        dataSpec='r1i1p1 1961-1990'
+        onDataSpecChange={noop}
 
         raster={{
           times,

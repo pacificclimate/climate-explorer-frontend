@@ -166,7 +166,7 @@ var MotiDataController = createReactClass({
           this.multiYearMeanSelected() ? (
             <AnnualCycleGraph
               meta={this.props.meta}
-              dataset={this.state.annualCycleInstance}
+              dataSpec={this.state.annualCycleDataSpec}
               onChangeDataset={this.updateAnnualCycleDataset}
               graphSpec={this.state.annualCycleData || this.blankGraph}
               onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
