@@ -76,7 +76,9 @@ var App = createReactClass({
           <Col lg={6}>
             <div style={{ width: 890, height: 700 }}>
               <PrecipMapController
+                variable_id={this.state.variable_id}
                 meta = {this.getfilteredMeta()}
+                comparand_id={"pr"}
                 comparandMeta = {this.getfilteredMeta("pr")}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}

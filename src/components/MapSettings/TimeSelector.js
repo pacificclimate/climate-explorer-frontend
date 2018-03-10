@@ -41,7 +41,7 @@ export default class TimeSelector extends React.Component {
     );
   }
 
-  static timeLinkedTooltip = <Tooltip>Timestamp matching is activated</Tooltip>;
+  static timeLinkedTooltip = <Tooltip id={"Time Link Button"}>Timestamp matching is activated</Tooltip>;
   static testTooltip = <Tooltip>TEST</Tooltip>;
 
   render() {

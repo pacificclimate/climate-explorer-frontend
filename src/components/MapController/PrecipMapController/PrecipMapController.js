@@ -37,15 +37,19 @@ import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
 import GeoExporter from '../../GeoExporter';
 
-import { hasValidData, getRasterParamsPromise, 
-         getAnnotatedParamsPromise, selectedVariable } from '../map-helpers.js';
+import { hasValidData, currentDataSpec,
+         updateLayerSimpleState, updateLayerTime,
+         getDatasetId, scalarParams,
+         selectRasterPalette, getTimeParametersPromise} from '../map-helpers.js';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class PrecipMapController extends React.Component {
   static propTypes = {
+    variable_id: PropTypes.string.isRequired,    
     meta: PropTypes.array.isRequired,
-    comparandMeta: PropTypes.array,
+    comparand_id: PropTypes.string.isRequired,
+    comparandMeta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -80,46 +84,14 @@ export default class PrecipMapController extends React.Component {
     };
   }
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentDataSpec() {
-    // Return encoding of currently selected dataSpec
-    return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-  }
-
-  // setState helpers
-
-  updateLayerSimpleState(layerType, name, value) {
-    this.setState(prevState => ({
-      [layerType]: {
-        ...prevState[layerType],
-        [name]: value,
-      },
-    }));
-  }
-
+  // setState helper
   updateTime(timeIdx) {
-    // update the timestamp in state for both layers
-    // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
-    // and an index denoting the timestamp's position with the file
- 
-    // The user selects times from a list drawn from the climdex variable,
-    // so the climdex variable time should be present, but it's possible precipitation
-    // isn't, in which case, the annotated isolines won't show up.
-    const annotatedTime = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
-        this.state.annotated.times[timeIdx] : undefined;
-    
-    this.setState(prevState => ({
-      raster: {
-        ...prevState.raster,
-        timeIdx,
-        wmsTime: prevState.raster.times[timeIdx],
-      },
-      annotated: {
-        ...prevState.annotated,
-        timeIdx,
-        wmsTime: annotatedTime,
-      },
-    }));
+    //times are selected from the raster list. annotated map will not appear if not 
+    //available for the selected time.
+    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
+        timeIdx : undefined;     
+    updateLayerTime.bind(this, 'raster', timeIdx)();
+    updateLayerTime.bind(this, 'annotated', annotatedIndex)();
   }
 
   // Support functions for event/callback handlers
@@ -146,13 +118,19 @@ export default class PrecipMapController extends React.Component {
 
     const { start_date, end_date, ensemble_member } = dataSpec;
     
-    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
-    const annotatedParamsPromise = getAnnotatedParamsPromise(dataSpec, props.comparandMeta);
+    const rasterScalarParams = scalarParams.bind(null, props.variable_id);
+    const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
+      .then(rasterScalarParams)
+      .then(selectRasterPalette);
+    
+    const annotatedScalarParams = scalarParams.bind(null, props.comparand_id);
+    const annotatedParamsPromise = getTimeParametersPromise(dataSpec, props.comparandMeta)
+      .then(annotatedScalarParams);
     
     Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(params => {
       
-      let rasterParams = _.findWhere(params, {variableId: selectedVariable(props.meta)});
-      let annotatedParams = _.findWhere(params, {variableId: selectedVariable(props.comparandMeta)});
+      let rasterParams = _.findWhere(params, {variableId: props.variable_id});
+      let annotatedParams = _.findWhere(params, {variableId: props.comparand_id});
       
       // if the variable has changed, go back to the default palette and logscale,
       // otherwise use the previous (user-selected) values in state.
@@ -182,34 +160,15 @@ export default class PrecipMapController extends React.Component {
     this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  // TODO: There may also be a second issue to do with encoding timeVarIdx
-  getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
-    let dataset = undefined;
-    if (encodedVarTimeIdx) {
-      if (hasValidData(varSymbol, this.props)) {
-        const timeIndex = JSON.parse(encodedVarTimeIdx);
-        dataset = _.findWhere(varMeta, {
-          ensemble_member: this.state.run,
-          start_date: this.state.start_date,
-          end_date: this.state.end_date,
-          timescale: timeIndex.timescale,
-        });
-      }
-    }
-    // dataset may not exist if generating a map for a single-variable portal
-    return dataset && dataset.unique_id;
-  }
-  
   // Handlers for settings changes
 
   handleChangeTime = this.updateTime.bind(this);  
-  handleChangeRasterPalette = this.updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = this.updateLayerSimpleState.bind(this, 'raster', 'range');
-  handleChangeAnnotatedRange = this.updateLayerSimpleState.bind(this, 'annotated', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
+  handleChangeAnnotatedRange = updateLayerSimpleState.bind(this, 'annotated', 'range');
 
   // Handlers for scale change
 
@@ -218,7 +177,7 @@ export default class PrecipMapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = this.updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
 
   // React lifecycle event handlers
 
@@ -231,17 +190,12 @@ export default class PrecipMapController extends React.Component {
     // will be displayed.
 
     if (hasValidData('variable', nextProps)) {
-      // TODO: DRY this up
-      const newVariableId = selectedVariable(nextProps.meta);
-      const oldVariableId = this.props.meta.length > 0 ? selectedVariable(this.props.meta) : undefined;
-      const hasComparand = hasValidData('comparand', nextProps);
-
       const defaultDataset = nextProps.meta[0];
       const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // (if so, palette and logscale will be reset)
-      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
       
       this.loadMap(nextProps, defaultDataSpec, switchVariable);
     } else {
@@ -277,15 +231,15 @@ export default class PrecipMapController extends React.Component {
       this.state.raster.times ? (
         <DataMap
           raster={{
-            dataset: this.getDatasetId(
-              'variable', this.props.meta, this.state.raster.timeIdx),
+            dataset: getDatasetId.bind(
+              this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
             ...this.state.raster,
             onChangeRange: this.handleChangeRasterRange,
           }}
 
           annotated={{
-            dataset: this.getDatasetId(
-              'comparand', this.props.comparandMeta, this.state.annotated.timeIdx),
+            dataset: getDatasetId.bind(
+              this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
             ...this.state.annotated,
             onChangeRange: this.handleChangeAnnotatedRange,
           }}
@@ -308,7 +262,7 @@ export default class PrecipMapController extends React.Component {
               meta={this.props.meta}
               comparandMeta={this.props.comparandMeta}
 
-              dataSpec={this.currentDataSpec()}
+              dataSpec={currentDataSpec.bind(this)()}
               onDataSpecChange={this.updateDataSpec}
 
               raster={{

@@ -35,14 +35,19 @@ import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
 import GeoExporter from '../../GeoExporter';
 
-import { hasValidData, getRasterParamsPromise, 
-  getIsolineParamsPromise, selectedVariable } from '../map-helpers.js';
+import { hasValidData, currentDataSpec,
+  scalarParams, getTimeParametersPromise,
+  selectRasterPalette, selectIsolinePalette,
+  updateLayerSimpleState, updateLayerTime,
+  getDatasetId} from '../map-helpers.js';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class MapController extends React.Component {
   static propTypes = {
+    variable_id: PropTypes.string.isRequired,    
     meta: PropTypes.array.isRequired,
+    comparand_id: PropTypes.string.isRequired,
     comparandMeta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
@@ -81,42 +86,12 @@ export default class MapController extends React.Component {
 
   // Support functions
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentDataSpec() {
-    // Return encoding of currently selected data specifier
-    return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-  }
-
   timesMatch(vTimes = this.state.raster.times, cTimes = this.state.isoline.times) {
     // Returns true if the timestamps available for the variable
     // and the timestamps available for the comparand match
     return !_.isUndefined(vTimes) &&
       !_.isUndefined(cTimes) &&
       _.isEqual(vTimes, cTimes);
-  }
-
-  // setState helpers
-
-  updateLayerSimpleState(layerType, name, value) {
-    this.setState(prevState => ({
-      [layerType]: {
-        ...prevState[layerType],
-        [name]: value,
-      },
-    }));
-  }
-
-  updateLayerTime(layerType, timeIdx) {
-    // update the timestamp in state
-    // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
-    // and an index denoting the timestamp's position with the file
-    this.setState((prevState) => ({
-      [layerType]: {
-        ...prevState[layerType],
-        timeIdx,
-        wmsTime: prevState[layerType].times[timeIdx],
-      },
-    }));
   }
 
   // Support functions for event/callback handlers
@@ -143,13 +118,20 @@ export default class MapController extends React.Component {
 
     const { start_date, end_date, ensemble_member } = dataSpec;
     
-    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
-    const isolineParamsPromise = getIsolineParamsPromise(dataSpec, props.comparandMeta);
+    const rasterScalarParams = scalarParams.bind(null, props.variable_id);
+    const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
+      .then(rasterScalarParams)
+      .then(selectRasterPalette);
+    
+    const isolineScalarParams = scalarParams.bind(null, props.comparand_id);
+    const isolineParamsPromise = getTimeParametersPromise(dataSpec, props.comparandMeta)
+      .then(isolineScalarParams)
+      .then(selectIsolinePalette);
     
     Promise.all([rasterParamsPromise, isolineParamsPromise]).then(params => {
             
-      let rasterParams = _.findWhere(params, {variableId: selectedVariable(props.meta)});
-      let isolineParams = _.findWhere(params, {variableId: selectedVariable(props.comparandMeta)});
+      let rasterParams = _.findWhere(params, {variableId: props.variable_id});
+      let isolineParams = _.findWhere(params, {variableId: props.comparand_id});
       
       if(rasterParams === isolineParams) {
         // needed when comparand and variable are the same
@@ -188,40 +170,21 @@ export default class MapController extends React.Component {
   updateDataSpec = (encodedDataSpec) => {
     this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  // TODO: There may also be a second issue to do with encoding timeVarIdx
-  getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
-    let dataset = undefined;
-    if (encodedVarTimeIdx) {
-      if (hasValidData(varSymbol, this.props)) {
-        const timeIndex = JSON.parse(encodedVarTimeIdx);
-        dataset = _.findWhere(varMeta, {
-          ensemble_member: this.state.run,
-          start_date: this.state.start_date,
-          end_date: this.state.end_date,
-          timescale: timeIndex.timescale,
-        });
-      }
-    }
-    // dataset may not exist if generating a map for a single-variable portal
-    return dataset && dataset.unique_id;
-  }
   
   // Handlers for time selection change
 
-  handleChangeVariableTime = this.updateLayerTime.bind(this, 'raster');
-  handleChangeComparandTime = this.updateLayerTime.bind(this, 'isoline');
+  handleChangeVariableTime = updateLayerTime.bind(this, 'raster');
+  handleChangeComparandTime = updateLayerTime.bind(this, 'isoline');
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = this.updateLayerSimpleState.bind(this, 'raster', 'palette');
-  handleChangeIsolinePalette = this.updateLayerSimpleState.bind(this, 'isoline', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeIsolinePalette = updateLayerSimpleState.bind(this, 'isoline', 'palette');
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = this.updateLayerSimpleState.bind(this, 'raster', 'range');
-  handleChangeIsolineRange = this.updateLayerSimpleState.bind(this, 'isoline', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
+  handleChangeIsolineRange = updateLayerSimpleState.bind(this, 'isoline', 'range');
 
   // Handlers for scale change
 
@@ -230,8 +193,8 @@ export default class MapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = this.updateLayerSimpleState.bind(this, 'raster', 'logscale');
-  handleChangeIsolineScale = this.updateLayerSimpleState.bind(this, 'isoline', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeIsolineScale = updateLayerSimpleState.bind(this, 'isoline', 'logscale');
 
   // React lifecycle event handlers
 
@@ -245,22 +208,14 @@ export default class MapController extends React.Component {
     // will be displayed.
 
     if (hasValidData('variable', nextProps)) {
-      // TODO: DRY this up
-      const newVariableId = selectedVariable(nextProps.meta);
-      const oldVariableId = selectedVariable(this.props.meta);
-      const hasComparand = hasValidData('comparand', nextProps);
-      let newComparandId, oldComparandId;
-      if (hasComparand) {
-        newComparandId = selectedVariable(nextProps.meta);
-        oldComparandId = selectedVariable(this.props.meta);
-      }
       const defaultDataset = nextProps.meta[0];
       const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // if so, logarithmic display and palettes will be reset to defaults
-      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
-      const switchComparand = hasComparand && !_.isEqual(newComparandId, oldComparandId);
+      const hasComparand = hasValidData('comparand', nextProps);
+      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
+      const switchComparand = hasComparand && !_.isEqual(this.props.comparand_id, nextProps.comparand_id);
 
       this.loadMap(nextProps, defaultDataSpec, switchVariable, switchComparand);
     } else {
@@ -295,15 +250,15 @@ export default class MapController extends React.Component {
       this.state.raster.times || this.state.isoline.times ? (
         <DataMap
           raster={{
-            dataset: this.getDatasetId(
-              'variable', this.props.meta, this.state.raster.timeIdx),
+            dataset: getDatasetId.bind(
+              this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
             ...this.state.raster,
             onChangeRange: this.handleChangeRasterRange,
           }}
 
           isoline={{
-            dataset: this.getDatasetId(
-              'comparand', this.props.comparandMeta, this.state.isoline.timeIdx),
+            dataset: getDatasetId.bind(
+              this, 'comparand', this.props.comparandMeta, this.state.isoline.timeIdx)(),
             ...this.state.isoline,
             onChangeRange: this.handleChangeIsolineRange,
           }}
@@ -326,7 +281,7 @@ export default class MapController extends React.Component {
               meta={this.props.meta}
               comparandMeta={this.props.comparandMeta}
 
-              dataSpec={this.currentDataSpec()}
+              dataSpec={currentDataSpec.bind(this)()}
               onDataSpecChange={this.updateDataSpec}
 
               raster={{

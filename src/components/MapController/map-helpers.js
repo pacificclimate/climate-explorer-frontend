@@ -1,13 +1,15 @@
 /************************************************************************
  * map-helpers.js - helper functions for MapControllers
  * 
- * Functions in this file fall into two general categories:
+ * Functions in this file fall into three general categories:
  * 
  *   0. Data processing helper functions, which extract information from
  *      a MapController props object or piece of one.
  *   
  *   1. WMS parameter generation functions, which generate initial 
  *      parameters for ncWMS layers of various types.
+ *      
+ *   2. State and handler functions shared by multiple MapControllers
  ************************************************************************/
 import _ from 'underscore';
 
@@ -22,8 +24,10 @@ function hasValidData(symbol, props) {
   // Returns true if props contains enough information to generate a map
   // for the primary (symbol is 'variable') or secondary ('comparand') variable.
   var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
+  var dataName = `${symbol}_id`;
 
-  return !_.isUndefined(props[dataLocation]) &&
+  return !_.isUndefined(props[dataName]) &&
+    !_.isUndefined(props[dataLocation]) &&
     props[dataLocation].length > 0;
 }
 
@@ -31,24 +35,42 @@ function hasComparand(props) {
   return this.hasValidData('comparand', props);
 }
 
-function selectedVariable(meta) {
-  // from an array of dataset meta filtered by variable, returns the active variable
-  // returns 'undefined' for empty arrays and arrays containing multiple variables.
-  var variables = _.uniq(_.pluck(meta, 'variable_id'));
-  return variables.length === 1 ? variables[0] : undefined;
-  }
-
 // predicate that detects whether a timestamp index is a 0th index:
 // either January, winter, or the first year in a file. 
 const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
+
+function currentDataSpec() {
+  return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
+}
+
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
+// TODO: There may also be a second issue to do with encoding timeVarIdx
+function getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
+  let dataset = undefined;
+  if (encodedVarTimeIdx) {
+    if (hasValidData(varSymbol, this.props)) {
+      const timeIndex = JSON.parse(encodedVarTimeIdx);
+      dataset = _.findWhere(varMeta, {
+        ensemble_member: this.state.run,
+        start_date: this.state.start_date,
+        end_date: this.state.end_date,
+        timescale: timeIndex.timescale,
+      });
+    }
+  }
+  // dataset may not exist if generating a map for a single-variable portal
+  return dataset && dataset.unique_id;
+}
+
 
 /********************************************************************
  * 1. WMS parameter generating functions
  ********************************************************************/
 
-function getTimesPromise(datafiles) {
-  // Get a promise for an indexed list of all timestamps available in the 
-  // selected datafiles. The indices are stringified objects with timescale
+function getTimeParametersPromise(dataSpec, meta) {
+  // Returns a promise for an indexed list of all timestamps available for the
+  // selected data specification in files whose metadata is in the "meta" array.
+  // The indices are stringified objects with timescale
   // and timeidx attributes, for example, for a climatological mean:
   //   {timescale: monthly, timeidx: 0} is January.
   //   {timescale: seasonal, timeidx: 2} is Summer
@@ -56,6 +78,9 @@ function getTimesPromise(datafiles) {
   //   {timescale: annual, timeidx: 0} is 1950
   //   {timescale: annual, timeidx: 1} is 1951
   // The timestamps are timestamp strings suitable for ncWMS.
+  const { start_date, end_date, ensemble_member } = dataSpec;  
+  let datafiles = _.filter(meta,
+      { ensemble_member, start_date, end_date });
   const timestampPromises = datafiles.map(df => getTimeMetadata(df.unique_id));
   
   return Promise.all(timestampPromises).then(responses => {
@@ -77,8 +102,8 @@ function getTimesPromise(datafiles) {
   });
 }
 
-function getScalarParamsPromise(dataSpec, meta) {
-  // return a promise for an object containing initial parameters common to
+function scalarParams(variable, times) {
+  // return an object containing initial parameters common to
   // all scalar WMS layers (raster, isoline, annotated isoline):
   //   * variableId (name of displayed variable)
   //   * times (list of all available times)
@@ -86,61 +111,81 @@ function getScalarParamsPromise(dataSpec, meta) {
   //   * wmsTime (the actual timestamp of the selected starting time)
   //   * logscale (boolean string, 'true' meaning logarithmic colour scaling)
   //   * range (empty object, as ncWMS won't have been queried yet)
-  // for this particular data specification (start date + end date + run)
+  // given the results of the getTimesPromise
   // These are default parameters, not based on user selection or MapController
   // state, and will likely need to be tweaked by the calling MapController.
-  const { start_date, end_date, ensemble_member } = dataSpec;
-  const variableId = selectedVariable(meta);
-  const logscale = "false"; 
+  const logscale = "false";
+  const variableId = variable;
+  const startingIndex = _.find(Object.keys(times), is0thIndex);
   
-  let datafiles = _.filter(meta,
-      { ensemble_member, start_date, end_date });
-  
-  return getTimesPromise(datafiles).then(times => {
-    //select a 0th index to display initially.
-    const startingIndex = _.find(Object.keys(times), is0thIndex);
-    return {variableId, times, logscale,
-      timeIdx: startingIndex,
-      wmsTime: times[startingIndex],
-      range: {}
-    };
-  });
+  return {
+    variableId, times, logscale,
+    timeIdx: startingIndex,
+    wmsTime: times[startingIndex],
+    range: {}
+  };
 }
 
-function getRasterParamsPromise(dataSpec, meta) {
-  // return a promise for an object containing initial raster parameters:
-  // scalar parameters plus a palette
-  return getScalarParamsPromise(dataSpec, meta).then(params => {
-    let palette = 'x-Occam';
-    if (!_.isUndefined(getVariableOptions(params.variableId, 'defaultRasterPalette'))) {
-        palette = getVariableOptions(params.variableId, 'defaultRasterPalette');
-    }
-    params.palette = palette;
-    return params;
-  });  
+function selectRasterPalette(params) {
+  // add a default raster palette to a ncWMS params object: either rainbow (x-Occam)
+  // or a variable default palette if the config file has one.
+  let palette = 'x-Occam';
+  if (!_.isUndefined(getVariableOptions(params.variableId, 'defaultRasterPalette'))) {
+      palette = getVariableOptions(params.variableId, 'defaultRasterPalette');
+  }
+  params.palette = palette;
+  return params;
 }
 
-function getIsolineParamsPromise(dataSpec, meta) {
-  // return a promise for an object containing initial coloured isoline parameters:
-  // scalar parameters plus a palette. 
-  return getScalarParamsPromise(dataSpec, meta).then(params => {
-    params.palette = 'x-Occam';
-    return params;
-  });
+function selectIsolinePalette(params) {
+  // adds the default isoline palette (rainbow / x-Occam) to the params object.
+  // TODO: add isoline numContours here when we get it working 
+  params.palette = 'x-Occam';
+  return params;
 }
 
-function getAnnotatedParamsPromise(dataSpec, meta) {
-  // return a promise for an object containing initial annotated isoline 
-  // parameters, which are the same as the default scalar parameters.
-  return getScalarParamsPromise(dataSpec, meta);
+/**************************************************************************
+ * 2. State handling functions shared by MapControllers
+ **************************************************************************/
+
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
+function currentDataSpec() {
+  // Return encoding of currently selected dataspec
+  return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
+}
+
+function updateLayerSimpleState(layerType, name, value) {
+  this.setState(prevState => ({
+    [layerType]: {
+      ...prevState[layerType],
+      [name]: value,
+    },
+  }));
+}
+
+function updateLayerTime(layerType, timeIdx) {
+  // update the timestamp in state
+  // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
+  // and an index denoting the timestamp's position with the file
+  this.setState((prevState) => ({
+    [layerType]: {
+      ...prevState[layerType],
+      timeIdx,
+      wmsTime: prevState[layerType].times[timeIdx],
+    },
+  }));
 }
 
   export {
     hasValidData,
     hasComparand,
-    getRasterParamsPromise,
-    getIsolineParamsPromise,
-    getAnnotatedParamsPromise,
+    getDatasetId,
+    getTimeParametersPromise,
+    scalarParams,
+    selectRasterPalette,
+    selectIsolinePalette,
     is0thIndex,
-    selectedVariable
+    currentDataSpec,
+    updateLayerSimpleState,
+    updateLayerTime
   };

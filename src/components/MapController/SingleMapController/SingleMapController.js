@@ -32,12 +32,15 @@ import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
 import GeoExporter from '../../GeoExporter';
 
-import { hasValidData, getRasterParamsPromise, selectedVariable } from '../map-helpers.js';
+import { hasValidData, selectRasterPalette,
+         currentDataSpec, updateLayerSimpleState,
+         updateLayerTime, getTimeParametersPromise, scalarParams} from '../map-helpers.js';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class MapController extends React.Component {
   static propTypes = {
+    variable_id: PropTypes.string.isRequired,    
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
@@ -63,38 +66,6 @@ export default class MapController extends React.Component {
     };
   }
 
-  // Support functions
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  currentDataSpec() {
-    // Return encoding of currently selected dataspec
-    return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-  }
-
-  // setState helpers
-
-  updateLayerSimpleState(layerType, name, value) {
-    this.setState(prevState => ({
-      [layerType]: {
-        ...prevState[layerType],
-        [name]: value,
-      },
-    }));
-  }
-
-  updateLayerTime(layerType, timeIdx) {
-    // update the timestamp in state
-    // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
-    // and an index denoting the timestamp's position with the file
-    this.setState((prevState) => ({
-      [layerType]: {
-        ...prevState[layerType],
-        timeIdx,
-        wmsTime: prevState[layerType].times[timeIdx],
-      },
-    }));
-  }
-
   // Support functions for event/callback handlers
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -116,7 +87,11 @@ export default class MapController extends React.Component {
 
     const { start_date, end_date, ensemble_member } = dataSpec;
     
-    const rasterParamsPromise = getRasterParamsPromise(dataSpec, props.meta);
+    const rasterScalarParams = scalarParams.bind(null, props.variable_id);
+    const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
+      .then(rasterScalarParams)
+      .then(selectRasterPalette);
+    
     rasterParamsPromise.then(params => {
       //if the variable has changed, use the default palette and logscale,
       //otherwise use the previous (user-selected) values from state.
@@ -162,15 +137,15 @@ export default class MapController extends React.Component {
   
   // Handlers for time selection change
 
-  handleChangeVariableTime = this.updateLayerTime.bind(this, 'raster');
+  handleChangeVariableTime = updateLayerTime.bind(this, 'raster');
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = this.updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = this.updateLayerSimpleState.bind(this, 'raster', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
 
   // Handlers for scale change
 
@@ -179,7 +154,7 @@ export default class MapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = this.updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
 
   // React lifecycle event handlers
 
@@ -192,17 +167,13 @@ export default class MapController extends React.Component {
     // the first dataset representing a 0th time index (January, Winter, or Annual)
     // will be displayed.
 
-    if (hasValidData('variable', nextProps)) {
-      // TODO: DRY this up
-      const newVariableId = selectedVariable(nextProps.meta);
-      const oldVariableId = selectedVariable(this.props.meta);
-      
+    if (hasValidData('variable', nextProps)) {      
       const defaultDataset = nextProps.meta[0];
       const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
 
       // check to see whether the variables displayed have been switched.
       // if so, loadMap will reset palette and logarithmic dispay.
-      const switchVariable = !_.isEqual(newVariableId, oldVariableId);
+      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
 
 
       this.loadMap(nextProps, defaultDataSpec, switchVariable);
@@ -259,7 +230,7 @@ export default class MapController extends React.Component {
               title='Map Settings'
               meta={this.props.meta}
 
-              dataSpec={this.currentDataSpec()}
+              dataSpec={currentDataSpec.bind(this)()}
               onDataSpecChange={this.updateDataSpec}
 
               raster={{
