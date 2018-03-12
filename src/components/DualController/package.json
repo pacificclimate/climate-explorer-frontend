@@ -1,6 +1,0 @@
-{
-  "name": "Dual Controller",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./DualController.js"
-}

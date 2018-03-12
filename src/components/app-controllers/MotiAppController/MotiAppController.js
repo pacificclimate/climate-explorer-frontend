@@ -1,26 +1,33 @@
-/***************************************************************
- * AppController.js 
+/******************************************************************
+ * MotiAppController.js - Ensemble-vewing app controller
  * 
- * This controller represent climate explorer's main portal. It
- * has dropdowns to allow a user to select a model, emission
- * scenario, and variable. It loads and filters metadata for 
- * the selected datasets and passes them to its children:  
- * - MapController (displays a variable as a colour-shaded map) 
- * - DataController (displays graphs and a statistical table).
- ***************************************************************/
+ * This controller is intended to be used with an ensemble containing
+ * a small number of datasets, each of which is the average of 
+ * multiple runs and models, controlled with a lightweight and simple UI.
+ * 
+ * Users can select a variable and an emissions scenario to view, and see
+ * data and maps displaying the mean of all models and runs with that
+ * variable and scenario. 
+ * 
+ * Its children are MotiDataController, which displays graphs and 
+ * stats with no user interaction supported, and SingleMapController,
+ * which displays the selected ensemble average as a colour-coded
+ * raster map.
+ ******************************************************************/
 
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import SingleMapController from '../MapController/SingleMapController';
-import DataController from '../DataController/DataController';
-import Selector from '../Selector';
-import AppMixin from '../AppMixin';
-import g from '../../core/geo';
+import SingleMapController from '../../map-controllers/SingleMapController/SingleMapController';
+import MotiDataController from '../../MotiDataController';
+import Selector from '../../Selector';
+import AppMixin from '../../AppMixin';
+import g from "../../../core/geo";
 
-var App = createReactClass({
-  displayName: 'App',
+
+export default createReactClass({
+  displayName: 'MotiAppController',
 
   /**
    * Initial state set upon metadata returning in {@link App#componentDidMount}.
@@ -29,35 +36,32 @@ var App = createReactClass({
 
   mixins: [AppMixin],
 
-  //This filter controls which datasets are available for viewing on this portal;
-  //only datasets the filter returns a truthy value for are available.
-  //Filters out noisy multi-year monthly datasets.
+  //This function is used to filter which datasets will be used by this
+  //portal. Datasets the filter returns "false" on will not be added to
+  //the set of available datasets. Filters out noisy monthly non-mean datasets.
   datasetFilter: function (datafile) {
     return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
   },
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
-    //hierarchical selection: model, then variable, then experiment
-    var modOptions = this.getMetadataItems('model_id');
+    //hierarchical selections: model (implicit), then variable, then emission
     var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
         this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id}));
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
 
-    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
     return (
       <Grid fluid>
         <Row>
-          <Col lg={4} md={4}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
-          </Col>
           <Col lg={4} md={4}>
             <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
           </Col>
           <Col lg={4} md={4}>
             <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
           </Col>
+          <Col lg={4} md={4} />
         </Row>
         <Row>
           <Col lg={6}>
@@ -71,15 +75,12 @@ var App = createReactClass({
             </div>
           </Col>
           <Col lg={6}>
-            <DataController
-              ensemble_name={this.state.ensemble_name}
+            <MotiDataController
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
-              contextMeta={this.state.meta} //for Context Graph: metadata from all models
             />
           </Col>
         </Row>
@@ -88,5 +89,3 @@ var App = createReactClass({
     );
   },
 });
-
-export default App;

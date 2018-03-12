@@ -1,5 +1,5 @@
 /************************************************************************
- * PrecipitationController.js - Extreme precipitation application controller
+ * PrecipAppController.js - Extreme precipitation application controller
  * 
  * This controller represents a portal that serves information on extreme
  * precipitation. It is meant to be used with an ensemble containing 
@@ -8,8 +8,9 @@
  * then compared to precipitation values.
  * 
  * Its children are DualDataController, which coordinates graphs comparing
- * the two selected variables, and MapController, which coordinates a map
- * displaying the climdex as scalar colours and precipitation as isolines.
+ * the two selected variables, and PrecipMapController, which coordinates
+ * a map displaying the selected climdex as a raster and precipitation as 
+ * annotated isolines.
  * 
  * It is very similar to the DualController, except the comparison variable
  * is always precipitation.
@@ -19,15 +20,15 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import DualDataController from '../DualDataController/DualDataController';
-import Selector from '../Selector';
-import AppMixin from '../AppMixin';
-import g from '../../core/geo';
-import PrecipMapController from '../MapController/PrecipMapController';
+import DualDataController from '../../data-controllers/DualDataController/DualDataController';
+import Selector from '../../Selector';
+import AppMixin from '../../AppMixin';
+import g from '../../../core/geo';
+import PrecipMapController from '../../map-controllers/PrecipMapController';
 import _ from 'underscore';
 
-var App = createReactClass({
-  displayName: 'App',
+export default createReactClass({
+  displayName: 'PrecipAppController',
 
   /*
    * Initial state is set after the multimeta API query run in AppMixin.componentDidMount()
@@ -103,5 +104,3 @@ var App = createReactClass({
     );
   },
 });
-
-export default App;

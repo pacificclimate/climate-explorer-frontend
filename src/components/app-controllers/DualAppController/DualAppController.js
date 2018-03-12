@@ -1,12 +1,12 @@
 /************************************************************************
- * DualController.js - Two-variable application controller
+ * DualAppController.js - Two-variable application controller
  * 
  * This controller represents a portal that allows the user to compare 
  * and display two variables at once. It has dropdowns to select a model,
  * experiment, and two seperate variables. 
  * 
  * Its children are DualDataController, which coordinates graphs comparing
- * the two selected variables, and MapController, which coordinates a map
+ * the two selected variables, and DualMapController, which coordinates a map
  * displaying one variable as scalar colours and the other as isolines.
  * 
  * The main variable is internally referred to as "variable," the variable
@@ -20,15 +20,15 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import DualDataController from '../DualDataController/DualDataController';
-import Selector from '../Selector';
-import AppMixin from '../AppMixin';
-import g from '../../core/geo';
-import DualMapController from '../MapController/DualMapController';
+import DualDataController from '../../data-controllers/DualDataController/DualDataController';
+import Selector from '../../Selector';
+import AppMixin from '../../AppMixin';
+import g from '../../../core/geo';
+import DualMapController from '../../map-controllers/DualMapController';
 import _ from 'underscore';
 
-var App = createReactClass({
-  displayName: 'App',
+export default createReactClass({
+  displayName: 'DualAppController',
 
   /*
    * Initial state is set after the multimeta API query run in AppMixin.componentDidMount()
@@ -122,5 +122,3 @@ var App = createReactClass({
     );
   },
 });
-
-export default App;

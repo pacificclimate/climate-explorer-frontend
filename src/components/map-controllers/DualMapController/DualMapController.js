@@ -43,7 +43,7 @@ import { hasValidData, currentDataSpec,
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-export default class MapController extends React.Component {
+export default class DualMapController extends React.Component {
   static propTypes = {
     variable_id: PropTypes.string.isRequired,    
     meta: PropTypes.array.isRequired,

@@ -1,6 +1,0 @@
-{
-  "name": "App Controller",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./AppController.js"
-}

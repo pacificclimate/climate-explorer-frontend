@@ -26,7 +26,6 @@ import _ from 'underscore';
 import { timeseriesToTimeseriesGraph, makeVariableResponseGraph } from '../../core/chart';
 import VariableResponseGraph from './VariableResponseGraph';
 
-//TODO: error message if same variable.
 export default function DualVariableResponseGraph(props) {
   function getMetadata() {
     const {

@@ -1,27 +1,24 @@
 /*******************************************************************
- * DataController.js - controller component for in-depth numerical
- * visualization
+ * SingleDataController.js - controller component for in-depth numerical
+ * visualization of a single variable
  *
  * Receives a model, an experiment, and a variable from its parent,
- * AppController. Presents the user with widgets to allow selection 
- * of a particular slice of data (time of year or run) and download 
- * of selected data. 
+ * SingleAppController. Manages viewer components that display data as
+ * graphs or tables. 
  *
- * Queries the API to retrieve the selected data generates graphs and
- * tables from it as viewing components. 
- *
- * If the selected dataset is a multi year mean climatology:
- *  - an Annual Cycle Datagraph with monthly, seasonal, and annual
- *    resolution (if available)
+ * Child components vary by whether the selected dataset is a multi year mean
+ * climatology. If so:
+ *  - a SingleAnnualCycleGraph displaying data with monthly, seasonal, and annual
+ *    resolution (as available)
  * 
- *  - a Long Term Average Datagraph showing the mean of each climatology
+ *  - a SingleLongTermAverageGraph showing the mean of each climatology
  *    period as a seperate data point.
  *
- *  - a Model Context Datagraph similar to the Long Term Average
- *    Datagraph, but with a separate line for each model.
+ *  - a SingleContextGraph similar to the Long Term Average graph, but with
+ *    a separate line for each model and simplified presentation.
  *
  * If the selected dataset is not a multi year mean:
- *  - a Time Series Datagraph showing each time point available.
+ *  - a freeform SingleTimeSeriesGraph showing each time point available.
  *
  * A Data Table viewer component showing statistical information for each
  * climatology period or timeseries is also generated. 
@@ -34,24 +31,24 @@ import createReactClass from 'create-react-class';
 import { Button, Row, Col, Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
-import styles from './DataController.css';
+import styles from './SingleDataController.css';
 
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
-         resolutionIndexToTimeKey} from '../../core/util';
-import DataTable from '../DataTable/DataTable';
-import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
-import DataControllerMixin from '../DataControllerMixin';
-import { displayError, multiYearMeanSelected } from '../graphs/graph-helpers';
-import SingleAnnualCycleGraph from '../graphs/SingleAnnualCycleGraph';
-import SingleLongTermAveragesGraph from '../graphs/SingleLongTermAveragesGraph';
-import SingleContextGraph from '../graphs/SingleContextGraph';
-import SingleTimeSeriesGraph from '../graphs/SingleTimeSeriesGraph';
+         resolutionIndexToTimeKey} from '../../../core/util';
+import DataTable from '../../DataTable/DataTable';
+import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
+import DataControllerMixin from '../../DataControllerMixin';
+import { displayError, multiYearMeanSelected } from '../../graphs/graph-helpers';
+import SingleAnnualCycleGraph from '../../graphs/SingleAnnualCycleGraph';
+import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
+import SingleContextGraph from '../../graphs/SingleContextGraph';
+import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
-var DataController = createReactClass({
-  displayName: 'DataController',
+export default createReactClass({
+  displayName: 'SingleDataController',
 
   propTypes: {
     model_id: PropTypes.string,
@@ -74,7 +71,7 @@ var DataController = createReactClass({
   },
 
   /*
-   * Called when DataController is first loaded. Selects and fetches 
+   * Called when SingleDataController is first loaded. Selects and fetches 
    * arbitrary initial data to display in the graphs and stats table. 
    * Monthly time resolution, January, on the first run returned by the API.
    */
@@ -214,5 +211,3 @@ var DataController = createReactClass({
     );
   },
 });
-
-export default DataController;
