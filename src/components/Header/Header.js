@@ -38,7 +38,7 @@ class Header extends React.Component {
                 <LinkContainer to='/compare/all_CLIMDEX_files'>
                   <NavItem eventKey={4}>ClimDEX comparison</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/precipitation/test_precipitation'>
+                <LinkContainer to='/precipitation/extreme_precipitation'>
                   <NavItem eventKey={4}>Extreme Precipitation</NavItem>
                 </LinkContainer>
               </Nav>
