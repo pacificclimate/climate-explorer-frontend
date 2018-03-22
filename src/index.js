@@ -23,7 +23,7 @@ class App extends React.Component {
           <Header />
         </div>
         <div>
-          {this.props.children || <AppController ensemble_name="all_downscale_files"/>}
+          {this.props.children || <SingleAppController ensemble_name="all_downscale_files"/>}
         </div>
         <div>
           <Footer />

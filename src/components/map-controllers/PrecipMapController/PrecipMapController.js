@@ -84,16 +84,6 @@ export default class PrecipMapController extends React.Component {
     };
   }
 
-  // setState helper
-  updateTime(timeIdx) {
-    //times are selected from the raster list. annotated map will not appear if not 
-    //available for the selected time.
-    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
-        timeIdx : undefined;     
-    updateLayerTime.bind(this, 'raster', timeIdx)();
-    updateLayerTime.bind(this, 'annotated', annotatedIndex)();
-  }
-
   // Support functions for event/callback handlers
 
   // TODO: split loadmap into helpers?
@@ -161,10 +151,16 @@ export default class PrecipMapController extends React.Component {
   };
 
   // Handlers for settings changes
-
-  handleChangeTime = this.updateTime.bind(this);  
   handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
-
+  handleChangeTime = (timeIdx) => {
+    //times are selected from the raster list. annotated map will not appear if not 
+    //available for the selected time.
+    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
+        timeIdx : undefined;     
+    updateLayerTime.bind(this, 'raster', timeIdx)();
+    updateLayerTime.bind(this, 'annotated', annotatedIndex)();
+  };
+  
   // Handlers for layer range change
 
   handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');

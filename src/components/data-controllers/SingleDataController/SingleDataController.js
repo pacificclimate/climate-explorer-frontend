@@ -174,7 +174,7 @@ export default createReactClass({
         {
           multiYearMeanSelected(this.props) ? (
 
-            <Tabs id={"Graphs"}>
+            <Tabs id="Graphs">
               <Tab eventKey={1} title='Annual Cycle'>
                 <SingleAnnualCycleGraph {...this.props}/>
               </Tab>
@@ -188,7 +188,7 @@ export default createReactClass({
 
           ) : (
 
-            <Tabs id={"Graphs"}>
+            <Tabs id="Graphs">
               <Tab eventKey={1} title='Time Series'>
                 <SingleTimeSeriesGraph {...this.props}/>
               </Tab>

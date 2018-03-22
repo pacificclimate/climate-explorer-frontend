@@ -39,10 +39,6 @@ function hasComparand(props) {
 // either January, winter, or the first year in a file. 
 const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
 
-function currentDataSpec() {
-  return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
-}
-
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
 // TODO: There may also be a second issue to do with encoding timeVarIdx
 function getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
