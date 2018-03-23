@@ -47,8 +47,8 @@ export default class DualMapController extends React.Component {
   static propTypes = {
     variable_id: PropTypes.string.isRequired,    
     meta: PropTypes.array.isRequired,
-    comparand_id: PropTypes.string.isRequired,
-    comparandMeta: PropTypes.array.isRequired,
+    comparand_id: PropTypes.string,
+    comparandMeta: PropTypes.array,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };

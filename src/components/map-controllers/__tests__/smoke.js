@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import DualMapController from '../DualMapController';
 import SingleMapController from '../SingleMapController';
 import PrecipMapController from '../PrecipMapController';
+import noop from 'underscore';
 
 
 /*********************************************************************
@@ -15,7 +16,9 @@ describe('DualMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <DualMapController
+            variable_id=""
             meta={[]}
+            onSetArea={noop}
           />,
           div
         );
@@ -26,6 +29,7 @@ describe('DualMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <DualMapController
+            variable_id="tasmax"
             meta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -42,6 +46,7 @@ describe('DualMapController', () => {
                 multi_year_mean: true
               },
             ]}
+            onSetArea={noop}
           />,
           div
         );
@@ -55,8 +60,11 @@ describe('DualMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <DualMapController
+            variable_id=""
             meta={[]}
+            comparand_id=""
             comparandMeta={[]}
+            onSetArea={noop}
           />,
           div
         );
@@ -67,6 +75,7 @@ describe('DualMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <DualMapController
+            variable_id="tasmax"
             meta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -83,6 +92,7 @@ describe('DualMapController', () => {
                 multi_year_mean: true,
               },
             ]}
+            comparand_id="tasmax"
             comparandMeta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -99,6 +109,7 @@ describe('DualMapController', () => {
                 multi_year_mean: true,
               },
             ]}
+            onSetArea={noop}
           />,
           div
         );
@@ -117,7 +128,9 @@ describe('SingleMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <SingleMapController
+            variable_id=""
             meta={[]}
+            onSetArea={noop}
           />,
           div
         );
@@ -128,6 +141,7 @@ describe('SingleMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <SingleMapController
+            variable_id="tasmax"
             meta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -144,6 +158,7 @@ describe('SingleMapController', () => {
                 multi_year_mean: true
               },
             ]}
+            onSetArea={noop}
           />,
           div
         );
@@ -162,7 +177,9 @@ describe('PrecipMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <PrecipMapController
+            variable_id=""
             meta={[]}
+            onSetArea={noop}
           />,
           div
         );
@@ -173,6 +190,7 @@ describe('PrecipMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <PrecipMapController
+            variable_id="tasmax"
             meta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -189,6 +207,7 @@ describe('PrecipMapController', () => {
                 multi_year_mean: true
               },
             ]}
+            onSetArea={noop}
           />,
           div
         );
@@ -202,8 +221,11 @@ describe('PrecipMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <PrecipMapController
+            variable_id=""
             meta={[]}
+            comparand_id=""
             comparandMeta={[]}
+            onSetArea={noop}
           />,
           div
         );
@@ -214,6 +236,7 @@ describe('PrecipMapController', () => {
         const div = document.createElement('div');
         ReactDOM.render(
           <PrecipMapController
+            variable_id="tasmax"
             meta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -230,6 +253,7 @@ describe('PrecipMapController', () => {
                 multi_year_mean: true,
               },
             ]}
+            comparand_id="tasmax"
             comparandMeta={[
               {
                 unique_id: 'tasmax_aClim_BCCAQv2_GFDL-ESM2G_historical-rcp26_r1i1p1_19610101-19901231_Canada',
@@ -246,6 +270,7 @@ describe('PrecipMapController', () => {
                 multi_year_mean: true,
               },
             ]}
+            onSetArea={noop}
           />,
           div
         );

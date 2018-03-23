@@ -20,7 +20,7 @@ import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import SingleMapController from '../../map-controllers/SingleMapController/SingleMapController';
-import MotiDataController from '../../MotiDataController';
+import MotiDataController from '../../data-controllers/MotiDataController';
 import Selector from '../../Selector';
 import AppMixin from '../../AppMixin';
 import g from "../../../core/geo";
