@@ -12,9 +12,21 @@ class MapFooter extends React.Component {
     start_date: PropTypes.string,
     end_date: PropTypes.string,
     run: PropTypes.string,
-    raster: PropTypes.object,
-    isoline: PropTypes.object,
-    annotated: PropTypes.object,
+    raster: PropTypes.shape({
+      variableId: PropTypes.string,
+      wmsTime: PropTypes.string,
+      times: PropTypes.object
+    }),
+    isoline: PropTypes.shape({
+      variableId: PropTypes.string,
+      wmsTime: PropTypes.string,
+      times: PropTypes.object
+    }),
+    annotated: PropTypes.shape({
+      variableId: PropTypes.string,
+      wmsTime: PropTypes.string,
+      times: PropTypes.object
+    }),
     hasValidComparand: PropTypes.bool,
   };
   

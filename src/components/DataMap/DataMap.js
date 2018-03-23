@@ -18,16 +18,7 @@ import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-
-const layerPropTypes = PropTypes.shape({
-  dataset: PropTypes.string,
-  variableId: PropTypes.string,
-  time: PropTypes.string,
-  palette: PropTypes.string,
-  logscale: PropTypes.string, // arg for ncwms: 'true' | 'false' (String)
-  range: PropTypes.object,
-  onChangeRange: PropTypes.func.isRequired,
-});
+import {layerParamsPropTypes} from '../../types/types.js';
 
 class DataMap extends React.Component {
   // This component provides data display layers (DataLayer) for up to two
@@ -36,9 +27,9 @@ class DataMap extends React.Component {
   // Renders its children within the base map.
 
   static propTypes = {
-    raster: layerPropTypes,
-    isoline: layerPropTypes,
-    annotated: layerPropTypes,
+    raster: layerParamsPropTypes,
+    isoline: layerParamsPropTypes,
+    annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -155,15 +146,27 @@ class DataMap extends React.Component {
     }
   }
 
-  render() {    
+  render() {
     // TODO: Add positioning for autoset
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        {this.dataLayerProps('raster')}
-        {this.dataLayerProps('isoline')}
-        {this.dataLayerProps('annotated')}
+        {
+          ['raster', 'isoline', 'annotated'].map(lType => {
+            if (!_.isUndefined(this.props[lType])) {
+                return (
+                  <DataLayer
+                    layerType={lType}
+                    layerParams={this.props[lType]}
+                    onLayerRef={this.handleLayerRef.bind(this, lType)}
+                  />
+                );
+              }
+            }
+          )
+        }
+
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
           {...this.props.raster}  // update when any raster prop changes
