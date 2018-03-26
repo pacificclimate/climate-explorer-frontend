@@ -1,6 +1,6 @@
 # News / Release Notes
 
-##1.1.0
+## 1.1.0
 *26-March-2018*
 * [Adds Extreme Precipitation tab to list of existing data views](https://github.com/pacificclimate/climate-explorer-frontend/pull/141)
 * [Add multi-model context graph (a.k.a. the "spaghetti plot) to main portal](https://github.com/pacificclimate/climate-explorer-frontend/pull/117)
@@ -8,7 +8,7 @@
 * [Fix DualDataController query bugs](https://github.com/pacificclimate/climate-explorer-frontend/pull/120)
 * [Several](https://github.com/pacificclimate/climate-explorer-frontend/pull/121) [refactoring](https://github.com/pacificclimate/climate-explorer-frontend/pull/113) [changes](https://github.com/pacificclimate/climate-explorer-frontend/pull/137) to improve code quality
 
-##1.0.2
+## 1.0.2
 *9-January-2018*
 * [Disable parameters that don't match any datasets on dataset dropdown menus](https://github.com/pacificclimate/climate-explorer-frontend/pull/98)
 * [Fix a bug that prevented comparing variables across a specified area](https://github.com/pacificclimate/climate-explorer-frontend/pull/109)
