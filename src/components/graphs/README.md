@@ -22,6 +22,9 @@ The graph components form a dependency hierarchy as follows (root at top):
     - `TimeSeriesGraph`: graphs the values of the selected variable(s) over time
         - `SingleTimeSeriesGraph`
         - `DualTimeSeriesGraph`
+    - `VariableResponseGraph`: no time dimension, graphs a scatterplot of
+    datapoints using one variable as the y axis and the other as the x axis.
+        - `DualVariableResponseGraph` (can't be generated with a single variable.)
 
 Note: All graphs show spatial averages of values over the area selected in the
 map UI (or the entire spatial area available if none selected).

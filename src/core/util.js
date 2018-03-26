@@ -311,7 +311,7 @@ var sameYear = function(date1, date2) {
 }
 
 /*****************************************************
- * String-related helper function
+ * String-related helper functions
  *****************************************************/
 
 /*
@@ -322,6 +322,13 @@ var capitalizeWords = function(s) {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 };
 
+/*
+ * Returns true if the second argument is a substring of the first,
+ * ignoring case.
+ */
+var caseInsensitiveStringSearch = function (s1, s2) {
+  return s1.toLowerCase().search(s2.toLowerCase()) !== -1;
+};
 
 /**********************************************************
  * Object-related helper function
@@ -350,5 +357,5 @@ module.exports = { PRECISION, parseBootstrapTableData, validateLongTermAverageDa
     timeKeyToTimeOfYear, timeKeyToResolutionIndex, timeResolutionIndexToTimeOfYear,
     resolutionIndexToTimeKey, extendedDateToBasicDate, timestampToTimeOfYear, timestampToYear,
     sameYear,
-    capitalizeWords,
+    capitalizeWords, caseInsensitiveStringSearch,
     nestedAttributeIsDefined};

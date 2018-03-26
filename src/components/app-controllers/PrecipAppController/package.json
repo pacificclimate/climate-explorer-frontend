@@ -1,0 +1,6 @@
+{
+  "name": "Extreme Precipitation Controller",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./PrecipAppController.js"
+}

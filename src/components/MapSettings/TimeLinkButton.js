@@ -22,7 +22,7 @@ export default class TimeLinkButton extends React.PureComponent {
     }
   }
 
-  tooltip = () => <Tooltip>{this.tooltipContent()}</Tooltip>;
+  tooltip = () => <Tooltip id={"Time Link Button"}>{this.tooltipContent()}</Tooltip>;
 
   render() {
     return (

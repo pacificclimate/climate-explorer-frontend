@@ -18,16 +18,7 @@ import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-
-const layerPropTypes = PropTypes.shape({
-  dataset: PropTypes.string,
-  variableId: PropTypes.string,
-  time: PropTypes.string,
-  palette: PropTypes.string,
-  logscale: PropTypes.string, // arg for ncwms: 'true' | 'false' (String)
-  range: PropTypes.object,
-  onChangeRange: PropTypes.func.isRequired,
-});
+import {layerParamsPropTypes} from '../../types/types.js';
 
 class DataMap extends React.Component {
   // This component provides data display layers (DataLayer) for up to two
@@ -36,8 +27,9 @@ class DataMap extends React.Component {
   // Renders its children within the base map.
 
   static propTypes = {
-    raster: layerPropTypes,
-    isoline: layerPropTypes,
+    raster: layerParamsPropTypes,
+    isoline: layerParamsPropTypes,
+    annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
   };
@@ -48,6 +40,7 @@ class DataMap extends React.Component {
     this.state = {
       rasterLayer: null,
       isolineLayer: null,
+      annotatedLayer: null,
     };
   }
 
@@ -113,6 +106,7 @@ class DataMap extends React.Component {
 
   handleRasterLayerRef = this.handleLayerRef.bind(this, 'raster');
   handleIsolineLayerRef = this.handleLayerRef.bind(this, 'isoline');
+  handleAnnotatedLayerRef = this.handleLayerRef.bind(this, 'annotated');
 
   // Handlers for area selection. Converts area to GeoJSON.
 
@@ -134,6 +128,23 @@ class DataMap extends React.Component {
     const b = propChange || stateChange;
     return b;
   }
+  
+  // Helper function for render, generates JSX for DataLayer
+  dataLayerProps(layertype) {
+    if(_.isUndefined(this.props[layertype])) {
+      return "";
+    }
+    else {
+      const handlerName = `handle${layertype.charAt(0).toUpperCase() + layertype.slice(1)}LayerRef`;
+      return (
+          <DataLayer
+            layerType={layertype}
+            {...this.props[layertype]}
+            onLayerRef={this[handlerName]}
+          />
+      );
+    }
+  }
 
   render() {
     // TODO: Add positioning for autoset
@@ -141,17 +152,20 @@ class DataMap extends React.Component {
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        <DataLayer
-          layerType='raster'
-          {...this.props.raster}
-          onLayerRef={this.handleRasterLayerRef}
-        />
-
-        <DataLayer
-          layerType='isoline'
-          {...this.props.isoline}
-          onLayerRef={this.handleIsolineLayerRef}
-        />
+        {
+          ['raster', 'isoline', 'annotated'].map(lType => {
+            if (!_.isUndefined(this.props[lType])) {
+                return (
+                  <DataLayer
+                    layerType={lType}
+                    layerParams={this.props[lType]}
+                    onLayerRef={this.handleLayerRef.bind(this, lType)}
+                  />
+                );
+              }
+            }
+          )
+        }
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}

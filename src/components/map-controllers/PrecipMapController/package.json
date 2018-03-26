@@ -1,0 +1,6 @@
+{
+  "name": "PrecipMapController",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./PrecipMapController.js"
+}

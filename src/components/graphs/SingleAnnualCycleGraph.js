@@ -8,32 +8,34 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 
 
 export default function SingleAnnualCycleGraph(props) {
-  function getMetadata(instance) {
-    // Find and return metadata matching model_id, experiment, variable_id
-    // and instance (start_date, end_date, ensemble_name) for monthly, seasonal
-    // and annual timescales.
+  function getMetadata(dataSpec) {
+    // Find and return metadata matching the parameters in the dataSpec:
+    // model_id, experiment, variable_id (supplied by parent)
+    // start_date, end_date, ensemble_name (chosen by this component)
+    // for monthly, seasonal and annual timescales.
 
     const {
       model_id, experiment,
       variable_id, meta,
     } = props;
+    
+    var findMetadataForResolution = function (resolution) {
+      return _.findWhere(meta, {
+        model_id, experiment, variable_id,
+        ...dataSpec,
+        timescale: resolution,
+        });
+    }
 
-    const monthlyVariableMetadata = _.findWhere(meta, {
-      model_id, experiment, variable_id,
-      ...instance,
-      timescale: 'monthly',
-    });
-    const seasonalVariablelMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'seasonal' }, meta
-    );
-    const yearlyVariableMetadata = findMatchingMetadata(
-      monthlyVariableMetadata, { timescale: 'yearly' }, meta
-    );
-    const metadataSets = [
+    const monthlyVariableMetadata = findMetadataForResolution('monthly');
+    const seasonalVariableMetadata = findMetadataForResolution('seasonal');
+    const yearlyVariableMetadata = findMetadataForResolution('yearly');
+    
+    const metadataSets = _.compact([
       monthlyVariableMetadata,
-      seasonalVariablelMetadata,
+      seasonalVariableMetadata,
       yearlyVariableMetadata,
-    ];
+    ]);
     return metadataSets;
   }
 

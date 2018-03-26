@@ -1,0 +1,6 @@
+{
+  "name": "Dual App Controller",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./DualAppController.js"
+}

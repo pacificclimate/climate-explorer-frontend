@@ -162,7 +162,7 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
  * Helper function for exportDataToWorksheet that generates metadata / summary
  * cells for export of Annual Cycle data.
  */
-var createTimeseriesWorksheetSummaryCells = function (metadata, instance) {
+var createTimeseriesWorksheetSummaryCells = function (metadata, dataSpec) {
 
   var rows = [];
   var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
@@ -170,8 +170,8 @@ var createTimeseriesWorksheetSummaryCells = function (metadata, instance) {
   var values = [
     metadata.model_id,
     metadata.experiment,
-    `${instance.start_date}-${instance.end_date}`,
-    instance.ensemble_member,
+    `${dataSpec.start_date}-${dataSpec.end_date}`,
+    dataSpec.ensemble_member,
     metadata.variable_id,
     metadata.meta[0].variable_name
   ];

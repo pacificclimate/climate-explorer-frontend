@@ -12,8 +12,8 @@ describe('with one variable', () => {
         title='Map Settings'
         meta={meta}
 
-        dataset='r1i1p1 1961-1990'
-        onDatasetChange={noop}
+        dataSpec='r1i1p1 1961-1990'
+        onDataSpecChange={noop}
 
         variableTimes={times}
         variableTimeIdx={Object.keys(times)[0]}

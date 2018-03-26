@@ -2,22 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { WMSTileLayer } from 'react-leaflet';
-import { getIsolineWMSParams, getRasterWMSParams } from '../../data-services/ncwms';
+import { getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams } from '../../data-services/ncwms';
 import _ from "underscore";
-
+import {layerParamsPropTypes} from '../../types/types.js';
 
 export default class DataLayer extends React.Component {
   static propTypes = {
     // Layer props
-    layerType: PropTypes.string.isRequired, // 'raster' | 'isoline'
-    dataset: PropTypes.string,
-    variableId: PropTypes.string,
-    wmsTime: PropTypes.string,
-    palette: PropTypes.string,
-    logscale: PropTypes.string,
-    range: PropTypes.object,
-    onChangeRange: PropTypes.func.isRequired,
-
+    layerType: PropTypes.string.isRequired, //'annotated', 'isoline', or 'raster'
+    layerParams: layerParamsPropTypes,
     onLayerRef: PropTypes.func,
   };
 
@@ -30,16 +23,17 @@ export default class DataLayer extends React.Component {
 
   render() {
     const {
-      onLayerRef, onChangeRange, layerType, ...layerParams,
+      onLayerRef, layerType, layerParams,
     } = this.props;
 
     // TODO: This dispatcher belongs in data-services/ncwms
     const wmsParams = {
       raster: getRasterWMSParams,
       isoline: getIsolineWMSParams,
+      annotated: getAnnotatedWMSParams
     }[layerType](layerParams);
 
-    if (layerParams.dataset) {
+    if (layerParams && layerParams.dataset) {
       return (
         <WMSTileLayer
           url={NCWMS_URL}

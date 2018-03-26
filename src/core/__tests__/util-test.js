@@ -275,6 +275,20 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(util.capitalizeWords("string number the 3rd")).toBe("String Number The 3rd");
     });
   });
+  
+  describe('caseInsensitiveStringSearch', function () {
+    it('finds present substrings irrespective of case', function () {
+      expect(util.caseInsensitiveStringSearch("category", "or")).toBeTruthy();
+      expect(util.caseInsensitiveStringSearch("CATEGORY", "OR")).toBeTruthy();
+      expect(util.caseInsensitiveStringSearch("category", "OR")).toBeTruthy();
+      expect(util.caseInsensitiveStringSearch("CATEGORY", "or")).toBeTruthy();
+      expect(util.caseInsensitiveStringSearch("cAtEgOrY", "oR")).toBeTruthy();     
+    });
+    it('does not find nonexistant substrings', function () {
+      expect(util.caseInsensitiveStringSearch("category", "and")).not.toBeTruthy();
+      expect(util.caseInsensitiveStringSearch("CATEGORY", "AND")).not.toBeTruthy();
+    });
+  });
 
   describe('nestedAttributeIsDefined', function () {
     it('returns true when an attribute is defined', function () {

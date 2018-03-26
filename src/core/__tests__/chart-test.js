@@ -412,3 +412,39 @@ describe('sortSeriesByRank', function (){
     expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
   });
 });
+
+describe('makeVariableResponseGraph', function () {
+  it('transforms two timeseries into a scatterplot', function() {
+    var c = chart.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.monthlyPrTimeseries);
+    c = chart.makeVariableResponseGraph("pr", "tasmax", c);
+    expect(validate.allDefinedObject(c)).toBe(true);
+    for(let i = 0; i < 12; i++) {
+      let pr = Object.values(mockAPI.monthlyPrTimeseries)[i];
+      let tasmax = Object.values(mockAPI.monthlyTasmaxTimeseries)[i];
+      let pri = c.data.columns[0].indexOf(pr);
+      let tasmaxi = c.data.columns[1].indexOf(tasmax);
+      expect(pri).toEqual(tasmaxi);
+    }
+  });
+});
+
+describe('getAxisTextForVariable', function () {
+  it('retrieves axis labels for a two-variable graph', function () {
+    var c = chart.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.monthlyPrTimeseries);
+    expect(chart.getAxisTextForVariable(c, "tasmax")).toBe("degC");
+    expect(chart.getAxisTextForVariable(c, "pr")).toBe("kg m-2 d-1");
+  });
+  it('throws an error on a single-variable graph', function () {
+    var c2 = chart.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.seasonalTasmaxTimeseries, 
+        mockAPI.annualTasmaxTimeseries);
+    var func = function () {
+      chart.getAxisTextForVariable(c2, "tasmax");      };
+    expect(func).toThrow(); 
+  });
+});
