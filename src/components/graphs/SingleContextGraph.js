@@ -2,11 +2,9 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import {
-  assignColoursByGroup,
-  dataToLongTermAverageGraph, fadeSeriesByRank, hideSeriesInLegend,
-  sortSeriesByRank,
-} from '../../core/chart';
+import { dataToLongTermAverageGraph } from '../../core/chart-generators';
+import { assignColoursByGroup, fadeSeriesByRank,
+         hideSeriesInLegend, sortSeriesByRank } from '../../core/chart-formatters';
 import ContextGraph from './ContextGraph';
 
 

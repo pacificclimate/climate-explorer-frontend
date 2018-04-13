@@ -1,22 +1,24 @@
 /************************************************************************
- * chart.js - provides functions to generate C3-formatted DataGraphs
- * based on the results from the climate explorer backend.
+ * chart-generators.js - functions that generate a C3 chart specification
+ * object from backend query results and metadata describing the query.
  * 
- * The two primary functions in this file are:
- * - timeseriesToAnnualCycleGraph, which creates graphs to display data 
- *   from the "timeseries" API call with monthly resolution
- * 
- * - dataToLongTermAverageGraph, which creates graphs to display data
- *   from the "data" API call with arbitrary resolution
+ * The three primary functions in this file are:
+ * - timeseriesToAnnualCycleGraph, which accepts data from the "timeseries"
+ *   API call and generates a structure annual cycle graph with months
+ *   labeled along the x-axis.
+ *
+ * - timeseriesToTimeseriesGraph, which accepts data from the "timeseries"
+ *   API call and generates an unstructured timeseries of arbitrary
+ *   resolution using whatever dates are available.   
+ *
+ * - dataToLongTermAverageGraph, which accepts data from the "data" API call
+ *   and creates timeseries graphs of arbitrary resolution
  * 
  * This file also contains helper functions used by the primary functions
  * to generate pieces of the C3 graph-describing data structure, which is
  * specified here: http://c3js.org/reference.html.
  *
- * timeseriesToTimeseriesGraph() generates a graph that has things in common
- * with each of the primary graphs, and post-processing functions to
- * fine-tune display parameters on an already-existant graph.
- **************************************************************************/
+ ***************************************************************************/
 
 import _ from 'underscore';
 import {PRECISION,
@@ -690,305 +692,9 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   }; 
 };
 
-/**************************************************************
- * 4. Post-processing functions to refine generated graphs
- **************************************************************/
-
-/*
- * Reiteration of D3's "category10" colors. They underlie c3's default
- * colours but are not directly accessible. Allows creating custom
- * colour palettes that use the same colors as the default assignments.
- */
-
-var category10Colours = ["#1f77b4",
-                         "#ff7f03",
-                         "#2ca02c",
-                         "#d62728",
-                         "#9467bd",
-                         "#8c564b",
-                         "#e377c2",
-                         "#7f7f7f",
-                         "#bcbd22",
-                         "#17becf"];
-
-
-/*
- * Post-processing graph function that assigns shared colours to
- * related data series.
- *
- * Accepts a C3 graph object and a segmentation function. Applies the
- * segmentation function to each data column in the graph object. All
- * data columns that evaluate to the same result are grouped together
- * and assigned the same display colour.
- *
- * Returns a modified graph object with colours assigned in graph.data.colors
- * accordingly.
- *
- * _.isEqual() is used to evaluate whether two segmentation results are equal.
- * Each data column is an array with the series name in the 0th location, example:
- *
- * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
- *
- */
-var assignColoursByGroup = function (graph, segmentor, colourList = category10Colours) {
-  var categories = [];
-  var colors = {};
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) { //"x" series used to provide categories, not data.
-      var category = segmentor(column);
-      var index = _.indexOf(categories, category);
-      if(index == -1) {
-        //first time we've encountered this category,
-        //add it to the list.
-        categories.push(category);
-        if(categories.length > colourList.length) {
-          throw new Error("Error: too many data categories for colour palette");
-        }
-        index = categories.length - 1;
-      }
-      colors[seriesName] = colourList[index];
-    }
-  });
-  graph.data.colors = colors;
-  return graph;
-};
-
-/*
- * Post-processing graph function that visually de-emphasizes certain
- * data series by lightening their assigned colour. (Assumes the graph
- * has a white background, otherwise lightening isn't de-emphasizing.)
- *
- * Accepts a C3 graph object and a ranking function. The ranking function
- * will be applied to each data column in the graph object, and should
- * output a number between 0 and 1, which will be used to determine the
- * visual prominence of the associated data series. Series ranked 1 will
- * be drawn normally with their assigned colour, values less than one and
- * greater than zero will be lightened proportionately. A data series ranked
- * 0 by the ranking function will be drawn in white.
- *
- * Returns the graph object, modified by the addition of a data.color
- * function to operate on assigned series colours.
- * Each data column passed to the ranking function is an array like this:
- *
- * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
- */
-var fadeSeriesByRank = function (graph, ranker) {
-
-  var rankDictionary = {};
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
-      rankDictionary[seriesName] = ranker(column);
-    }
-  });
-
-  //c3 will pass the function the assigned colour, and either:
-  //     * a string with the name of the time series (drawing legend)
-  //     * an object with attributes about the time series (drawing a point or line)
-  var fader = function(colour, d) {
-    var scale = chroma.scale(['white', colour]);
-    if(_.isObject(d)) { //d = data attributes
-      return scale(rankDictionary[d.id]).hex();
-    }
-    else { //d = series name only
-      return scale(rankDictionary[d]).hex();
-    }
-  };
-
-  graph.data.color = fader;
-  return graph;
-};
-
-/*
- * Post-processing graph function that removes data series from the legend.
- *
- * Accepts a C3 graph and a predicate function. Applies the predicate to
- * each data series. If the predicate returns true, the data series will
- * be hidden from the legend. If the predicate returns false, the data series
- * will appear in the legend as normal.
- *
- * By default, every data series appears in the legend; this postprocessor
- * is only needed if at least one series should be hidden.
- */
-var hideSeriesInLegend = function(graph, predicate) {
-  var hiddenSeries = [];
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
-      if(predicate(column)){
-        hiddenSeries.push(seriesName);
-      }
-    }
-  });
-
-  if(!graph.legend) {
-    graph.legend = {};
-  }
-
-  graph.legend.hide = hiddenSeries;
-  return graph;
-};
-
-/*
- * Post-processing graph function that sets the order of the data series.
- * The last-drawn series is the most clearly visible; its points and lines
- * will be on top where they intersect with other series.
- *
- * Accepts a C3 graph and a ranking function. The ranking function will be
- * applied to each series in the graph, and the series will be sorted by the
- * ranking function's results. The higher a series is ranked, the later it
- * will be drawn and the more prominent it will appear.
- */
-var sortSeriesByRank = function(graph, ranker) {
-  var sorter = function(a, b) {return ranker(a) - ranker(b);}
-  graph.data.columns = graph.data.columns.sort(sorter);
-  return graph;
-}
-
-/*
- * Post-processing graph function that accepts two keywords (x and y) and a graph
- * containing one or more pairs of timeseries and combines pairs of matching time 
- * series into a variable response graph.
- * 
- * Each data series should match exactly one other series. In order to match, two 
- * data series must:
- *   - have names that are identical except for the substitution of x for y
- *   - have data at all the same timestamps
- * 
- * This function combines each pair of matching data series into a new data series. For
- * each (time, data) tuple present in both original time series, it creates a new
- * (data-x, data-y) tuple, using the series with the x keyword as the x coordinate
- * and the series with the y keyword as the y coordinate.
- *
- * The axis labels of the new graph will be generated from the y axis label(s) of the
- * old graph.
- *
- * Example:
- * x: pr
- * y: tasmax
- * chart with data.columns:
- * ["Monthly pr", 10, 20, 30, 40, 50 ]
- * ["Monthly tasmax", 1, 2, 3, 4, 5 ]
- * ["x", 1/1/15, 1/2/15, 1/3/15, 1/4/15, 1/5/15]
- * 
- * Would result in a new chart with data.columns:
- * ["x", 10, 20, 30, 40, 50]
- * ["pr", 1, 2, 3, 4, 5]
- * 
- * This is intended to graph the effect of one variable (x) on another (y).
- */
-var makeVariableResponseGraph = function(x, y, graph) {
-  let c3Data = {};
-
-  const seriesNameContains = function (series, keyword) {
-    return caseInsensitiveStringSearch(series[0], keyword);
-  }
-  
-  const xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
-  const yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
-    
-  let tuples = [];
-  
-  for(let i = 0; i < xseries.length; i++) {
-    //Try to match each dependent variable series with an independent variable series
-    let dependent = xseries[i];
-    let independent = _.find(yseries, series => {
-      return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) === 
-        dependent[0].toLowerCase();
-      });
-    for(let d = 1; d < dependent.length; d++) {
-      if(!_.isNull(dependent[d]) && !_.isNull(independent[d])) {
-        tuples.push([independent[d], dependent[d]]);
-      }
-    }
-  }
-  //sort by x value, preperatory to putting on the graph.
-  tuples.sort((a, b) => a[0] - b[0]);  
-  c3Data.columns = [["x"], [y]];
-
-
-  for(let i = 1; i < tuples.length; i++) {
-    c3Data.columns[0].push(tuples[i][0]);
-    c3Data.columns[1].push(tuples[i][1]);
-    //C3 doesn't really support scatterplots, but we can fake it by adding
-    //a missing data point between each actual data point, and instructing C3
-    //not to connect across missing data points with {connectNull: false} 
-    if(i < tuples.length - 1) {
-      c3Data.columns[0].push((tuples[i][0] + tuples[i+1][0])/2);
-      c3Data.columns[1].push(null);
-    }
-  }
-
-  // Generate x and y axes. Reuse labels from source graph,
-  // but add variable names if not present.
-  let xAxisLabel = getAxisTextForVariable(graph, x);
-  xAxisLabel = xAxisLabel.search(x) === -1 ? `${x} ${xAxisLabel}` : xAxisLabel;
-  const xAxis = {
-      tick: {
-        count: 8,
-        fit: true,
-        format: fixedPrecision
-      },
-      label: xAxisLabel
-    };
-
-  let yAxisLabel = getAxisTextForVariable(graph, y);
-  yAxisLabel = yAxisLabel.search(y) === -1 ? `${y} ${yAxisLabel}` : yAxisLabel;
-  const yAxis = {
-      tick: {
-        format: fixedPrecision
-      },
-      label: yAxisLabel
-  };
-
-  //Whole-graph formatting options
-  c3Data.x = 'x'; //use x series
-  const c3Line = {connectNull: false}; //don't connect point data
-  const c3Tooltip = {show: false}; //no tooltip or legend, simplify graph.
-  const c3Legend = {show: false};
-
-  return {
-    data: c3Data,
-    line: c3Line,
-    tooltip: c3Tooltip,
-    legend: c3Legend,
-    axis: {
-      y: yAxis,
-      x: xAxis
-    },
-  };
-}
-
-/*
- * Helper function for makeVariableResponseGraph: given a graph and a
- * variable name, returns the axis label text associated with that variable.
- */
-var getAxisTextForVariable = function(graph, variable) {
-  let series = graph.data.columns.find(s => {
-    return caseInsensitiveStringSearch(s[0], variable);
-    });
-  
-  if(_.isUndefined(series)) {
-    throw new Error("Cannot build variable response chart from single variable chart");
-  }
-  series = series[0];
-
-  //see if this series has an explicit axis association, default to y if not.
-  const axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
-
-  return _.isString(graph.axis[axis].label) ?
-      graph.axis[axis].label :
-      graph.axis[axis].label.text;
-}
-
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
-    timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
-    hideSeriesInLegend, sortSeriesByRank, makeVariableResponseGraph,
+    timeseriesToTimeseriesGraph,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction, getAxisTextForVariable};
+    getAllTimestamps, nameAPICallParametersFunction};

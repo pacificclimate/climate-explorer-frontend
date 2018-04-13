@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { dataToLongTermAverageGraph } from '../../core/chart';
+import { dataToLongTermAverageGraph } from '../../core/chart-generators';
 import { timeKeyToResolutionIndex } from '../../core/util';
 import LongTermAveragesGraph from './LongTermAveragesGraph';
 

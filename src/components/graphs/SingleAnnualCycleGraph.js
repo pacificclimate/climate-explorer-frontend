@@ -2,7 +2,9 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { sortSeriesByRank, timeseriesToAnnualCycleGraph } from '../../core/chart';
+import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
+import { sortSeriesByRank } from '../../core/chart-formatters';
+
 import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 
