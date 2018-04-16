@@ -1,5 +1,5 @@
 /****************************************************************************
- * FutureAnnualCycleGraph.js - contrast present and future climatology values
+ * AnomalyAnnualCycleGraph.js - contrast present and future climatology values
  * 
  * Given a data specification (model_id, experiment, variable_id),
  * provides functions to help generate a graph specification contrasting
@@ -18,12 +18,12 @@ import React from 'react';
 import _ from 'underscore';
 
 import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
-import { sortSeriesByRank } from '../../core/chart-formatters';
+import { makeAnomalyGraph } from '../../core/chart-transformers';
 import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 
 
-export default function FutureAnnualCycleGraph(props) {
+export default function AnomalyAnnualCycleGraph(props) {
   
   function getPresentMetadatas(includeFuture = false) {
     // returns an array of all metadata objects that conform 
@@ -58,7 +58,13 @@ export default function FutureAnnualCycleGraph(props) {
   }
 
   function dataToGraphSpec(meta, data) {
-    return timeseriesToAnnualCycleGraph(meta, ...data);
+    let graph = timeseriesToAnnualCycleGraph(meta, ...data);
+    // Select the lowest starting year as the base series for the anomaly graph
+    let seriesNames = _.without(graph.data.columns.map(series => _.first(series)), 'x');
+    seriesNames.sort();
+    console.log(seriesNames[0]);
+    graph = makeAnomalyGraph(seriesNames[0], graph);
+    return graph;
   }
 
   const graphProps = _.pick(props,

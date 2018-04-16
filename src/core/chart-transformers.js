@@ -11,10 +11,17 @@
  *  - makeVariableReponseGraph: transforms a graph with one or more pairs 
  *    of timeseries representing different variables into a graph showing
  *    correlation between the variables (x and y axes are the variables)
+ *  
+ *  -makeAnomalyGraph: using one of the existing data series as the base, 
+ *    adds additional data series representing the difference between the
+ *    base series and each other data series (including itself)
  ***************************************************************************/
 import _ from 'underscore';
 import {caseInsensitiveStringSearch} from './util';
 import {fixedPrecision} from './chart-generators';
+import {assignColoursByGroup, hideSeriesInTooltip,
+        hideSeriesInLegend, padYAxis,
+        fadeSeriesByRank} from './chart-formatters';
 
 /***************************************************************************
  * 0. makeVariableReponseGraph and its helper functions
@@ -156,6 +163,108 @@ var getAxisTextForVariable = function(graph, variable) {
       graph.axis[axis].label.text;
 };
 
-module.exports = { makeVariableResponseGraph,
+/***************************************************************************
+ * 1. makeAnomalyGraph and its helper functions
+ ***************************************************************************/
+//TODO: this function needs a test
+/*
+ * Graph transformation function that accepts a graph containing one or more
+ * timeseries associated with a single axis, and the name of one of the 
+ * timeseries to use as a base. Adds a secondary y axis, graphing a data series
+ * showing the difference (anomaly) between each of the original series and the
+ * base series. (Including the base series itself, shown as a flat line.)
+ * 
+ * The anomaly series will have the same colour as the original series they represent.
+ * They will not appear in legends or tooltips.
+ * 
+ * This is intended to show changes over time.
+ */
+
+var makeAnomalyGraph = function(base, graph) {
+  //TODO: enforce single axis.
+  //TODO: enforce data length.
+  const baseSeries = _.find(graph.data.columns, series => {return series[0] === base});
+  const origLength = graph.data.columns.length;
+  graph.data.axes = {};
+  graph.axis.y2 = {show: true};
+  
+  for(let i = 0; i < origLength; i++) {
+    if(graph.data.columns[i][0] !== 'x') {
+      let oldSeries = graph.data.columns[i];
+      let newSeries = [];
+      newSeries.push(`${oldSeries[0]} Anomaly`);
+      for(let j = 1; j < oldSeries.length; j++){
+        newSeries.push(oldSeries[j] - baseSeries[j]);
+      }
+      graph.data.columns.push(newSeries);
+      graph.data.axes[oldSeries[0]] = 'y';
+      graph.data.axes[`${oldSeries[0]} Anomaly`] = 'y2';
+      //TODO: add units for y2.
+    }
+  }
+  graph.axis.y2.label = {};
+  graph.axis.y2.label.position = 'outer-middle';
+  graph.axis.y2.label.text = `${getAxisTextForVariable(graph, baseSeries[0])} anomaly from ${baseSeries[0]}`;
+  
+  
+  // function that determines whether a data series an anomaly series.
+  // used to format anomalies differently than data
+  let isAnomaly = function (series) {
+    return series[0].indexOf("Anomaly") != -1;
+  }
+  
+  // classifier function that matches each "anomaly" data series with
+  // the nominal series it is based on. Used to match colours.
+  let anomalyMatcher = function(series) {
+    let sName = series[0];
+    return isAnomaly(series) ? sName.substring(0, sName.length - 8) : sName;
+  };  
+  
+  // ranking function that assigns anomaly series lower results than 
+  // nominal series, used to make them distinguishable.
+  let anomalyRanker = function (series) {
+    return isAnomaly(series) ? .7 : 1;
+  }
+  
+  //assign anomaly data series the same colour as the series they describe.
+  graph = assignColoursByGroup(graph, anomalyMatcher);
+
+  
+  //remove anomaly series from tooltips and legends, lighten anomalies
+  graph = hideSeriesInTooltip(graph, isAnomaly);
+  graph = hideSeriesInLegend(graph, isAnomaly);
+  graph = fadeSeriesByRank(graph, anomalyRanker);
+  
+  //show anomalies with nominal values in tooltip:
+  graph.tooltip.format.value = addAnomalyTooltipFormatter(graph.tooltip.format.value, baseSeries);
+  
+  //move the two sets of data apart for less confusing visuals
+  graph = padYAxis(graph, 'y2', 'top', 8);
+  graph = padYAxis(graph, 'y', 'bottom', .2);
+  
+  return graph;
+};
+
+/*
+ * Helper function for makeAnomalyGraph: takes an existing tool tip number
+ * formatting function, and adds a wrapper which appends the anomaly from
+ * the specified base series.
+ */
+var addAnomalyTooltipFormatter = function (oldFormatter, baseSeries) {  
+  const newTooltipValueFormatter = function(value, ratio, id, index) {
+    let nominal = oldFormatter(value, ratio, id, index);
+    if(_.isUndefined(nominal)) { //this series doesn't display in tooltip.
+      return undefined; 
+    }
+    else {
+      const anomaly = value - baseSeries[index + 1];
+      const sign = anomaly >= 0 ? "+" : "";
+      return nominal + " (" + sign + anomaly.toPrecision(2) + ")";
+    }
+  };
+  return newTooltipValueFormatter;
+}
+
+module.exports = { makeVariableResponseGraph, makeAnomalyGraph,
     //exported only for testing purposes:
     getAxisTextForVariable};

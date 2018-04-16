@@ -184,5 +184,99 @@ var sortSeriesByRank = function(graph, ranker) {
   return graph;
 };
 
+//TODO: this function needs a test.
+/*
+ * Post-processing graph function that hides specific series from the tooltip.
+ * 
+ * Takes a graph specification object and a predicate. Any series for which
+ * the predicate returns true will be blocked from appearing in the tooltip.
+ * 
+ * By default, every series appears in the tooltip. This postprocessor is 
+ * only needed if you want one or more series NOT to be shown.
+ */
+var hideSeriesInTooltip = function(graph, predicate) {
+  //determine which series do not appear in the tooltip
+  let hidden = [];
+  
+  for(let i = 0; i < graph.data.columns.length; i++) {
+    if(predicate(graph.data.columns[i])) {
+      hidden.push(graph.data.columns[i][0]);
+    }
+  }
+
+  //in order to have a value not show up in the tooltip, it needs to
+  //render as undefined in the tooltip value formatting function. 
+  //Return undefined for values in the series list made earlier.
+  const oldTooltipValueFormatter = graph.tooltip.format.value;  
+  const newTooltipValueFormatter = function(value, ratio, id, index) {
+    if(hidden.indexOf(id) !== -1) {
+      return undefined; 
+    }
+    else {
+      return oldTooltipValueFormatter(value, ratio, id, index);
+    }  
+  };
+  graph.tooltip.format.value = newTooltipValueFormatter;
+  return graph;
+}
+
+//TODO: this function needs a test
+/*
+ * Post-processing graph function that adds extra space above or below
+ * data on a graph by setting the y-axis maximums and minimums to multiples
+ * of the data span. Especially useful if you have data on both the y1 and y2
+ * axis, but don't want them to visually overlap.
+ * 
+ * Arguments:
+ *   graph - the graph to be modified
+ *   axis - either "y1" or "y2"
+ *   direction - where to add padding, either "top" or "bottom"
+ *   padding - the amount of extra y-axis space to add, expressed as a 
+ *             multiple of the existing data span. 
+ */
+var padYAxis = function (graph, axis = "y", direction = "top", padding = 1) {
+  if(padding <= 0) {
+    throw new Error("Graph axis padding value must be greater than 0");
+  }
+  
+  if(direction != "top" && direction != "bottom") {
+    throw new Error("Unknown graph axis padding direction");
+  }
+  
+  // if this graph does not yet have minimums and maximums defined, calculate
+  // them from the data.
+  let min = graph.axis[axis].min;
+  let max = graph.axis[axis].max
+  if(_.isUndefined(min)) {
+    min = Infinity;
+    for(let i = 0; i < graph.data.columns.length; i++) {
+      let series = graph.data.columns[i];
+      if(series[0] !== 'x' && graph.data.axes[series[0]] === axis) {
+        const seriesMin = _.min(series);
+        min = seriesMin < min ? seriesMin : min; 
+      }
+    }
+  }
+  
+  if(_.isUndefined(max)) {
+    max = -Infinity;
+    for(let i = 0; i < graph.data.columns.length; i++) {
+      let series = graph.data.columns[i];
+      if(series[0] !== 'x' && graph.data.axes[series[0]] === axis) {
+        const seriesMax = _.max(series);
+        max = seriesMax > max ? seriesMax : max; 
+      }
+    }
+  }
+  
+  if(direction === "top") {
+    graph.axis[axis].max = max + (max - min) * padding;
+  } else if(direction === "bottom") {
+    graph.axis[axis].min = min - (max - min) * padding;
+  } 
+  return graph;
+}
+
 module.exports = { assignColoursByGroup, fadeSeriesByRank,
-    hideSeriesInLegend, sortSeriesByRank};
+    hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
+    padYAxis};
