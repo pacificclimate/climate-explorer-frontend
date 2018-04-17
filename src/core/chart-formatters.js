@@ -184,7 +184,6 @@ var sortSeriesByRank = function(graph, ranker) {
   return graph;
 };
 
-//TODO: this function needs a test.
 /*
  * Post-processing graph function that hides specific series from the tooltip.
  * 
@@ -220,7 +219,6 @@ var hideSeriesInTooltip = function(graph, predicate) {
   return graph;
 }
 
-//TODO: this function needs a test
 /*
  * Post-processing graph function that adds extra space above or below
  * data on a graph by setting the y-axis maximums and minimums to multiples
@@ -236,11 +234,15 @@ var hideSeriesInTooltip = function(graph, predicate) {
  */
 var padYAxis = function (graph, axis = "y", direction = "top", padding = 1) {
   if(padding <= 0) {
-    throw new Error("Graph axis padding value must be greater than 0");
+    throw new Error("Error: Graph axis padding value must be greater than 0");
   }
   
   if(direction != "top" && direction != "bottom") {
-    throw new Error("Unknown graph axis padding direction");
+    throw new Error("Error: Unknown graph axis padding direction");
+  }
+  
+  if(axis !== "y" && axis !== "y2") {
+    throw new Error("Error: invalid scaling axis");
   }
   
   // if this graph does not yet have minimums and maximums defined, calculate

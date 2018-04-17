@@ -5,7 +5,7 @@
  * provides functions to help generate a graph specification contrasting
  * current (2010-2039) and future (2040-2069, 2070-2099) Annual Cycle data:
  * 
- *   - getMetadata locates metadata for up to three climatology periods
+ *   - getMetadata locates metadata for multiple three climatology periods
  *   - dataToGraphSpec formats a graph to shade the climatology periods
  * 
  * Similar to SingleAnnualCycleGraph, but instead of displaying the annual
@@ -62,7 +62,6 @@ export default function AnomalyAnnualCycleGraph(props) {
     // Select the lowest starting year as the base series for the anomaly graph
     let seriesNames = _.without(graph.data.columns.map(series => _.first(series)), 'x');
     seriesNames.sort();
-    console.log(seriesNames[0]);
     graph = makeAnomalyGraph(seriesNames[0], graph);
     return graph;
   }

@@ -57,3 +57,58 @@ describe('getAxisTextForVariable', function () {
     expect(func).toThrow(); 
   });
 });
+
+describe('makeAnomalyGraph', function() {
+  it('rejects multi-variable graphs', function () {
+    let doubleGraph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.monthlyPrTimeseries);
+    let doubleFunc = function () {
+      ct.makeAnomalyGraph("tasmax", doubleGraph);
+    };
+    expect(doubleFunc).toThrow();
+  });
+  it('rejects graphs with no base data', function () {
+    let noBaseGraph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.seasonalTasmaxTimeseries, 
+        mockAPI.annualTasmaxTimeseries);
+    let noBaseFunc= function () { ct.makeAnomalyGraph("pr", noBaseGraph)};
+    expect(noBaseFunc).toThrow();
+  });
+  it('rejects graphs with mismatched data resolutions', function () {
+    let dataMissingGraph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.seasonalTasmaxTimeseries, 
+        mockAPI.annualTasmaxTimeseries);
+    dataMissingGraph.data.columns[1] = dataMissingGraph.data.columns[1].slice(0, 5);
+    let dataMissingFunc = function () {ct.makeAnomalyGraph("Monthly Mean", dataMissingGraph)};
+    expect(dataMissingFunc).toThrow();
+  });
+  it('generates an anomaly graph', function () {
+    let graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.seasonalTasmaxTimeseries, 
+        mockAPI.annualTasmaxTimeseries);
+    let anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", graph);
+    expect(anomalyGraph.data.columns.length).toBe(6);
+    expect(validate.allDefinedObject(anomalyGraph)).toBe(true);
+    expect(validate.allDefinedArray(anomalyGraph.data.columns)).toBe(true);
+    expect(anomalyGraph.axis.y2).toBeDefined();
+  });
+});
+
+describe('addAnomalyTooltipFormatter', function () {
+  it('appends an anomaly value to tooltip listings', function () {
+  let graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+      mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, 
+      mockAPI.annualTasmaxTimeseries);
+  let oldTooltipFormat = graph.tooltip.format.value;
+  let anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", graph);
+  let newTooltipFormat = anomalyGraph.tooltip.format.value;
+  expect(oldTooltipFormat(-18, 0, "Monthly Mean", 1)).toBe("-18 degC");
+  expect(newTooltipFormat(-18, 0, "Monthly Mean", 1)).toBe("-18 degC (+0.81)");
+  });
+});
+

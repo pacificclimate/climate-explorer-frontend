@@ -174,16 +174,25 @@ var getAxisTextForVariable = function(graph, variable) {
  * showing the difference (anomaly) between each of the original series and the
  * base series. (Including the base series itself, shown as a flat line.)
  * 
- * The anomaly series will have the same colour as the original series they represent.
- * They will not appear in legends or tooltips.
+ * The anomaly series will have the same hue, but somewhat desaturated colour 
+ * as the original series they represent.They will not appear in legends or 
+ * tooltips, but their name (if needed for further graph manipulation)
+ * will be "[original name] Anomaly."
  * 
- * This is intended to show changes over time.
+ * This is intended to display change over time on a single graph.
  */
 
 var makeAnomalyGraph = function(base, graph) {
-  //TODO: enforce single axis.
-  //TODO: enforce data length.
+  
+  if(!_.isUndefined(graph.axis.y2)) {
+    throw new Error("Error: Cannot calculate anomalies for multiple data types.");
+  }
+  
   const baseSeries = _.find(graph.data.columns, series => {return series[0] === base});
+  if(_.isUndefined(baseSeries)) {
+    throw new Error("Error: Invalid base data for anomaly calculation.");
+  }
+  
   const origLength = graph.data.columns.length;
   graph.data.axes = {};
   graph.axis.y2 = {show: true};
@@ -191,6 +200,10 @@ var makeAnomalyGraph = function(base, graph) {
   for(let i = 0; i < origLength; i++) {
     if(graph.data.columns[i][0] !== 'x') {
       let oldSeries = graph.data.columns[i];
+      if(oldSeries.length !== baseSeries.length) {
+        throw new Error("Error: Incorrect data series length, cannot calculate anomaly");
+      }
+
       let newSeries = [];
       newSeries.push(`${oldSeries[0]} Anomaly`);
       for(let j = 1; j < oldSeries.length; j++){
@@ -199,7 +212,6 @@ var makeAnomalyGraph = function(base, graph) {
       graph.data.columns.push(newSeries);
       graph.data.axes[oldSeries[0]] = 'y';
       graph.data.axes[`${oldSeries[0]} Anomaly`] = 'y2';
-      //TODO: add units for y2.
     }
   }
   graph.axis.y2.label = {};
@@ -263,7 +275,7 @@ var addAnomalyTooltipFormatter = function (oldFormatter, baseSeries) {
     }
   };
   return newTooltipValueFormatter;
-}
+};
 
 module.exports = { makeVariableResponseGraph, makeAnomalyGraph,
     //exported only for testing purposes:

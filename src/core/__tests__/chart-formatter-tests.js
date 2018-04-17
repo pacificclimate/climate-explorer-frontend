@@ -109,3 +109,59 @@ describe('sortSeriesByRank', function (){
     expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
   });
 });
+
+describe('hideSeriesInToolTip', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var formatFunction;
+  it('removes data series from the tooltip', function() {
+    var hideAll = function(series) {return true};
+    graph = cf.hideSeriesInTooltip(graph, hideAll);
+    formatFunction = graph.tooltip.format.value;
+    expect(formatFunction(10, 19, "Yearly Mean")).toBeUndefined();
+  });
+  it('retains data series in the tooltip', function() {
+    var showAll = function(series) {return false};
+    graph.tooltip.format.value = (a, b, c, d) => {return "test"};
+    graph = cf.hideSeriesInTooltip(graph, showAll);
+    formatFunction = graph.tooltip.format.value; 
+    expect(formatFunction(10, 29, "Monthly Mean", 0)).toBeDefined();
+  });
+});
+
+describe('padYAxis', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var func;
+  it('rejects negative padding', function () {
+    func = function ()  {cf.padYAxis(graph, "y", "top", -1);};
+    expect(func).toThrow();
+  });
+  it('rejects nonexistant axes', function () {
+    func = function ()  {cf.padYAxis(graph, "y1", "top", -1);};
+    expect(func).toThrow();
+  });
+  it('rejects horizontal padding directions', function () {
+    var func = function ()  {cf.padYAxis(graph, "y", "left", -1);};
+    expect(func).toThrow();
+  });
+  it('pads a graph by adding space at the top', function () {
+    let currentMax = graph.axis.y.max;
+    graph = cf.padYAxis(graph, "y", "top", 1);
+    expect(graph.axis.y.max).toBeDefined();
+    if(currentMax !== undefined) {
+      expect(graph.axis.y.max > currentMax).toBeTrue();
+    }
+  });
+  it('pads a graph by adding space at the bottom', function () {
+    let currentMin = graph.axis.y.min;
+    graph = cf.padYAxis(graph, "y", "bottom", 1);
+    expect(graph.axis.y.min).toBeDefined();
+    if(currentMin !== undefined) {
+      expect(graph.axis.y.min < currentMin).toBeTrue();
+    }
+  });
+
+})
