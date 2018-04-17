@@ -212,6 +212,7 @@ var makeAnomalyGraph = function(base, graph) {
       graph.data.columns.push(newSeries);
       graph.data.axes[oldSeries[0]] = 'y';
       graph.data.axes[`${oldSeries[0]} Anomaly`] = 'y2';
+      graph.data.types[`${oldSeries[0]} Anomaly`] = oldSeries[0] === base ? "line" : "bar";
     }
   }
   graph.axis.y2.label = {};
