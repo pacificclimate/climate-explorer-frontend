@@ -284,6 +284,33 @@ function addAnomalyTooltipFormatter (oldFormatter, baseSeries) {
   return newTooltipValueFormatter;
 };
 
+/***************************************************************************
+ * 1. makeTimeSliceGraph and its helper functions
+ ***************************************************************************/
+/*
+ * Given a timeseries graph and a string matching a timestamp in that graph,
+ * returns a new graph containing only data present at that particular moment.
+ */
+
+var makeTimeSliceGraph = function(timestamp, graph) {
+  let slicedData = [];
+  let timestamps = graph.data.columns.find(function(series) {return series[0] === 'x'});
+  let sliceIndex = timestamps.indexOf(timestamp);
+  
+  if(sliceIndex === -1) {
+    throw new Error("Error: invalid timestamp");
+  }
+  
+  for(let i = 0; i < graph.data.columns.length; i++) {
+    let series = graph.data.columns[i];
+    slicedData.push([series[0], series[sliceIndex]]);
+  }
+
+  graph.data.columns = slicedData;
+  return graph;
+}
+
 module.exports = { makeVariableResponseGraph, makeAnomalyGraph,
+    makeTimeSliceGraph,
     //exported only for testing purposes:
     getAxisTextForVariable};
