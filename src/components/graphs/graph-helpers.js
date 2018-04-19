@@ -1,4 +1,9 @@
 import _ from 'underscore';
+import {
+  assignColoursByGroup, fadeSeriesByRank,
+  hideSeriesInLegend, sortSeriesByRank
+  } from '../../core/chart-formatters';
+import { caseInsensitiveStringSearch } from '../../core/util';
 
 
 function areAllPropsValid(
@@ -149,6 +154,29 @@ function shouldLoadData(props, displayMessage) {
   return true;
 }
 
+function emphasizeSeries(graph, seriesName) {
+  // De-emphasizes all non-selected series in a graph specification.
+  // Every data series that does not have seriesName in its name will
+  // be assigned the same low-saturation colour, removed from the legend,
+  // and placed on a lower z-axis.
+  // Used by graphs that whose purpose is to provide context for a
+  // particular dataset: (SingleTimeSliceGraph, SingleContextGraph).
+  // Classify data series by which model generated them
+  const makeSegmentor = function (selectedOutput, otherOutput) {
+    return function(dataseries) {
+      return caseInsensitiveStringSearch(dataseries[0], seriesName) ?
+        selectedOutput :
+        otherOutput;
+    };
+  };
+
+  graph = assignColoursByGroup(graph, makeSegmentor(1, 0));
+  graph = fadeSeriesByRank(graph, makeSegmentor(1, 0.35));
+  graph = hideSeriesInLegend(graph, makeSegmentor(false, true));
+  graph = sortSeriesByRank(graph, makeSegmentor(1, 0));
+
+  return graph;
+}
 
 export {
   multiYearMeanSelected,
@@ -160,4 +188,5 @@ export {
   noDataMessageGraphSpec,
   blankGraphSpec,
   shouldLoadData,
+  emphasizeSeries,
 };

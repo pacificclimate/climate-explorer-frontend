@@ -3,6 +3,7 @@ import React from 'react';
 import _ from 'underscore';
 
 import { dataToLongTermAverageGraph } from '../../core/chart-generators';
+import { emphasizeSeries } from './graph-helpers';
 import { assignColoursByGroup, fadeSeriesByRank,
          hideSeriesInLegend, sortSeriesByRank } from '../../core/chart-formatters';
 import ContextGraph from './ContextGraph';
@@ -40,29 +41,13 @@ export default function SingleContextGraph(props) {
   function dataToGraphSpec(meta, data, selectedModelId) {
     // Convert `data` (described by `meta`) to a graph specification compatible
     // with `DataGraph`.
+    let graph = dataToLongTermAverageGraph(data, meta);
+    graph = emphasizeSeries(graph, selectedModelId);
 
-    const emphasizeCurrentModel = function(graph) {
-      // Classify data series by which model generated them
-      const makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
-        return function(dataseries) {
-          return dataseries[0].search(selectedModelId) !== -1 ?
-            selectedModelOutput :
-            otherModelOutput;
-        };
-      };
-
-      graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
-      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, 0.35));
-      graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
-      graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
-
-      //simplify graph by turning off tooltip and missing data gaps
-      graph.line.connectNull = true;
-      graph.tooltip = { show: false };
-      return graph;
-    };
-
-    return emphasizeCurrentModel(dataToLongTermAverageGraph(data, meta));
+    //simplify graph by turning off tooltip and missing data gaps
+    graph.line.connectNull = true;
+    graph.tooltip = { show: false };
+    return graph;
   }
 
   const graphProps = _.pick(props,

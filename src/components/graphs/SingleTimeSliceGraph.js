@@ -5,7 +5,7 @@
  *   
  * Produced from the same data as SingleContextGraph, but shows a
  * single timestamp rather than comparing multiple long term 
- * averages. Whils this graph shows a strict subset of the data
+ * averages. While this graph shows a strict subset of the data
  * available in a Model Context Graph, its simplicity and narrowness 
  * makes it possible to use it as a sidebar or popup for 
  * providing context.
@@ -16,7 +16,10 @@ import _ from 'underscore';
 
 import { dataToLongTermAverageGraph } from '../../core/chart-generators';
 import { makeTimeSliceGraph } from '../../core/chart-transformers';
+import { selectPoint } from '../../core/chart-formatters';
+import {caseInsensitiveStringSearch} from '../../core/util';
 import ContextGraph from './ContextGraph';
+import { emphasizeSeries } from './graph-helpers';
 
 
 export default function SingleTimeSliceGraph(props) {
@@ -53,10 +56,7 @@ export default function SingleTimeSliceGraph(props) {
 
   function dataToGraphSpec(meta, data, selectedModelId) {
     let graph = dataToLongTermAverageGraph(data, meta);
-    graph.legend = _.isUndefined(graph.legend) ? {}: graph.legend;
-    graph.legend.position = "right";
-    
-    
+
     //select the median timestamp present in the future.
     let timestamps = graph.data.columns.find(function(series) {return series[0] === 'x'});
     let futureTimestamps = [];
@@ -68,35 +68,11 @@ export default function SingleTimeSliceGraph(props) {
     }
     futureTimestamps.sort();
     let selectedTimestamp = futureTimestamps[Math.ceil((futureTimestamps.length - 1) / 2)];
-    
+
     graph = makeTimeSliceGraph(selectedTimestamp, graph);
-    console.log(`timestamps: ${futureTimestamps} ${selectedTimestamp}`);
+    graph.size = {width: 150}; //adjust as needed to make a sidebar.
+    graph = emphasizeSeries(graph, selectedModelId);
 
-    // Convert `data` (described by `meta`) to a graph specification compatible
-    // with `DataGraph`.
-
-//    const emphasizeCurrentModel = function(graph) {
-      // Classify data series by which model generated them
-//      const makeModelSegmentor = function (selectedModelOutput, otherModelOutput) {
-//        return function(dataseries) {
-//          return dataseries[0].search(selectedModelId) !== -1 ?
-//            selectedModelOutput :
-//            otherModelOutput;
-//        };
-//      };
-
-//      graph = assignColoursByGroup(graph, makeModelSegmentor(1, 0));
-//      graph = fadeSeriesByRank(graph, makeModelSegmentor(1, 0.35));
-//      graph = hideSeriesInLegend(graph, makeModelSegmentor(false, true));
-//      graph = sortSeriesByRank(graph, makeModelSegmentor(1, 0));
-
-      //simplify graph by turning off tooltip and missing data gaps
-//      graph.line.connectNull = true;
-//      graph.tooltip = { show: false };
-//      return graph;
-//    };
-
-//    return emphasizeCurrentModel(dataToLongTermAverageGraph(data, meta));
     return graph;
   }
 

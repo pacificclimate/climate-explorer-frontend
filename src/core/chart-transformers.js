@@ -298,15 +298,30 @@ var makeTimeSliceGraph = function(timestamp, graph) {
   let sliceIndex = timestamps.indexOf(timestamp);
   
   if(sliceIndex === -1) {
-    throw new Error("Error: invalid timestamp");
-  }
-  
-  for(let i = 0; i < graph.data.columns.length; i++) {
-    let series = graph.data.columns[i];
-    slicedData.push([series[0], series[sliceIndex]]);
+    throw new Error("Error: invalid timestamp selected");
   }
 
+  for(let i = 0; i < graph.data.columns.length; i++) {
+    let series = graph.data.columns[i];
+    if(!_.isUndefined(series[sliceIndex]) && series[0] !== 'x'){
+      slicedData.push([series[0], series[sliceIndex]]);
+    }
+  }
+
+  //sort the data series by value, to make matching with the legend easier
+  slicedData.sort((a, b) => {return b[1] - a[1]});
+
   graph.data.columns = slicedData;
+
+  //remove timeseries-related formatting
+  let date = new Date(timestamp);
+  graph.axis.x = {
+      type: 'category',
+      categories: [date.getFullYear()]
+  };
+  graph.data.x = undefined;
+  graph.tooltip = {show: false};
+
   return graph;
 }
 
