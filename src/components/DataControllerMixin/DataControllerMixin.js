@@ -74,56 +74,39 @@ var ModalMixin = {
     return data;
   },
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-  //Fetches and validates data from a call to the backend's
-  //"multistat" API endpoint
-  getStatsPromise: function (props, timeidx) {
-    return axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
-      params: {
-        ensemble_name: props.ensemble_name,
-        model: props.model_id,
-        variable: props.variable_id,
-        emission: props.experiment,
-        area: props.area || null,
-        time: timeidx,
+  //Returns the metadata object that corresponds to a unique_id
+  getMetadata: function (id, meta = this.props.meta) {
+    return _.find(meta, function(m) {return m.unique_id === id;} );
+  },
+    
+  /*
+   * Filters data from any call to the API that returns an object with
+   * individual values keyed to unique_ids. It returns a new object
+   * that contains only results from datasets whose metadata matches the
+   * attributes passed to the filter argument.
+   * 
+   * This is a temporary stopgap until this issue is solved:
+   * https://github.com/pacificclimate/climate-explorer-backend/issues/61
+   * FIXME: remove this function and calls to it when issue 61 is solved.
+   */
+  filterAPIResults: function(data, filter, metadata = this.props.meta) {
+    var filtered = {};
+      
+    for(let id in data) {
+      var qualified = true;
+      var metad = this.getMetadata(id, metadata);
+      for(let att in filter) {
+        qualified = filter[att] == metad[att] ? qualified : false;
+        }
+      if(qualified) {
+        filtered[id] = data[id];
       }
-    }).then(validateStatsData);
+    }
+    return filtered;
   },
 
-    //Returns the metadata object that corresponds to a unique_id
-    getMetadata: function (id, meta = this.props.meta) {
-      return _.find(meta, function(m) {return m.unique_id === id;} );
-    },
-    
-    /*
-     * Filters data from any call to the API that returns an object with 
-     * individual values keyed to unique_ids. It returns a new object 
-     * that contains only results from datasets whose metadata matches the 
-     * attributes passed to the filter argument. 
-     * 
-     * This is a temporary stopgap until this issue is solved:
-     * https://github.com/pacificclimate/climate-explorer-backend/issues/61
-     * FIXME: remove this function and calls to it when issue 61 is solved.
-     */
-    filterAPIResults: function(data, filter, metadata = this.props.meta) {
-      var filtered = {};
-      
-      for(let id in data) {
-        var qualified = true;
-        var metad = this.getMetadata(id, metadata);
-        for(let att in filter) {
-          qualified = filter[att] == metad[att] ? qualified : false;
-          }
-        if(qualified) {
-          filtered[id] = data[id];
-        }
-      }
-      return filtered;
-    },
-
-    //Used to render uninitialized stats tables
-    blankStatsData: []
+  //Used to render uninitialized stats tables
+  blankStatsData: []
 };
 
 export default ModalMixin;

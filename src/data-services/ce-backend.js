@@ -59,6 +59,42 @@ function getData(
   });
 }
 
+// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
+function getStats (
+    { ensemble_name, model_id, variable_id, experiment, area }, timeidx
+) {
+  // Query the "multistats" API endpoint.
+  // Gets an object from each qualifying dataset file with the following
+  // information:
+  //  {
+  //   unique_ID: {
+  //      min
+  //      max
+  //      mean
+  //      median
+  //      stdev
+  //      ncells
+  //      units
+  //      time (median time represented by the dataset)
+  //      modtime (last time dataset was modified)
+  //    }
+  //  }
+  let queryExpString = guessExperimentFormatFromVariable(variable_id, experiment);
+  return axios({
+    baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
+    params: {
+      ensemble_name: ensemble_name,
+      model: model_id,
+      variable: variable_id,
+      emission: queryExpString,
+      area: area || null,
+      time: timeidx,
+    }
+  });
+}
+
+
+
 // Downscaled GCM data has experiment strings like 'historical,rcp26'
 // while climdex data uses 'historical, rcp26'
 // These are regularized by AppMixin.updateMetadata(), but the 'data'
@@ -69,4 +105,4 @@ function guessExperimentFormatFromVariable(variable, experiment) {
 }
 
 
-export { getTimeMetadata, getTimeseries, getData };
+export { getTimeMetadata, getTimeseries, getData, getStats };
