@@ -34,7 +34,7 @@ import chroma from 'chroma-js';
  *****************************************************/
 
 //Generates a typical y-axis configuration, given the text of the label.
-var formatYAxis = function (label) {
+function formatYAxis (label) {
   return {
     "label": {
       "text": label,
@@ -52,7 +52,7 @@ var formatYAxis = function (label) {
  * Used as a default when a more specialized formatting function isn't
  * available; ignores all its inputs except the number to be formatted.
  */
-var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
+function fixedPrecision (n, ...rest) { return +n.toFixed(PRECISION);};
 
 /*
  * Accepts a object with seriesname:variable pairs.
@@ -61,7 +61,7 @@ var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
  * file for the associated variable, or a default precision with
  * util.PRECISION for variables with no precision options in the file.
  */
-var makePrecisionBySeries = function (series) {
+function makePrecisionBySeries (series) {
   var dictionary = {};
   for(var s in series) {
     var fromConfig = getVariableOptions(series[s], "decimalPrecision");
@@ -86,7 +86,7 @@ var makePrecisionBySeries = function (series) {
  * numbers. precisionFunction will be passed the number to format and the
  * series id it belongs to.
  */
-var makeTooltipDisplayNumbersWithUnits = function(axes, axis, precisionFunction) {
+function makeTooltipDisplayNumbersWithUnits (axes, axis, precisionFunction) {
   var unitsDictionary = {};
   if(_.isUndefined(precisionFunction)) { //use a default.
     precisionFunction = fixedPrecision;
@@ -130,7 +130,7 @@ var makeTooltipDisplayNumbersWithUnits = function(axes, axis, precisionFunction)
  * seasonal (4), or yearly (1); an error will be thrown 
  * if this function is called on data with another time resolution.
  */
-var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
+function timeseriesToAnnualCycleGraph (metadata, ...data) {
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
@@ -210,7 +210,7 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
  * and returns an array with twelve values in order by timestamp,
  * repeating values as necessary to get a monthly-resolution sequence.
  */
-var getMonthlyData = function(data, timescale = "monthly") {
+function getMonthlyData (data, timescale = "monthly") {
 
   var expectedTimestamps = {"monthly": 12, "seasonal": 4, "yearly": 1};
   var monthlyData = [];
@@ -256,7 +256,7 @@ var getMonthlyData = function(data, timescale = "monthly") {
 //TODO: special case climatological period to display as (XXXX-XXXX)
 //TODO: possibly cue descriptors to appear in a specific order?
 // "Tasmin Monthly Mean" sounds better than "Monthly Tasmin Mean".
-var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
+function shortestUniqueTimeseriesNamingFunction (metadata, data) {
   if (metadata.length === 0) {
     throw new Error('No data to show');
   }
@@ -306,7 +306,7 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
  * Helper constant for timeseriesToAnnualCycleGraph: an X-axis configuration 
  * object representing a categorical axis labeled in months.
  */
-var monthlyXAxis = {
+const monthlyXAxis = {
     type: 'category',
     categories: ['January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December']
@@ -359,7 +359,7 @@ var monthlyXAxis = {
  * The context objects are used in the graph legend, to distinguish runs
  * with the same name ("r1i1p1") from different datasets.
  */
-var dataToLongTermAverageGraph = function(data, contexts = []){
+function dataToLongTermAverageGraph (data, contexts = []){
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
@@ -470,7 +470,7 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
  * Helper function for dataToLongTermAverageGraph. Extracts the
  * list of all unique timestamps found in the data.
  */
-var getAllTimestamps = function(data) {
+function getAllTimestamps (data) {
   var allTimes = [];
 
   var addSeries = function(seriesData) {
@@ -508,7 +508,7 @@ var getAllTimestamps = function(data) {
  * specific run's call and other calls being graphed at the same time. 
  * Example: "tasmax r1i1p1" vs "pr r1i1p1"
  */
-var nameAPICallParametersFunction = function(contexts) {
+function nameAPICallParametersFunction (contexts) {
   
   var variation = [];
   var exemplarContext = contexts[0];
@@ -551,7 +551,7 @@ var nameAPICallParametersFunction = function(contexts) {
  * Helper constant for dataToLongTermAverageGraph: Format object 
  * for a timeseries X axis.
  */
-var timeseriesXAxis = {
+const timeseriesXAxis = {
     type: 'timeseries',
     tick: {
       format: '%Y-%m-%d'
@@ -596,7 +596,7 @@ var timeseriesXAxis = {
  * Accepts an arbitrary number of data objects, but no more than
  * two separate unit types.
  */
-var timeseriesToTimeseriesGraph = function(metadata, ...data) {
+function timeseriesToTimeseriesGraph (metadata, ...data) {
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
   var c3Data = {

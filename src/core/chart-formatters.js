@@ -19,6 +19,10 @@
  *  
  *  - sortSeriesByRank: draw higher ranked data series above (higher z-axis)
  *      lower ranked series
+ *      
+ *  - hideSeriesInTooltip: removes specific data series from the tooltip
+ *      
+ *  - padYAxis: add additional blank space above or below the data series
  ***************************************************************************/
 import _ from 'underscore';
 import {PRECISION,
@@ -35,7 +39,7 @@ import chroma from 'chroma-js';
  * colour palettes that use the same colors as the default assignments.
  */
 
-var category10Colours = ["#1f77b4",
+const category10Colours = ["#1f77b4",
                          "#ff7f03",
                          "#2ca02c",
                          "#d62728",
@@ -65,7 +69,7 @@ var category10Colours = ["#1f77b4",
  * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
  *
  */
-var assignColoursByGroup = function (graph, segmentor, colourList = category10Colours) {
+function assignColoursByGroup (graph, segmentor, colourList = category10Colours) {
   var categories = [];
   var colors = {};
 
@@ -109,7 +113,7 @@ var assignColoursByGroup = function (graph, segmentor, colourList = category10Co
  *
  * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
  */
-var fadeSeriesByRank = function (graph, ranker) {
+function fadeSeriesByRank (graph, ranker) {
 
   var rankDictionary = {};
 
@@ -148,7 +152,7 @@ var fadeSeriesByRank = function (graph, ranker) {
  * By default, every data series appears in the legend; this postprocessor
  * is only needed if at least one series should be hidden.
  */
-var hideSeriesInLegend = function(graph, predicate) {
+function hideSeriesInLegend (graph, predicate) {
   var hiddenSeries = [];
 
   _.each(graph.data.columns, column => {
@@ -178,7 +182,7 @@ var hideSeriesInLegend = function(graph, predicate) {
  * ranking function's results. The higher a series is ranked, the later it
  * will be drawn and the more prominent it will appear.
  */
-var sortSeriesByRank = function(graph, ranker) {
+function sortSeriesByRank (graph, ranker) {
   var sorter = function(a, b) {return ranker(a) - ranker(b);}
   graph.data.columns = graph.data.columns.sort(sorter);
   return graph;
@@ -193,15 +197,9 @@ var sortSeriesByRank = function(graph, ranker) {
  * By default, every series appears in the tooltip. This postprocessor is 
  * only needed if you want one or more series NOT to be shown.
  */
-var hideSeriesInTooltip = function(graph, predicate) {
+function hideSeriesInTooltip (graph, predicate) {
   //determine which series do not appear in the tooltip
-  let hidden = [];
-  
-  for(let i = 0; i < graph.data.columns.length; i++) {
-    if(predicate(graph.data.columns[i])) {
-      hidden.push(graph.data.columns[i][0]);
-    }
-  }
+  const hidden = _.pluck(_.filter(graph.data.columns, predicate),0);
 
   //in order to have a value not show up in the tooltip, it needs to
   //render as undefined in the tooltip value formatting function. 
@@ -232,7 +230,7 @@ var hideSeriesInTooltip = function(graph, predicate) {
  *   padding - the amount of extra y-axis space to add, expressed as a 
  *             multiple of the existing data span. 
  */
-var padYAxis = function (graph, axis = "y", direction = "top", padding = 1) {
+function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
   if(padding <= 0) {
     throw new Error("Error: Graph axis padding value must be greater than 0");
   }
@@ -249,26 +247,16 @@ var padYAxis = function (graph, axis = "y", direction = "top", padding = 1) {
   // them from the data.
   let min = graph.axis[axis].min;
   let max = graph.axis[axis].max
+  const axisSeries = _.filter(graph.data.columns, series => {
+      return series[0] !== 'x' && graph.data.axes[series[0]] === axis
+    });
+  
   if(_.isUndefined(min)) {
-    min = Infinity;
-    for(let i = 0; i < graph.data.columns.length; i++) {
-      let series = graph.data.columns[i];
-      if(series[0] !== 'x' && graph.data.axes[series[0]] === axis) {
-        const seriesMin = _.min(series);
-        min = seriesMin < min ? seriesMin : min; 
-      }
-    }
-  }
+    min = _.min(_.map(axisSeries, series => _.min(series)));
+  }    
   
   if(_.isUndefined(max)) {
-    max = -Infinity;
-    for(let i = 0; i < graph.data.columns.length; i++) {
-      let series = graph.data.columns[i];
-      if(series[0] !== 'x' && graph.data.axes[series[0]] === axis) {
-        const seriesMax = _.max(series);
-        max = seriesMax > max ? seriesMax : max; 
-      }
-    }
+    max = _.max(_.map(axisSeries, series => _.max(series)));
   }
   
   if(direction === "top") {

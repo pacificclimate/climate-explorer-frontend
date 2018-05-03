@@ -12,7 +12,7 @@
  *    of timeseries representing different variables into a graph showing
  *    correlation between the variables (x and y axes are the variables)
  *  
- *  -makeAnomalyGraph: using one of the existing data series as the base, 
+ *  - makeAnomalyGraph: using one of the existing data series as the base, 
  *    adds additional data series representing the difference between the
  *    base series and each other data series (including itself)
  ***************************************************************************/
@@ -59,7 +59,7 @@ import {assignColoursByGroup, hideSeriesInTooltip,
  * 
  * This is intended to graph the effect of one variable (x) on another (y).
  */
-var makeVariableResponseGraph = function(x, y, graph) {
+function makeVariableResponseGraph (x, y, graph) {
   let c3Data = {};
 
   const seriesNameContains = function (series, keyword) {
@@ -95,6 +95,7 @@ var makeVariableResponseGraph = function(x, y, graph) {
     //C3 doesn't really support scatterplots, but we can fake it by adding
     //a missing data point between each actual data point, and instructing C3
     //not to connect across missing data points with {connectNull: false} 
+    //TODO: breake this out into makeScatterplot(); we'll likely need it again
     if(i < tuples.length - 1) {
       c3Data.columns[0].push((tuples[i][0] + tuples[i+1][0])/2);
       c3Data.columns[1].push(null);
@@ -145,7 +146,7 @@ var makeVariableResponseGraph = function(x, y, graph) {
  * Helper function for makeVariableResponseGraph: given a graph and a
  * variable name, returns the axis label text associated with that variable.
  */
-var getAxisTextForVariable = function(graph, variable) {
+function getAxisTextForVariable (graph, variable) {
   let series = graph.data.columns.find(s => {
     return caseInsensitiveStringSearch(s[0], variable);
     });
@@ -166,7 +167,6 @@ var getAxisTextForVariable = function(graph, variable) {
 /***************************************************************************
  * 1. makeAnomalyGraph and its helper functions
  ***************************************************************************/
-//TODO: this function needs a test
 /*
  * Graph transformation function that accepts a graph containing one or more
  * timeseries associated with a single axis, and the name of one of the 
@@ -182,7 +182,7 @@ var getAxisTextForVariable = function(graph, variable) {
  * This is intended to display change over time on a single graph.
  */
 
-var makeAnomalyGraph = function(base, graph) {
+function makeAnomalyGraph (base, graph) {
   
   if(!_.isUndefined(graph.axis.y2)) {
     throw new Error("Error: Cannot calculate anomalies for multiple data types.");
@@ -222,20 +222,20 @@ var makeAnomalyGraph = function(base, graph) {
   
   // function that determines whether a data series an anomaly series.
   // used to format anomalies differently than data
-  let isAnomaly = function (series) {
-    return series[0].indexOf("Anomaly") != -1;
+  function isAnomaly (series) {
+    return caseInsensitiveStringSearch(series[0], "Anomaly");
   }
   
   // classifier function that matches each "anomaly" data series with
   // the nominal series it is based on. Used to match colours.
-  let anomalyMatcher = function(series) {
-    let sName = series[0];
+  function anomalyMatcher (series) {
+    const sName = series[0];
     return isAnomaly(series) ? sName.substring(0, sName.length - 8) : sName;
   };  
   
   // ranking function that assigns anomaly series lower results than 
   // nominal series, used to make them distinguishable.
-  let anomalyRanker = function (series) {
+  function anomalyRanker (series) {
     return isAnomaly(series) ? .7 : 1;
   }
   
@@ -263,7 +263,7 @@ var makeAnomalyGraph = function(base, graph) {
  * formatting function, and adds a wrapper which appends the anomaly from
  * the specified base series.
  */
-var addAnomalyTooltipFormatter = function (oldFormatter, baseSeries) {  
+function addAnomalyTooltipFormatter (oldFormatter, baseSeries) {  
   const newTooltipValueFormatter = function(value, ratio, id, index) {
     let nominal = oldFormatter(value, ratio, id, index);
     if(_.isUndefined(nominal)) { //this series doesn't display in tooltip.
