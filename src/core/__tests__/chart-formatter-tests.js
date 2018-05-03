@@ -163,5 +163,21 @@ describe('padYAxis', function () {
       expect(graph.axis.y.min < currentMin).toBeTrue();
     }
   });
+});
 
-})
+describe('hideTicksByRange', function () {
+  var metadata = mockAPI.metadataToArray();
+  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  var graph = cf.hideTicksByRange(graph, "y", 10, 20);
+  var format = graph.axis.y.tick.format;
+  it('displays axis ticks inside designated range', function () {
+    expect(format(15)).toBe(15);
+    expect(format(10)).toBe(10);
+    expect(format(20)).toBe(20);
+  });
+  it('does not display axis ticks outside designated range', function () {
+    expect(format(0)).toBe("");
+    expect(format(39)).toBe("");
+  });
+});

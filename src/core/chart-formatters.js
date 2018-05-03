@@ -3,12 +3,12 @@
  *   to alter the way data is displayed to make charts more readable. These
  *   functions do not affect the data itself, only its formatting and display.
  * 
- * Each function in this file accepts a C3 graph specification object and a
+ * Data series format functions accept a C3 graph specification and a 
  * segmentation function. The segmentation function will be applied to each
  * data series in the C3 graph object, with the results being used to decide
- * how to format data from that series. It returns the modified graph spec.
+ * how to format data from that series. 
  * 
- * The functions in this file are:
+ * Data series formatters:
  *  - assignColoursByGroup: assigns the same display colour to all data series
  *      belonging to the same group
  *      
@@ -21,8 +21,15 @@
  *      lower ranked series
  *      
  *  - hideSeriesInTooltip: removes specific data series from the tooltip
- *      
+ * 
+ * Axis formatters accept a C3 graph specification and additional parameters
+ * that vary by function. They adjust formatting on graph axes.
+ * 
+ * Axis formatters:
  *  - padYAxis: add additional blank space above or below the data series
+ *  
+ *  - displayTicksByRange: only display axis ticks for specific parts of the
+ *    data range
  ***************************************************************************/
 import _ from 'underscore';
 import {PRECISION,
@@ -33,6 +40,10 @@ import {PRECISION,
         getVariableOptions} from './util';
 import chroma from 'chroma-js';
 
+
+/****************************************************************************
+ * 0. Data series formatters
+ ****************************************************************************/
 /*
  * Reiteration of D3's "category10" colors. They underlie c3's default
  * colours but are not directly accessible. Allows creating custom
@@ -217,6 +228,10 @@ function hideSeriesInTooltip (graph, predicate) {
   return graph;
 }
 
+/****************************************************************************
+ * 1. Axis formatters
+ ****************************************************************************/
+
 /*
  * Post-processing graph function that adds extra space above or below
  * data on a graph by setting the y-axis maximums and minimums to multiples
@@ -267,6 +282,47 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
   return graph;
 }
 
+/*
+ * Post-processing graph function that alters the graph to only display
+ * numerical values for axis ticks inside a certain range. This is 
+ * intended to help make it clearer which data series are
+ * associated with which y axis in graphs with multiple axes.
+ * 
+ * If min and max are not specified, data range will be used.
+ * 
+ * By default, without this formatter, numerical values for all 
+ * ticks are visible.
+ */
+
+function hideTicksByRange(graph, axis = "y", min, max) {
+  const oldFormatFunction = graph.axis[axis].tick.format;
+  const axisSeries = _.filter(graph.data.columns, series => {
+    return series[0] !== 'x' && graph.data.axes[series[0]] === axis
+  });
+  
+  //if a range is not supplied, generate one from the data
+  const genMin = _.isUndefined(min);
+  const genMax = _.isUndefined(max);
+  min = genMin ? _.min(_.map(axisSeries, series => _.min(series))) : min;
+  max = genMax ? _.max(_.map(axisSeries, series => _.max(series))) : max;
+  //expand generated axis range to include a ceiling or floor tick
+  //(may not matter in very short or very tall graphs)
+  min = genMin ? min - (max - min) / 4 : min;
+  max = genMax ? max + (max - min) / 4 : max;
+  
+  function newFormatFunction(value) {
+    if(value <= max && value >= min) {
+      return oldFormatFunction(value);
+    }
+    else {
+      return "";
+    }
+  };
+  
+  graph.axis[axis].tick.format = newFormatFunction;
+  return graph;
+}
+
 module.exports = { assignColoursByGroup, fadeSeriesByRank,
     hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
-    padYAxis};
+    padYAxis, hideTicksByRange};

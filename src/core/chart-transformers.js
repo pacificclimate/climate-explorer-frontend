@@ -21,7 +21,7 @@ import {caseInsensitiveStringSearch} from './util';
 import {fixedPrecision} from './chart-generators';
 import {assignColoursByGroup, hideSeriesInTooltip,
         hideSeriesInLegend, padYAxis,
-        fadeSeriesByRank} from './chart-formatters';
+        fadeSeriesByRank, hideTicksByRange} from './chart-formatters';
 
 /***************************************************************************
  * 0. makeVariableReponseGraph and its helper functions
@@ -218,7 +218,8 @@ function makeAnomalyGraph (base, graph) {
   graph.axis.y2.label = {};
   graph.axis.y2.label.position = 'outer-middle';
   graph.axis.y2.label.text = `${getAxisTextForVariable(graph, baseSeries[0])} anomaly from ${baseSeries[0]}`;
-  
+  graph.axis.y2.tick = {};
+  graph.axis.y2.tick.format = graph.axis.y.tick.format;
   
   // function that determines whether a data series an anomaly series.
   // used to format anomalies differently than data
@@ -252,9 +253,12 @@ function makeAnomalyGraph (base, graph) {
   graph.tooltip.format.value = addAnomalyTooltipFormatter(graph.tooltip.format.value, baseSeries);
   
   //move the two sets of data apart for less confusing visuals
-  graph = padYAxis(graph, 'y2', 'top', 8);
-  graph = padYAxis(graph, 'y', 'bottom', .2);
+  graph = padYAxis(graph, 'y2', 'top', 1);
+  graph = padYAxis(graph, 'y', 'bottom', 1);
   
+  graph = hideTicksByRange(graph, "y");
+  graph = hideTicksByRange(graph, "y2");
+
   return graph;
 };
 
