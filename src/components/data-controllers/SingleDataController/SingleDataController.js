@@ -132,17 +132,14 @@ export default createReactClass({
 
     //load stats table
     this.setStatsTableNoDataMessage("Loading Data");
-    var myStatsPromise = getStats(props, timeidx).then(validateStatsData);
+    var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
 
     myStatsPromise.then(response => {
-      //remove all results from datasets with the wrong timescale
-      var stats = this.filterAPIResults(response.data, 
-          {timescale: timeres}, props.meta);
-      if(_.allKeys(stats).length > 0) {
+      if(_.allKeys(response.data).length > 0) {
         this.setState({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
-          statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+          statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
         });
       }
       else {

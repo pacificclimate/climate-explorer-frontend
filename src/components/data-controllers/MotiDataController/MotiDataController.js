@@ -110,14 +110,11 @@ export default createReactClass({
     
     //Load stats table
     this.setStatsTableNoDataMessage("Loading Data");
-    var myStatsPromise = getStats(props, this.state.dataTableTimeOfYear).then(validateStatsData);
+    var myStatsPromise = getStats(props, this.state.dataTableTimeOfYear, "yearly").then(validateStatsData);
 
     myStatsPromise.then(response => {
-      //This portal doesn't offer users a choice of what time of year to display
-      //stats for. It always shows annual stats.
-      var stats = this.filterAPIResults(response.data, {timescale: "yearly"}, props.meta);
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);

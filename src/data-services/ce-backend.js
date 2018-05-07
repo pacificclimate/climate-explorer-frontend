@@ -59,9 +59,8 @@ function getData(
   });
 }
 
-// TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
 function getStats (
-    { ensemble_name, model_id, variable_id, experiment, area }, timeidx
+    { ensemble_name, model_id, variable_id, experiment, area }, timeidx, timeres
 ) {
   // Query the "multistats" API endpoint.
   // Gets an object from each qualifying dataset file with the following
@@ -79,16 +78,17 @@ function getStats (
   //      modtime (last time dataset was modified)
   //    }
   //  }
-  let queryExpString = guessExperimentFormatFromVariable(variable_id, experiment);
+  const emissionString = guessExperimentFormatFromVariable(variable_id, experiment);
   return axios({
     baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
     params: {
       ensemble_name: ensemble_name,
       model: model_id,
       variable: variable_id,
-      emission: queryExpString,
+      emission: emissionString,
       area: area || null,
       time: timeidx,
+      timescale: timeres
     }
   });
 }
