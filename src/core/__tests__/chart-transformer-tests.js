@@ -91,7 +91,7 @@ describe('makeAnomalyGraph', function() {
         mockAPI.seasonalTasmaxTimeseries, 
         mockAPI.annualTasmaxTimeseries);
     let anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", graph);
-    expect(anomalyGraph.data.columns.length).toBe(6);
+    expect(anomalyGraph.data.columns.length).toBe(5);
     expect(validate.allDefinedObject(anomalyGraph)).toBe(true);
     expect(validate.allDefinedArray(anomalyGraph.data.columns)).toBe(true);
     expect(anomalyGraph.axis.y2).toBeDefined();

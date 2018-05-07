@@ -200,21 +200,22 @@ function makeAnomalyGraph (base, graph) {
   graph.axis.y2 = {show: true};
   
   for(let i = 0; i < origLength; i++) {
-    if(graph.data.columns[i][0] !== 'x') {
+    let seriesName = graph.data.columns[i][0];
+    if(seriesName !== 'x' && seriesName !== base) {
       let oldSeries = graph.data.columns[i];
       if(oldSeries.length !== baseSeries.length) {
         throw new Error("Error: Incorrect data series length, cannot calculate anomaly");
       }
 
       let newSeries = [];
-      newSeries.push(`${oldSeries[0]} Anomaly`);
+      newSeries.push(`${seriesName} Anomaly`);
       for(let j = 1; j < oldSeries.length; j++){
         newSeries.push(oldSeries[j] - baseSeries[j]);
       }
       graph.data.columns.push(newSeries);
-      graph.data.axes[oldSeries[0]] = 'y';
-      graph.data.axes[`${oldSeries[0]} Anomaly`] = 'y2';
-      graph.data.types[`${oldSeries[0]} Anomaly`] = oldSeries[0] === base ? "line" : "bar";
+      graph.data.axes[seriesName] = 'y';
+      graph.data.axes[`${seriesName} Anomaly`] = 'y2';
+      graph.data.types[`${seriesName} Anomaly`] = "line";
     }
   }
   graph.axis.y2.label = {};
