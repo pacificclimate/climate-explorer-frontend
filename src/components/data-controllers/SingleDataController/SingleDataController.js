@@ -35,7 +35,8 @@ import styles from './SingleDataController.css';
 
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
-         resolutionIndexToTimeKey} from '../../../core/util';
+         resolutionIndexToTimeKey,
+         validateStatsData} from '../../../core/util';
 import DataTable from '../../DataTable/DataTable';
 import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../../DataControllerMixin';
@@ -44,6 +45,7 @@ import SingleAnnualCycleGraph from '../../graphs/SingleAnnualCycleGraph';
 import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
 import SingleContextGraph from '../../graphs/SingleContextGraph';
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
+import { getStats } from '../../../data-services/ce-backend';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -130,17 +132,14 @@ export default createReactClass({
 
     //load stats table
     this.setStatsTableNoDataMessage("Loading Data");
-    var myStatsPromise = this.getStatsPromise(props, timeidx);
+    var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
 
     myStatsPromise.then(response => {
-      //remove all results from datasets with the wrong timescale
-      var stats = this.filterAPIResults(response.data, 
-          {timescale: timeres}, props.meta);
-      if(_.allKeys(stats).length > 0) {
+      if(_.allKeys(response.data).length > 0) {
         this.setState({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
-          statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+          statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
         });
       }
       else {

@@ -29,12 +29,14 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Button, ControlLabel } from 'react-bootstrap';
 
-import { parseBootstrapTableData } from '../../../core/util';
+import { parseBootstrapTableData, validateStatsData } from '../../../core/util';
 import DataGraph from '../../graphs/DataGraph/DataGraph';
 import DataTable from '../../DataTable/DataTable';
 import DataControllerMixin from '../../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,
         timeseriesToTimeseriesGraph} from '../../../core/chart';
+import { getStats } from '../../../data-services/ce-backend';
+
 import _ from 'underscore';
 
 import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';
@@ -108,14 +110,11 @@ export default createReactClass({
     
     //Load stats table
     this.setStatsTableNoDataMessage("Loading Data");
-    var myStatsPromise = this.getStatsPromise(props, this.state.dataTableTimeOfYear);
+    var myStatsPromise = getStats(props, this.state.dataTableTimeOfYear, "yearly").then(validateStatsData);
 
     myStatsPromise.then(response => {
-      //This portal doesn't offer users a choice of what time of year to display
-      //stats for. It always shows annual stats.
-      var stats = this.filterAPIResults(response.data, {timescale: "yearly"}, props.meta);
       this.setState({
-        statsData: parseBootstrapTableData(this.injectRunIntoStats(stats), props.meta),
+        statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
       });
     }).catch(error => {
       this.displayError(error, this.setStatsTableNoDataMessage);
