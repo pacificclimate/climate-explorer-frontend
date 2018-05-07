@@ -86,22 +86,24 @@ function makeVariableResponseGraph (x, y, graph) {
   }
   //sort by x value, preperatory to putting on the graph.
   tuples.sort((a, b) => a[0] - b[0]);  
-  c3Data.columns = [["x"], [y]];
-
-
-  for(let i = 1; i < tuples.length; i++) {
-    c3Data.columns[0].push(tuples[i][0]);
-    c3Data.columns[1].push(tuples[i][1]);
-    //C3 doesn't really support scatterplots, but we can fake it by adding
-    //a missing data point between each actual data point, and instructing C3
-    //not to connect across missing data points with {connectNull: false} 
-    //TODO: breake this out into makeScatterplot(); we'll likely need it again
-    if(i < tuples.length - 1) {
-      c3Data.columns[0].push((tuples[i][0] + tuples[i+1][0])/2);
-      c3Data.columns[1].push(null);
+  
+  //C3 doesn't really support scatterplots, but we can fake it by adding
+  //a missing data point between each actual data point, and instructing C3
+  //not to connect across missing data points with {connectNull: false} 
+  //TODO: break this out into makeScatterplot(); we'll likely need it again
+  c3Data.columns = [];
+  c3Data.columns.push(_.reduce(tuples, (memo, tuple, index, list) => {
+    memo.push(tuple[0]);
+    if(index < list.length - 1) {
+      memo.push(tuple[0] / 2 + list[index + 1][0] / 2);
     }
-  }
-
+    return memo;
+  }, ["x"]));  
+  c3Data.columns.push(_.reduce(tuples, (memo, tuple, index, list) => {
+    index < list.length - 1 ? memo.push(tuple[1], null) : memo.push(tuple[1]);
+    return memo;
+  }, [y]));
+  
   // Generate x and y axes. Reuse labels from source graph,
   // but add variable names if not present.
   let xAxisLabel = getAxisTextForVariable(graph, x);

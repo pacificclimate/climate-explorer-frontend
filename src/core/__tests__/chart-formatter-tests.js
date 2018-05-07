@@ -130,6 +130,24 @@ describe('hideSeriesInToolTip', function () {
   });
 });
 
+describe('getDataSeriesByAxis', function () {
+  var metadata = mockAPI.metadataToArray();
+  var twoAxes = cg.timeseriesToTimeseriesGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.monthlyPrTimeseries);
+  var oneAxis = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+      mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
+  it('associates data series for a 1-axis graph', function () {
+    expect(cf.getDataSeriesByAxis(oneAxis, 'y').length).toBe(3);
+    expect(cf.getDataSeriesByAxis(oneAxis, 'y2').length).toBe(0);
+    expect(cf.getDataSeriesByAxis(oneAxis, 'fakeaxis').length).toBe(0);
+  });
+  it('associates data series for a 2-axis graph', function () {
+    expect(cf.getDataSeriesByAxis(twoAxes, 'y').length).toBe(1);
+    expect(cf.getDataSeriesByAxis(twoAxes, 'y2').length).toBe(1);
+    expect(cf.getDataSeriesByAxis(twoAxes, 'fakeaxis').length).toBe(0);
+  })
+});
+
 describe('padYAxis', function () {
   var metadata = mockAPI.metadataToArray();
   var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,

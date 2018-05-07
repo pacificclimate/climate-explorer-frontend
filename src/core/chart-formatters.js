@@ -231,6 +231,16 @@ function hideSeriesInTooltip (graph, predicate) {
 /****************************************************************************
  * 1. Axis formatters
  ****************************************************************************/
+/*
+ * Helper function that returns an array of all data series associated with 
+ * a specific y axis (y or y2). Ignores category or time series, if present.
+ */
+function getDataSeriesByAxis(graph, axis) {
+  return _.filter(graph.data.columns, series => {
+    const seriesName = series[0];
+    return seriesName !== 'x' && graph.data.axes[seriesName] === axis;
+  });
+}
 
 /*
  * Post-processing graph function that adds extra space above or below
@@ -262,9 +272,7 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
   // them from the data.
   let min = graph.axis[axis].min;
   let max = graph.axis[axis].max
-  const axisSeries = _.filter(graph.data.columns, series => {
-      return series[0] !== 'x' && graph.data.axes[series[0]] === axis
-    });
+  const axisSeries = getDataSeriesByAxis(graph, axis);
   
   if(_.isUndefined(min)) {
     min = _.min(_.map(axisSeries, series => _.min(series)));
@@ -296,9 +304,7 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
 
 function hideTicksByRange(graph, axis = "y", min, max) {
   const oldFormatFunction = graph.axis[axis].tick.format;
-  const axisSeries = _.filter(graph.data.columns, series => {
-    return series[0] !== 'x' && graph.data.axes[series[0]] === axis
-  });
+  const axisSeries = getDataSeriesByAxis(graph, axis);
   
   //if a range is not supplied, generate one from the data
   const genMin = _.isUndefined(min);
@@ -325,4 +331,7 @@ function hideTicksByRange(graph, axis = "y", min, max) {
 
 module.exports = { assignColoursByGroup, fadeSeriesByRank,
     hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
-    padYAxis, hideTicksByRange};
+    padYAxis, hideTicksByRange,
+    //helper functions exported only for testing:
+    getDataSeriesByAxis
+    };
