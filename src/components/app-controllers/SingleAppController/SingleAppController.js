@@ -12,6 +12,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
+import _ from 'underscore';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
@@ -34,6 +35,13 @@ export default createReactClass({
   //Filters out noisy multi-year monthly datasets.
   datasetFilter: function (datafile) {
     return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+  },
+
+  //Returns metadata for datasets with thethe selected variable + scenario, any model.
+  //Passed as a prop for SingleDataController to generate model comparison graphs.
+  getModelContextMetadata: function () {
+    return _.where(this.state.meta,
+        {variable_id: this.state.variable_id, experiment: this.state.experiment});
   },
 
   render: function () {
@@ -79,7 +87,7 @@ export default createReactClass({
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {this.getfilteredMeta()}
-              contextMeta={this.state.meta} //for Context Graph: metadata from all models
+              contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
           </Col>
         </Row>
