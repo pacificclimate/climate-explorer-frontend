@@ -255,8 +255,8 @@ function makeAnomalyGraph (base, graph) {
   graph.tooltip.format.value = addAnomalyTooltipFormatter(graph.tooltip.format.value, baseSeries);
   
   //move the two sets of data apart for less confusing visuals
-  graph = padYAxis(graph, 'y2', 'top', 1);
-  graph = padYAxis(graph, 'y', 'bottom', 1);
+  graph = padYAxis(graph, 'y2', 'top', 1.1);
+  graph = padYAxis(graph, 'y', 'bottom', 1.1);
   
   graph = hideTicksByRange(graph, "y");
   graph = hideTicksByRange(graph, "y2");
