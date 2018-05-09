@@ -69,27 +69,27 @@ const category10Colours = ["#1f77b4",
  * Accepts a C3 graph object and a segmentation function. Applies the
  * segmentation function to each data column in the graph object. All
  * data columns that evaluate to the same result are grouped together
- * and assigned the same display colour.
+ * and assigned the same display colour. _.isEqual() is used (by _.indexOf()) 
+ * to evaluate whether two segmentation results are equal.
  *
  * Returns a modified graph object with colours assigned in graph.data.colors
  * accordingly.
  *
- * _.isEqual() is used to evaluate whether two segmentation results are equal.
  * Each data column is an array with the series name in the 0th location, example:
  *
  * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
  *
  */
 function assignColoursByGroup (graph, segmentor, colourList = category10Colours) {
-  var categories = [];
-  var colors = {};
+  let categories = [];
+  let colors = {};
 
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) { //"x" series used to provide categories, not data.
-      var category = segmentor(column);
-      var index = _.indexOf(categories, category);
-      if(index == -1) {
+  for(let column of graph.data.columns) {
+    const seriesName = column[0];
+    if(seriesName !== "x") { //"x" series used to provide categories, not data.
+      let category = segmentor(column);
+      let index = _.indexOf(categories, category);
+      if(index === -1) {
         //first time we've encountered this category,
         //add it to the list.
         categories.push(category);
@@ -100,7 +100,7 @@ function assignColoursByGroup (graph, segmentor, colourList = category10Colours)
       }
       colors[seriesName] = colourList[index];
     }
-  });
+  }
   graph.data.colors = colors;
   return graph;
 };
@@ -126,20 +126,20 @@ function assignColoursByGroup (graph, segmentor, colourList = category10Colours)
  */
 function fadeSeriesByRank (graph, ranker) {
 
-  var rankDictionary = {};
+  let rankDictionary = {};
 
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
+  for(let column of graph.data.columns) {
+    const seriesName = column[0];
+    if(seriesName !== "x") {
       rankDictionary[seriesName] = ranker(column);
     }
-  });
+  }
 
   //c3 will pass the function the assigned colour, and either:
   //     * a string with the name of the time series (drawing legend)
   //     * an object with attributes about the time series (drawing a point or line)
-  var fader = function(colour, d) {
-    var scale = chroma.scale(['white', colour]);
+  function fader (colour, d) {
+    const scale = chroma.scale(['white', colour]);
     if(_.isObject(d)) { //d = data attributes
       return scale(rankDictionary[d.id]).hex();
     }
@@ -150,7 +150,7 @@ function fadeSeriesByRank (graph, ranker) {
 
   graph.data.color = fader;
   return graph;
-};
+}
 
 /*
  * Post-processing graph function that removes data series from the legend.
@@ -164,14 +164,12 @@ function fadeSeriesByRank (graph, ranker) {
  * is only needed if at least one series should be hidden.
  */
 function hideSeriesInLegend (graph, predicate) {
-  var hiddenSeries = [];
+  let hiddenSeries = [];
 
   _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
-      if(predicate(column)){
-        hiddenSeries.push(seriesName);
-      }
+    const seriesName = column[0];
+    if(seriesName !== "x" && predicate(column)) {
+      hiddenSeries.push(seriesName);
     }
   });
 
@@ -194,7 +192,7 @@ function hideSeriesInLegend (graph, predicate) {
  * will be drawn and the more prominent it will appear.
  */
 function sortSeriesByRank (graph, ranker) {
-  var sorter = function(a, b) {return ranker(a) - ranker(b);}
+  const sorter = function(a, b) {return ranker(a) - ranker(b);}
   graph.data.columns = graph.data.columns.sort(sorter);
   return graph;
 };

@@ -62,9 +62,9 @@ function fixedPrecision (n, ...rest) { return +n.toFixed(PRECISION);};
  * util.PRECISION for variables with no precision options in the file.
  */
 function makePrecisionBySeries (series) {
-  var dictionary = {};
-  for(var s in series) {
-    var fromConfig = getVariableOptions(series[s], "decimalPrecision");
+  let dictionary = {};
+  for(let s in series) {
+    const fromConfig = getVariableOptions(series[s], "decimalPrecision");
     dictionary[s] = _.isUndefined(fromConfig) ? PRECISION : fromConfig;
   }
 
@@ -87,13 +87,13 @@ function makePrecisionBySeries (series) {
  * series id it belongs to.
  */
 function makeTooltipDisplayNumbersWithUnits (axes, axis, precisionFunction) {
-  var unitsDictionary = {};
+  let unitsDictionary = {};
   if(_.isUndefined(precisionFunction)) { //use a default.
     precisionFunction = fixedPrecision;
   }
   
   //build a dictionary between timeseries names and units
-  for(var series in axes) {
+  for(let series in axes) {
     unitsDictionary[series] = axis[axes[series]].label.text;
   }
 
@@ -134,26 +134,25 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
 
-  var yUnits = "";
-  var y2Units = "";
-  var seriesVariables = {};
+  let yUnits = "";
+  let y2Units = "";
+  let seriesVariables = {};
   
-  var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
   
   //Add each timeseries to the graph
-  for(var i = 0; i < data.length; i++) {
+  for(let timeseries of data) {
 
     //get metadata for this timeseries
-    var timeseries = data[i];
-    var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
-    var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
+    const timeseriesName = getTimeseriesName(timeseriesMetadata);
     seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
        
     //add the actual data to the graph
@@ -185,15 +184,15 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
   }
   
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = monthlyXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) { 
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
@@ -212,9 +211,9 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
  */
 function getMonthlyData (data, timescale = "monthly") {
 
-  var expectedTimestamps = {"monthly": 12, "seasonal": 4, "yearly": 1};
-  var monthlyData = [];
-  var timestamps = Object.keys(data).sort();
+  const expectedTimestamps = {"monthly": 12, "seasonal": 4, "yearly": 1};
+  let monthlyData = [];
+  const timestamps = Object.keys(data).sort();
   
   if(timestamps.length == 17) {
     throw new Error("Error: concatenated 17-point chronology.");
@@ -224,8 +223,8 @@ function getMonthlyData (data, timescale = "monthly") {
     throw new Error("Error: inconsistent time resolution in data");
   }
   
-  for(var i = 0; i < 12; i++) {
-    var mapped = Math.ceil((timestamps.length / 12.0) * (i + 1)) - 1;
+  for(let i = 0; i < 12; i++) {
+    let mapped = Math.ceil((timestamps.length / 12.0) * (i + 1)) - 1;
     monthlyData.push(data[timestamps[mapped]]);
   }
   
@@ -266,13 +265,13 @@ function shortestUniqueTimeseriesNamingFunction (metadata, data) {
     return function(m) { return capitalizeWords(`${m.timescale} mean`);};
   }
   
-  var variation = [];
-  var exemplarMetadata = _.find(metadata, function(m) {return m.unique_id === data[0].id;});
+  let variation = [];
+  const exemplarMetadata = _.find(metadata, function(m) {return m.unique_id === data[0].id;});
   
-  for(var i = 0; i < data.length; i++) {
-    var comparandMetadata = _.find(metadata, function(m) {return m.unique_id == data[i].id;});
+  for(let datum of data) {
+    const comparandMetadata = _.find(metadata, function(m) {return m.unique_id == datum.id;});
 
-    for(var att in comparandMetadata) {
+    for(let att in comparandMetadata) {
       if(exemplarMetadata[att] !== comparandMetadata[att] && variation.indexOf(att) == -1) {
         variation.push(att);
       }
@@ -293,9 +292,9 @@ function shortestUniqueTimeseriesNamingFunction (metadata, data) {
   }
   
   return function (m) {
-    var name = "";
-    for(var j = 0; j < variation.length; j++) {
-      name = name.concat(`${m[variation[j]]} `);
+    let name = "";
+    for(let v of variation) {
+      name = name.concat(`${m[v]} `);
     }
     name = name.concat("mean");
     return capitalizeWords(name);
@@ -363,18 +362,18 @@ function dataToLongTermAverageGraph (data, contexts = []){
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
   
-  var yUnits = "";
-  var y2Units = "";
+  let yUnits = "";
+  let y2Units = "";
   
-  var seriesVariables = {};
-  var nameSeries;
+  let seriesVariables = {};
+  let nameSeries;
   
   if(data.length == 1) {
     nameSeries = function(run, context) {return run;};
@@ -388,28 +387,28 @@ function dataToLongTermAverageGraph (data, contexts = []){
 
   //get the list of all timestamps and add them to the chart
   //(C3 requires x-axis timestamps be added as a data column)
-  var timestamps = getAllTimestamps(data);
+  const timestamps = getAllTimestamps(data);
   c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
   c3Data.x = "x";
   
 
   //add each API call to the chart
-  for(var i = 0; i < data.length; i++) {
-    var context = contexts.length ? contexts[i] : {};
-    var call = data[i];
+  for(let i = 0; i < data.length; i++) {
+    const context = contexts.length ? contexts[i] : {};
+    const call = data[i];
     
     //add each individual dataset from the API to the chart
     for(let run in call) {
-      var runName = nameSeries(run, context);
+      const runName = nameSeries(run, context);
       seriesVariables[runName] = _.isEmpty(context) ? undefined : context.variable_id;
-      var series = [runName];
+      const series = [runName];
       
       //if a given timestamp is present in some, but not all
       //datasets, set the timestamp's value to "null"
       //in the C3 data object. This will cause C3 to render the
       //line with a break where the missing timestamp is.
-      for(var t = 0; t < timestamps.length; t++ ) {
-        series.push(_.isUndefined(call[run].data[timestamps[t]]) ? null : call[run].data[timestamps[t]]);
+      for(let t of timestamps ) {
+        series.push(_.isUndefined(call[run].data[t]) ? null : call[run].data[t]);
       }
       c3Data.columns.push(series);
       c3Data.types[runName] = "line";
@@ -436,7 +435,7 @@ function dataToLongTermAverageGraph (data, contexts = []){
   }
   
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) { 
@@ -446,15 +445,15 @@ function dataToLongTermAverageGraph (data, contexts = []){
   //The long term average graph doesn't require every series to have the exact
   //same timestamps, since it's comparing long term trends anyway. Allow C3
   //to smoothly connect series even if they're "missing" timestamps.
-  var c3Line = {
+  const c3Line = {
       connectNull: true
   };
 
   //Note: if context is empty (dataToLongTermAverageGraph was called with only
   //one time series), variable-determined precision will not be available and
   //numbers will be formatted with default precision.
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
@@ -471,9 +470,9 @@ function dataToLongTermAverageGraph (data, contexts = []){
  * list of all unique timestamps found in the data.
  */
 function getAllTimestamps (data) {
-  var allTimes = [];
+  let allTimes = [];
 
-  var addSeries = function(seriesData) {
+  const addSeries = function(seriesData) {
     for(let timestamp in seriesData) {
       if(!_.find(allTimes, function(t){return t== timestamp;})) {
         allTimes.push(timestamp);
@@ -481,7 +480,7 @@ function getAllTimestamps (data) {
     }
   };
 
-  for(var i in _.keys(data)) {
+  for(let i in _.keys(data)) {
     if(!_.isUndefined(data[i].data)) { //data is from "timeseries" API
       addSeries(data[i].data);
     }
@@ -510,12 +509,12 @@ function getAllTimestamps (data) {
  */
 function nameAPICallParametersFunction (contexts) {
   
-  var variation = [];
-  var exemplarContext = contexts[0];
+  let variation = [];
+  const exemplarContext = contexts[0];
   
-  for (var i = 0; i < contexts.length; i++) {
-    for(var att in contexts[i]) {
-      if(exemplarContext[att] != contexts[i][att] && variation.indexOf(att) == -1) {
+  for (let context of contexts) {
+    for(let att in context) {
+      if(exemplarContext[att] != context[att] && variation.indexOf(att) == -1) {
         variation.push(att);
       }
     }
@@ -538,9 +537,9 @@ function nameAPICallParametersFunction (contexts) {
   }
   
   return function (run, context) {
-    var name = "";
-    for(var j = 0; j < variation.length; j++) {
-      name = name.concat(`${context[variation[j]]} `);
+    let name = "";
+    for(let v of variation) {
+      name = name.concat(`${context[v]} `);
     }
     name = name.concat(run);
     return name;
@@ -599,39 +598,38 @@ const timeseriesXAxis = {
 function timeseriesToTimeseriesGraph (metadata, ...data) {
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
 
-  var yUnits = "";
-  var y2Units = "";
-  var seriesVariables = {};
+  let yUnits = "";
+  let y2Units = "";
+  let seriesVariables = {};
 
-  var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
 
   //get list of all timestamps
-  var timestamps = getAllTimestamps(data);
+  const timestamps = getAllTimestamps(data);
   c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
   c3Data.x = "x";
 
   //Add each timeseries to the graph
-  for(var i = 0; i < data.length; i++) {
+  for(let timeseries of data) {
     //get metadata for this timeseries
-    var timeseries = data[i];
-    var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
-    var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
+    const timeseriesName = getTimeseriesName(timeseriesMetadata);
     seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
 
     //add the actual data to the graph
-    var column = [timeseriesName];
+    let column = [timeseriesName];
 
-    for(var t = 0; t < timestamps.length; t++ ) {
+    for(let t in timestamps) {
       //assigns "null" for any timestamps missing from this series.
       //C3's behaviour toward null values is set by the line.connectNull attribute
-      column.push(_.isUndefined(timeseries.data[timestamps[t]]) ? null : timeseries.data[timestamps[t]]);
+      column.push(_.isUndefined(timeseries.data[t]) ? null : timeseries.data[t]);
     }
 
     c3Data.columns.push(column);
@@ -659,14 +657,14 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
   }
 
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) {
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
-  var c3Subchart = {show: true,
+  const c3Subchart = {show: true,
       size: {height: 20} };
 
   //instructs c3 to connect series across gaps where a timeseries is missing
@@ -674,12 +672,12 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
   //is actually missing from a series, it's helpful in cases where
   //series are at different time resolutions (monthly/yearly), so it's
   //included by default.
-  var c3Line = {
+  const c3Line = {
       connectNull: true
   };
 
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
 

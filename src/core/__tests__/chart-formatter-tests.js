@@ -15,34 +15,34 @@ jest.dontMock('../chart-formatters');
 jest.dontMock('../util');
 jest.dontMock('underscore');
 
-var cg = require('../chart-generators');
-var cf = require('../chart-formatters'); 
-var validate = require('../__test_data__/test-validators');
-var mockAPI = require('../__test_data__/sample-API-results');
+const cg = require('../chart-generators');
+const cf = require('../chart-formatters'); 
+const validate = require('../__test_data__/test-validators');
+const mockAPI = require('../__test_data__/sample-API-results');
 
 describe('assignColoursByGroup', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
   it('assigns the same color to each series in a group', function () {
-    var segmentFunc = function (col) {return "group"};
-    var newChart = cf.assignColoursByGroup(graph, segmentFunc);
+    const segmentFunc = function (col) {return "group"};
+    let newChart = cf.assignColoursByGroup(graph, segmentFunc);
     expect(validate.allDefinedObject(newChart)).toBe(true);
-    var colourAssignments = newChart.data.colors;
-    var seriesKeys = Object.keys(colourAssignments);
+    const colourAssignments = newChart.data.colors;
+    const seriesKeys = Object.keys(colourAssignments);
     expect(seriesKeys.length).toBe(3);
-    for(var i = 0; i < seriesKeys.length; i++) {
-      expect(colourAssignments[seriesKeys[i]]).toMatch(colourAssignments[seriesKeys[0]]);
+    for(let key of seriesKeys) {
+      expect(colourAssignments[key]).toMatch(colourAssignments[seriesKeys[0]]);
     }
   });
   it('assigns different colours to different groups', function () {
-    var segmentFunc = function(col) {return col[0]};
-    var newChart = cf.assignColoursByGroup(graph, segmentFunc);
+    const segmentFunc = function(col) {return col[0]};
+    let newChart = cf.assignColoursByGroup(graph, segmentFunc);
     expect(validate.allDefinedObject(newChart)).toBe(true);
-    var assignments = newChart.data.colors;
-    var seriesKeys = Object.keys(assignments);
-    for(var i = 1; i < seriesKeys.length; i++) {
-      for(var j = 0; j < i; j++) {
+    const assignments = newChart.data.colors;
+    const seriesKeys = Object.keys(assignments);
+    for(let i = 0; i < seriesKeys.length; i++) {
+      for(let j = 0; j < i; j++) {
         expect(assignments[seriesKeys[i]]).not.toBe(assignments[seriesKeys[j]]);
       }
     }
@@ -50,52 +50,52 @@ describe('assignColoursByGroup', function () {
 });
 
 describe('fadeSeriesByRank', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
   it('does not affect tier-1 series', function () {
-    var ranker = function(series) {return 1};
-    graph = cf.fadeSeriesByRank(graph, ranker);
-    var fader = graph.data.color;
-    var series = graph.data.columns;
-    for(var i = 0; i < series.length; i++) {
-      var faded = fader("#000000", series[i][0]);
+    const ranker1 = function(series) {return 1};
+    graph = cf.fadeSeriesByRank(graph, ranker1);
+    const fader = graph.data.color;
+    let series = graph.data.columns;
+    for(let s of series) {
+      const faded = fader("#000000", s[0]);
       expect(faded).toMatch("#000000");
     }
   });
   it('fades low-ranked series', function () {});
-  var ranker = function (series) {return .5};
-  graph = cf.fadeSeriesByRank(graph, ranker);
-  var fader = graph.data.color;
-  var series = graph.data.columns;
-  for(var i = 0; i < series.length; i++) {
-    var faded = fader("#000000", series[i][0]);
+  const ranker2 = function (series) {return .5};
+  graph = cf.fadeSeriesByRank(graph, ranker2);
+  const fader = graph.data.color;
+  const series = graph.data.columns;
+  for(let s of series) {
+    let faded = fader("#000000", s[0]);
     expect(faded).not.toMatch("#000000");
   }
 });
 
 describe('hideSeriesInLegend', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
   it('removes data series from the lengend', function() {
-    var hideAll = function(series) {return true};
+    const hideAll = function(series) {return true};
     graph = cf.hideSeriesInLegend(graph, hideAll);
     expect(graph.legend.hide.length).toBe(3);
   });
   it('retains data series in the legend', function() {
-    var showAll = function(series) {return false};
+    const showAll = function(series) {return false};
     graph = cf.hideSeriesInLegend(graph, showAll);
     expect(graph.legend.hide.length).toBe(0);
   });
 });
 
 describe('sortSeriesByRank', function (){
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-  var rankByTimeResolution = function (series) {
-    var resolutions = ["Yearly", "Seasonal", "Monthly"];
+  const rankByTimeResolution = function (series) {
+    const resolutions = ["Yearly", "Seasonal", "Monthly"];
     for(let i = 0; i < 3; i++) {
       if(series[0].search(resolutions[i]) != -1) {
         return i;
@@ -103,7 +103,7 @@ describe('sortSeriesByRank', function (){
     }
   }
   it('orders series by ranking', function () {
-    var ranked = cf.sortSeriesByRank(graph, rankByTimeResolution);
+    const ranked = cf.sortSeriesByRank(graph, rankByTimeResolution);
     expect(ranked.data.columns[0][0]).toBe("Yearly Mean");
     expect(ranked.data.columns[1][0]).toBe("Seasonal Mean");
     expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
@@ -111,18 +111,18 @@ describe('sortSeriesByRank', function (){
 });
 
 describe('hideSeriesInToolTip', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-  var formatFunction;
+  let formatFunction;
   it('removes data series from the tooltip', function() {
-    var hideAll = function(series) {return true};
+    const hideAll = function(series) {return true};
     graph = cf.hideSeriesInTooltip(graph, hideAll);
     formatFunction = graph.tooltip.format.value;
     expect(formatFunction(10, 19, "Yearly Mean")).toBeUndefined();
   });
   it('retains data series in the tooltip', function() {
-    var showAll = function(series) {return false};
+    const showAll = function(series) {return false};
     graph.tooltip.format.value = (a, b, c, d) => {return "test"};
     graph = cf.hideSeriesInTooltip(graph, showAll);
     formatFunction = graph.tooltip.format.value; 
@@ -131,10 +131,10 @@ describe('hideSeriesInToolTip', function () {
 });
 
 describe('getDataSeriesByAxis', function () {
-  var metadata = mockAPI.metadataToArray();
-  var twoAxes = cg.timeseriesToTimeseriesGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let twoAxes = cg.timeseriesToTimeseriesGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.monthlyPrTimeseries);
-  var oneAxis = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  let oneAxis = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
   it('associates data series for a 1-axis graph', function () {
     expect(cf.getDataSeriesByAxis(oneAxis, 'y').length).toBe(3);
@@ -149,10 +149,10 @@ describe('getDataSeriesByAxis', function () {
 });
 
 describe('padYAxis', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-  var func;
+  let func;
   it('rejects negative padding', function () {
     func = function ()  {cf.padYAxis(graph, "y", "top", -1);};
     expect(func).toThrow();
@@ -162,7 +162,7 @@ describe('padYAxis', function () {
     expect(func).toThrow();
   });
   it('rejects horizontal padding directions', function () {
-    var func = function ()  {cf.padYAxis(graph, "y", "left", -1);};
+    func = function ()  {cf.padYAxis(graph, "y", "left", -1);};
     expect(func).toThrow();
   });
   it('pads a graph by adding space at the top', function () {
@@ -184,11 +184,11 @@ describe('padYAxis', function () {
 });
 
 describe('hideTicksByRange', function () {
-  var metadata = mockAPI.metadataToArray();
-  var graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
+  const metadata = mockAPI.metadataToArray();
+  let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-  var graph = cf.hideTicksByRange(graph, "y", 10, 20);
-  var format = graph.axis.y.tick.format;
+  graph = cf.hideTicksByRange(graph, "y", 10, 20);
+  const format = graph.axis.y.tick.format;
   it('displays axis ticks inside designated range', function () {
     expect(format(15)).toBe(15);
     expect(format(10)).toBe(10);
