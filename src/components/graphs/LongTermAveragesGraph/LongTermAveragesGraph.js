@@ -116,7 +116,7 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  handleExportXslx = this.exportData.bind(this, 'xslx');
+  handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
 
   // Lifecycle hooks
@@ -147,7 +147,7 @@ export default class LongTermAveragesGraph extends React.Component {
           </Col>
           <Col>
             <ExportButtons
-              onExportXslx={this.handleExportXslx}
+              onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
             />
           </Col>

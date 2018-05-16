@@ -135,7 +135,7 @@ export default class AnnualCycleGraph extends React.Component {
     );
   }
   
-  handleExportXslx = this.exportData.bind(this, 'xslx');
+  handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
   
   // Lifecycle hooks
@@ -168,7 +168,7 @@ export default class AnnualCycleGraph extends React.Component {
           </Col>
           <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
             <ExportButtons
-              onExportXslx={this.handleExportXslx}
+              onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
             />
           </Col>

@@ -7,7 +7,7 @@ it('renders without crashing', () => {
   const div = document.createElement('div');
   ReactDOM.render(
     <ExportButtons
-      onExportXslx={noop}
+      onExportXlsx={noop}
       onExportCsv={noop}
     />,
     div

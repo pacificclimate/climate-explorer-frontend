@@ -168,7 +168,7 @@ export default createReactClass({
               dataSpec={this.state.annualCycleDataSpec}
               onChangeDataset={this.updateAnnualCycleDataset}
               graphSpec={this.state.annualCycleData || this.blankGraph}
-              onExportXslx={this.exportAnnualCycle.bind(this, 'xlsx')}
+              onExportXlsx={this.exportAnnualCycle.bind(this, 'xlsx')}
               onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
             />
           ) : (

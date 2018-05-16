@@ -7,7 +7,7 @@ import styles from './ExportButtons.css';
 
 export default class ExportButtons extends React.Component {
   static propTypes = {
-    onExportXslx: PropTypes.func.isRequired,
+    onExportXlsx: PropTypes.func.isRequired,
     onExportCsv: PropTypes.func.isRequired,
   };
 
@@ -15,7 +15,7 @@ export default class ExportButtons extends React.Component {
     return (
       <div>
         <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-        <Button onClick={this.props.onExportXslx}>XLSX</Button>
+        <Button onClick={this.props.onExportXlsx}>XLSX</Button>
         <Button onClick={this.props.onExportCsv}>CSV</Button>
       </div>
     );
