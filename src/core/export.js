@@ -101,7 +101,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       );
       break;
 
-    case 'xslx':
+    case 'xlsx':
       var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
       out_data = new Blob(
         [xml_to_binary_string(wbout)],
