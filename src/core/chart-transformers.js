@@ -290,13 +290,34 @@ function addAnomalyTooltipFormatter (oldFormatter, baseSeries) {
 /*
  * Given a timeseries graph and a string matching a timestamp in that graph,
  * returns a new graph containing only data present at that particular moment.
+ *
+ * Can generate a timeslice from a C3 graph specification with an x-axis of
+ * either "timeseries" (like a Long Term Average graph) or "category" (like an
+ * Annual Cycle graph) type, but not from a graph with an "indexed" type x axis.
  */
 
-var makeTimeSliceGraph = function(timestamp, graph) {
+function makeTimeSliceGraph (timestamp, graph) {
   let slicedData = [];
-  let timestamps = graph.data.columns.find(function(series) {return series[0] === 'x'});
-  let sliceIndex = timestamps.indexOf(timestamp);
+  let timestamps = [];
+  let sliceIndex = -1;
+
+  if(graph.axis.x.type == "timeseries") {
+    //x-axis has a series of dates
+    timestamps = graph.data.columns.find(function(series) {return series[0] === 'x'});
+  }
+  else if(graph.axis.x.type == "category") {
+    //x-axis is text, most likely month names
+    timestamps = graph.axis.x.categories;
+  }
+  else {
+    throw new Error("Error: timeslice graph must be generated from a timeseries");
+  }
+
+  if(_.isUndefined(timestamps)) {
+    throw new Error("Error: time information missing from source graph");
+  }
   
+  sliceIndex = timestamps.indexOf(timestamp);
   if(sliceIndex === -1) {
     throw new Error("Error: invalid timestamp selected");
   }
