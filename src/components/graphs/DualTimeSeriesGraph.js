@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { timeseriesToTimeseriesGraph } from '../../core/chart';
+import { timeseriesToTimeseriesGraph } from '../../core/chart-generators';
 import TimeSeriesGraph from './TimeSeriesGraph';
 
 

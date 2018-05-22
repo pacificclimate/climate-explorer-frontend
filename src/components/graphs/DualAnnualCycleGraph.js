@@ -2,9 +2,8 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import {
-  assignColoursByGroup, fadeSeriesByRank, timeseriesToAnnualCycleGraph,
-} from '../../core/chart';
+import {timeseriesToAnnualCycleGraph} from '../../core/chart-generators';
+import {assignColoursByGroup, fadeSeriesByRank} from '../../core/chart-formatters';
 import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 

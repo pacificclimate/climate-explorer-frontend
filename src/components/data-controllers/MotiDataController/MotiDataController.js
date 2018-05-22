@@ -34,9 +34,8 @@ import DataGraph from '../../graphs/DataGraph/DataGraph';
 import DataTable from '../../DataTable/DataTable';
 import DataControllerMixin from '../../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,
-        timeseriesToTimeseriesGraph} from '../../../core/chart';
+        timeseriesToTimeseriesGraph} from '../../../core/chart-generators';
 import { getStats } from '../../../data-services/ce-backend';
-
 import _ from 'underscore';
 
 import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';

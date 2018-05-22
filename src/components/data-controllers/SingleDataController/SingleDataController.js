@@ -46,6 +46,7 @@ import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGrap
 import SingleContextGraph from '../../graphs/SingleContextGraph';
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import { getStats } from '../../../data-services/ce-backend';
+import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -182,6 +183,9 @@ export default createReactClass({
               </Tab>
               <Tab eventKey={3} title='Model Context'>
                 <SingleContextGraph {...this.props}/>
+              </Tab>
+              <Tab eventKey={4} title='Future Anomaly'>
+                <AnomalyAnnualCycleGraph {...this.props} />
               </Tab>
             </Tabs>
 

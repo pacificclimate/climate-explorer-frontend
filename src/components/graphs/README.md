@@ -12,6 +12,7 @@ The graph components form a dependency hierarchy as follows (root at top):
     selected variable(s) over a full year
         - `SingleAnnualCycleGraph`
         - `DualAnnualCycleGraph`
+        - `AnomalyAnnualCycleGraph` 
     - `ContextGraph`: graphs all matching datasets from other models, 
     overlaid, to provide context for selected model's dataset
         - `SingleContextGraph`

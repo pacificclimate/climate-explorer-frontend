@@ -23,7 +23,9 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { timeseriesToTimeseriesGraph, makeVariableResponseGraph } from '../../core/chart';
+import { timeseriesToTimeseriesGraph} from '../../core/chart-generators';
+import { makeVariableResponseGraph } from '../../core/chart-transformers';
+
 import VariableResponseGraph from './VariableResponseGraph';
 
 export default function DualVariableResponseGraph(props) {

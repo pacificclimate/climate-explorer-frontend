@@ -1,22 +1,24 @@
 /************************************************************************
- * chart.js - provides functions to generate C3-formatted DataGraphs
- * based on the results from the climate explorer backend.
+ * chart-generators.js - functions that generate a C3 chart specification
+ * object from backend query results and metadata describing the query.
  * 
- * The two primary functions in this file are:
- * - timeseriesToAnnualCycleGraph, which creates graphs to display data 
- *   from the "timeseries" API call with monthly resolution
- * 
- * - dataToLongTermAverageGraph, which creates graphs to display data
- *   from the "data" API call with arbitrary resolution
+ * The three primary functions in this file are:
+ * - timeseriesToAnnualCycleGraph, which accepts data from the "timeseries"
+ *   API call and generates a structure annual cycle graph with months
+ *   labeled along the x-axis.
+ *
+ * - timeseriesToTimeseriesGraph, which accepts data from the "timeseries"
+ *   API call and generates an unstructured timeseries of arbitrary
+ *   resolution using whatever dates are available.   
+ *
+ * - dataToLongTermAverageGraph, which accepts data from the "data" API call
+ *   and creates timeseries graphs of arbitrary resolution
  * 
  * This file also contains helper functions used by the primary functions
  * to generate pieces of the C3 graph-describing data structure, which is
  * specified here: http://c3js.org/reference.html.
  *
- * timeseriesToTimeseriesGraph() generates a graph that has things in common
- * with each of the primary graphs, and post-processing functions to
- * fine-tune display parameters on an already-existant graph.
- **************************************************************************/
+ ***************************************************************************/
 
 import _ from 'underscore';
 import {PRECISION,
@@ -32,7 +34,7 @@ import chroma from 'chroma-js';
  *****************************************************/
 
 //Generates a typical y-axis configuration, given the text of the label.
-var formatYAxis = function (label) {
+function formatYAxis (label) {
   return {
     "label": {
       "text": label,
@@ -50,7 +52,7 @@ var formatYAxis = function (label) {
  * Used as a default when a more specialized formatting function isn't
  * available; ignores all its inputs except the number to be formatted.
  */
-var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
+function fixedPrecision (n, ...rest) { return +n.toFixed(PRECISION);};
 
 /*
  * Accepts a object with seriesname:variable pairs.
@@ -59,10 +61,10 @@ var fixedPrecision = function (n, ...rest) { return +n.toFixed(PRECISION);};
  * file for the associated variable, or a default precision with
  * util.PRECISION for variables with no precision options in the file.
  */
-var makePrecisionBySeries = function (series) {
-  var dictionary = {};
-  for(var s in series) {
-    var fromConfig = getVariableOptions(series[s], "decimalPrecision");
+function makePrecisionBySeries (series) {
+  let dictionary = {};
+  for(let s in series) {
+    const fromConfig = getVariableOptions(series[s], "decimalPrecision");
     dictionary[s] = _.isUndefined(fromConfig) ? PRECISION : fromConfig;
   }
 
@@ -84,14 +86,14 @@ var makePrecisionBySeries = function (series) {
  * numbers. precisionFunction will be passed the number to format and the
  * series id it belongs to.
  */
-var makeTooltipDisplayNumbersWithUnits = function(axes, axis, precisionFunction) {
-  var unitsDictionary = {};
+function makeTooltipDisplayNumbersWithUnits (axes, axis, precisionFunction) {
+  let unitsDictionary = {};
   if(_.isUndefined(precisionFunction)) { //use a default.
     precisionFunction = fixedPrecision;
   }
   
   //build a dictionary between timeseries names and units
-  for(var series in axes) {
+  for(let series in axes) {
     unitsDictionary[series] = axis[axes[series]].label.text;
   }
 
@@ -128,30 +130,29 @@ var makeTooltipDisplayNumbersWithUnits = function(axes, axis, precisionFunction)
  * seasonal (4), or yearly (1); an error will be thrown 
  * if this function is called on data with another time resolution.
  */
-var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
+function timeseriesToAnnualCycleGraph (metadata, ...data) {
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
 
-  var yUnits = "";
-  var y2Units = "";
-  var seriesVariables = {};
+  let yUnits = "";
+  let y2Units = "";
+  let seriesVariables = {};
   
-  var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
   
   //Add each timeseries to the graph
-  for(var i = 0; i < data.length; i++) {
+  for(let timeseries of data) {
 
     //get metadata for this timeseries
-    var timeseries = data[i];
-    var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
-    var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
+    const timeseriesName = getTimeseriesName(timeseriesMetadata);
     seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
        
     //add the actual data to the graph
@@ -183,15 +184,15 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
   }
   
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = monthlyXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) { 
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
@@ -208,11 +209,11 @@ var timeseriesToAnnualCycleGraph = function(metadata, ...data) {
  * and returns an array with twelve values in order by timestamp,
  * repeating values as necessary to get a monthly-resolution sequence.
  */
-var getMonthlyData = function(data, timescale = "monthly") {
+function getMonthlyData (data, timescale = "monthly") {
 
-  var expectedTimestamps = {"monthly": 12, "seasonal": 4, "yearly": 1};
-  var monthlyData = [];
-  var timestamps = Object.keys(data).sort();
+  const expectedTimestamps = {"monthly": 12, "seasonal": 4, "yearly": 1};
+  let monthlyData = [];
+  const timestamps = Object.keys(data).sort();
   
   if(timestamps.length == 17) {
     throw new Error("Error: concatenated 17-point chronology.");
@@ -222,8 +223,8 @@ var getMonthlyData = function(data, timescale = "monthly") {
     throw new Error("Error: inconsistent time resolution in data");
   }
   
-  for(var i = 0; i < 12; i++) {
-    var mapped = Math.ceil((timestamps.length / 12.0) * (i + 1)) - 1;
+  for(let i = 0; i < 12; i++) {
+    let mapped = Math.ceil((timestamps.length / 12.0) * (i + 1)) - 1;
     monthlyData.push(data[timestamps[mapped]]);
   }
   
@@ -254,7 +255,7 @@ var getMonthlyData = function(data, timescale = "monthly") {
 //TODO: special case climatological period to display as (XXXX-XXXX)
 //TODO: possibly cue descriptors to appear in a specific order?
 // "Tasmin Monthly Mean" sounds better than "Monthly Tasmin Mean".
-var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
+function shortestUniqueTimeseriesNamingFunction (metadata, data) {
   if (metadata.length === 0) {
     throw new Error('No data to show');
   }
@@ -264,13 +265,13 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
     return function(m) { return capitalizeWords(`${m.timescale} mean`);};
   }
   
-  var variation = [];
-  var exemplarMetadata = _.find(metadata, function(m) {return m.unique_id === data[0].id;});
+  let variation = [];
+  const exemplarMetadata = _.find(metadata, function(m) {return m.unique_id === data[0].id;});
   
-  for(var i = 0; i < data.length; i++) {
-    var comparandMetadata = _.find(metadata, function(m) {return m.unique_id == data[i].id;});
+  for(let datum of data) {
+    const comparandMetadata = _.find(metadata, function(m) {return m.unique_id == datum.id;});
 
-    for(var att in comparandMetadata) {
+    for(let att in comparandMetadata) {
       if(exemplarMetadata[att] !== comparandMetadata[att] && variation.indexOf(att) == -1) {
         variation.push(att);
       }
@@ -291,9 +292,9 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
   }
   
   return function (m) {
-    var name = "";
-    for(var j = 0; j < variation.length; j++) {
-      name = name.concat(`${m[variation[j]]} `);
+    let name = "";
+    for(let v of variation) {
+      name = name.concat(`${m[v]} `);
     }
     name = name.concat("mean");
     return capitalizeWords(name);
@@ -304,7 +305,7 @@ var shortestUniqueTimeseriesNamingFunction = function (metadata, data) {
  * Helper constant for timeseriesToAnnualCycleGraph: an X-axis configuration 
  * object representing a categorical axis labeled in months.
  */
-var monthlyXAxis = {
+const monthlyXAxis = {
     type: 'category',
     categories: ['January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December']
@@ -357,22 +358,22 @@ var monthlyXAxis = {
  * The context objects are used in the graph legend, to distinguish runs
  * with the same name ("r1i1p1") from different datasets.
  */
-var dataToLongTermAverageGraph = function(data, contexts = []){
+function dataToLongTermAverageGraph (data, contexts = []){
 
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
   
-  var yUnits = "";
-  var y2Units = "";
+  let yUnits = "";
+  let y2Units = "";
   
-  var seriesVariables = {};
-  var nameSeries;
+  let seriesVariables = {};
+  let nameSeries;
   
   if(data.length == 1) {
     nameSeries = function(run, context) {return run;};
@@ -386,28 +387,28 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
 
   //get the list of all timestamps and add them to the chart
   //(C3 requires x-axis timestamps be added as a data column)
-  var timestamps = getAllTimestamps(data);
+  const timestamps = getAllTimestamps(data);
   c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
   c3Data.x = "x";
   
 
   //add each API call to the chart
-  for(var i = 0; i < data.length; i++) {
-    var context = contexts.length ? contexts[i] : {};
-    var call = data[i];
+  for(let i = 0; i < data.length; i++) {
+    const context = contexts.length ? contexts[i] : {};
+    const call = data[i];
     
     //add each individual dataset from the API to the chart
     for(let run in call) {
-      var runName = nameSeries(run, context);
+      const runName = nameSeries(run, context);
       seriesVariables[runName] = _.isEmpty(context) ? undefined : context.variable_id;
-      var series = [runName];
+      const series = [runName];
       
       //if a given timestamp is present in some, but not all
       //datasets, set the timestamp's value to "null"
       //in the C3 data object. This will cause C3 to render the
       //line with a break where the missing timestamp is.
-      for(var t = 0; t < timestamps.length; t++ ) {
-        series.push(_.isUndefined(call[run].data[timestamps[t]]) ? null : call[run].data[timestamps[t]]);
+      for(let t of timestamps ) {
+        series.push(_.isUndefined(call[run].data[t]) ? null : call[run].data[t]);
       }
       c3Data.columns.push(series);
       c3Data.types[runName] = "line";
@@ -434,7 +435,7 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
   }
   
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) { 
@@ -444,15 +445,15 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
   //The long term average graph doesn't require every series to have the exact
   //same timestamps, since it's comparing long term trends anyway. Allow C3
   //to smoothly connect series even if they're "missing" timestamps.
-  var c3Line = {
+  const c3Line = {
       connectNull: true
   };
 
   //Note: if context is empty (dataToLongTermAverageGraph was called with only
   //one time series), variable-determined precision will not be available and
   //numbers will be formatted with default precision.
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
   
@@ -468,10 +469,10 @@ var dataToLongTermAverageGraph = function(data, contexts = []){
  * Helper function for dataToLongTermAverageGraph. Extracts the
  * list of all unique timestamps found in the data.
  */
-var getAllTimestamps = function(data) {
-  var allTimes = [];
+function getAllTimestamps (data) {
+  let allTimes = [];
 
-  var addSeries = function(seriesData) {
+  const addSeries = function(seriesData) {
     for(let timestamp in seriesData) {
       if(!_.find(allTimes, function(t){return t== timestamp;})) {
         allTimes.push(timestamp);
@@ -479,7 +480,7 @@ var getAllTimestamps = function(data) {
     }
   };
 
-  for(var i in _.keys(data)) {
+  for(let i in _.keys(data)) {
     if(!_.isUndefined(data[i].data)) { //data is from "timeseries" API
       addSeries(data[i].data);
     }
@@ -506,14 +507,14 @@ var getAllTimestamps = function(data) {
  * specific run's call and other calls being graphed at the same time. 
  * Example: "tasmax r1i1p1" vs "pr r1i1p1"
  */
-var nameAPICallParametersFunction = function(contexts) {
+function nameAPICallParametersFunction (contexts) {
   
-  var variation = [];
-  var exemplarContext = contexts[0];
+  let variation = [];
+  const exemplarContext = contexts[0];
   
-  for (var i = 0; i < contexts.length; i++) {
-    for(var att in contexts[i]) {
-      if(exemplarContext[att] != contexts[i][att] && variation.indexOf(att) == -1) {
+  for (let context of contexts) {
+    for(let att in context) {
+      if(exemplarContext[att] != context[att] && variation.indexOf(att) == -1) {
         variation.push(att);
       }
     }
@@ -536,9 +537,9 @@ var nameAPICallParametersFunction = function(contexts) {
   }
   
   return function (run, context) {
-    var name = "";
-    for(var j = 0; j < variation.length; j++) {
-      name = name.concat(`${context[variation[j]]} `);
+    let name = "";
+    for(let v of variation) {
+      name = name.concat(`${context[v]} `);
     }
     name = name.concat(run);
     return name;
@@ -549,7 +550,7 @@ var nameAPICallParametersFunction = function(contexts) {
  * Helper constant for dataToLongTermAverageGraph: Format object 
  * for a timeseries X axis.
  */
-var timeseriesXAxis = {
+const timeseriesXAxis = {
     type: 'timeseries',
     tick: {
       format: '%Y-%m-%d'
@@ -594,42 +595,41 @@ var timeseriesXAxis = {
  * Accepts an arbitrary number of data objects, but no more than
  * two separate unit types.
  */
-var timeseriesToTimeseriesGraph = function(metadata, ...data) {
+function timeseriesToTimeseriesGraph (metadata, ...data) {
   //blank graph data object to be populated - holds data values
   //and individual-timeseries-level display options.
-  var c3Data = {
+  let c3Data = {
       columns: [],
       types: {},
       labels: {},
       axes: {}
   };
 
-  var yUnits = "";
-  var y2Units = "";
-  var seriesVariables = {};
+  let yUnits = "";
+  let y2Units = "";
+  let seriesVariables = {};
 
-  var getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
 
   //get list of all timestamps
-  var timestamps = getAllTimestamps(data);
+  const timestamps = getAllTimestamps(data);
   c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
   c3Data.x = "x";
 
   //Add each timeseries to the graph
-  for(var i = 0; i < data.length; i++) {
+  for(let timeseries of data) {
     //get metadata for this timeseries
-    var timeseries = data[i];
-    var timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
-    var timeseriesName = getTimeseriesName(timeseriesMetadata);
+    const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
+    const timeseriesName = getTimeseriesName(timeseriesMetadata);
     seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
 
     //add the actual data to the graph
-    var column = [timeseriesName];
+    let column = [timeseriesName];
 
-    for(var t = 0; t < timestamps.length; t++ ) {
+    for(let t in timestamps) {
       //assigns "null" for any timestamps missing from this series.
       //C3's behaviour toward null values is set by the line.connectNull attribute
-      column.push(_.isUndefined(timeseries.data[timestamps[t]]) ? null : timeseries.data[timestamps[t]]);
+      column.push(_.isUndefined(timeseries.data[t]) ? null : timeseries.data[t]);
     }
 
     c3Data.columns.push(column);
@@ -657,14 +657,14 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   }
 
   //whole-graph display options: axis formatting and tooltip behaviour
-  var c3Axis = {};
+  let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
   c3Axis.y = formatYAxis(yUnits);
   if(y2Units) {
     c3Axis.y2 = formatYAxis(y2Units);
     }
 
-  var c3Subchart = {show: true,
+  const c3Subchart = {show: true,
       size: {height: 20} };
 
   //instructs c3 to connect series across gaps where a timeseries is missing
@@ -672,12 +672,12 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   //is actually missing from a series, it's helpful in cases where
   //series are at different time resolutions (monthly/yearly), so it's
   //included by default.
-  var c3Line = {
+  const c3Line = {
       connectNull: true
   };
 
-  var precision = makePrecisionBySeries(seriesVariables);
-  var c3Tooltip = {format: {}};
+  const precision = makePrecisionBySeries(seriesVariables);
+  let c3Tooltip = {format: {}};
   c3Tooltip.grouped = "true";
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
 
@@ -690,305 +690,9 @@ var timeseriesToTimeseriesGraph = function(metadata, ...data) {
   }; 
 };
 
-/**************************************************************
- * 4. Post-processing functions to refine generated graphs
- **************************************************************/
-
-/*
- * Reiteration of D3's "category10" colors. They underlie c3's default
- * colours but are not directly accessible. Allows creating custom
- * colour palettes that use the same colors as the default assignments.
- */
-
-var category10Colours = ["#1f77b4",
-                         "#ff7f03",
-                         "#2ca02c",
-                         "#d62728",
-                         "#9467bd",
-                         "#8c564b",
-                         "#e377c2",
-                         "#7f7f7f",
-                         "#bcbd22",
-                         "#17becf"];
-
-
-/*
- * Post-processing graph function that assigns shared colours to
- * related data series.
- *
- * Accepts a C3 graph object and a segmentation function. Applies the
- * segmentation function to each data column in the graph object. All
- * data columns that evaluate to the same result are grouped together
- * and assigned the same display colour.
- *
- * Returns a modified graph object with colours assigned in graph.data.colors
- * accordingly.
- *
- * _.isEqual() is used to evaluate whether two segmentation results are equal.
- * Each data column is an array with the series name in the 0th location, example:
- *
- * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
- *
- */
-var assignColoursByGroup = function (graph, segmentor, colourList = category10Colours) {
-  var categories = [];
-  var colors = {};
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) { //"x" series used to provide categories, not data.
-      var category = segmentor(column);
-      var index = _.indexOf(categories, category);
-      if(index == -1) {
-        //first time we've encountered this category,
-        //add it to the list.
-        categories.push(category);
-        if(categories.length > colourList.length) {
-          throw new Error("Error: too many data categories for colour palette");
-        }
-        index = categories.length - 1;
-      }
-      colors[seriesName] = colourList[index];
-    }
-  });
-  graph.data.colors = colors;
-  return graph;
-};
-
-/*
- * Post-processing graph function that visually de-emphasizes certain
- * data series by lightening their assigned colour. (Assumes the graph
- * has a white background, otherwise lightening isn't de-emphasizing.)
- *
- * Accepts a C3 graph object and a ranking function. The ranking function
- * will be applied to each data column in the graph object, and should
- * output a number between 0 and 1, which will be used to determine the
- * visual prominence of the associated data series. Series ranked 1 will
- * be drawn normally with their assigned colour, values less than one and
- * greater than zero will be lightened proportionately. A data series ranked
- * 0 by the ranking function will be drawn in white.
- *
- * Returns the graph object, modified by the addition of a data.color
- * function to operate on assigned series colours.
- * Each data column passed to the ranking function is an array like this:
- *
- * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
- */
-var fadeSeriesByRank = function (graph, ranker) {
-
-  var rankDictionary = {};
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
-      rankDictionary[seriesName] = ranker(column);
-    }
-  });
-
-  //c3 will pass the function the assigned colour, and either:
-  //     * a string with the name of the time series (drawing legend)
-  //     * an object with attributes about the time series (drawing a point or line)
-  var fader = function(colour, d) {
-    var scale = chroma.scale(['white', colour]);
-    if(_.isObject(d)) { //d = data attributes
-      return scale(rankDictionary[d.id]).hex();
-    }
-    else { //d = series name only
-      return scale(rankDictionary[d]).hex();
-    }
-  };
-
-  graph.data.color = fader;
-  return graph;
-};
-
-/*
- * Post-processing graph function that removes data series from the legend.
- *
- * Accepts a C3 graph and a predicate function. Applies the predicate to
- * each data series. If the predicate returns true, the data series will
- * be hidden from the legend. If the predicate returns false, the data series
- * will appear in the legend as normal.
- *
- * By default, every data series appears in the legend; this postprocessor
- * is only needed if at least one series should be hidden.
- */
-var hideSeriesInLegend = function(graph, predicate) {
-  var hiddenSeries = [];
-
-  _.each(graph.data.columns, column => {
-    var seriesName = column[0];
-    if(!_.isEqual(seriesName, "x")) {
-      if(predicate(column)){
-        hiddenSeries.push(seriesName);
-      }
-    }
-  });
-
-  if(!graph.legend) {
-    graph.legend = {};
-  }
-
-  graph.legend.hide = hiddenSeries;
-  return graph;
-};
-
-/*
- * Post-processing graph function that sets the order of the data series.
- * The last-drawn series is the most clearly visible; its points and lines
- * will be on top where they intersect with other series.
- *
- * Accepts a C3 graph and a ranking function. The ranking function will be
- * applied to each series in the graph, and the series will be sorted by the
- * ranking function's results. The higher a series is ranked, the later it
- * will be drawn and the more prominent it will appear.
- */
-var sortSeriesByRank = function(graph, ranker) {
-  var sorter = function(a, b) {return ranker(a) - ranker(b);}
-  graph.data.columns = graph.data.columns.sort(sorter);
-  return graph;
-}
-
-/*
- * Post-processing graph function that accepts two keywords (x and y) and a graph
- * containing one or more pairs of timeseries and combines pairs of matching time 
- * series into a variable response graph.
- * 
- * Each data series should match exactly one other series. In order to match, two 
- * data series must:
- *   - have names that are identical except for the substitution of x for y
- *   - have data at all the same timestamps
- * 
- * This function combines each pair of matching data series into a new data series. For
- * each (time, data) tuple present in both original time series, it creates a new
- * (data-x, data-y) tuple, using the series with the x keyword as the x coordinate
- * and the series with the y keyword as the y coordinate.
- *
- * The axis labels of the new graph will be generated from the y axis label(s) of the
- * old graph.
- *
- * Example:
- * x: pr
- * y: tasmax
- * chart with data.columns:
- * ["Monthly pr", 10, 20, 30, 40, 50 ]
- * ["Monthly tasmax", 1, 2, 3, 4, 5 ]
- * ["x", 1/1/15, 1/2/15, 1/3/15, 1/4/15, 1/5/15]
- * 
- * Would result in a new chart with data.columns:
- * ["x", 10, 20, 30, 40, 50]
- * ["pr", 1, 2, 3, 4, 5]
- * 
- * This is intended to graph the effect of one variable (x) on another (y).
- */
-var makeVariableResponseGraph = function(x, y, graph) {
-  let c3Data = {};
-
-  const seriesNameContains = function (series, keyword) {
-    return caseInsensitiveStringSearch(series[0], keyword);
-  }
-  
-  const xseries = _.filter(graph.data.columns, series => seriesNameContains(series, x));
-  const yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
-    
-  let tuples = [];
-  
-  for(let i = 0; i < xseries.length; i++) {
-    //Try to match each dependent variable series with an independent variable series
-    let dependent = xseries[i];
-    let independent = _.find(yseries, series => {
-      return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) === 
-        dependent[0].toLowerCase();
-      });
-    for(let d = 1; d < dependent.length; d++) {
-      if(!_.isNull(dependent[d]) && !_.isNull(independent[d])) {
-        tuples.push([independent[d], dependent[d]]);
-      }
-    }
-  }
-  //sort by x value, preperatory to putting on the graph.
-  tuples.sort((a, b) => a[0] - b[0]);  
-  c3Data.columns = [["x"], [y]];
-
-
-  for(let i = 1; i < tuples.length; i++) {
-    c3Data.columns[0].push(tuples[i][0]);
-    c3Data.columns[1].push(tuples[i][1]);
-    //C3 doesn't really support scatterplots, but we can fake it by adding
-    //a missing data point between each actual data point, and instructing C3
-    //not to connect across missing data points with {connectNull: false} 
-    if(i < tuples.length - 1) {
-      c3Data.columns[0].push((tuples[i][0] + tuples[i+1][0])/2);
-      c3Data.columns[1].push(null);
-    }
-  }
-
-  // Generate x and y axes. Reuse labels from source graph,
-  // but add variable names if not present.
-  let xAxisLabel = getAxisTextForVariable(graph, x);
-  xAxisLabel = xAxisLabel.search(x) === -1 ? `${x} ${xAxisLabel}` : xAxisLabel;
-  const xAxis = {
-      tick: {
-        count: 8,
-        fit: true,
-        format: fixedPrecision
-      },
-      label: xAxisLabel
-    };
-
-  let yAxisLabel = getAxisTextForVariable(graph, y);
-  yAxisLabel = yAxisLabel.search(y) === -1 ? `${y} ${yAxisLabel}` : yAxisLabel;
-  const yAxis = {
-      tick: {
-        format: fixedPrecision
-      },
-      label: yAxisLabel
-  };
-
-  //Whole-graph formatting options
-  c3Data.x = 'x'; //use x series
-  const c3Line = {connectNull: false}; //don't connect point data
-  const c3Tooltip = {show: false}; //no tooltip or legend, simplify graph.
-  const c3Legend = {show: false};
-
-  return {
-    data: c3Data,
-    line: c3Line,
-    tooltip: c3Tooltip,
-    legend: c3Legend,
-    axis: {
-      y: yAxis,
-      x: xAxis
-    },
-  };
-}
-
-/*
- * Helper function for makeVariableResponseGraph: given a graph and a
- * variable name, returns the axis label text associated with that variable.
- */
-var getAxisTextForVariable = function(graph, variable) {
-  let series = graph.data.columns.find(s => {
-    return caseInsensitiveStringSearch(s[0], variable);
-    });
-  
-  if(_.isUndefined(series)) {
-    throw new Error("Cannot build variable response chart from single variable chart");
-  }
-  series = series[0];
-
-  //see if this series has an explicit axis association, default to y if not.
-  const axis = graph.data.axes[series] ? graph.data.axes[series] : 'y';
-
-  return _.isString(graph.axis[axis].label) ?
-      graph.axis[axis].label :
-      graph.axis[axis].label.text;
-}
-
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
-    timeseriesToTimeseriesGraph, assignColoursByGroup, fadeSeriesByRank,
-    hideSeriesInLegend, sortSeriesByRank, makeVariableResponseGraph,
+    timeseriesToTimeseriesGraph,
     //exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction, getAxisTextForVariable};
+    getAllTimestamps, nameAPICallParametersFunction};

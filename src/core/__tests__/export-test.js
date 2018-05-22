@@ -10,7 +10,7 @@
  ******************************************************************/
 
 jest.dontMock('../util');
-jest.dontMock('../chart');
+jest.dontMock('../chart-generators');
 jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
@@ -21,7 +21,7 @@ var exportdata = require('../export');
 var validate = require('../__test_data__/test-validators');
 var mockAPI = require('../__test_data__/sample-API-results');
 var util = require('../util');
-var chart = require('../chart');
+var chart = require('../chart-generators');
 
 /*
  * It's not clear how to test exportDataToWorksheet, which would require
