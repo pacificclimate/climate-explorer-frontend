@@ -26,17 +26,11 @@ class Header extends React.Component {
                 bsStyle='tabs'
                 justified
               >
-                <LinkContainer to='/climo/all_downscale_files'>
+                <LinkContainer to='/climo/ce_files'>
                   <NavItem eventKey={1}>Standard climatologies</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/climo/all_CLIMDEX_files'>
-                  <NavItem eventKey={2}>ClimDEX climatologies</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/compare/all_downscale_files'>
-                  <NavItem eventKey={3}>Standard comparison</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/compare/all_CLIMDEX_files'>
-                  <NavItem eventKey={4}>ClimDEX comparison</NavItem>
+                <LinkContainer to='/compare/ce_files'>
+                  <NavItem eventKey={2}>Standard comparison</NavItem>
                 </LinkContainer>
                 <LinkContainer to='/precipitation/extreme_precipitation'>
                   <NavItem eventKey={4}>Extreme Precipitation</NavItem>
