@@ -626,7 +626,7 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
     //add the actual data to the graph
     let column = [timeseriesName];
 
-    for(let t in timestamps) {
+    for(let t of timestamps) {
       //assigns "null" for any timestamps missing from this series.
       //C3's behaviour toward null values is set by the line.connectNull attribute
       column.push(_.isUndefined(timeseries.data[t]) ? null : timeseries.data[t]);
