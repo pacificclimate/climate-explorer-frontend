@@ -112,3 +112,29 @@ describe('addAnomalyTooltipFormatter', function () {
   });
 });
 
+describe('makeTimeSliceGraph', function () {
+  it('rejects non-existent timestamps', function () {
+    let graph = cg.dataToLongTermAverageGraph([mockAPI.tasmaxData]);
+    const func = function () {ct.makeTimeSliceGraph("3000-01-15", graph)};
+    expect(func).toThrow();
+  });
+  it('generates a monthly timeslice', function () {
+    const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.seasonalTasmaxTimeseries,
+        mockAPI.annualTasmaxTimeseries);
+    const timeSliceGraph = ct.makeTimeSliceGraph("March", graph);
+    for(let c of timeSliceGraph.data.columns) {
+      expect(c.length).toBe(2);
+    }
+  });
+  it('generates a yearly timeslice', function () {
+    let graph = cg.dataToLongTermAverageGraph([mockAPI.tasmaxData]);
+    const timeSliceGraph = ct.makeTimeSliceGraph("1997-01-15", graph);
+    for(let c of timeSliceGraph.data.columns) {
+      expect(c.length).toBe(2);
+    }
+    expect(timeSliceGraph.axis.x.type).toBe("category");
+  });
+});
+
