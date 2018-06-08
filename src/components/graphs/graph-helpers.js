@@ -20,7 +20,6 @@ function multiYearMeanSelected({ model_id, variable_id, experiment, meta }) {
   return selectedMetadata.multi_year_mean;
 }
 
-
 function hasComparand(props) {
   return !_.isUndefined(props.comparandMeta);
 }
@@ -135,7 +134,7 @@ function shouldLoadData(props, displayMessage) {
     { failCondition: isEnsembleLoading,
       message: 'Loading ensemble...' },
     { failCondition: p =>
-        hasComparand(p) && (isVariableMYM(p) !== isVariableMYM(p)),
+        hasComparand(p) && (isVariableMYM(p) !== isComparandMYM(p)),
       message:
         'Error: Cannot compare climatologies to nominal time value datasets.' },
   ];
