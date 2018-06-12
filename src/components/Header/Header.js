@@ -27,10 +27,10 @@ class Header extends React.Component {
                 justified
               >
                 <LinkContainer to='/climo/ce_files'>
-                  <NavItem eventKey={1}>Standard climatologies</NavItem>
+                  <NavItem eventKey={1}>Single dataset</NavItem>
                 </LinkContainer>
                 <LinkContainer to='/compare/ce_files'>
-                  <NavItem eventKey={2}>Standard comparison</NavItem>
+                  <NavItem eventKey={2}>Compare datasets</NavItem>
                 </LinkContainer>
                 <LinkContainer to='/precipitation/extreme_precipitation'>
                   <NavItem eventKey={4}>Extreme Precipitation</NavItem>
