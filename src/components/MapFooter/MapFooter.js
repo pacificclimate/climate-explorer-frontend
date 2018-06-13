@@ -39,19 +39,23 @@ class MapFooter extends React.Component {
   }
   
   timeAndVariable({ times, wmsTime, variableId }) {
-    return `${this.timeOfYear(times, wmsTime)} ${variableId}`;
+    return wmsTime ? `${this.timeOfYear(times, wmsTime)} ${variableId}` :
+      `${variableId} not available for this time period`;
   }
 
   render() {
+    let comparandText = "";
+    if(this.props.hasValidComparand) {
+      const comparand = this.props.isoline || this.props.annotated;
+      comparandText = ` ${comparand.wmsTime ? "vs." : " |"} ${this.timeAndVariable(comparand)}`;
+    }
     return (
         <h5>
           Dataset {`${this.props.start_date}-${this.props.end_date}`} {this.props.run}:
           {' '}
           {this.timeAndVariable(this.props.raster)}
-          {' '}
           {
-            this.props.hasValidComparand &&
-            `vs. ${this.timeAndVariable(this.props.isoline || this.props.annotated)}`
+            this.props.hasValidComparand && comparandText
           }
         </h5>
     );

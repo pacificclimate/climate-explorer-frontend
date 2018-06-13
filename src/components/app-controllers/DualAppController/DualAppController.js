@@ -68,13 +68,23 @@ export default createReactClass({
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
-    //hierarchical data selection: model, then experiment, then variable(s)
+    //hierarchical data selection: model, then experiments (filtered by model),
+    // then variable (filtered by model and experiments),
+    // then comparison variable (filtered by model and experiment, must be MYM if var is.)
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
     var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
         this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
 
+    var selectedVariable = _.findWhere(this.state.meta, { model_id: this.state.model_id,
+                                                          variable_id: this.state.variable_id,
+                                                          experiment: this.state.experiment });
+    var selectedMYM = selectedVariable ? selectedVariable.multi_year_mean : true;
+    var compOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
+        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id,
+                                                      experiment: this.state.experiment,
+                                                      multi_year_mean: selectedMYM}));
     return (
       <Grid fluid>
         <Row>
@@ -88,7 +98,7 @@ export default createReactClass({
             <Selector label={"Variable #1 (Colour blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={varOptions} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
+            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={compOptions} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
           </Col>
         </Row>
         <Row>

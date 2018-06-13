@@ -108,7 +108,7 @@ export default function DualAnnualCycleGraph(props) {
   }
 
   const graphProps = _.pick(props,
-    'model_id', 'variable_id', 'experiment', 'meta', 'area'
+    'model_id', 'variable_id', 'comparand_id', 'experiment', 'meta', 'comparandMeta', 'area'
   );
 
   return (
