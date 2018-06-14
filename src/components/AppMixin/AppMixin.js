@@ -84,14 +84,18 @@ var AppMixin = {
         }
 
         // Merge the selection information
-        //
-        // If it has not already been set or the current selection
-        // is not available from the current metadata, simply use
-        // the first available
+        // If a dataset is already selected, use that. Otherwise, use
+        // defaults if available. Otherwise, first available.
+        // CanESM2 and rcp85 are most likely to be of interest to users.
+        function specifiedIfAvailable(attribute, value, items) {
+          return _.pluck(items, attribute).includes(value) ? value : items[0][attribute];
+        }
 
-        const {model_id, variable_id, experiment} = _.mapObject(_.pick(this.state, 'model_id', 'variable_id', 'experiment'), (val, key) => {
-            return _.contains(_.pluck(models, key), val) ? val : models[0][key];
-        });
+        const model_id = this.state.model_id ? this.state.model_id :
+          specifiedIfAvailable("model_id", "CanESM2", models);
+        const experiment = this.state.experiment ? this.state.experiment :
+          specifiedIfAvailable("experiment", "historical, rcp85", _.where(models, {model_id: model_id}));
+        const variable_id = _.where(models, {model_id: model_id, experiment: experiment})[0].variable_id;
 
         this.setState({
           meta: models,
