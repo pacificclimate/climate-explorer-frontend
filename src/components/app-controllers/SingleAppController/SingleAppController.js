@@ -17,6 +17,7 @@ import _ from 'underscore';
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
 import Selector from '../../Selector';
+import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 
@@ -47,8 +48,6 @@ export default createReactClass({
   render: function () {
     //hierarchical selection: model, then variable, then experiment
     var modOptions = this.getMetadataItems('model_id');
-    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
-        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id}));
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
 
@@ -58,13 +57,29 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
+            <Selector 
+              label={"Model Selection"} 
+              onChange={this.updateSelection.bind(this, 'model_id')} 
+              items={modOptions} 
+              value={this.state.model_id}
+            />
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
+            <VariableDescriptionSelector
+              label={"Variable Selection"}
+              onChange={this.handleSetVariable.bind(this, "variable")}
+              meta={this.state.meta}
+              constraints={{model_id: this.state.model_id}}
+              value={_.pick(this.state, "variable_id", "variable_name")} 
+            />
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
+            <Selector
+              label={"Emission Scenario Selection"}
+              onChange={this.updateSelection.bind(this, 'experiment')}
+              items={expOptions}
+              value={this.state.experiment}
+            />
           </Col>
         </Row>
         <Row>
@@ -72,7 +87,7 @@ export default createReactClass({
             <div style={{ width: 890, height: 700 }}>
               <SingleMapController
                 variable_id={this.state.variable_id}
-                meta = {this.getfilteredMeta()}
+                meta = {this.getFilteredMeta()}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
@@ -86,7 +101,7 @@ export default createReactClass({
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getfilteredMeta()}
+              meta = {this.getFilteredMeta()}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
           </Col>

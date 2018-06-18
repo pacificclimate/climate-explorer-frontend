@@ -16,7 +16,7 @@
  *   
  * This is useful for creating selectors that offer combinations of parameters, such
  * as start date, end date, and run. The parameters can be encoded as attribute-value
- * pairs on objects passed to IndexedSelector. 
+ * pairs on objects passed to IndexedSelector as items. 
  *************************************************************************************/
 
 import PropTypes from 'prop-types';
@@ -36,7 +36,6 @@ export default class IndexedSelector extends React.Component {
     disabled: PropTypes.array
   };
   
-  //todo: handle empty items case.
   componentWillReceiveProps(newProps) {
     const disabled = newProps.itemsDisabled ? newProps.itemsDisabled : 
       Array(newProps.items.length).fill(false);
@@ -55,13 +54,23 @@ export default class IndexedSelector extends React.Component {
     
     this.menuItems = menuItems;
     this.displayString = _.isObject(value) ? itemLabeler(value) : value;
+    
+    if(_.isString(value)) {
+      this.value = value;
+    }
+    else if(value) {
+      this.value = itemLabeler(value);
+    }
+    else {
+      this.value = "Select an Item";
+    }
   }
   
   render() {
     return (
       <Selector
         label={this.props.label}
-        value={this.props.value}
+        value={this.value}
         items={this.menuItems}
         onChange={this.handleChange.bind(this)}
         disabled={this.props.disabled}
