@@ -70,19 +70,26 @@ function makeVariableResponseGraph (x, y, graph) {
   const yseries = _.filter(graph.data.columns, series => seriesNameContains(series, y));
     
   let tuples = [];
-  
+  let seriesMatched = false;
   for(let dependent of xseries) {
     //Try to match each dependent variable series with an independent variable series
     let independent = _.find(yseries, series => {
       return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) === 
         dependent[0].toLowerCase();
       });
-    for(let d = 1; d < dependent.length; d++) {
-      if(!_.isNull(dependent[d]) && !_.isNull(independent[d])) {
-        tuples.push([independent[d], dependent[d]]);
+    if(independent) {
+      seriesMatched = true;
+      for(let d = 1; d < dependent.length; d++) {
+        if(!_.isNull(dependent[d]) && !_.isNull(independent[d])) {
+          tuples.push([independent[d], dependent[d]]);
+        }
       }
     }
   }
+  if(!seriesMatched) {
+    throw new Error("Unable to correlate variables");
+  }
+  
   //sort by x value, preperatory to putting on the graph.
   tuples.sort((a, b) => a[0] - b[0]);  
   
