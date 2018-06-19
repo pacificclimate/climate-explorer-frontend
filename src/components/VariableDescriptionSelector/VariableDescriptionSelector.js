@@ -33,7 +33,7 @@ export default class VariableDescriptionSelector extends React.Component {
     onChange: PropTypes.any,
     value: PropTypes.any,
     constraints: PropTypes.any,
-    disabled: PropTypes.array
+    disabled: PropTypes.boolean
   };
   
   componentWillReceiveProps(newProps) {
