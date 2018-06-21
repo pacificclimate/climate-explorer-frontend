@@ -22,6 +22,7 @@ import { Grid, Row, Col } from 'react-bootstrap';
 
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
+import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
@@ -56,21 +57,34 @@ export default createReactClass({
     const modOptions = this.getMetadataItems('model_id');
     const expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    let varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
-        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
-    varOptions = _.filter(varOptions, function(option) {return option[0] != "pr"});
-
+    
     return (
       <Grid fluid>
         <Row>
           <Col lg={3} md={3}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
+            <Selector 
+              label={"Model Selection"}
+              onChange={this.updateSelection.bind(this, 'model_id')}
+              items={modOptions}
+              value={this.state.model_id}
+            />
           </Col>
             <Col lg={3} md={3}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
+            <Selector
+              label={"Emission Scenario Selection"}
+              onChange={this.updateSelection.bind(this, 'experiment')}
+              items={expOptions}
+              value={this.state.experiment}
+            />
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
+            <VariableDescriptionSelector
+              label={"Variable Selection"}
+              onChange={this.handleSetVariable.bind(this, "variable")}
+              meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
+              constraints={_.pick(this.state, "model_id", "experiment")}
+              value={_.pick(this.state, "variable_id", "variable_name")} 
+            />
           </Col>
         </Row>
         <Row>
@@ -78,9 +92,9 @@ export default createReactClass({
             <div style={{ width: 890, height: 700 }}>
               <PrecipMapController
                 variable_id={this.state.variable_id}
-                meta = {this.getfilteredMeta()}
+                meta = {this.getFilteredMeta()}
                 comparand_id={"pr"}
-                comparandMeta = {this.getfilteredMeta("pr")}
+                comparandMeta = {this.getFilteredMeta("pr", "Precipitation")}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
@@ -94,8 +108,8 @@ export default createReactClass({
               comparand_id={"pr"}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getfilteredMeta()}
-              comparandMeta = {this.getfilteredMeta("pr")}
+              meta = {this.getFilteredMeta()}
+              comparandMeta = {this.getFilteredMeta("pr")}
             />
           </Col>
         </Row>

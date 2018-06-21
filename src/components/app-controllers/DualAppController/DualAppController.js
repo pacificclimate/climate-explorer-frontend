@@ -25,6 +25,7 @@ import Selector from '../../Selector';
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import DualMapController from '../../map-controllers/DualMapController';
+import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import _ from 'underscore';
 
 export default createReactClass({
@@ -54,13 +55,15 @@ export default createReactClass({
   componentDidUpdate: function (prevProps, prevState) {
     if(!this.state.comparand_id) {//comparand uninitialized
       this.setState({
-        comparand_id: this.state.variable_id
+        comparand_id: this.state.variable_id,
+        comparand_name: this.state.variable_name
       });
     }
     else if(!_.contains(_.pluck(this.state.meta, "variable_id"), this.state.comparand_id)) {
       //comparand leftover from previous ensemble; not present in current one
       this.setState({
-        comparand_id: this.state.variable_id
+        comparand_id: this.state.variable_id,
+        comparand_name: this.state.variable_name
       });
     }
   },
@@ -74,31 +77,48 @@ export default createReactClass({
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
-        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id, experiment: this.state.experiment}));
-
     var selectedVariable = _.findWhere(this.state.meta, { model_id: this.state.model_id,
                                                           variable_id: this.state.variable_id,
                                                           experiment: this.state.experiment });
-    var selectedMYM = selectedVariable ? selectedVariable.multi_year_mean : true;
-    var compOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
-        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id,
-                                                      experiment: this.state.experiment,
-                                                      multi_year_mean: selectedMYM}));
+    let comparandConstraints = _.pick(this.state, 'model_id', 'experiment');
+    comparandConstraints.multi_year_mean = selectedVariable ? selectedVariable.multi_year_mean : true;
+    
     return (
       <Grid fluid>
         <Row>
           <Col lg={3} md={3}>
-            <Selector label={"Model Selection"} onChange={this.updateSelection.bind(this, 'model_id')} items={modOptions} value={this.state.model_id}/>
-          </Col>
-            <Col lg={3} md={3}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
+            <Selector 
+              label={"Model Selection"}
+              onChange={this.updateSelection.bind(this, 'model_id')}
+              items={modOptions}
+              value={this.state.model_id}
+            />
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #1 (Colour blocks)"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
+            <Selector
+              label={"Emission Scenario Selection"}
+              onChange={this.updateSelection.bind(this, 'experiment')}
+              items={expOptions}
+              value={this.state.experiment}
+            />
           </Col>
           <Col lg={3} md={3}>
-            <Selector label={"Variable #2 (Isolines)"} onChange={this.updateSelection.bind(this, 'comparand_id')} items={compOptions} value={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}/>
+            <VariableDescriptionSelector
+              label={"Variable #1 (Colour blocks)"}
+              onChange={this.handleSetVariable.bind(this, "variable")}
+              meta={this.state.meta}
+              constraints={{model_id: this.state.model_id, experiment: this.state.experiment}}
+              value={_.pick(this.state, "variable_id", "variable_name")} 
+            />
+          </Col>
+          <Col lg={3} md={3}>
+            <VariableDescriptionSelector
+              label={"Variable #2 (Isolines)"}
+              onChange={this.handleSetVariable.bind(this, "comparand")}
+              meta={this.state.meta}
+              constraints={comparandConstraints}
+              value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
+            />
           </Col>
         </Row>
         <Row>
@@ -106,9 +126,9 @@ export default createReactClass({
             <div style={{ width: 890, height: 700 }}>
               <DualMapController
                 variable_id={this.state.variable_id}
-                meta = {this.getfilteredMeta()}
+                meta = {this.getFilteredMeta()}
                 comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-                comparandMeta = {this.getfilteredMeta(this.state.comparand_id)}
+                comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
@@ -122,8 +142,9 @@ export default createReactClass({
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getfilteredMeta()}
-              comparandMeta = {this.state.comparand_id ? this.getfilteredMeta(this.state.comparand_id) : this.getfilteredMeta()}
+              meta = {this.getFilteredMeta()}
+              comparandMeta = {this.state.comparand_id ? this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name) 
+                  : this.getFilteredMeta()}
             />
           </Col>
         </Row>

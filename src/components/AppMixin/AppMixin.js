@@ -26,6 +26,7 @@ var AppMixin = {
       ensemble_name: findEnsemble(this.props),
       model_id: '',
       variable_id: '',
+      variable_name: '',
       experiment: '',
       area: undefined,  // geojson object
       meta: [],
@@ -96,11 +97,14 @@ var AppMixin = {
         const experiment = this.state.experiment ? this.state.experiment :
           specifiedIfAvailable("experiment", "historical, rcp85", _.where(models, {model_id: model_id}));
         const variable_id = _.where(models, {model_id: model_id, experiment: experiment})[0].variable_id;
-
+        const variable_name = _.where(models, {model_id: model_id, experiment: experiment, 
+          variable_id: variable_id})[0].variable_name;
+        
         this.setState({
           meta: models,
           model_id,
           variable_id,
+          variable_name,
           experiment,
         });
     });
@@ -124,39 +128,64 @@ var AppMixin = {
   handleSetArea: function (geojson) {
     this.setState({ area: geojson });
   },
+  
+  /*
+   * At present, the user selecting a variable is a complicated by the fact
+   * that some climdex datafiles have the same variable name, but different
+   * variable descriptions, indicating different algorithms for calculating those
+   * variables.
+   * 
+   * The variables for which this is the case are: rx1day, rx5day, tnn, tnx, txn, and txx
+   * These minimum / maximum measurements have two different "annual" algorithms: either
+   * the mean of the twelve monthly mins/maxes, or a single min/max for the whole year;
+   * their descriptions are identical, but begin with either "Monthly" or "Annual" 
+   * respectively.
+   * 
+   * In these cases, the description displayed next to the variable selected by the user
+   * is important. So variable and description are selected and updated in state as a 
+   * unit, instead of being handled by the generic user selection update function. Then 
+   * description is used alongside variable to filter the datasets sent to data and map
+   * controllers.
+   * 
+   * This is a stopgap solution. Longterm, we'd like to standardize the algorithms or
+   * incorporate both algorithms in our data model.
+   */
+  handleSetVariable(variable, selection) {
+    let update = {};
+    update[`${variable}_id`] = selection.variable_id;
+    update[`${variable}_name`] = selection.variable_name;
+    this.setState(update);
+  },
 
   /*
-   * Return metadata from all datasets that match the currently selected model,
-   * emissions scenario, and either selected variable or one supplied as an argument.
+   * Return metadata from all datasets that match the currently selected
+   * model, emissions scenario, and either selected variable, or one 
+   * passed in as an argument (with optional description).
    */
-  getfilteredMeta: function (variableFilter = this.state.variable_id) {
-    var l = this.state.meta.filter(function (x) {
-      return x.model_id === this.state.model_id && x.experiment === this.state.experiment && x.variable_id === variableFilter;
-    }, this);
+  getFilteredMeta: function (variableFilter, nameFilter) {
+    let filter = _.pick(this.state, "model_id", "experiment");
+    if(variableFilter && nameFilter) {
+      filter.variable_id = variableFilter;
+      filter.variable_name = nameFilter;
+    }
+    else if(!variableFilter || variableFilter === this.state.variable_id) {
+      filter.variable_id = this.state.variable_id;
+      filter.variable_name = this.state.variable_name;
+    }
+    else {
+      filter.variable_id = variableFilter;      
+    }
+    let l = _.filter(this.state.meta, filter);
     l.sort(function (a, b) {return a.unique_id > b.unique_id ? 1 : -1;});
     return l;
   },
-
-  /*
-   * Creates an array of [variable name, variable description] tuples to populate
-   * variable selection dropdowns.
-   */
-  getVariableIdNameArray: function () {
-    var varArray = _.zip(this.getMetadataItems('variable_id'), this.getMetadataItems('variable_name'));
-    var varNames = _.map(varArray, function (v) {
-      return v[0] + ' - ' + v[1];
-    });
-    var varOptions = _.zip(this.getMetadataItems('variable_id'), varNames).sort(function (a, b) {
-      return a[0] > b[0] ? 1 : -1;
-    });
-    return varOptions;
-  },
   
   /*
-   * Records user choices for model, emissions scenario, or variable(s) in state.
+   * Records user choices for model or emissions scenario in state.
    */
   updateSelection: function (param, selection) {
-    var update = {}; update[param] = selection;
+    var update = {}; 
+    update[param] = selection;
     this.setState(update);
   },
 

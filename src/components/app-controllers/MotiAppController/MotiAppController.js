@@ -22,6 +22,7 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import SingleMapController from '../../map-controllers/SingleMapController/SingleMapController';
 import MotiDataController from '../../data-controllers/MotiDataController';
 import Selector from '../../Selector';
+import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import AppMixin from '../../AppMixin';
 import g from "../../../core/geo";
 
@@ -47,8 +48,6 @@ export default createReactClass({
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
     //hierarchical selections: model (implicit), then variable, then emission
-    var varOptions = this.markDisabledMetadataItems(this.getVariableIdNameArray(),
-        this.getFilteredMetadataItems('variable_id', {model_id: this.state.model_id}));
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
 
@@ -56,10 +55,21 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector label={"Variable Selection"} onChange={this.updateSelection.bind(this, 'variable_id')} items={varOptions} value={this.state.variable_id}/>
+            <VariableDescriptionSelector
+              label={"Variable Selection"}
+              onChange={this.handleSetVariable.bind(this, "variable")}
+              meta={this.state.meta}
+              constraints={{model_id: this.state.model_id}}
+              value={_.pick(this.state, "variable_id", "variable_name")} 
+            />
           </Col>
           <Col lg={4} md={4}>
-            <Selector label={"Emission Scenario Selection"} onChange={this.updateSelection.bind(this, 'experiment')} items={expOptions} value={this.state.experiment}/>
+            <Selector
+              label={"Emission Scenario Selection"}
+              onChange={this.updateSelection.bind(this, 'experiment')}
+              items={expOptions}
+              value={this.state.experiment}
+            />
           </Col>
           <Col lg={4} md={4} />
         </Row>
@@ -68,7 +78,7 @@ export default createReactClass({
             <div style={{ width: 890, height: 700 }}>
               <SingleMapController
                 variable_id={this.state.variable_id}
-                meta = {this.getfilteredMeta()}
+                meta = {this.getFilteredMeta()}
                 area={this.state.area}
                 onSetArea={this.handleSetArea}
               />
@@ -80,7 +90,7 @@ export default createReactClass({
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getfilteredMeta()}
+              meta = {this.getFilteredMeta()}
             />
           </Col>
         </Row>
