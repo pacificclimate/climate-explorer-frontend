@@ -28,8 +28,15 @@ export default function SingleTimeSliceGraph(props) {
   //https://github.com/pacificclimate/climate-explorer-frontend/issues/139.
   function getMetadata() {
     const {
-      ensemble_name, experiment, variable_id, area, contextMeta,
+      ensemble_name, experiment, variable_id, area, contextMeta, model_id
     } = props;
+
+    //we prefer the lowest possible time resolution for this graph, since it's
+    //used to provide broad context, not detailed data. But if the
+    //selected dataset doesn't have yearly data, use whatever resolution it has.
+    const model_metadata = _.where(contextMeta, {model_id: model_id, multi_year_mean: true});
+    const resolutions = _.unique(_.pluck(model_metadata, "timescale")).sort();
+    const timescale = resolutions[resolutions.length - 1];
 
     // Array of unique model_id's
     const uniqueContextModelIds = _.uniq(_.pluck(contextMeta, 'model_id'));
@@ -38,7 +45,7 @@ export default function SingleTimeSliceGraph(props) {
       experiment,
       variable_id,
       area,
-      timescale: 'yearly',
+      timescale: timescale,
       timeidx: 0,
       multi_year_mean: true,
     };

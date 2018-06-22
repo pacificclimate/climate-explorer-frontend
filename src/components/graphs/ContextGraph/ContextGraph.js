@@ -100,7 +100,8 @@ export default class ContextGraph extends React.Component {
       this.state.graphSpec &&
       this.state.graphSpec.data.columns.length > 0 &&
       nextProps.variable_id === this.props.variable_id &&
-      nextProps.experiment === this.props.experiment
+      nextProps.experiment === this.props.experiment &&
+      nextProps.area === this.props.area
     ) {
       this.setState({
         graphSpec: this.props.dataToGraphSpec(
