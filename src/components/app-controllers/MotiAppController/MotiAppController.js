@@ -19,6 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
+import styles from '../AppController.css';
 import SingleMapController from '../../map-controllers/SingleMapController/SingleMapController';
 import MotiDataController from '../../data-controllers/MotiDataController';
 import Selector from '../../Selector';
@@ -75,7 +76,7 @@ export default createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div style={{ width: 890, height: 700 }}>
+            <div className={styles.mapcontroller}>
               <SingleMapController
                 variable_id={this.state.variable_id}
                 meta = {this.getFilteredMeta()}

@@ -20,6 +20,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
+import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
@@ -89,7 +90,7 @@ export default createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div style={{ width: 890, height: 700 }}>
+            <div className={styles.mapcontroller}>
               <PrecipMapController
                 variable_id={this.state.variable_id}
                 meta = {this.getFilteredMeta()}

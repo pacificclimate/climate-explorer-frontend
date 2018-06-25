@@ -20,6 +20,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
+import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import AppMixin from '../../AppMixin';
@@ -71,6 +72,7 @@ export default createReactClass({
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
+    console.log(JSON.stringify(styles));
     //hierarchical data selection: model, then experiments (filtered by model),
     // then variable (filtered by model and experiments),
     // then comparison variable (filtered by model and experiment, must be MYM if var is.)
@@ -123,7 +125,7 @@ export default createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div style={{ width: 890, height: 700 }}>
+            <div className={styles.mapcontroller}>
               <DualMapController
                 variable_id={this.state.variable_id}
                 meta = {this.getFilteredMeta()}
