@@ -64,7 +64,7 @@ var addStationMarkerLayer = function (map, onClick) {
     var markers = [];
     for(var key in response.data) {
       for(var station in response.data[key].outlets) {
-        var stationName = `${response.data[key].watershed} ${station}`;
+        var stationName = response.data[key].outlets[station].name;
         var stationLat = response.data[key].outlets[station].latitude;
         var stationLong = response.data[key].outlets[station].longitude;
         stations[stationName] = {latitude: stationLat, longitude: stationLong, id: station, fileId: key};
