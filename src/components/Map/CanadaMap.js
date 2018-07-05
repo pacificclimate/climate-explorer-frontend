@@ -310,7 +310,7 @@ var CanadaMap = React.createClass({
           maxZoom: 10,
           attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }),
-        L.tileLayer.wms("http://127.0.0.1:8080/wms", this.getWMSParams("vector"))
+        L.tileLayer.wms(NCWMS_URL, this.getWMSParams("vector"))
       ],
     });
 
