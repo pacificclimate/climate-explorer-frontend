@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, hashHistory } from 'react-router';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 import SingleAppController from './components/app-controllers/SingleAppController';
 import DualAppController from './components/app-controllers/DualAppController';
@@ -17,31 +17,28 @@ class App extends React.Component {
   };
 
   render() {
+    // We have to set Router basename with the hash (#) in it to enable navigating
+    // into a specific path from outside the app.
     return (
-      <div>
+      <Router basename={'/#'}>
         <div>
-          <Header />
+          <div>
+            <Header />
+          </div>
+          <div>
+            <Route exact path='/' render={() => (<Redirect to='/climo/ce_files'/>)} />
+            <Route path='/moti' component={MotiAppController} />
+            <Route path='/climo/:ensemble_name' component={SingleAppController} />
+            <Route path='/compare/:ensemble_name' component={DualAppController} />
+            <Route path='/precipitation/:ensemble_name' component={PrecipAppController} />
+          </div>
+          <div>
+            <Footer />
+          </div>
         </div>
-        <div>
-          {this.props.children || <SingleAppController ensemble_name="ce_files"/>}
-        </div>
-        <div>
-          <Footer />
-        </div>
-      </div>
+      </Router>
     );
   }
 }
 
-render((
-  <Router history={hashHistory}>
-    <Route path='/' component={App}>
-      <Route path='/moti' component={MotiAppController} />
-      <Route path='/climo/:ensemble_name' component={SingleAppController} />
-      <Route path='/compare/:ensemble_name' component={DualAppController} />
-      <Route path='/precipitation/:ensemble_name' component={PrecipAppController} />
-    </Route>
-  </Router>
-), document.getElementById('wrapper'));
-
-
+render(<App/>, document.getElementById('wrapper'));
