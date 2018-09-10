@@ -26,11 +26,12 @@ class App extends React.Component {
             <Header />
           </div>
           <div>
-            <Route exact path='/' render={() => (<Redirect to='/climo/ce_files'/>)} />
-            <Route path='/moti' component={MotiAppController} />
-            <Route path='/climo/:ensemble_name' component={SingleAppController} />
-            <Route path='/compare/:ensemble_name' component={DualAppController} />
-            <Route path='/precipitation/:ensemble_name' component={PrecipAppController} />
+            <Route exact path='/' render={() => (<Redirect to='/data'/>)} />
+            <Route exact path='/data' render={() => (<Redirect to='/data/climo/ce_files'/>)} />
+            <Route path='/data/moti' component={MotiAppController} />
+            <Route path='/data/climo/:ensemble_name' component={SingleAppController} />
+            <Route path='/data/compare/:ensemble_name' component={DualAppController} />
+            <Route path='/data/precipitation/:ensemble_name' component={PrecipAppController} />
           </div>
           <div>
             <Footer />
