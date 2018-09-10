@@ -23,17 +23,14 @@ class Header extends React.Component {
             </Col>
             <Col lg={8}>
               <Nav
-                bsStyle='tabs'
-                justified
+                bsStyle='pills'
+                pullRight
               >
-                <LinkContainer to='/data/climo/ce_files'>
-                  <NavItem eventKey={1}>Single dataset</NavItem>
+                <LinkContainer to='/data'>
+                  <NavItem eventKey={1}>Home/Data</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/data/compare/ce_files'>
-                  <NavItem eventKey={2}>Compare datasets</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/data/precipitation/extreme_precipitation'>
-                  <NavItem eventKey={4}>Extreme Precipitation</NavItem>
+                <LinkContainer to='/about'>
+                  <NavItem eventKey={2}>About</NavItem>
                 </LinkContainer>
               </Nav>
             </Col>
