@@ -26,13 +26,13 @@ class Header extends React.Component {
                 bsStyle='tabs'
                 justified
               >
-                <LinkContainer to='/climo/ce_files'>
+                <LinkContainer to='/data/climo/ce_files'>
                   <NavItem eventKey={1}>Single dataset</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/compare/ce_files'>
+                <LinkContainer to='/data/compare/ce_files'>
                   <NavItem eventKey={2}>Compare datasets</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/precipitation/extreme_precipitation'>
+                <LinkContainer to='/data/precipitation/extreme_precipitation'>
                   <NavItem eventKey={4}>Extreme Precipitation</NavItem>
                 </LinkContainer>
               </Nav>
