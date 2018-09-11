@@ -12,6 +12,17 @@ class App extends React.Component {
     children: PropTypes.element,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataPath: '/data/climo/ce_files',
+    };
+  }
+
+  handleNavigate = key => {
+    this.setState({ dataPath: key });
+  }
+
   render() {
     // We have to set Router basename with the hash (#) in it to enable navigating
     // into a specific path from outside the app.
@@ -23,7 +34,14 @@ class App extends React.Component {
           </div>
           <div>
             <Route exact path='/' render={() => (<Redirect to='/data'/>)} />
-            <Route path='/data' component={DataTool}/>
+            <Route path='/data' render={
+                props => <DataTool
+                  {...props}
+                  defaultPath={this.state.dataPath}
+                  onNavigate={this.handleNavigate}
+                />
+              }
+            />
           </div>
           <div>
             <Footer />
