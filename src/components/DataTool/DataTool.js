@@ -16,7 +16,15 @@ import './DataTool.css';
 
 export default class DataTool extends React.Component {
   static propTypes = {
+    defaultPath: PropTypes.string,
+    onNavigate: PropTypes.func,
   };
+
+  static navItems = [
+    { path: '/data/climo/ce_files', label: 'Single dataset' },
+    { path: '/data/compare/ce_files', label: 'Compare datasets' },
+    { path: '/data/precipitation/extreme_precipitation', label: 'Extreme Precipitation' },
+  ];
 
   render() {
     return (
@@ -26,22 +34,21 @@ export default class DataTool extends React.Component {
               <Nav
                 bsStyle='tabs'
                 justified
+                onSelect={this.props.onNavigate}
               >
-                <LinkContainer to='/data/climo/ce_files'>
-                  <NavItem eventKey={1}>Single dataset</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/data/compare/ce_files'>
-                  <NavItem eventKey={2}>Compare datasets</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/data/precipitation/extreme_precipitation'>
-                  <NavItem eventKey={4}>Extreme Precipitation</NavItem>
-                </LinkContainer>
+                {
+                  DataTool.navItems.map(item =>
+                    <LinkContainer to={item.path}>
+                      <NavItem eventKey={item.path}>{item.label}</NavItem>
+                    </LinkContainer>
+                  )
+                }
               </Nav>
             </Col>
         </Row>
         <Row>
           <Col>
-            <Route exact path='/data' render={() => (<Redirect to='/data/climo/ce_files'/>)} />
+            <Route exact path='/data' render={() => (<Redirect to={this.props.defaultPath}/>)} />
             <Route path='/data/moti' component={MotiAppController} />
             <Route path='/data/climo/:ensemble_name' component={SingleAppController} />
             <Route path='/data/compare/:ensemble_name' component={DualAppController} />
