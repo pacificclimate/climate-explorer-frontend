@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Grid, Row, Col, Nav, NavItem } from 'react-bootstrap';
+import { Grid, Row, Col, Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Route, Redirect } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -29,23 +29,21 @@ export default class DataTool extends React.Component {
   render() {
     return (
       <Grid fluid>
-        <Row>
-            <Col lg={12}>
-              <Nav
-                bsStyle='tabs'
-                justified
-                onSelect={this.props.onNavigate}
-              >
-                {
-                  DataTool.navItems.map(item =>
-                    <LinkContainer to={item.path}>
-                      <NavItem eventKey={item.path}>{item.label}</NavItem>
-                    </LinkContainer>
-                  )
-                }
-              </Nav>
-            </Col>
-        </Row>
+        <Navbar fluid>
+          <Nav
+            bsStyle='pills'
+            pullRight
+            onSelect={this.props.onNavigate}
+          >
+            {
+              DataTool.navItems.map(item =>
+                <LinkContainer to={item.path}>
+                  <NavItem eventKey={item.path}>{item.label}</NavItem>
+                </LinkContainer>
+              )
+            }
+          </Nav>
+        </Navbar>
         <Row>
           <Col>
             <Route exact path='/data' render={() => (<Redirect to={this.props.defaultPath}/>)} />
