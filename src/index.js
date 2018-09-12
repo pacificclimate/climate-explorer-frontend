@@ -4,7 +4,6 @@ import { Navbar } from 'react-bootstrap';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import Footer from './components/Footer';
 import DataTool from './components/navigation/DataTool';
 import NavRoutes from './components/navigation/NavRoutes';
 import Help from './components/navigation/Help';
@@ -80,7 +79,6 @@ class App extends React.Component {
               Climate Explorer
             </Navbar.Brand>
           </NavRoutes>
-          <Footer />
         </div>
       </Router>
     );
