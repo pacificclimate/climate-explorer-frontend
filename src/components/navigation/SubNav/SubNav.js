@@ -31,67 +31,65 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import './SubNav.css';
 
-export default class SubNav extends React.Component {
-  static propTypes = {
-    navSpec: PropTypes.shape({
-      basePath: PropTypes.string, // base of all route paths in this page
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          label: PropTypes.string,  // label for navigation for this item
-          subpath: PropTypes.string,  // route subpath for this item
-          component: PropTypes.element, // component to render for this item
-          render: PropTypes.func,  // functional component to render for this item
-        }),
-      ),
-    }).isRequired,
-    navIndex: PropTypes.number,
-    onNavigate: PropTypes.func,
-    children: PropTypes.any,
-  };
+export default function SubNav(props) {
+  const withBasePath = subpath => `${props.navSpec.basePath}/${subpath}`;
 
-  static defaultProps = {
-    navIndex: 0,
-  };
+  const navItems = props.navSpec.items.map((item, index) =>
+    <LinkContainer key={index} to={withBasePath(item.subpath)}>
+      <NavItem eventKey={index}>{item.label}</NavItem>
+    </LinkContainer>
+  );
 
-  withBasePath = subpath => `${this.props.navSpec.basePath}/${subpath}`;
+  const routes = props.navSpec.items.map((item, index) =>
+    <Route
+      key={index}
+      path={withBasePath(item.subpath)}
+      component={item.component}
+      render={item.render}
+    />
+  );
 
-  render() {
-    const navItems = this.props.navSpec.items.map((item, index) =>
-      <LinkContainer key={index} to={this.withBasePath(item.subpath)}>
-        <NavItem eventKey={index}>{item.label}</NavItem>
-      </LinkContainer>
-    );
+  const basePathRedirectTo =
+    withBasePath(props.navSpec.items[props.navIndex].subpath);
 
-    const routes = this.props.navSpec.items.map((item, index) =>
+  return (
+    <div>
+      <Navbar fluid>
+        { props.children }
+        <Nav
+          bsStyle='pills'
+          pullRight
+          onSelect={props.onNavigate}
+        >
+          { navItems }
+        </Nav>
+      </Navbar>
       <Route
-        key={index}
-        path={this.withBasePath(item.subpath)}
-        component={item.component}
-        render={item.render}
+        exact path={props.navSpec.basePath}
+        render={() => <Redirect to={basePathRedirectTo}/>}
       />
-    );
-
-    const basePathRedirectTo = 
-      this.withBasePath(this.props.navSpec.items[this.props.navIndex].subpath);
-    
-    return (
-      <div>
-        <Navbar fluid>
-          { this.props.children }
-          <Nav
-            bsStyle='pills'
-            pullRight
-            onSelect={this.props.onNavigate}
-          >
-            { navItems }
-          </Nav>
-        </Navbar>
-        <Route
-          exact path={this.props.navSpec.basePath}
-          render={() => <Redirect to={basePathRedirectTo}/>}
-        />
-        { routes }
-      </div>
-    );
-  }
+      { routes }
+    </div>
+  );
 }
+
+SubNav.propTypes = {
+  navSpec: PropTypes.shape({
+    basePath: PropTypes.string, // base of all route paths in this page
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string,  // label for navigation for this item
+        subpath: PropTypes.string,  // route subpath for this item
+        component: PropTypes.element, // component to render for this item
+        render: PropTypes.func,  // functional component to render for this item
+      }),
+    ),
+  }).isRequired,
+  navIndex: PropTypes.number,
+  onNavigate: PropTypes.func,
+  children: PropTypes.any,
+};
+
+SubNav.defaultProps = {
+  navIndex: 0,
+};
