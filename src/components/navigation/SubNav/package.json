@@ -1,0 +1,6 @@
+{
+  "name": "SubNav",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SubNav.js"
+}
