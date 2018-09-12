@@ -1,5 +1,5 @@
 import React from 'react';
-import SubNav from '../navigation/SubNav';
+import SubNav from './SubNav/SubNav';
 
 const navSpec = {
   basePath: '/about',
