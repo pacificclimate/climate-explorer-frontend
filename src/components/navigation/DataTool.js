@@ -27,13 +27,11 @@ const navSpec = {
   ],
 };
 
-export default class DataTool extends React.Component {
-  static propTypes = {
-    navIndex: PropTypes.number,
-    onNavigate: PropTypes.func,
-  };
-
-  render() {
-    return <SubNav { ...{ navSpec, ...this.props } } />;
-  }
+export default function DataTool(props) {
+  return <SubNav { ...{ navSpec, ...props } } />;
 }
+
+DataTool.propTypes = {
+  navIndex: PropTypes.number,
+  onNavigate: PropTypes.func,
+};
