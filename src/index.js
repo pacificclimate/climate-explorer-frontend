@@ -7,9 +7,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Footer from './components/Footer';
 import DataTool from './components/navigation/DataTool';
 import SubNav from './components/navigation/SubNav';
-import Help from './components/help-etc/Help';
+import Help from './components/navigation/Help';
 import Science from './components/help-etc/Science';
-import About from './components/help-etc/About';
+import About from './components/navigation/About';
 
 class App extends React.Component {
   static propTypes = {
