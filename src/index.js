@@ -7,6 +7,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Footer from './components/Footer';
 import DataTool from './components/navigation/DataTool';
 import SubNav from './components/navigation/SubNav';
+import Help from './components/help-etc/Help';
+import Science from './components/help-etc/Science';
+import About from './components/help-etc/About';
 
 class App extends React.Component {
   static propTypes = {
@@ -38,19 +41,19 @@ class App extends React.Component {
           />,
       },
       {
-        label: 'Science',
-        subpath: 'science',
-        component: null,
+        label: 'Help',
+        subpath: 'help',
+        component: Help,
       },
       {
-        label: 'Credits',
-        subpath: 'credits',
-        component: null,
+        label: 'Science',
+        subpath: 'science',
+        component: Science,
       },
       {
         label: 'About',
         subpath: 'about',
-        component: null,
+        component: About,
       },
     ],
   };
