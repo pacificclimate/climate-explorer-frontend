@@ -6,8 +6,6 @@ import SingleAppController from '../app-controllers/SingleAppController/SingleAp
 import PrecipAppController from '../app-controllers/PrecipAppController/PrecipAppController';
 import DualAppController from '../app-controllers/DualAppController/DualAppController';
 
-import '../DataTool/DataTool.css';
-
 const navSpec = {
   basePath: '/data',
   items: [
