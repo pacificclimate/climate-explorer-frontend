@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Navbar } from 'react-bootstrap';
 import { render } from 'react-dom';
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-import Header from './components/Header';
 import Footer from './components/Footer';
-import DataTool from './components/DataTool';
+import DataTool from './components/navigation/DataTool';
+import SubNav from './components/navigation/SubNav';
 
 class App extends React.Component {
   static propTypes = {
@@ -15,37 +16,68 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataPath: '/data/climo/ce_files',
+      navIndex: 0,
     };
   }
 
-  handleNavigate = key => {
-    this.setState({ dataPath: key });
-  }
+  handleNavigate = navIndex => {
+    this.setState({ navIndex });
+  };
+
+  navSpec = {
+    basePath: '',
+    items: [
+      {
+        label: 'Home/Data',
+        subpath: 'data',
+        render: props =>
+          <DataTool
+            {...props}
+            navIndex={this.state.navIndex}
+            onNavigate={this.handleNavigate}
+          />,
+      },
+      {
+        label: 'Science',
+        subpath: 'science',
+        component: null,
+      },
+      {
+        label: 'Credits',
+        subpath: 'credits',
+        component: null,
+      },
+      {
+        label: 'About',
+        subpath: 'about',
+        component: null,
+      },
+    ],
+  };
 
   render() {
-    // We have to set Router basename with the hash (#) in it to enable navigating
-    // into a specific path from outside the app.
+    // We have to set Router basename with the hash (#) in it to enable
+    // navigating directly into a specific route path from outside the app.
+    // Not sure why this is required, but it works.
     return (
       <Router basename={'/#'}>
         <div>
-          <div>
-            <Header />
-          </div>
-          <div>
-            <Route exact path='/' render={() => (<Redirect to='/data'/>)} />
-            <Route path='/data' render={
-                props => <DataTool
-                  {...props}
-                  defaultPath={this.state.dataPath}
-                  onNavigate={this.handleNavigate}
+          <SubNav navSpec={this.navSpec}>
+            <Navbar.Header>
+              <a href='https://pacificclimate.org/'>
+                <img
+                  src={require('./components/Header/logo.png')}
+                  width='328'
+                  height='38'
+                  alt='Pacific Climate Impacts Consortium'
                 />
-              }
-            />
-          </div>
-          <div>
-            <Footer />
-          </div>
+              </a>
+            </Navbar.Header>
+            <Navbar.Brand>
+              Climate Explorer
+            </Navbar.Brand>
+          </SubNav>
+          <Footer />
         </div>
       </Router>
     );
