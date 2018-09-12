@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import SubNav from './SubNav/SubNav';
+import NavRoutes from './NavRoutes';
 import SingleAppController from '../app-controllers/SingleAppController/SingleAppController';
 import PrecipAppController from '../app-controllers/PrecipAppController/PrecipAppController';
 import DualAppController from '../app-controllers/DualAppController/DualAppController';
@@ -28,7 +28,7 @@ const navSpec = {
 };
 
 export default function DataTool(props) {
-  return <SubNav { ...{ navSpec, ...props } } />;
+  return <NavRoutes { ...{ navSpec, ...props } } />;
 }
 
 DataTool.propTypes = {
