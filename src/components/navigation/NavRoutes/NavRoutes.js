@@ -29,9 +29,9 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Route, Redirect } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import './SubNav.css';
+import './NavRoutes.css';
 
-export default function SubNav(props) {
+export default function NavRoutes(props) {
   const withBasePath = subpath => `${props.navSpec.basePath}/${subpath}`;
 
   const navItems = props.navSpec.items.map((item, index) =>
@@ -73,7 +73,7 @@ export default function SubNav(props) {
   );
 }
 
-SubNav.propTypes = {
+NavRoutes.propTypes = {
   navSpec: PropTypes.shape({
     basePath: PropTypes.string, // base of all route paths in this page
     items: PropTypes.arrayOf(
@@ -90,6 +90,6 @@ SubNav.propTypes = {
   children: PropTypes.any,
 };
 
-SubNav.defaultProps = {
+NavRoutes.defaultProps = {
   navIndex: 0,
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import SubNav from './SubNav/SubNav';
+import NavRoutes from './NavRoutes';
 
 const navSpec = {
   basePath: '/help',
@@ -18,5 +18,5 @@ const navSpec = {
 };
 
 export default function Help(props) {
-  return <SubNav { ...{ navSpec, ...props } }/>;
+  return <NavRoutes { ...{ navSpec, ...props } }/>;
 }
