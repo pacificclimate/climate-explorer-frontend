@@ -29,14 +29,19 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Route, Redirect } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import LabelWithInfo from '../../help-etc/LabelWithInfo';
+
 import './NavRoutes.css';
+
 
 export default function NavRoutes(props) {
   const withBasePath = subpath => `${props.navSpec.basePath}/${subpath}`;
 
   const navItems = props.navSpec.items.map((item, index) =>
     <LinkContainer key={index} to={withBasePath(item.subpath)}>
-      <NavItem eventKey={index}>{item.label}</NavItem>
+      <NavItem eventKey={index}>
+        <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
+      </NavItem>
     </LinkContainer>
   );
 
@@ -79,8 +84,9 @@ NavRoutes.propTypes = {
     items: PropTypes.arrayOf(
       PropTypes.shape({
         label: PropTypes.string,  // label for navigation for this item
+        info: PropTypes.node, // content for Information for this item (placed with label)
         subpath: PropTypes.string,  // route subpath for this item
-        component: PropTypes.element, // component to render for this item
+        component: PropTypes.func, // component to render for this item
         render: PropTypes.func,  // functional component to render for this item
       }),
     ),
