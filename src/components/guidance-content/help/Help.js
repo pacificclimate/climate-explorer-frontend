@@ -1,5 +1,7 @@
 import React from 'react';
-import NavRoutes from '../navigation/NavRoutes/NavRoutes';
+import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
+import FAQ from './FAQ';
+import HelpGeneral from './HelpGeneral';
 
 const navSpec = {
   basePath: '/help',
@@ -7,12 +9,12 @@ const navSpec = {
     {
       label: 'FAQ',
       subpath: 'faq',
-      component: null,
+      component: FAQ,
     },
     {
       label: 'General',
       subpath: 'general',
-      component: null,
+      component: HelpGeneral,
     },
   ],
 };

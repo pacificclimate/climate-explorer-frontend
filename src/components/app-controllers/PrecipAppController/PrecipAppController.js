@@ -24,6 +24,10 @@ import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
+import {
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
+} from '../../guidance-content/info/LabelWithInfoItems';
+
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
@@ -64,7 +68,7 @@ export default createReactClass({
         <Row>
           <Col lg={3} md={3}>
             <Selector 
-              label={"Model Selection"}
+              label={modelSelectorLabel}
               onChange={this.updateSelection.bind(this, 'model_id')}
               items={modOptions}
               value={this.state.model_id}
@@ -72,7 +76,7 @@ export default createReactClass({
           </Col>
             <Col lg={3} md={3}>
             <Selector
-              label={"Emission Scenario Selection"}
+              label={emissionScenarioSelectorLabel}
               onChange={this.updateSelection.bind(this, 'experiment')}
               items={expOptions}
               value={this.state.experiment}
@@ -80,7 +84,7 @@ export default createReactClass({
           </Col>
           <Col lg={3} md={3}>
             <VariableDescriptionSelector
-              label={"Variable Selection"}
+              label={variableSelectorLabel}
               onChange={this.handleSetVariable.bind(this, "variable")}
               meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
               constraints={_.pick(this.state, "model_id", "experiment")}

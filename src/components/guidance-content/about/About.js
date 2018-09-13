@@ -1,5 +1,5 @@
 import React from 'react';
-import NavRoutes from '../navigation/NavRoutes/NavRoutes';
+import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
 import ClimateExplorer from "./ClimateExplorer";
 
 const navSpec = {
