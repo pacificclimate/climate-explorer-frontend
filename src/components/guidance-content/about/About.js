@@ -1,6 +1,9 @@
 import React from 'react';
 import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
-import ClimateExplorer from "./ClimateExplorer";
+import ClimateExplorer from './ClimateExplorer';
+import Contact from './Contact';
+import Credits from './Credits';
+import Team from './Team';
 
 const navSpec = {
   basePath: '/about',
@@ -13,17 +16,17 @@ const navSpec = {
     {
       label: 'Contact',
       subpath: 'contact',
-      component: null,
+      component: Contact,
     },
     {
       label: 'Credits and Acknowledgements',
       subpath: 'credits',
-      component: null,
+      component: Credits,
     },
     {
       label: 'Team',
       subpath: 'team',
-      component: null,
+      component: Team,
     },
   ],
 };
