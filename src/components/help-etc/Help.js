@@ -1,5 +1,5 @@
 import React from 'react';
-import NavRoutes from './NavRoutes';
+import NavRoutes from '../navigation/NavRoutes/NavRoutes';
 
 const navSpec = {
   basePath: '/help',
