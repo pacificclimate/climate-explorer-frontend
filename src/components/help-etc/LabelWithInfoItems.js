@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import LabelWithInfo from './LabelWithInfo';
 
+// Selector labels
+
 export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
     GCM model with which the climate data was generated.
@@ -11,7 +13,7 @@ export const modelSelectorLabel = (
 
 export const emissionScenarioSelectorLabel = (
   <LabelWithInfo label='Emission Scenario'>
-    Emission scenario used to drive the model run
+    Emission scenario used to drive the model run.
   </LabelWithInfo>
 );
 
@@ -25,7 +27,7 @@ export const variableSelectorLabel = (
 
 export const variable1SelectorLabel = (
   <LabelWithInfo label='Variable 1 (Colour blocks)'>
-    First variable to view.
+    First or 'primary' variable to view.
     This variable is represented in the map as a grid of coloured blocks
     overlaid on the map.
   </LabelWithInfo>
@@ -33,69 +35,143 @@ export const variable1SelectorLabel = (
 
 export const variable2SelectorLabel = (
   <LabelWithInfo label='Variable 2 (Isolines)'>
-    Second variable to view.
+    Second or 'secondary' variable to view.
     This variable is represented in the map as a set of isolines
     (contours of export constant value) overlaid on the map.
   </LabelWithInfo>
 );
 
-export const annualCycleTabLabel = (
+// Graph tab labels
+
+const annualCycleGraphDefn = `
+  An annual cycle graph presents spatially averaged values of a multi-year 
+  mean dataset as points over a nominal year (representing the "average" year).
+  Horizontal axis indicates time point within representative year.
+`;
+
+const spatialAveragingDefn = `
+  Values are spatially averaged over the area selected by the polygon
+  drawn on the map (or over the entire dataset if no polygon is drawn).
+`;
+
+const datasetSelectorDefn = `
+  Model run and averaging period are selected by the Dataset selector
+  in the graph.
+`;
+
+const timeOfYearSelectorDefn = `
+  Month, season, or annual average is selected by the Time of Year
+  selector in the graph.
+`;
+
+export const singleAnnualCycleTabLabel = (
   <LabelWithInfo label='Annual Cycle'>
-    Graph of a representative "year" with the yearly, seasonal, and monthly
-    mean values of the selected variable, taken over a multi-decade period.
-    Horizontal axis indicates time point within representative year.
-    Values are spatially averaged over the area selected by the polygon
-    drawn on the map (or over the entire dataset if no polygon is drawn).
-    Model run and averaging period are selected by the Dataset selector
-    in the graph.
+    <p>
+      Annual cycle graph showing the yearly, seasonal, and monthly
+      mean values of the selected variable.
+    </p>
+    <p>{annualCycleGraphDefn}</p>
+    <p>{spatialAveragingDefn}</p>
+    <p>{datasetSelectorDefn}</p>
   </LabelWithInfo>
 );
 
-export const ltaTabLabel = (
+export const dualAnnualCycleTabLabel = (
+  <LabelWithInfo label='Annual Cycle'>
+    Annual cycle graphs showing the yearly, seasonal, and monthly
+    mean values of the two selected variables (if different).
+    <p>{annualCycleGraphDefn}</p>
+    <p>{spatialAveragingDefn}</p>
+    <p>{datasetSelectorDefn}</p>
+  </LabelWithInfo>
+);
+
+const ltaGraphDefn = `
+  A long term average graph presents the monthly, seasonal, or annual average 
+  value, taken over a several different multi-decade period, of the 
+  selected variable.
+  Horizontal axis indicates midpoint of multi-decade averaging period.
+`;
+
+export const singleLtaTabLabel = (
   <LabelWithInfo label='Long Term Average'>
-    Graph of the monthly, seasonal, or annual average value of the selected
-    variable, taken over a multi-decade period.
-    Horizontal axis indicates midpoint of multi-decade averaging period.
-    Values are spatially averaged over the area selected by the polygon
-    drawn on the map (or over the entire dataset if no polygon is drawn).
-    Month, season, or annual average is selected by the Time of Year
-    selector in the graph.
+    <p>Long term average graphs for the selected variable.</p>
+    <p>{ltaGraphDefn}</p>
+    <p>{spatialAveragingDefn}</p>
+    <p>{timeOfYearSelectorDefn}</p>
+  </LabelWithInfo>
+);
+
+export const dualLtaTabLabel = (
+  <LabelWithInfo label='Long Term Average'>
+    Long term average graphs for the two selected variables (if different).
+    <p>{ltaGraphDefn}</p>
+    <p>{spatialAveragingDefn}</p>
+    <p>{timeOfYearSelectorDefn}</p>
   </LabelWithInfo>
 );
 
 export const modelContextTabLabel = (
   <LabelWithInfo label='Model Context'>
-     Graph of average value of the selected value, taken over a multi-decade
-    period, for each model and run available for the selected emission scenario
-    and variable.
-    The selected model run is highlighted. This puts the selected model into
-    context with other similar model runs.
-    Values are spatially averaged over the area selected by the polygon
-    drawn on the map (or over the entire dataset if no polygon is drawn).
+    <p>
+      Graph of average value of the selected value, taken over a multi-decade
+      period, for each model and run available for the selected emission scenario
+      and variable.
+      The selected model run is highlighted. This puts the selected model into
+      context with other similar model runs.
+    </p>
+    <p>{spatialAveragingDefn}</p>
 </LabelWithInfo>
 );
 
 export const futureAnomalyTabLabel = (
   <LabelWithInfo label='Future Anomaly'>
-    Future Anomaly info
+    <p>
+      Annual cycle graphs showing anomaly (difference from average over
+      baseline period)
+      for averages over near-term (2010-2039) and future (2040-2069, 2070-2099)
+      periods.
+    </p>
+    <p>{annualCycleGraphDefn}</p>
+    <p>{spatialAveragingDefn}</p>
   </LabelWithInfo>
 );
 
 export const snapshotTabLabel = (
   <LabelWithInfo label='Snapshot'>
-    Snapshot info
+    <p>
+      Shows all model results at a single point in time, for the selected variable
+      and emissions scenario, with the selected model highlighted.
+    </p>
+    <p>{spatialAveragingDefn}</p>
   </LabelWithInfo>
 );
 
 export const timeSeriesTabLabel = (
   <LabelWithInfo label='Time Series'>
-    Time Series info
+    <p>Simple graph of data values against time.</p>
+    <p>{spatialAveragingDefn}</p>
   </LabelWithInfo>
 );
 
 export const variableResponseTabLabel = (
   <LabelWithInfo label='Variable Response'>
-    Variable Response info
+    <p>
+      This graph shows the influnce of the secondary variable
+      on the primary variable irrespective of time.
+    </p>
+    <p>
+      It is composed from timeseries data with matching availability for
+      both variables. Each point in time t with data from both variables
+      (t, primary(t)) and (t, secondary(t)) appears as the scatterplot point
+      (secondary(t), primary(t)) instead.
+    </p>
+    <p>
+      The secondary variable appears along the x axis as the explanatory
+      variable; the primary variable appears along the y axis as the
+      response variable.
+    </p>
+    <p>{spatialAveragingDefn}</p>
   </LabelWithInfo>
 );
 

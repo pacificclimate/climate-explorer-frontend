@@ -51,9 +51,8 @@ import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';
 import DualTimeSeriesGraph from '../../graphs/DualTimeSeriesGraph';
 import DualVariableResponseGraph from '../../graphs/DualVariableResponseGraph';
 import {
-  annualCycleTabLabel,
-  ltaTabLabel, timeSeriesTabLabel,
-  variableResponseTabLabel,
+  singleLtaTabLabel, timeSeriesTabLabel,
+  variableResponseTabLabel, dualAnnualCycleTabLabel,
 } from '../../help-etc/LabelWithInfoItems';
 
 export default createReactClass({
@@ -104,10 +103,10 @@ export default createReactClass({
           multiYearMeanSelected(this.props) ? (
 
             <Tabs id='Graphs'>
-              <Tab eventKey={1} title={annualCycleTabLabel}>
+              <Tab eventKey={1} title={dualAnnualCycleTabLabel}>
                 <DualAnnualCycleGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title={ltaTabLabel}>
+              <Tab eventKey={2} title={singleLtaTabLabel}>
                 <DualLongTermAveragesGraph {...this.props}/>
               </Tab>
               <Tab eventKey={3} title={variableResponseTabLabel}>
