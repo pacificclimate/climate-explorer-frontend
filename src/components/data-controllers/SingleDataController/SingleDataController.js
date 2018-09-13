@@ -49,8 +49,8 @@ import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
-  annualCycleTabLabel, futureAnomalyTabLabel,
-  ltaTabLabel, modelContextTabLabel, snapshotTabLabel,
+  singleAnnualCycleTabLabel, futureAnomalyTabLabel,
+  singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel,
 } from '../../help-etc/LabelWithInfoItems';
 
@@ -181,10 +181,10 @@ export default createReactClass({
           multiYearMeanSelected(this.props) ? (
 
             <Tabs id='Graphs'>
-              <Tab eventKey={1} title={annualCycleTabLabel}>
+              <Tab eventKey={1} title={singleAnnualCycleTabLabel}>
                 <SingleAnnualCycleGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title={ltaTabLabel}>
+              <Tab eventKey={2} title={singleLtaTabLabel}>
                 <SingleLongTermAveragesGraph {...this.props}/>
               </Tab>
               <Tab eventKey={3} title={modelContextTabLabel}>
