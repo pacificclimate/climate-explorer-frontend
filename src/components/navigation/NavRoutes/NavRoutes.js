@@ -34,10 +34,10 @@ import LabelWithInfo from '../../help-etc/LabelWithInfo';
 import './NavRoutes.css';
 
 
-export default function NavRoutes(props) {
-  const withBasePath = subpath => `${props.navSpec.basePath}/${subpath}`;
+export default function NavRoutes({ navSpec, navIndex, onNavigate, children }) {
+  const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
 
-  const navItems = props.navSpec.items.map((item, index) =>
+  const navItems = navSpec.items.map((item, index) =>
     <LinkContainer key={index} to={withBasePath(item.subpath)}>
       <NavItem eventKey={index}>
         <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
@@ -45,7 +45,7 @@ export default function NavRoutes(props) {
     </LinkContainer>
   );
 
-  const routes = props.navSpec.items.map((item, index) =>
+  const routes = navSpec.items.map((item, index) =>
     <Route
       key={index}
       path={withBasePath(item.subpath)}
@@ -55,22 +55,22 @@ export default function NavRoutes(props) {
   );
 
   const basePathRedirectTo =
-    withBasePath(props.navSpec.items[props.navIndex].subpath);
+    withBasePath(navSpec.items[navIndex].subpath);
 
   return (
     <div>
       <Navbar fluid>
-        { props.children }
+        { children }
         <Nav
           bsStyle='pills'
           pullRight
-          onSelect={props.onNavigate}
+          onSelect={onNavigate}
         >
           { navItems }
         </Nav>
       </Navbar>
       <Route
-        exact path={props.navSpec.basePath}
+        exact path={navSpec.basePath}
         render={() => <Redirect to={basePathRedirectTo}/>}
       />
       { routes }
