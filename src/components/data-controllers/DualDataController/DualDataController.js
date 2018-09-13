@@ -53,7 +53,7 @@ import DualVariableResponseGraph from '../../graphs/DualVariableResponseGraph';
 import {
   singleLtaTabLabel, timeSeriesTabLabel,
   variableResponseTabLabel, dualAnnualCycleTabLabel,
-} from '../../help-etc/LabelWithInfoItems';
+} from '../../guidance-content/info/LabelWithInfoItems';
 
 export default createReactClass({
   displayName: 'DualDataController',

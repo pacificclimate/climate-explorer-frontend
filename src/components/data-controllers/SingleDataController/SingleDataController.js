@@ -52,7 +52,7 @@ import {
   singleAnnualCycleTabLabel, futureAnomalyTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel,
-} from '../../help-etc/LabelWithInfoItems';
+} from '../../guidance-content/info/LabelWithInfoItems';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain

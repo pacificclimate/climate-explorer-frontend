@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Information from './Information';
+import Information from './Information/Information';
 
 export default function LabelWithInfo({ label, children }) {
   return (

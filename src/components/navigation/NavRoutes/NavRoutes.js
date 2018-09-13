@@ -29,7 +29,7 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Route, Redirect } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import LabelWithInfo from '../../help-etc/LabelWithInfo';
+import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
 import './NavRoutes.css';
 

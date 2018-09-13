@@ -1,19 +1,54 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LabelWithInfo from './LabelWithInfo';
+import { Table } from 'react-bootstrap';
+import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
 // Selector labels
 
 export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
-    GCM model with which the climate data was generated.
-    Kan we haz <Link to={'/help'}>link</Link>?
+    <p>
+      GCM model with which the climate data was generated.
+    </p>
+    <p>
+      Models are identified by short codes. For full model identification,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
   </LabelWithInfo>
 );
 
 export const emissionScenarioSelectorLabel = (
   <LabelWithInfo label='Emission Scenario'>
-    Emission scenario used to drive the model run.
+    <p>Emission scenario used to drive the model run.</p>
+    <p>
+      Emission scenarios use the following coding:
+      <Table condensed>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>historical</td>
+            <td>Emission values based on historical records</td>
+          </tr>
+          <tr>
+            <td>rcp26</td>
+            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6</td>
+          </tr>
+          <tr>
+            <td>rcp45</td>
+            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5</td>
+          </tr>
+          <tr>
+            <td>rcp85</td>
+            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5</td>
+          </tr>
+        </tbody>
+      </Table>
+    </p>
   </LabelWithInfo>
 );
 
@@ -164,7 +199,7 @@ export const variableResponseTabLabel = (
       It is composed from timeseries data with matching availability for
       both variables. Each point in time t with data from both variables
       (t, primary(t)) and (t, secondary(t)) appears as the scatterplot point
-      (secondary(t), primary(t)) instead.
+      (secondary(t), primary(t)).
     </p>
     <p>
       The secondary variable appears along the x axis as the explanatory
