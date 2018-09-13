@@ -27,10 +27,10 @@ import styles from './Selector.css';
 class Selector extends React.Component {
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
-    label: PropTypes.string,
+    label: PropTypes.node,
     items: PropTypes.array,
     value: PropTypes.node,
-    disabled: PropTypes.bool
+    disabled: PropTypes.bool,
   };
 
   static defaultProps = {
