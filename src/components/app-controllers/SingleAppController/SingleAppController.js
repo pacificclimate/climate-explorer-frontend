@@ -19,6 +19,10 @@ import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
+import {
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
+} from '../../help-etc/LabelWithInfoItems';
+
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 
@@ -36,21 +40,21 @@ export default createReactClass({
   //only datasets the filter returns a truthy value for are available.
   //Filters out noisy multi-year monthly datasets.
   datasetFilter: function (datafile) {
-    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+    return !(datafile.multi_year_mean === false && datafile.timescale === 'monthly');
   },
 
   //Returns metadata for datasets with thethe selected variable + scenario, any model.
   //Passed as a prop for SingleDataController to generate model comparison graphs.
   getModelContextMetadata: function () {
     return _.where(this.state.meta,
-        {variable_id: this.state.variable_id, experiment: this.state.experiment});
+        { variable_id: this.state.variable_id, experiment: this.state.experiment });
   },
 
   render: function () {
     //hierarchical selection: model, then variable, then experiment
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
-        this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
+        this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id, variable_id: this.state.variable_id }));
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -58,28 +62,28 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <Col lg={4} md={4}>
-            <Selector 
-              label={"Model Selection"} 
-              onChange={this.updateSelection.bind(this, 'model_id')} 
-              items={modOptions} 
+            <Selector
+              label={modelSelectorLabel}
+              onChange={this.updateSelection.bind(this, 'model_id')}
+              items={modOptions}
               value={this.state.model_id}
             />
           </Col>
           <Col lg={4} md={4}>
-            <VariableDescriptionSelector
-              label={"Variable Selection"}
-              onChange={this.handleSetVariable.bind(this, "variable")}
-              meta={this.state.meta}
-              constraints={{model_id: this.state.model_id}}
-              value={_.pick(this.state, "variable_id", "variable_name")} 
-            />
-          </Col>
-          <Col lg={4} md={4}>
             <Selector
-              label={"Emission Scenario Selection"}
+              label={emissionScenarioSelectorLabel}
               onChange={this.updateSelection.bind(this, 'experiment')}
               items={expOptions}
               value={this.state.experiment}
+            />
+          </Col>
+          <Col lg={4} md={4}>
+            <VariableDescriptionSelector
+              label={variableSelectorLabel}
+              onChange={this.handleSetVariable.bind(this, 'variable')}
+              meta={this.state.meta}
+              constraints={{ model_id: this.state.model_id }}
+              value={_.pick(this.state, 'variable_id', 'variable_name')}
             />
           </Col>
         </Row>
