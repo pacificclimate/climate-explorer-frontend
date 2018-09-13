@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid } from 'react-bootstrap';
-import Accordion from './Accordion';
+import Accordion from '../../guidance-tools/Accordion';
 
 
 const faqs = [
