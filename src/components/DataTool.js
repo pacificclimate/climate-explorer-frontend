@@ -12,17 +12,17 @@ const navSpec = {
     {
       label: 'Single dataset',
       subpath: 'climo/ce_files',
-      component: SingleAppController,
+      render: () => <SingleAppController/>,
     },
     {
       label: 'Compare datasets',
       subpath: 'compare/ce_files',
-      component: DualAppController,
+      render: () => <DualAppController/>,
     },
     {
       label: 'Extreme Precipitation',
       subpath: 'precipitation/extreme_precipitation',
-      component: PrecipAppController,
+      render: () => <PrecipAppController/>,
     },
   ],
 };
