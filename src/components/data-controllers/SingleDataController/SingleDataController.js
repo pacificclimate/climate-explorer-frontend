@@ -36,7 +36,7 @@ import styles from './SingleDataController.css';
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
          resolutionIndexToTimeKey,
-         validateStatsData} from '../../../core/util';
+         validateStatsData } from '../../../core/util';
 import DataTable from '../../DataTable/DataTable';
 import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../../DataControllerMixin';
@@ -48,6 +48,11 @@ import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
+import {
+  annualCycleTabLabel, futureAnomalyTabLabel,
+  ltaTabLabel, modelContextTabLabel, snapshotTabLabel,
+  timeSeriesTabLabel,
+} from '../../help-etc/LabelWithInfoItems';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -69,7 +74,7 @@ export default createReactClass({
   getInitialState: function () {
     return {
       dataTableTimeOfYear: 0,
-      dataTableTimeScale: "monthly",
+      dataTableTimeScale: 'monthly',
       statsData: undefined,
     };
   },
@@ -86,12 +91,12 @@ export default createReactClass({
       this.loadDataTable(props);
     }
     else {
-      this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
+      this.loadDataTable(props, { timeidx: 0, timescale: "yearly" });
     }
   },
 
   //Removes all data from the Stats Table and displays a message
-  setStatsTableNoDataMessage: function(message) {
+  setStatsTableNoDataMessage: function (message) {
     this.setState({
       statsTableOptions: { noDataText: message },
       statsData: [],
@@ -133,11 +138,11 @@ export default createReactClass({
     var timeres = time ? time.timescale : this.state.dataTableTimeScale;
 
     //load stats table
-    this.setStatsTableNoDataMessage("Loading Data");
+    this.setStatsTableNoDataMessage('Loading Data');
     var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
 
     myStatsPromise.then(response => {
-      if(_.allKeys(response.data).length > 0) {
+      if (_.allKeys(response.data).length > 0) {
         this.setState({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
@@ -149,7 +154,7 @@ export default createReactClass({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
         });
-        this.setStatsTableNoDataMessage("Statistics unavailable for this time period.");
+        this.setStatsTableNoDataMessage('Statistics unavailable for this time period.');
       }
     }).catch(error => {
       displayError(error, this.setStatsTableNoDataMessage);
@@ -175,28 +180,28 @@ export default createReactClass({
         {
           multiYearMeanSelected(this.props) ? (
 
-            <Tabs id="Graphs">
-              <Tab eventKey={1} title='Annual Cycle'>
+            <Tabs id='Graphs'>
+              <Tab eventKey={1} title={annualCycleTabLabel}>
                 <SingleAnnualCycleGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title='Long Term Averages'>
+              <Tab eventKey={2} title={ltaTabLabel}>
                 <SingleLongTermAveragesGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={3} title='Model Context'>
+              <Tab eventKey={3} title={modelContextTabLabel}>
                 <SingleContextGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={4} title='Future Anomaly'>
+              <Tab eventKey={4} title={futureAnomalyTabLabel}>
                 <AnomalyAnnualCycleGraph {...this.props} />
               </Tab>
-              <Tab eventKey={5} title='Snapshot'>
+              <Tab eventKey={5} title={snapshotTabLabel}>
                 <SingleTimeSliceGraph {...this.props} />
               </Tab>
             </Tabs>
 
           ) : (
 
-            <Tabs id="Graphs">
-              <Tab eventKey={1} title='Time Series'>
+            <Tabs id='Graphs'>
+              <Tab eventKey={1} title={timeSeriesTabLabel}>
                 <SingleTimeSeriesGraph {...this.props}/>
               </Tab>
             </Tabs>
@@ -209,7 +214,7 @@ export default createReactClass({
             <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
           </Col>
         </Row>
-        <DataTable data={statsData}  options={this.state.statsTableOptions}/>
+        <DataTable data={statsData} options={this.state.statsTableOptions}/>
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
           <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
