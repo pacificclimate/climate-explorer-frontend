@@ -38,7 +38,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Panel, Tab, Tabs } from 'react-bootstrap';
 import _ from 'underscore';
 
 
@@ -52,7 +52,7 @@ import DualTimeSeriesGraph from '../../graphs/DualTimeSeriesGraph';
 import DualVariableResponseGraph from '../../graphs/DualVariableResponseGraph';
 import {
   singleLtaTabLabel, timeSeriesTabLabel,
-  variableResponseTabLabel, dualAnnualCycleTabLabel,
+  variableResponseTabLabel, dualAnnualCycleTabLabel, graphsPanelLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
 
 export default createReactClass({
@@ -96,37 +96,47 @@ export default createReactClass({
     return (
       <div>
         <h3>
-          {`${this.props.model_id} ${this.props.experiment}: ${this.props.variable_id} vs ${this.props.comparand_id}`}
+          {`${this.props.model_id} ${this.props.experiment}:
+          ${this.props.variable_id} vs ${this.props.comparand_id}`}
         </h3>
 
-        {
-          multiYearMeanSelected(this.props) ? (
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title componentClass="h4">
+              {graphsPanelLabel}
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            {
+              multiYearMeanSelected(this.props) ? (
 
-            <Tabs id='Graphs'>
-              <Tab eventKey={1} title={dualAnnualCycleTabLabel}>
-                <DualAnnualCycleGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={2} title={singleLtaTabLabel}>
-                <DualLongTermAveragesGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={3} title={variableResponseTabLabel}>
-                <DualVariableResponseGraph {...this.props}/>
-              </Tab>
-            </Tabs>
+                <Tabs id='Graphs'>
+                  <Tab eventKey={1} title={dualAnnualCycleTabLabel}>
+                    <DualAnnualCycleGraph {...this.props}/>
+                  </Tab>
+                  <Tab eventKey={2} title={singleLtaTabLabel}>
+                    <DualLongTermAveragesGraph {...this.props}/>
+                  </Tab>
+                  <Tab eventKey={3} title={variableResponseTabLabel}>
+                    <DualVariableResponseGraph {...this.props}/>
+                  </Tab>
+                </Tabs>
 
-          ) : (
+              ) : (
 
-            <Tabs id='Graphs'>
-              <Tab eventKey={1} title={timeSeriesTabLabel}>
-                <DualTimeSeriesGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={2} title={variableResponseTabLabel}>
-                <DualVariableResponseGraph {...this.props}/>
-              </Tab>
-            </Tabs>
+                <Tabs id='Graphs'>
+                  <Tab eventKey={1} title={timeSeriesTabLabel}>
+                    <DualTimeSeriesGraph {...this.props}/>
+                  </Tab>
+                  <Tab eventKey={2} title={variableResponseTabLabel}>
+                    <DualVariableResponseGraph {...this.props}/>
+                  </Tab>
+                </Tabs>
 
-          )
-        }
+              )
+            }
+          </Panel.Body>
+        </Panel>
       </div>
     );
   },

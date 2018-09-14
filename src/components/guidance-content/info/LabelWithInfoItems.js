@@ -158,7 +158,7 @@ export const timeOfYearSelectorLabel = (
 // );
 
 ///////////////////////////////
-// Graph tabs
+// Graphs
 ///////////////////////////////
 
 const annualCycleGraphDefn = `
@@ -168,7 +168,8 @@ const annualCycleGraphDefn = `
 `;
 
 const spatialAveragingDefn = `
-  Values are spatially averaged over the area selected by the polygon
+  Data values shown in each graph are spatially averaged over the area 
+  selected by the polygon
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
@@ -181,6 +182,16 @@ const timeOfYearSelectorDefn = `
   Month, season, or annual average is selected by the Time of Year
   selector in the graph.
 `;
+
+export const graphsPanelLabel = (
+  <LabelWithInfo label='Data Graphs'>
+    <p>
+      Graphs showing various slices and views of the dataset(s)
+      selected by Model, Emission Scenario, and Variable(s).
+    </p>
+    <p>{spatialAveragingDefn}</p>
+  </LabelWithInfo>
+);
 
 export const singleAnnualCycleTabLabel = (
   <LabelWithInfo label='Annual Cycle'>
