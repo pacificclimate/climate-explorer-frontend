@@ -26,6 +26,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
+import { Panel } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -41,6 +42,8 @@ import { hasValidData, currentDataSpec,
          updateLayerSimpleState, updateLayerTime,
          getDatasetId, scalarParams,
          selectRasterPalette, getTimeParametersPromise} from '../map-helpers.js';
+
+import styles from '../MapController.css';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -224,66 +227,72 @@ export default class PrecipMapController extends React.Component {
   render() {
 
     return (
-      this.state.raster.times ? (
-        <DataMap
-          raster={{
-            dataset: getDatasetId.bind(
-              this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
-            ...this.state.raster,
-            onChangeRange: this.handleChangeRasterRange,
-          }}
+      <Panel>
+        <Panel.Body className={styles.mapcontroller}>
+          {
+            this.state.raster.times ? (
+              <DataMap
+                raster={{
+                  dataset: getDatasetId.bind(
+                    this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
+                  ...this.state.raster,
+                  onChangeRange: this.handleChangeRasterRange,
+                }}
 
-          annotated={{
-            dataset: getDatasetId.bind(
-              this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
-            ...this.state.annotated,
-            onChangeRange: this.handleChangeAnnotatedRange,
-          }}
+                annotated={{
+                  dataset: getDatasetId.bind(
+                    this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
+                  ...this.state.annotated,
+                  onChangeRange: this.handleChangeAnnotatedRange,
+                }}
 
-          onSetArea={this.props.onSetArea}
-          area={this.props.area}
-        >
+                onSetArea={this.props.onSetArea}
+                area={this.props.area}
+              >
 
-          <StaticControl position='topleft'>
-            <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
+                </StaticControl>
 
-          <StaticControl position='topleft'>
-            <GeoExporter area={this.props.area} title='Export polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoExporter area={this.props.area} title='Export polygon' />
+                </StaticControl>
 
-          <StaticControl position='topright' style={{ marginRight: '70px' }}>
-            <MapSettings
-              title='Map Settings'
-              meta={this.props.meta}
-              comparandMeta={this.props.comparandMeta}
+                <StaticControl position='topright' style={{ marginRight: '70px' }}>
+                  <MapSettings
+                    title='Map Settings'
+                    meta={this.props.meta}
+                    comparandMeta={this.props.comparandMeta}
 
-              dataSpec={currentDataSpec.bind(this)()}
-              onDataSpecChange={this.updateDataSpec}
+                    dataSpec={currentDataSpec.bind(this)()}
+                    onDataSpecChange={this.updateDataSpec}
 
-              raster={{
-                ...this.state.raster,
-                onChangeTime: this.handleChangeTime,
-                onChangePalette: this.handleChangeRasterPalette,
-                onChangeScale: this.handleChangeRasterScale,
-              }}
-              //does have a comparand, but comparand has no user-configurable params.
-              hasComparand={false}
-              timesLinkable={false}
-            />
-          </StaticControl>
+                    raster={{
+                      ...this.state.raster,
+                      onChangeTime: this.handleChangeTime,
+                      onChangePalette: this.handleChangeRasterPalette,
+                      onChangeScale: this.handleChangeRasterScale,
+                    }}
+                    //does have a comparand, but comparand has no user-configurable params.
+                    hasComparand={false}
+                    timesLinkable={false}
+                  />
+                </StaticControl>
 
-          <StaticControl position='bottomleft'>
-            <MapFooter
-              {...this.state}
-              hasValidComparand={hasValidData('comparand', this.props)}
-            />
-          </StaticControl>
+                <StaticControl position='bottomleft'>
+                  <MapFooter
+                    {...this.state}
+                    hasValidComparand={hasValidData('comparand', this.props)}
+                  />
+                </StaticControl>
 
-        </DataMap>
-      ) : (
-        <Loader/>
-      )
+              </DataMap>
+            ) : (
+              <Loader/>
+            )
+          }
+        </Panel.Body>
+      </Panel>
     );
   }
 }
