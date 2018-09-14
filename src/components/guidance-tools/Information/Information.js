@@ -15,8 +15,8 @@ export default function Information(
 ) {
   return (
     <OverlayTrigger
-      trigger='hover'
-      delayHide={delayHide}
+      trigger='click'
+      rootClose
       placement={placement}
       overlay={
         <Popover id={nextPopoverId()}>{children}</Popover>
