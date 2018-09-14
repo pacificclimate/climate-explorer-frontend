@@ -1,9 +1,15 @@
+// Central resource for LabelWithInfo and Information items used throughout
+// the app.
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Table } from 'react-bootstrap';
+import { Glyphicon, Table } from 'react-bootstrap';
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
+import Information from '../../guidance-tools/Information';
 
-// Selector labels
+///////////////////////////////
+// Selectors
+///////////////////////////////
 
 export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
@@ -20,6 +26,11 @@ export const modelSelectorLabel = (
 export const emissionScenarioSelectorLabel = (
   <LabelWithInfo label='Emission Scenario'>
     <p>Emission scenario used to drive the model run.</p>
+    <p>
+      Emission scenarios represent a range of possible future projections for
+      greenhouse gas emissions, which are input into climate models.
+      Higher RCP values represent greater projected greenhouse gas emissions.
+    </p>
     <p>
       Emission scenarios use the following coding:
       <Table condensed>
@@ -52,31 +63,103 @@ export const emissionScenarioSelectorLabel = (
   </LabelWithInfo>
 );
 
+const downloadFormats = `
+  Data may be downloaded in Microsoft Excel compatible format (XSLX)
+  or in Comma Separated Values (CSV) format.
+  For details on these formats, see <Link to='/help/general'>Help</Link>.
+`;
+
+export const downloadDataLabel = (
+  <LabelWithInfo label='Download Data'>
+    <p>
+      Click a button to download the selected data to your computer.
+    </p>
+    <p>
+      The data downloaded is that shown on the graph.
+      For details on the layout and content of the exported data,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
+    <p>{downloadFormats}</p>
+  </LabelWithInfo>
+);
+
+const colourBlocksVariable = `
+  This variable is represented in the map as a grid of coloured blocks
+  overlaid on the map.
+`;
+
+const isolinesVariable = `
+  This variable is represented in the map as a set of isolines
+  (contours of constant value) overlaid on the map.
+`;
+
 export const variableSelectorLabel = (
   <LabelWithInfo label='Variable'>
-    Variable to view on the map and in the graphs.
-    The variable is represented in the map as a grid of coloured blocks
-    overlaid on the map.
+    <p>Variable to view on the map and in the graphs.</p>
+    <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
 );
 
 export const variable1SelectorLabel = (
   <LabelWithInfo label='Variable 1 (Colour blocks)'>
-    First or 'primary' variable to view.
-    This variable is represented in the map as a grid of coloured blocks
-    overlaid on the map.
+    <p>First or 'primary' variable to view.</p>
+    <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
 );
 
 export const variable2SelectorLabel = (
   <LabelWithInfo label='Variable 2 (Isolines)'>
-    Second or 'secondary' variable to view.
-    This variable is represented in the map as a set of isolines
-    (contours of export constant value) overlaid on the map.
+    <p>Second or 'secondary' variable to view.</p>
+    <p>{isolinesVariable}</p>
   </LabelWithInfo>
 );
 
-// Graph tab labels
+
+export const datasetSelectorLabel = (
+  <LabelWithInfo label='Dataset'>
+    <p>
+      Select a single dataset to display from all of those that match the Model,
+      Emissions Scenario, and Variable selected.
+    </p>
+    <p>
+      The map and the graph(s) have independently selected datasets.
+      That is, they may be displaying different datasets simultaneously.
+    </p>
+    <p>
+      On the map, use Map Settings <Glyphicon glyph='menu-hamburger'/>
+      button to access the Dataset selector.
+      The selected dataset is shown in the legend in the lower left of the map.
+    </p>
+    <p>
+      On the graph(s), the Dataset selector appears directly above the graph.
+    </p>
+    <p>
+      Datasets are identified by a combination of
+      model run id (e.g., <code>r1i1p1</code>) and
+      averaging period (e.g., <code>1961-1990</code>).
+    </p>
+  </LabelWithInfo>
+);
+
+export const timeOfYearSelectorLabel = (
+  <LabelWithInfo label='Time of Year'>
+    <p>
+      Select the portion of the year over which data values are averaged
+      before being averaged over a multi-decadal period.
+    </p>
+  </LabelWithInfo>
+);
+
+// export const template = (
+//   <LabelWithInfo label=''>
+//      <p>
+//      </p>
+//   </LabelWithInfo>
+// );
+
+///////////////////////////////
+// Graph tabs
+///////////////////////////////
 
 const annualCycleGraphDefn = `
   An annual cycle graph presents spatially averaged values of a multi-year 
@@ -122,9 +205,10 @@ export const dualAnnualCycleTabLabel = (
 );
 
 const ltaGraphDefn = `
-  A long term average graph presents the monthly, seasonal, or annual average 
-  value, taken over a several different multi-decade period, of the 
-  selected variable.
+  A long term average graph presents average values of the selected variable
+  for the selected month, season, or the year, averaged
+  over several different multi-decade period. 
+  There is one data point per mulit-decade averaging period.
   Horizontal axis indicates midpoint of multi-decade averaging period.
 `;
 
@@ -189,6 +273,11 @@ export const timeSeriesTabLabel = (
   </LabelWithInfo>
 );
 
+
+const t = <em>t</em>;
+const V1 = <span>V<sub>1</sub></span>;
+const V2 = <span>V<sub>2</sub></span>;
+
 export const variableResponseTabLabel = (
   <LabelWithInfo label='Variable Response'>
     <p>
@@ -197,9 +286,10 @@ export const variableResponseTabLabel = (
     </p>
     <p>
       It is composed from timeseries data with matching availability for
-      both variables. Each point in time t with data from both variables
-      (t, primary(t)) and (t, secondary(t)) appears as the scatterplot point
-      (secondary(t), primary(t)).
+      both variables. Each point in time {t} with data from each variable
+      ({t}, {V1}({t})) and ({t}, {V2}({t}))
+      appears as the scatterplot point
+      ({V2}({t}), {V1}({t})).
     </p>
     <p>
       The secondary variable appears along the x axis as the explanatory
@@ -210,8 +300,48 @@ export const variableResponseTabLabel = (
   </LabelWithInfo>
 );
 
-export const template = (
-  <LabelWithInfo label=''>
-    info
+
+///////////////////////////////
+// Stats table
+///////////////////////////////
+
+export const statsTableLabel = (
+  <LabelWithInfo label='Statistical Summary'>
+    <p>
+      This table presents a statistical summary of all the datasets matching
+      the selected Model, Emissions Scenario, and Variable.
+    </p>
+    <p>
+      The matching datasets are identified by Averaging Period and Model Run.
+    </p>
+    <p>{spatialAveragingDefn}</p>
+    <p>
+      The data statistically summarized for a selected subperiod (Time of Year)
+      within the averaging period.
+    </p>
   </LabelWithInfo>
 );
+
+export const statsTableExportButtonsInfo = (
+  <Information>
+    <p>
+      Click a button to export the contents of the statistical summary table.
+    </p>
+    <p>{downloadFormats}</p>
+  </Information>
+);
+
+// export const infoTemplate = (
+//   <Information>
+//     <p>
+//     </p>
+//   </Information>
+// );
+
+// export const labelTemplate = (
+//   <LabelWithInfo label=''>
+//     <p>
+//     </p>
+//   </LabelWithInfo>
+// );
+
