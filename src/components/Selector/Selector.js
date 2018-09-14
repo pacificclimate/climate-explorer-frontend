@@ -31,6 +31,7 @@ class Selector extends React.Component {
     items: PropTypes.array,
     value: PropTypes.node,
     disabled: PropTypes.bool,
+    inlineLabel: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -38,6 +39,7 @@ class Selector extends React.Component {
     items: [],
     value: '',
     disabled: false,
+    inlineLabel: false,
   };
 
   componentWillReceiveProps(newProps) {
@@ -82,9 +84,15 @@ class Selector extends React.Component {
   render() {
     return (
         <div className={styles.selectorframe}>
-          <div>
-            <ControlLabel className={styles.selectorlabel}>{this.props.label}</ControlLabel>
-          </div>
+          <ControlLabel
+            className={
+              this.props.inlineLabel ?
+                styles.selectorlabel_inline :
+                styles.selectorlabel_stacked
+            }
+          >
+            {this.props.label}
+          </ControlLabel>
           <Dropdown vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
             <Dropdown.Toggle className={styles.selectortitle}>
               {this.displayString}

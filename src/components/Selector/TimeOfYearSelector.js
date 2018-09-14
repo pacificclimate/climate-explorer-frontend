@@ -26,27 +26,32 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import Selector from './Selector';
-import {timeKeyToTimeOfYear} from '../../core/util';
+import { timeKeyToTimeOfYear } from '../../core/util';
+import { timeOfYearSelectorLabel } from '../guidance-content/info/LabelWithInfoItems';
 
 class TimeOfYearSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     value: PropTypes.any,
+    inlineLabel: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    inlineLabel: false,
   };
 
   render() {
 
     var timesofyear = [];
-    for(var index = 0; index < 17; index++) {
+    for (var index = 0; index < 17; index++) {
       timesofyear.push([index, timeKeyToTimeOfYear(index)]);
     }
 
     return (
       <Selector
-        label='Time of year'
-        onChange={this.props.onChange}
+        label={timeOfYearSelectorLabel}
         items={timesofyear}
-        value={this.props.value}
+        {...this.props}
       />
     );
   }
