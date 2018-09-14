@@ -11,7 +11,7 @@ export default function Team() {
           href='https://pacificclimate.org/about-pcic/people/james-hiebert'
         >
           Fearless leader.
-          Architect of the PCIC systems.
+          Ur-Architect of PCIC information systems.
           Keeper of the clan's lore and history.
         </ListGroupItem>
         <ListGroupItem
@@ -20,9 +20,9 @@ export default function Team() {
           href='https://pacificclimate.org/about-pcic/people/lee-zeman'
         >
           Front-end engineer.
-          Valiant contender with GIS backend rebellions.
+          Valiant contender with GIS legacy backend rebellions.
           Implementor of wondrous data graphs.
-          Advocate of the practical and effective.
+          Champion of the practical and effective.
         </ListGroupItem>
         <ListGroupItem
           header='Rod Glover'
