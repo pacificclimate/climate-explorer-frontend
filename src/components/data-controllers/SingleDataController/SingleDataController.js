@@ -52,6 +52,7 @@ import {
   singleAnnualCycleTabLabel, futureAnomalyTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel,
+  statsTableLabel, statsTableExportButtonsInfo,
 } from '../../help-etc/LabelWithInfoItems';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -210,14 +211,22 @@ export default createReactClass({
         }
 
         <Row>
-          <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
+          <Col lg={8} md={6} sm={6}>
+            <h4>{statsTableLabel}</h4>
+          </Col>
+          <Col lg={4} md={6} sm={6}>
+            <TimeOfYearSelector
+              onChange={this.updateDataTableTimeOfYear}
+              value={dataTableSelected}
+              inlineLabel
+            />
           </Col>
         </Row>
         <DataTable data={statsData} options={this.state.statsTableOptions}/>
         <div style={{ marginTop: '10px' }}>
           <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
           <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
+          {statsTableExportButtonsInfo}
         </div>
       </div>
     );
