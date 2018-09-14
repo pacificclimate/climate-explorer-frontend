@@ -3,7 +3,7 @@
  * 
  * Given a data specification (model_id, experiment, variable_id),
  * provides functions to help generate a graph specification contrasting
- * current (2010-2039) and future (2040-2069, 2070-2099) Annual Cycle data:
+ * a baseline historical climatology and future Annual Cycle data:
  * 
  *   - getMetadata locates metadata for multiple three climatology periods
  *   - dataToGraphSpec formats a graph to shade the climatology periods
@@ -29,7 +29,6 @@ export default function AnomalyAnnualCycleGraph(props) {
     //returns metadata for all datasets whose start year is greater 
     //than start, and whose end year is less than end.
     //the interval is exclusive. optionally leave either endpoint undefined.
-    console.log(`${start} ${end}`);
     return _.filter(props.meta, md => {
       return md.model_id === props.model_id &&
       md.experiment === props.experiment &&
@@ -57,7 +56,6 @@ export default function AnomalyAnnualCycleGraph(props) {
     let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
     const end_date = _.max(_.pluck(historicalMetadatas, "end_date"));
     historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
-    console.log(`historical end date: ${end_date}`);
     
     //pick the highest-resolution dataset available for that climatology
     const baselineMetadata = _.findWhere(historicalMetadatas, {timescale: "monthly"})
@@ -71,7 +69,7 @@ export default function AnomalyAnnualCycleGraph(props) {
     else {
       let anomalyMetadatas = getDateRangeMetadatas(baselineMetadata.start_date, undefined);
       anomalyMetadatas = _.where(anomalyMetadatas, {timescale: baselineMetadata.timescale});
-      return anomalyMetadatas.concat(baselineMetadata);
+      return [baselineMetadata].concat(anomalyMetadatas);
     }
   }
 

@@ -216,17 +216,17 @@ function makeAnomalyGraph (base, graph) {
       let newSeries = [];
       newSeries.push(`${seriesName} Anomaly`);
       for(let j = 1; j < oldSeries.length; j++){
-        newSeries.push(oldSeries[j] - baseSeries[j]);
+        newSeries.push(percentageChange(baseSeries[j], oldSeries[j]));
       }
       graph.data.columns.push(newSeries);
       graph.data.axes[seriesName] = 'y';
       graph.data.axes[`${seriesName} Anomaly`] = 'y2';
-      graph.data.types[`${seriesName} Anomaly`] = "line";
+      graph.data.types[`${seriesName} Anomaly`] = oldSeries[0] === base? "line" : "bar";
     }
   }
   graph.axis.y2.label = {};
   graph.axis.y2.label.position = 'outer-middle';
-  graph.axis.y2.label.text = `${getAxisTextForVariable(graph, baseSeries[0])} anomaly from ${baseSeries[0]}`;
+  graph.axis.y2.label.text = `${getAxisTextForVariable(graph, baseSeries[0])} percentage change from ${baseSeries[0]}`;
   graph.axis.y2.tick = {};
   graph.axis.y2.tick.format = graph.axis.y.tick.format;
   
@@ -271,6 +271,10 @@ function makeAnomalyGraph (base, graph) {
   return graph;
 };
 
+function percentageChange(a, b) {
+  return 100 * (b - a) / a;
+}
+
 /*
  * Helper function for makeAnomalyGraph: takes an existing tool tip number
  * formatting function, and adds a wrapper which appends the anomaly from
@@ -283,9 +287,9 @@ function addAnomalyTooltipFormatter (oldFormatter, baseSeries) {
       return undefined; 
     }
     else {
-      const anomaly = value - baseSeries[index + 1];
+      const anomaly = percentageChange(baseSeries[index+1], value);
       const sign = anomaly >= 0 ? "+" : "";
-      return nominal + " (" + sign + anomaly.toPrecision(2) + ")";
+      return nominal + " (" + sign + anomaly.toPrecision(2) + "%)";
     }
   };
   return newTooltipValueFormatter;
