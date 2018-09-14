@@ -426,7 +426,8 @@ const annualCycleGraphDefn = `
 `;
 
 const spatialAveragingDefn = `
-  Values are spatially averaged over the area selected by the polygon
+  Data values shown in each graph are spatially averaged over the area 
+  selected by the polygon
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
@@ -611,6 +612,15 @@ export const exportStatsTableDataLabel = (
     </p>
     <p>{downloadFormats}</p>
   </LabelWithInfo>
+);
+
+export const statsTableExportButtonsInfo = (
+  <Information>
+    <p>
+      Click a button to export the contents of the statistical summary table.
+    </p>
+    <p>{downloadFormats}</p>
+  </Information>
 );
 
 // export const infoTemplate = (
