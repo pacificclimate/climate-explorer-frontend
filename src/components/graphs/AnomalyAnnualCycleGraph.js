@@ -25,19 +25,22 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 
 export default function AnomalyAnnualCycleGraph(props) {
   
-  function getPresentMetadatas(includeFuture = false) {
-    // returns an array of all metadata objects that conform 
-    // to the user-selected parameters and contain data that 
-    // includes the current year (or future years, if includeFuture is true).
-    const currentYear = new Date().getFullYear();
-    
+  function getDateRangeMetadatas(start = undefined, end = undefined) {
+    //returns metadata for all datasets whose start year is greater 
+    //than start, and whose end year is less than end.
+    //the interval is exclusive. optionally leave either endpoint undefined.
+    console.log(`${start} ${end}`);
     return _.filter(props.meta, md => {
       return md.model_id === props.model_id &&
       md.experiment === props.experiment &&
       md.variable_id === props.variable_id &&
-      md.end_date >= currentYear &&
-      (includeFuture || md.start_date <= currentYear);
+      (_.isUndefined(end) || md.end_date < end) &&
+      (_.isUndefined(start) || md.start_date > start);
     });
+  }
+  
+  function currentYear() {
+    return new Date().getFullYear();
   }
   
   function getMetadata(dataSpec) {
@@ -46,15 +49,30 @@ export default function AnomalyAnnualCycleGraph(props) {
       model_id, experiment,
       variable_id, meta,
     } = props;
-
-    // Find the highest-resolution dataset that describes the present.
-    const presentMetadatas = getPresentMetadatas();
-    const presentMetadata = _.findWhere(presentMetadatas, {timescale: "monthly"})
-                            || _.findWhere(presentMetadatas, {timescale: "seasonal"})
-                            || _.findWhere(presentMetadatas, {timescale: "annual"});
-
-    return _.isUndefined(presentMetadata)? [] : _.where(getPresentMetadatas(meta, true), 
-        {timescale: presentMetadata.timescale});
+    
+    //Select a base historical dataset to be the baseline. 
+    //The most recent dataset that does *not* include the present date is
+    //used (usually 1981 - 2010). if there are two equally recent datasets
+    //(such as 1971-2000 and 1981-2000) for some reason, one will be arbitrarily selected.
+    let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
+    const end_date = _.max(_.pluck(historicalMetadatas, "end_date"));
+    historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
+    console.log(`historical end date: ${end_date}`);
+    
+    //pick the highest-resolution dataset available for that climatology
+    const baselineMetadata = _.findWhere(historicalMetadatas, {timescale: "monthly"})
+                             || _.findWhere(historicalMetadatas, {timescale: "seasonal"})
+                             || _.findWhere(historicalMetadatas, {timescale: "annual"});
+    
+    //return the baseline dataset and every same-resolution dataset that starts after it.
+    if(_.isUndefined(baselineMetadata)) {
+      return [];
+    }
+    else {
+      let anomalyMetadatas = getDateRangeMetadatas(baselineMetadata.start_date, undefined);
+      anomalyMetadatas = _.where(anomalyMetadatas, {timescale: baselineMetadata.timescale});
+      return anomalyMetadatas.concat(baselineMetadata);
+    }
   }
 
   function dataToGraphSpec(meta, data) {
@@ -73,7 +91,7 @@ export default function AnomalyAnnualCycleGraph(props) {
   return (
     <AnnualCycleGraph
       {...graphProps}
-      meta={getPresentMetadatas(false)}
+      meta={getDateRangeMetadatas(undefined, currentYear())}
       getMetadata={getMetadata}
       dataToGraphSpec={dataToGraphSpec}
     />
