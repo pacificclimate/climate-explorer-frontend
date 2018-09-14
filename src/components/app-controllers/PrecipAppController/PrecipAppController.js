@@ -20,7 +20,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
@@ -94,16 +93,14 @@ export default createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <PrecipMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                comparand_id={"pr"}
-                comparandMeta = {this.getFilteredMeta("pr", "Precipitation")}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
+            <PrecipMapController
+              variable_id={this.state.variable_id}
+              meta = {this.getFilteredMeta()}
+              comparand_id={"pr"}
+              comparandMeta = {this.getFilteredMeta("pr", "Precipitation")}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
           </Col>
           <Col lg={6}>
             <DualDataController

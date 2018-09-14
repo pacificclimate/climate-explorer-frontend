@@ -20,7 +20,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import {
@@ -77,7 +76,6 @@ export default createReactClass({
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
-    console.log(JSON.stringify(styles));
     //hierarchical data selection: model, then experiments (filtered by model),
     // then variable (filtered by model and experiments),
     // then comparison variable (filtered by model and experiment, must be MYM if var is.)
@@ -130,16 +128,14 @@ export default createReactClass({
         </Row>
         <Row>
           <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <DualMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-                comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
+            <DualMapController
+              variable_id={this.state.variable_id}
+              meta = {this.getFilteredMeta()}
+              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
+              comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
           </Col>
           <Col lg={6}>
             <DualDataController

@@ -21,6 +21,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
+import { Panel } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -35,6 +36,8 @@ import GeoExporter from '../../GeoExporter';
 import { hasValidData, selectRasterPalette,
          currentDataSpec, updateLayerSimpleState,
          updateLayerTime, getTimeParametersPromise, scalarParams} from '../map-helpers.js';
+
+import styles from '../MapController.css';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -204,58 +207,69 @@ export default class SingleMapController extends React.Component {
 
   render() {
     return (
-      this.state.raster.times ? (
-        <DataMap
-          raster={{
-            dataset: this.getDatasetId(
-              'variable', this.props.meta, this.state.raster.timeIdx),
-            ...this.state.raster,
-            onChangeRange: this.handleChangeRasterRange,
-          }}
+      <Panel>
+        <Panel.Body className={styles.mapcontroller}>
+          {
+            this.state.raster.times ? (
+              <DataMap
+                raster={{
+                  dataset: this.getDatasetId(
+                    'variable', this.props.meta, this.state.raster.timeIdx),
+                  ...this.state.raster,
+                  onChangeRange: this.handleChangeRasterRange,
+                }}
 
-          onSetArea={this.props.onSetArea}
-          area={this.props.area}
-        >
+                onSetArea={this.props.onSetArea}
+                area={this.props.area}
+              >
 
-          <StaticControl position='topleft'>
-            <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoLoader
+                    onLoadArea={this.props.onSetArea}
+                    title='Import polygon' />
+                </StaticControl>
 
-          <StaticControl position='topleft'>
-            <GeoExporter area={this.props.area} title='Export polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoExporter area={this.props.area} title='Export polygon' />
+                </StaticControl>
 
-          <StaticControl position='topright' style={{ marginRight: '70px' }}>
-            <MapSettings
-              title='Map Settings'
-              meta={this.props.meta}
+                <StaticControl
+                  position='topright'
+                  style={{ marginRight: '70px' }}
+                >
+                  <MapSettings
+                    title='Map Settings'
+                    meta={this.props.meta}
 
-              dataSpec={currentDataSpec.bind(this)()}
-              onDataSpecChange={this.updateDataSpec}
+                    dataSpec={currentDataSpec.bind(this)()}
+                    onDataSpecChange={this.updateDataSpec}
 
-              raster={{
-                ...this.state.raster,
-                onChangeTime: this.handleChangeVariableTime,
-                onChangePalette: this.handleChangeRasterPalette,
-                onChangeScale: this.handleChangeRasterScale,
-              }}
+                    raster={{
+                      ...this.state.raster,
+                      onChangeTime: this.handleChangeVariableTime,
+                      onChangePalette: this.handleChangeRasterPalette,
+                      onChangeScale: this.handleChangeRasterScale,
+                    }}
 
-              hasComparand={false}
-              timesLinkable={false}
-            />
-          </StaticControl>
+                    hasComparand={false}
+                    timesLinkable={false}
+                  />
+                </StaticControl>
 
-          <StaticControl position='bottomleft'>
-            <MapFooter
-              {...this.state}
-              hasValidComparand={false}
-            />
-          </StaticControl>
+                <StaticControl position='bottomleft'>
+                  <MapFooter
+                    {...this.state}
+                    hasValidComparand={false}
+                  />
+                </StaticControl>
 
-        </DataMap>
-      ) : (
-        <Loader/>
-      )
+              </DataMap>
+            ) : (
+              <Loader/>
+            )
+          }
+        </Panel.Body>
+      </Panel>
     );
   }
 }
