@@ -14,14 +14,14 @@ const navSpec = {
       component: ClimateExplorer,
     },
     {
-      label: 'Contact',
-      subpath: 'contact',
-      component: Contact,
-    },
-    {
       label: 'Credits and Acknowledgements',
       subpath: 'credits',
       component: Credits,
+    },
+    {
+      label: 'Contact',
+      subpath: 'contact',
+      component: Contact,
     },
     {
       label: 'Team',

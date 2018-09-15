@@ -1,3 +1,12 @@
+// App: Top-level component of the Climate Explorer app.
+//
+// Defines top-level navigation and routes.
+//
+// Controls the DataTool component (the main attraction; path `/data`)
+// so that it maintains which view is selected when navigated away from.
+// Other components could be similarly managed, but it was not deemed useful.
+// Easy enough to do if desired.
+
 import React from 'react';
 
 import { Navbar } from 'react-bootstrap';
@@ -80,6 +89,7 @@ export default class App extends React.Component {
                 <img
                   src={marmot} height={68}
                   alt='Vancouver Island Marmot'
+                  title='"The Marmot": Graphic by permission, V.I. Marmot Recovery Foundation'
                 />
               </Navbar.Brand>
               <Navbar.Brand>

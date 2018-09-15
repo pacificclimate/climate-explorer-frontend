@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import Accordion from '../../guidance-tools/Accordion';
 
 
@@ -20,19 +20,32 @@ const items = faqs.map((faq, i) => (
   <Accordion.Item
     key={i}
     eventKey={i}
-    title={`Question ${i + 1}: ${faq.question}`}
+    title={`${i + 1}: ${faq.question}`}
   >
     {faq.answer}
   </Accordion.Item>
 ));
 
+const half = Math.ceil(items.length / 2);
+const firstItems = items.slice(0, half);
+const secondItems = items.slice(half);
+
 export default function FAQ() {
   return (
     <Grid fluid>
       <h1>Frequently Asked Questions</h1>
-      <Accordion>
-        {items}
-      </Accordion>
+      <Row>
+        <Col lg={6}>
+          <Accordion>
+            {firstItems}
+          </Accordion>
+        </Col>
+        <Col lg={6}>
+          <Accordion>
+            {secondItems}
+          </Accordion>
+        </Col>
+      </Row>
     </Grid>
   );
 }
