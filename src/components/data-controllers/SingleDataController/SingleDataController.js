@@ -31,8 +31,6 @@ import createReactClass from 'create-react-class';
 import { Button, Row, Col, Tab, Tabs, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
-import styles from './SingleDataController.css';
-
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
          resolutionIndexToTimeKey,
@@ -54,6 +52,9 @@ import {
   timeSeriesTabLabel, statsTableExportButtonsInfo, statsTableLabel,
   graphsPanelLabel,
 } from '../../guidance-content/info/InformationItems';
+
+import styles from '../DataController.css';
+
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -178,7 +179,7 @@ export default createReactClass({
               {graphsPanelLabel}
             </Panel.Title>
           </Panel.Heading>
-          <Panel.Body>
+          <Panel.Body className={styles.data_panel}>
             {
               multiYearMeanSelected(this.props) ? (
 
@@ -219,7 +220,7 @@ export default createReactClass({
               {statsTableLabel}
             </Panel.Title>
           </Panel.Heading>
-          <Panel.Body>
+          <Panel.Body className={styles.data_panel}>
             <TimeOfYearSelector
               onChange={this.updateDataTableTimeOfYear}
               value={dataTableSelected}

@@ -40,12 +40,14 @@ import _ from 'underscore';
 
 import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';
 import TimeSeriesGraph from '../../graphs/TimeSeriesGraph';
-import styles from './MotiDataController.css';
 import {
   graphsPanelLabel,
   statsTableExportButtonsInfo,
   statsTableLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
+
+import styles from '../DataController.css';
+
 
 export default createReactClass({
   displayName: 'MotiDataController',
@@ -202,7 +204,7 @@ export default createReactClass({
               {statsTableLabel}
             </Panel.Title>
           </Panel.Heading>
-          <Panel.Body>
+          <Panel.Body className={styles.data_panel}>
             <DataTable data={statsData} options={this.state.statsTableOptions} />
             <div style={{ marginTop: '10px' }}>
               <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
