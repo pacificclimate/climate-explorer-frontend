@@ -8,7 +8,7 @@ import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
 
 ///////////////////////////////
-// Selectors
+// Main selectors (Model, Emission, Variable)
 ///////////////////////////////
 
 export const modelSelectorLabel = (
@@ -63,26 +63,6 @@ export const emissionScenarioSelectorLabel = (
   </LabelWithInfo>
 );
 
-const downloadFormats = `
-  Data may be downloaded in Microsoft Excel compatible format (XSLX)
-  or in Comma Separated Values (CSV) format.
-  For details on these formats, see <Link to='/help/general'>Help</Link>.
-`;
-
-export const downloadDataLabel = (
-  <LabelWithInfo label='Download Data'>
-    <p>
-      Click a button to download the selected data to your computer.
-    </p>
-    <p>
-      The data downloaded is that shown on the graph.
-      For details on the layout and content of the exported data,
-      see <Link to='/help/general'>Help</Link>.
-    </p>
-    <p>{downloadFormats}</p>
-  </LabelWithInfo>
-);
-
 const colourBlocksVariable = `
   This variable is represented in the map as a grid of coloured blocks
   overlaid on the map.
@@ -114,6 +94,9 @@ export const variable2SelectorLabel = (
   </LabelWithInfo>
 );
 
+///////////////////////////////
+// Dataset selectors
+///////////////////////////////
 
 export const datasetSelectorLabel = (
   <LabelWithInfo label='Dataset'>
@@ -148,6 +131,36 @@ export const timeOfYearSelectorLabel = (
     </p>
   </LabelWithInfo>
 );
+
+///////////////////////////////
+// Export/download controls
+///////////////////////////////
+
+const downloadFormats = (<span>
+  Data may be downloaded in Microsoft Excel compatible format (XSLX)
+  or in Comma Separated Values (CSV) format.
+  For details on these formats, see <Link to='/help/general'>Help</Link>.
+</span>);
+
+const exportDataLabel = 'Export Data';
+
+export const downloadGraphDataLabel = (
+  <LabelWithInfo label={exportDataLabel}>
+    <p>
+      Click a button to download the selected data to your computer.
+    </p>
+    <p>
+      The data downloaded is that shown on the graph.
+      For details on the layout and content of the exported data,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
+    <p>{downloadFormats}</p>
+  </LabelWithInfo>
+);
+
+export const xslxButtonLabel = 'XSLX';
+export const csvButtonLabel = 'CSV';
+
 
 ///////////////////////////////
 // Map
@@ -351,13 +364,18 @@ export const statsTableLabel = (
   </LabelWithInfo>
 );
 
-export const statsTableExportButtonsInfo = (
-  <Information>
+export const exportStatsTableDataLabel = (
+  <LabelWithInfo label={exportDataLabel}>
     <p>
       Click a button to export the contents of the statistical summary table.
     </p>
+    <p>
+      The data downloaded is that shown in the table.
+      For details on the layout and content of the exported data,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
     <p>{downloadFormats}</p>
-  </Information>
+  </LabelWithInfo>
 );
 
 // export const infoTemplate = (

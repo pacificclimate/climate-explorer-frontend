@@ -42,7 +42,7 @@ import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';
 import TimeSeriesGraph from '../../graphs/TimeSeriesGraph';
 import {
   graphsPanelLabel,
-  statsTableExportButtonsInfo,
+  exportStatsTableDataLabel,
   statsTableLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
 
@@ -209,7 +209,7 @@ export default createReactClass({
             <div style={{ marginTop: '10px' }}>
               <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
               <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
-              {statsTableExportButtonsInfo}
+              {exportStatsTableDataLabel}
             </div>
           </Panel.Body>
         </Panel>

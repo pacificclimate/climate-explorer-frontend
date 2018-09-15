@@ -28,7 +28,10 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, Tab, Tabs, Panel } from 'react-bootstrap';
+import {
+  Button, Row, Col, Tab, Tabs, Panel, ControlLabel,
+}
+from 'react-bootstrap';
 import _ from 'underscore';
 
 import { parseBootstrapTableData,
@@ -49,8 +52,8 @@ import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
   singleAnnualCycleTabLabel, futureAnomalyTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
-  timeSeriesTabLabel, statsTableExportButtonsInfo, statsTableLabel,
-  graphsPanelLabel,
+  timeSeriesTabLabel, exportStatsTableDataLabel, statsTableLabel,
+  graphsPanelLabel, downloadGraphDataLabel, xslxButtonLabel, csvButtonLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
 
 import styles from '../DataController.css';
@@ -221,17 +224,27 @@ export default createReactClass({
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
-            <TimeOfYearSelector
-              onChange={this.updateDataTableTimeOfYear}
-              value={dataTableSelected}
-              inlineLabel
-            />
+            <Row>
+              <Col lg={6} md={6} sm={6}>
+                <TimeOfYearSelector
+                  onChange={this.updateDataTableTimeOfYear}
+                  value={dataTableSelected}
+                  inlineLabel
+                />
+              </Col>
+              <Col lg={6} md={6} sm={6}>
+                <ControlLabel className={styles.exportlabel}>
+                  {exportStatsTableDataLabel}
+                </ControlLabel>
+                <Button onClick={this.exportDataTable.bind(this, 'xlsx')}>
+                  {xslxButtonLabel}
+                </Button>
+                <Button onClick={this.exportDataTable.bind(this, 'csv')}>
+                  {csvButtonLabel}
+                  </Button>
+              </Col>
+            </Row>
             <DataTable data={statsData} options={this.state.statsTableOptions}/>
-            <div style={{ marginTop: '10px' }}>
-              <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
-              <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
-              {statsTableExportButtonsInfo}
-            </div>
           </Panel.Body>
         </Panel>
       </div>
