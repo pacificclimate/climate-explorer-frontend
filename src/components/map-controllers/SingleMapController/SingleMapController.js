@@ -21,7 +21,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
-import { Panel } from 'react-bootstrap';
+import { Panel, Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -33,12 +33,15 @@ import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
 import GeoExporter from '../../GeoExporter';
 
-import { hasValidData, selectRasterPalette,
-         currentDataSpec, updateLayerSimpleState,
-         updateLayerTime, getTimeParametersPromise, scalarParams} from '../map-helpers.js';
+import {
+  hasValidData, selectRasterPalette,
+  currentDataSpec, updateLayerSimpleState,
+         updateLayerTime, getTimeParametersPromise, scalarParams,
+} from '../map-helpers.js';
 
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
+import { SingleMEVSummary } from '../../MEVSummary/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -210,7 +213,22 @@ export default class SingleMapController extends React.Component {
     return (
       <Panel>
         <Panel.Heading>
-          <Panel.Title>{mapPanelLabel}</Panel.Title>
+          <Panel.Title>
+            <Row>
+              <Col lg={2}>
+                {mapPanelLabel}
+              </Col>
+              <Col lg={10}>
+                <SingleMEVSummary
+                  className={styles.mevSummary} {...this.props}
+                />
+                {': '}
+                { this.state.run }
+                {' '}
+                { this.state.start_date }-{ this.state.end_date }
+              </Col>
+            </Row>
+        </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
           {

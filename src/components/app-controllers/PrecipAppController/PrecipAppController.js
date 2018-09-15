@@ -18,7 +18,7 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
 
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
@@ -31,7 +31,7 @@ import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
 import _ from 'underscore';
-import { DualAppHeading } from '../AppHeadings';
+import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
 
 export default createReactClass({
   displayName: 'PrecipAppController',
@@ -67,7 +67,7 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <Col lg={2} md={2}>
-            <Selector 
+            <Selector
               label={modelSelectorLabel}
               onChange={this.updateSelection.bind(this, 'model_id')}
               items={modOptions}
@@ -88,17 +88,16 @@ export default createReactClass({
               onChange={this.handleSetVariable.bind(this, "variable")}
               meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
               constraints={_.pick(this.state, "model_id", "experiment")}
-              value={_.pick(this.state, "variable_id", "variable_name")} 
+              value={_.pick(this.state, "variable_id", "variable_name")}
             />
-          </Col>
-          <Col lg={4} md={4}>
-            <DualAppHeading {...this.state} comparand_id='pr' />
           </Col>
         </Row>
         <Row>
           <Col lg={6}>
             <PrecipMapController
+              model_id={this.state.model_id}
               variable_id={this.state.variable_id}
+              experiment={this.state.experiment}
               meta = {this.getFilteredMeta()}
               comparand_id={"pr"}
               comparandMeta = {this.getFilteredMeta("pr", "Precipitation")}

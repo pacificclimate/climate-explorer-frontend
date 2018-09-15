@@ -38,7 +38,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Panel, Tab, Tabs } from 'react-bootstrap';
+import { Panel, Tab, Tabs, Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 
 
@@ -56,6 +56,7 @@ import {
 } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
+import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
 
 
 export default createReactClass({
@@ -101,7 +102,16 @@ export default createReactClass({
         <Panel>
           <Panel.Heading>
             <Panel.Title>
-              {graphsPanelLabel}
+              <Row>
+                <Col lg={4}>
+                  {graphsPanelLabel}
+                </Col>
+                <Col lg={8}>
+                  <DualMEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>

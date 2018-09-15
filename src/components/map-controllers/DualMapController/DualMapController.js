@@ -24,7 +24,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
-import { Panel } from 'react-bootstrap';
+import { Panel, Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -44,6 +44,7 @@ import { hasValidData, currentDataSpec,
 
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
+import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -253,7 +254,23 @@ export default class DualMapController extends React.Component {
     return (
       <Panel>
         <Panel.Heading>
-          <Panel.Title>{mapPanelLabel}</Panel.Title>
+          <Panel.Title>
+            <Row>
+              <Col lg={2}>
+                {mapPanelLabel}
+              </Col>
+              <Col lg={10}>
+                <DualMEVSummary
+                  className={styles.mevSummary} {...this.props}
+                />
+                {': '}
+                { this.state.run }
+                {' '}
+                { this.state.start_date }-{ this.state.end_date }
+              </Col>
+            </Row>
+
+          </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
           {

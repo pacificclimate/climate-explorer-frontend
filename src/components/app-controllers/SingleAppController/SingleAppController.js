@@ -24,7 +24,6 @@ import {
 
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
-import {SingleAppHeading} from "../AppHeadings";
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -86,14 +85,13 @@ export default createReactClass({
               value={_.pick(this.state, 'variable_id', 'variable_name')}
             />
           </Col>
-          <Col lg={4} md={4}>
-            <SingleAppHeading {...this.state} />
-          </Col>
         </Row>
         <Row>
           <Col lg={6}>
             <SingleMapController
               variable_id={this.state.variable_id}
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
               meta = {this.getFilteredMeta()}
               area={this.state.area}
               onSetArea={this.handleSetArea}
