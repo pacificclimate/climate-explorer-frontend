@@ -11,7 +11,7 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
@@ -81,7 +81,7 @@ export default createReactClass({
               label={variableSelectorLabel}
               onChange={this.handleSetVariable.bind(this, 'variable')}
               meta={this.state.meta}
-              constraints={{ model_id: this.state.model_id, experiment: this.state.experiment }}
+              constraints={{ model_id: this.state.model_id }}
               value={_.pick(this.state, 'variable_id', 'variable_name')}
             />
           </Col>
