@@ -158,15 +158,16 @@ export default class AnnualCycleGraph extends React.Component {
     return (
       <React.Fragment>
         <Row>
-          <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+          <Col lg={6} md={6} sm={6}>
             <DataSpecSelector
               meta={this.props.meta}
               // TODO: Refactor to eliminate encoding of dataSpec.
               value={JSON.stringify(this.state.dataSpec)}
               onChange={this.handleChangeDataSpec}
+              inlineLabel
             />
           </Col>
-          <Col lg={4} lgPush={1} md={6} mdPush={1} sm={6} smPush={1}>
+          <Col lg={6} md={6} sm={6}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
