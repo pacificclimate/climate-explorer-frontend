@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Glyphicon, Table } from 'react-bootstrap';
+import { Button, Glyphicon, Table } from 'react-bootstrap';
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
 
@@ -126,8 +126,7 @@ export const datasetSelectorLabel = (
       That is, they may be displaying different datasets simultaneously.
     </p>
     <p>
-      On the map, use Map Settings <Glyphicon glyph='menu-hamburger'/>
-      button to access the Dataset selector.
+      On the map, use the {mapSettingsButton} button to access the Dataset selector.
       The selected dataset is shown in the legend in the lower left of the map.
     </p>
     <p>
@@ -150,12 +149,31 @@ export const timeOfYearSelectorLabel = (
   </LabelWithInfo>
 );
 
-// export const template = (
-//   <LabelWithInfo label=''>
-//      <p>
-//      </p>
-//   </LabelWithInfo>
-// );
+///////////////////////////////
+// Map
+///////////////////////////////
+
+const mapSettingsButton = (
+  <span>
+    Map Settings
+    <Button bsSize='small'><Glyphicon glyph='menu-hamburger'/></Button>
+  </span>
+);
+
+export const mapPanelLabel = (
+  <LabelWithInfo label='Data Map'>
+     <p>
+       Map displaying data selected by
+       Model, Emission Scenario, and Variable(s).
+     </p>
+     <p>
+       The specific dataset displayed is selected in the Dataset selector
+       accessed through the {mapSettingsButton} button.
+       The selected dataset is shown in the legend in the lower left of the map.
+     </p>
+    <p><em>TBD: More about Map Settings and other controls.</em></p>
+  </LabelWithInfo>
+);
 
 ///////////////////////////////
 // Graphs
