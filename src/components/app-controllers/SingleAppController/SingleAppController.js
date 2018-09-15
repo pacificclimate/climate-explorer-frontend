@@ -19,7 +19,8 @@ import SingleDataController from '../../data-controllers/SingleDataController/Si
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
+  mevPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -60,6 +61,9 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Panel>
+          <Panel.Heading>
+            <Panel.Title>{mevPanelLabel}</Panel.Title>
+          </Panel.Heading>
           <Panel.Body>
             <Row>
               <Col lg={2} md={2}>

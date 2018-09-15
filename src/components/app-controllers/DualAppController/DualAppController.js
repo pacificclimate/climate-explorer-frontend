@@ -24,7 +24,7 @@ import DualDataController from '../../data-controllers/DualDataController/DualDa
 import Selector from '../../Selector';
 import {
   modelSelectorLabel, emissionScenarioSelectorLabel,
-  variable1SelectorLabel, variable2SelectorLabel,
+  variable1SelectorLabel, variable2SelectorLabel, mevPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -91,6 +91,9 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Panel>
+          <Panel.Heading>
+            <Panel.Title>{mevPanelLabel}</Panel.Title>
+          </Panel.Heading>
           <Panel.Body>
             <Row>
               <Col lg={2} md={2}>

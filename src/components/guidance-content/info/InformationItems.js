@@ -8,8 +8,22 @@ import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
 
 ///////////////////////////////
-// Main selectors (Model, Emission, Variable)
+// MEV selectors (Model, Emission, Variable)
 ///////////////////////////////
+
+export const mevPanelLabel = (
+  <LabelWithInfo label='Select Datasets'>
+    <p>
+      This is the primary filter for the datasets to be displayed.
+    </p>
+    <p>
+      Datasets matching these filter criteria can be displayed in the
+      map, on graphs, and in a statistical summary table.
+      Within each such presentation of data, you can independently select
+      which of the matching datasets to display.
+    </p>
+  </LabelWithInfo>
+);
 
 export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
