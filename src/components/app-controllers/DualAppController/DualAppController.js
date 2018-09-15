@@ -32,7 +32,6 @@ import g from '../../../core/geo';
 import DualMapController from '../../map-controllers/DualMapController';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import _ from 'underscore';
-import { DualAppHeading } from '../AppHeadings';
 
 export default createReactClass({
   displayName: 'DualAppController',
@@ -126,14 +125,13 @@ export default createReactClass({
               value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
             />
           </Col>
-          <Col lg={2} md={2}>
-            <DualAppHeading {...this.state} />
-          </Col>
         </Row>
         <Row>
           <Col lg={6}>
             <DualMapController
               variable_id={this.state.variable_id}
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
               meta = {this.getFilteredMeta()}
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}

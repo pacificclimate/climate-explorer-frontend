@@ -57,6 +57,7 @@ import {
 } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
+import { SingleMEVSummary } from '../../MEVSummary/MEVSummary';
 
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -179,7 +180,16 @@ export default createReactClass({
         <Panel>
           <Panel.Heading>
             <Panel.Title>
-              {graphsPanelLabel}
+              <Row>
+                <Col lg={4}>
+                  {graphsPanelLabel}
+                </Col>
+                <Col lg={8}>
+                  <SingleMEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
@@ -220,7 +230,16 @@ export default createReactClass({
         <Panel>
           <Panel.Heading>
             <Panel.Title>
-              {statsTableLabel}
+              <Row>
+                <Col lg={4}>
+                  {statsTableLabel}
+                </Col>
+                <Col lg={8}>
+                  <SingleMEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
