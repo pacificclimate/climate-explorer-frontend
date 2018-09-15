@@ -253,7 +253,7 @@ export default class DualMapController extends React.Component {
     return (
       <Panel>
         <Panel.Heading>
-          <Panel.Title componentClass='h3'>{mapPanelLabel}</Panel.Title>
+          <Panel.Title>{mapPanelLabel}</Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
           {

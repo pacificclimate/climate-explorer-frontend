@@ -172,7 +172,7 @@ export default createReactClass({
 
         <Panel>
           <Panel.Heading>
-            <Panel.Title componentClass="h4">
+            <Panel.Title>
               {graphsPanelLabel}
             </Panel.Title>
           </Panel.Heading>
@@ -198,7 +198,7 @@ export default createReactClass({
 
         <Panel>
           <Panel.Heading>
-            <Panel.Title componentClass="h4">
+            <Panel.Title>
               {statsTableLabel}
             </Panel.Title>
           </Panel.Heading>
