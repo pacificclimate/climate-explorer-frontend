@@ -12,6 +12,7 @@ import React from 'react';
 
 import Selector from '../Selector';
 import { getVariableOptions } from '../../core/util';
+import LabelWithInfo from '../guidance-tools/LabelWithInfo';
 
 
 export default class ScaleSelector extends React.Component {
@@ -32,10 +33,15 @@ export default class ScaleSelector extends React.Component {
       ['true', 'Logarithmic', layerMin <= 0 && !override],
     ];
 
+    const label = (
+      <LabelWithInfo label={`${this.props.name} Scale`}>
+        Explanation TBD
+      </LabelWithInfo>
+    );
 
     return (
       <Selector
-        label={`${this.props.name} Scale`}
+        label={label}
         items={colourScales}
         value={this.props.value}
         onChange={this.props.onChange}

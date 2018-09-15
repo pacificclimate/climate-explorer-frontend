@@ -4,13 +4,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import _ from 'underscore';
 
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
 import NullTimeSelector from './NullTimeSelector';
 import Selector from '../Selector';
+import LabelWithInfo from '../guidance-tools/LabelWithInfo';
 
 export default class TimeSelector extends React.Component {
   static propTypes = {
@@ -41,9 +41,6 @@ export default class TimeSelector extends React.Component {
     );
   }
 
-  static timeLinkedTooltip = <Tooltip id="TimeLinkButton">Timestamp matching is activated</Tooltip>;
-  static testTooltip = <Tooltip id="test">TEST</Tooltip>;
-
   render() {
     if (!this.props.times) {
       // FIXME: Code smell:
@@ -53,16 +50,20 @@ export default class TimeSelector extends React.Component {
       return <NullTimeSelector/>;
     }
 
+    const label = (
+      <LabelWithInfo label={`${this.props.name} ${this.temporalLabelPart()}`}>
+        Explanation TBD
+      </LabelWithInfo>
+    );
+
     return (
-      <OverlayTrigger placement='right' overlay={TimeSelector.testTooltip}>
         <Selector
           disabled={this.props.timeLinked}
-          label={`${this.props.name} ${this.temporalLabelPart()}`}
+          label={label}
           items={this.timeOptions()}
           value={this.props.timeIdx}
           onChange={this.props.onChange}
         />
-      </OverlayTrigger>
     );
   }
 }
