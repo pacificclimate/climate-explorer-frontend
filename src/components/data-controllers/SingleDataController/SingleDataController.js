@@ -172,12 +172,6 @@ export default createReactClass({
 
     return (
       <div>
-        <h3>
-          {this.props.model_id} {' '}
-          {this.props.variable_id} {' '}
-          {this.props.experiment}
-        </h3>
-
         <Panel>
           <Panel.Heading>
             <Panel.Title componentClass="h4">

@@ -32,6 +32,7 @@ import g from '../../../core/geo';
 import DualMapController from '../../map-controllers/DualMapController';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import _ from 'underscore';
+import { DualAppHeading } from '../AppHeadings';
 
 export default createReactClass({
   displayName: 'DualAppController',
@@ -91,7 +92,7 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Row>
-          <Col lg={3} md={3}>
+          <Col lg={2} md={2}>
             <Selector 
               label={modelSelectorLabel}
               onChange={this.updateSelection.bind(this, 'model_id')}
@@ -99,7 +100,7 @@ export default createReactClass({
               value={this.state.model_id}
             />
           </Col>
-          <Col lg={3} md={3}>
+          <Col lg={2} md={2}>
             <Selector
               label={emissionScenarioSelectorLabel}
               onChange={this.updateSelection.bind(this, 'experiment')}
@@ -124,6 +125,9 @@ export default createReactClass({
               constraints={comparandConstraints}
               value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
             />
+          </Col>
+          <Col lg={2} md={2}>
+            <DualAppHeading {...this.state} />
           </Col>
         </Row>
         <Row>

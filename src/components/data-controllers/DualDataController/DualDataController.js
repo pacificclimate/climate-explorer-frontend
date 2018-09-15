@@ -95,11 +95,6 @@ export default createReactClass({
   render: function () {
     return (
       <div>
-        <h3>
-          {`${this.props.model_id} ${this.props.experiment}:
-          ${this.props.variable_id} vs ${this.props.comparand_id}`}
-        </h3>
-
         <Panel>
           <Panel.Heading>
             <Panel.Title componentClass="h4">

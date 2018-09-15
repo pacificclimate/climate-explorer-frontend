@@ -24,6 +24,7 @@ import {
 
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
+import {SingleAppHeading} from "../AppHeadings";
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -60,7 +61,7 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Row>
-          <Col lg={4} md={4}>
+          <Col lg={2} md={2}>
             <Selector
               label={modelSelectorLabel}
               onChange={this.updateSelection.bind(this, 'model_id')}
@@ -68,7 +69,7 @@ export default createReactClass({
               value={this.state.model_id}
             />
           </Col>
-          <Col lg={4} md={4}>
+          <Col lg={2} md={2}>
             <Selector
               label={emissionScenarioSelectorLabel}
               onChange={this.updateSelection.bind(this, 'experiment')}
@@ -84,6 +85,9 @@ export default createReactClass({
               constraints={{ model_id: this.state.model_id }}
               value={_.pick(this.state, 'variable_id', 'variable_name')}
             />
+          </Col>
+          <Col lg={4} md={4}>
+            <SingleAppHeading {...this.state} />
           </Col>
         </Row>
         <Row>

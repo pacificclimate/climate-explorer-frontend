@@ -31,6 +31,7 @@ import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
 import _ from 'underscore';
+import { DualAppHeading } from '../AppHeadings';
 
 export default createReactClass({
   displayName: 'PrecipAppController',
@@ -65,7 +66,7 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Row>
-          <Col lg={3} md={3}>
+          <Col lg={2} md={2}>
             <Selector 
               label={modelSelectorLabel}
               onChange={this.updateSelection.bind(this, 'model_id')}
@@ -73,7 +74,7 @@ export default createReactClass({
               value={this.state.model_id}
             />
           </Col>
-            <Col lg={3} md={3}>
+            <Col lg={2} md={2}>
             <Selector
               label={emissionScenarioSelectorLabel}
               onChange={this.updateSelection.bind(this, 'experiment')}
@@ -81,7 +82,7 @@ export default createReactClass({
               value={this.state.experiment}
             />
           </Col>
-          <Col lg={3} md={3}>
+          <Col lg={4} md={4}>
             <VariableDescriptionSelector
               label={variableSelectorLabel}
               onChange={this.handleSetVariable.bind(this, "variable")}
@@ -89,6 +90,9 @@ export default createReactClass({
               constraints={_.pick(this.state, "model_id", "experiment")}
               value={_.pick(this.state, "variable_id", "variable_name")} 
             />
+          </Col>
+          <Col lg={4} md={4}>
+            <DualAppHeading {...this.state} comparand_id='pr' />
           </Col>
         </Row>
         <Row>
@@ -107,7 +111,7 @@ export default createReactClass({
               ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
-              comparand_id={"pr"}
+              comparand_id='pr'
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {this.getFilteredMeta()}
