@@ -44,6 +44,7 @@ import { hasValidData, currentDataSpec,
          selectRasterPalette, getTimeParametersPromise} from '../map-helpers.js';
 
 import styles from '../MapController.css';
+import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -228,6 +229,9 @@ export default class PrecipMapController extends React.Component {
 
     return (
       <Panel>
+        <Panel.Heading>
+          <Panel.Title>{mapPanelLabel}</Panel.Title>
+        </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
           {
             this.state.raster.times ? (

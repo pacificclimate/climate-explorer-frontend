@@ -414,6 +414,16 @@ export const colourMapTypeSelectorLabel = (
     </p>
   </LabelWithInfo>
 );
+///////////////////////////////
+// Map
+///////////////////////////////
+
+const mapSettingsButton = (
+  <span>
+    Map Settings
+    <Button bsSize='small'><Glyphicon glyph='menu-hamburger'/></Button>
+  </span>
+);
 
 ///////////////////////////////
 // Graphs

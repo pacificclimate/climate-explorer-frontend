@@ -43,6 +43,7 @@ import { hasValidData, currentDataSpec,
   getDatasetId} from '../map-helpers.js';
 
 import styles from '../MapController.css';
+import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -251,6 +252,9 @@ export default class DualMapController extends React.Component {
   render() {
     return (
       <Panel>
+        <Panel.Heading>
+          <Panel.Title componentClass='h3'>{mapPanelLabel}</Panel.Title>
+        </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
           {
             this.state.raster.times || this.state.isoline.times ? (
