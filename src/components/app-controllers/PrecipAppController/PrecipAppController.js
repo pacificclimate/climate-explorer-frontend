@@ -65,33 +65,37 @@ export default createReactClass({
     
     return (
       <Grid fluid>
-        <Row>
-          <Col lg={2} md={2}>
-            <Selector
-              label={modelSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'model_id')}
-              items={modOptions}
-              value={this.state.model_id}
-            />
-          </Col>
-            <Col lg={2} md={2}>
-            <Selector
-              label={emissionScenarioSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'experiment')}
-              items={expOptions}
-              value={this.state.experiment}
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <VariableDescriptionSelector
-              label={variableSelectorLabel}
-              onChange={this.handleSetVariable.bind(this, "variable")}
-              meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
-              constraints={_.pick(this.state, "model_id", "experiment")}
-              value={_.pick(this.state, "variable_id", "variable_name")}
-            />
-          </Col>
-        </Row>
+        <Panel>
+          <Panel.Body>
+            <Row>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={modelSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'model_id')}
+                  items={modOptions}
+                  value={this.state.model_id}
+                />
+              </Col>
+                <Col lg={2} md={2}>
+                <Selector
+                  label={emissionScenarioSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'experiment')}
+                  items={expOptions}
+                  value={this.state.experiment}
+                />
+              </Col>
+              <Col lg={4} md={4}>
+                <VariableDescriptionSelector
+                  label={variableSelectorLabel}
+                  onChange={this.handleSetVariable.bind(this, "variable")}
+                  meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
+                  constraints={_.pick(this.state, "model_id", "experiment")}
+                  value={_.pick(this.state, "variable_id", "variable_name")}
+                />
+              </Col>
+            </Row>
+          </Panel.Body>
+        </Panel>
         <Row>
           <Col lg={6}>
             <PrecipMapController
