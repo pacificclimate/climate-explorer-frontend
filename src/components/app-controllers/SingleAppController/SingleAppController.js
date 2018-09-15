@@ -19,7 +19,8 @@ import SingleDataController from '../../data-controllers/SingleDataController/Si
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
+  mevPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -59,33 +60,40 @@ export default createReactClass({
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
     return (
       <Grid fluid>
-        <Row>
-          <Col lg={2} md={2}>
-            <Selector
-              label={modelSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'model_id')}
-              items={modOptions}
-              value={this.state.model_id}
-            />
-          </Col>
-          <Col lg={2} md={2}>
-            <Selector
-              label={emissionScenarioSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'experiment')}
-              items={expOptions}
-              value={this.state.experiment}
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <VariableDescriptionSelector
-              label={variableSelectorLabel}
-              onChange={this.handleSetVariable.bind(this, 'variable')}
-              meta={this.state.meta}
-              constraints={{ model_id: this.state.model_id }}
-              value={_.pick(this.state, 'variable_id', 'variable_name')}
-            />
-          </Col>
-        </Row>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>{mevPanelLabel}</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            <Row>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={modelSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'model_id')}
+                  items={modOptions}
+                  value={this.state.model_id}
+                />
+              </Col>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={emissionScenarioSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'experiment')}
+                  items={expOptions}
+                  value={this.state.experiment}
+                />
+              </Col>
+              <Col lg={4} md={4}>
+                <VariableDescriptionSelector
+                  label={variableSelectorLabel}
+                  onChange={this.handleSetVariable.bind(this, 'variable')}
+                  meta={this.state.meta}
+                  constraints={{ model_id: this.state.model_id }}
+                  value={_.pick(this.state, 'variable_id', 'variable_name')}
+                />
+              </Col>
+            </Row>
+          </Panel.Body>
+        </Panel>
         <Row>
           <Col lg={6}>
             <SingleMapController
