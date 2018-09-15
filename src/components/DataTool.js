@@ -10,13 +10,13 @@ const navSpec = {
   basePath: '/data',
   items: [
     {
-      label: 'Single dataset',
+      label: 'Single Variable',
       info: 'View a single climate variable from a selected GCM and emission scenario.',
       subpath: 'climo/ce_files',
       render: () => <SingleAppController/>,
     },
     {
-      label: 'Compare datasets',
+      label: 'Compare Variables',
       info: 'Simulataneously view and compare two climate variables from a selected GCM and emission scenario.',
       subpath: 'compare/ce_files',
       render: () => <DualAppController/>,
