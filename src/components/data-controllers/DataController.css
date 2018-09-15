@@ -1,0 +1,12 @@
+.data_panel {
+    padding: 15px 5px;
+}
+
+.exportlabel {
+    display: block;
+}
+
+.graphlabel {
+    display: block;
+    text-align: center;
+}

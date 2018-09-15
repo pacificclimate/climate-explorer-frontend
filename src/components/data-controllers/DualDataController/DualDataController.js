@@ -44,7 +44,6 @@ import _ from 'underscore';
 
 import DataControllerMixin from '../../DataControllerMixin';
 
-import styles from './DualDataController.css';
 import { multiYearMeanSelected } from '../../graphs/graph-helpers';
 import DualAnnualCycleGraph from '../../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';
@@ -54,6 +53,9 @@ import {
   singleLtaTabLabel, timeSeriesTabLabel,
   variableResponseTabLabel, dualAnnualCycleTabLabel, graphsPanelLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
+
+import styles from '../DataController.css';
+
 
 export default createReactClass({
   displayName: 'DualDataController',
@@ -101,7 +103,7 @@ export default createReactClass({
               {graphsPanelLabel}
             </Panel.Title>
           </Panel.Heading>
-          <Panel.Body>
+          <Panel.Body className={styles.data_panel}>
             {
               multiYearMeanSelected(this.props) ? (
 
