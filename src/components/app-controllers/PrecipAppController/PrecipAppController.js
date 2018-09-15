@@ -25,7 +25,7 @@ import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
   modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
-} from '../../guidance-content/info/LabelWithInfoItems';
+} from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';

@@ -44,7 +44,7 @@ import { hasValidData, currentDataSpec,
          selectRasterPalette, getTimeParametersPromise} from '../map-helpers.js';
 
 import styles from '../MapController.css';
-import {mapPanelLabel} from "../../guidance-content/info/LabelWithInfoItems";
+import {mapPanelLabel} from "../../guidance-content/info/InformationItems";
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125

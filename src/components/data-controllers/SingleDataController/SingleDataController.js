@@ -54,7 +54,7 @@ import {
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel, exportStatsTableDataLabel, statsTableLabel,
   graphsPanelLabel, downloadGraphDataLabel, xslxButtonLabel, csvButtonLabel,
-} from '../../guidance-content/info/LabelWithInfoItems';
+} from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
 

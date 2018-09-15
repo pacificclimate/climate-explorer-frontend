@@ -44,7 +44,7 @@ import {
   graphsPanelLabel,
   exportStatsTableDataLabel,
   statsTableLabel,
-} from '../../guidance-content/info/LabelWithInfoItems';
+} from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
 

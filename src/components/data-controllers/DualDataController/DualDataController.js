@@ -52,7 +52,7 @@ import DualVariableResponseGraph from '../../graphs/DualVariableResponseGraph';
 import {
   singleLtaTabLabel, timeSeriesTabLabel,
   variableResponseTabLabel, dualAnnualCycleTabLabel, graphsPanelLabel,
-} from '../../guidance-content/info/LabelWithInfoItems';
+} from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
 
