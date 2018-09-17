@@ -78,7 +78,7 @@ export default function AnomalyAnnualCycleGraph(props) {
     // Select the lowest starting year as the base series for the anomaly graph
     let seriesNames = _.without(graph.data.columns.map(series => _.first(series)), 'x');
     seriesNames.sort();
-    graph = makeAnomalyGraph(seriesNames[0], graph);
+    graph = makeAnomalyGraph(seriesNames[0], props.variable_id, graph);
     return graph;
   }
 

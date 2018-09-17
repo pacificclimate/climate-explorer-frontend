@@ -17,6 +17,12 @@
  *  - a SingleContextGraph similar to the Long Term Average graph, but with
  *    a separate line for each model and simplified presentation.
  *
+ *  - an AnomalyAnnualCycleGraph displaying future data as delta from a
+ *    "baseline" climatology (usually 1981 - 2010)
+ *
+ *  - a SingleTimeSliceGraph, which compares all available models
+ *    at a single timestamp.
+ *
  * If the selected dataset is not a multi year mean:
  *  - a freeform SingleTimeSeriesGraph showing each time point available.
  *
