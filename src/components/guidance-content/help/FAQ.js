@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Row } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import Accordion from '../../guidance-tools/Accordion';
-import { contactEmail } from '../info/InformationItems';
+import { appContact } from '../info/InformationItems';
 
 
 const faqs = [
@@ -63,12 +63,12 @@ export default function FAQ() {
       <Row>
         <HalfWidthCol>
           <p>
-            The content of our FAQ is driven by our users needs and questions.
+            The content of our FAQ is driven by our users' needs and questions.
           </p>
           <p>
             At present, we have no questions or answers here, because we don't
             yet know what you, our user, needs to know.
-            Please <a href={contactEmail}>email us</a> with questions you
+            Please <a href={appContact.email}>email us</a> with questions you
             would like to see in the FAQ.
           </p>
           <p>
