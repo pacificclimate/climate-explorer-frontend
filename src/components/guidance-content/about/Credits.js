@@ -1,12 +1,18 @@
 import React from 'react';
-import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
 export default function Credits() {
   return (
     <Grid fluid>
-      <h1>Credits and Acknowledgements</h1>
       <Row>
-        <Col lg={6}>
+        <FullWidthCol>
+          <h1>Credits and Acknowledgements</h1>
+        </FullWidthCol>
+      </Row>
+
+      <Row>
+        <HalfWidthCol>
           <h2>Sponsors</h2>
           <ListGroup>
             <ListGroupItem
@@ -26,9 +32,9 @@ export default function Credits() {
               Use of MRF marmot graphic by kind permission.
             </ListGroupItem>
           </ListGroup>
-        </Col>
+        </HalfWidthCol>
 
-        <Col lg={6}>
+        <HalfWidthCol>
           <h2>Data</h2>
           <ListGroup>
 
@@ -70,7 +76,7 @@ export default function Credits() {
             </ListGroupItem>
 
           </ListGroup>
-        </Col>
+        </HalfWidthCol>
       </Row>
 
     </Grid>

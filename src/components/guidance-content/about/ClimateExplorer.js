@@ -1,19 +1,18 @@
 import React from 'react';
-import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
 export default function ClimateExplorer() {
   return (
     <Grid fluid>
       <Row>
-        <Col lg={12}>
+        <FullWidthCol>
           <h1>Climate Explorer</h1>
-        </Col>
+        </FullWidthCol>
       </Row>
 
-
       <Row>
-        <Col lg={6}>
-
+        <HalfWidthCol>
           <ListGroup>
             <ListGroupItem header='Description'>
               <p>
@@ -73,7 +72,7 @@ export default function ClimateExplorer() {
               </p>
             </ListGroupItem>
           </ListGroup>
-        </Col>
+        </HalfWidthCol>
       </Row>
     </Grid>
   );
