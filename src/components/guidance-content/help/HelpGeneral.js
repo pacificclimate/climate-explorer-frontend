@@ -1,11 +1,21 @@
 import React from 'react';
-import { Grid } from 'react-bootstrap';
+import { Grid, Row } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
 export default function HelpGeneral() {
   return (
     <Grid fluid>
-      <h1>Help: General</h1>
-      <p>Content TBD</p>
+      <Row>
+        <FullWidthCol>
+          <h1>Help: General</h1>
+        </FullWidthCol>
+      </Row>
+
+      <Row>
+        <HalfWidthCol>
+          <p>Content TBD</p>
+        </HalfWidthCol>
+      </Row>
     </Grid>
   );
 }

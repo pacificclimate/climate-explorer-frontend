@@ -1,5 +1,6 @@
 import React from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import Accordion from '../../guidance-tools/Accordion';
 import { contactEmail } from '../info/InformationItems';
 
@@ -54,13 +55,13 @@ export default function FAQ() {
   return (
     <Grid fluid>
       <Row>
-        <Col lg={12}>
+        <FullWidthCol>
           <h1>Frequently Asked Questions</h1>
-        </Col>
+        </FullWidthCol>
       </Row>
 
       <Row>
-        <Col lg={6}>
+        <HalfWidthCol>
           <p>
             The content of our FAQ is driven by our users needs and questions.
           </p>
@@ -73,20 +74,21 @@ export default function FAQ() {
           <p>
             In the meantime, we offer the following pearls of wisdom.
           </p>
-        </Col>
+        </HalfWidthCol>
       </Row>
 
       <Row>
-        <Col lg={6}>
+        <HalfWidthCol>
           <Accordion>
             {firstItems}
           </Accordion>
-        </Col>
-        <Col lg={6}>
+        </HalfWidthCol>
+
+        <HalfWidthCol>
           <Accordion>
             {secondItems}
           </Accordion>
-        </Col>
+        </HalfWidthCol>
       </Row>
     </Grid>
   );

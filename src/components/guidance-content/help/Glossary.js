@@ -1,5 +1,6 @@
 import React from 'react';
-import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
 import _ from 'underscore';
 
@@ -36,18 +37,23 @@ const secondItems = items.slice(half);
 export default function HelpGeneral() {
   return (
     <Grid fluid>
-      <h1>Glossary</h1>
       <Row>
-        <Col lg={6}>
+        <FullWidthCol>
+          <h1>Glossary</h1>
+        </FullWidthCol>
+      </Row>
+
+      <Row>
+        <HalfWidthCol>
           <ListGroup>
             {firstItems}
           </ListGroup>
-        </Col>
-        <Col lg={6}>
+        </HalfWidthCol>
+        <HalfWidthCol>
           <ListGroup>
             {secondItems}
           </ListGroup>
-        </Col>
+        </HalfWidthCol>
       </Row>
     </Grid>
   );

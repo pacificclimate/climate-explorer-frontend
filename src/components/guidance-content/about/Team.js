@@ -1,12 +1,18 @@
 import React from 'react';
-import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
 export default function Team() {
   return (
     <Grid fluid>
-      <h1>Team</h1>
       <Row>
-        <Col lg={6}>
+        <FullWidthCol>
+          <h1>Team</h1>
+        </FullWidthCol>
+      </Row>
+
+      <Row>
+        <HalfWidthCol>
           <ListGroup>
             <ListGroupItem
               header='James Hiebert'
@@ -18,7 +24,6 @@ export default function Team() {
             </ListGroupItem>
             <ListGroupItem
               header='Lee Zeman'
-
               href='https://pacificclimate.org/about-pcic/people/lee-zeman'
             >
               Front-end engineer.
@@ -34,7 +39,7 @@ export default function Team() {
               Implementor of fearsome data preparation tools.
               Wrangler of metadata.
               React refactorer and perfectionist.
-              Database migrator and devotee of the alchemical arts.
+              Migrator of databases and devotee of the alchemical arts.
             </ListGroupItem>
             <ListGroupItem
               header='Matthew Benstead'
@@ -45,7 +50,7 @@ export default function Team() {
               Restorer of fallen-over servers and failing disk arrays.
             </ListGroupItem>
           </ListGroup>
-        </Col>
+        </HalfWidthCol>
       </Row>
     </Grid>
   );
