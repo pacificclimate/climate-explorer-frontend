@@ -21,9 +21,9 @@ export default function ClimateExplorer() {
                 for the B.C. - Yukon region.
               </p>
               <p>
-                Climate Explorer is also fondly known as "the Marmot,"
+                Climate Explorer is also fondly known as 'the Marmot,'
                 since it is an improvement (we sincerely hope) on its predecessor,
-                the Regional Analysis Tool, or "RAT." Hence our mascot in the
+                the Regional Analysis Tool, or 'RAT.' Hence our mascot in the
                 header.
               </p>
             </ListGroupItem>
@@ -47,12 +47,18 @@ export default function ClimateExplorer() {
               </p>
               <ul>
                 <li>
-                  <a href="../sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf" target="_blamk">
+                  <a
+                    href='https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf'
+                    target='_blank'
+                  >
                     The Coupled Model Intercomparison Project
                   </a>
                 </li>
                 <li>
-                  <a href="/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf">
+                  <a 
+                    href='https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf'
+                    target='_blank'
+                  >
                     National Center for Atmospheric Research Earth System Grid
                   </a>
                 </li>
