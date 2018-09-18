@@ -8,6 +8,18 @@ import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
 
 ///////////////////////////////
+// Parts for building items
+///////////////////////////////
+
+
+///////////////////////////////
+// Contact info
+///////////////////////////////
+
+export const contactEmail = 'mailto:rglover@uvic.ca';
+
+
+///////////////////////////////
 // MEV selectors (Model, Emission, Variable)
 ///////////////////////////////
 
