@@ -16,7 +16,10 @@ import Information from '../../guidance-tools/Information';
 // Contact info
 ///////////////////////////////
 
-export const contactEmail = 'mailto:rglover@uvic.ca';
+export const appContact = {
+  email: 'mailto:rglover@uvic.ca',
+  name: 'Rod Glover',
+};
 
 
 ///////////////////////////////
