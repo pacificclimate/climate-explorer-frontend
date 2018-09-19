@@ -26,8 +26,8 @@ export const appContact = {
 // MEV selectors (Model, Emission, Variable)
 ///////////////////////////////
 
-export const mevPanelLabel = (
-  <LabelWithInfo label='Select Datasets'>
+export const datasetFilterPanelLabel = (
+  <LabelWithInfo label='Dataset Filter'>
     <p>
       This is the primary filter for the datasets to be displayed.
     </p>

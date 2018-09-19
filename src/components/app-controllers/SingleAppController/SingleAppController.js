@@ -20,7 +20,7 @@ import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
   modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
-  mevPanelLabel,
+  datasetFilterPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -62,7 +62,7 @@ export default createReactClass({
       <Grid fluid>
         <Panel>
           <Panel.Heading>
-            <Panel.Title>{mevPanelLabel}</Panel.Title>
+            <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
             <Row>
