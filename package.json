@@ -23,6 +23,7 @@
     "config file variable-options.yaml created by prestart if not present"
   ],
   "jest": {
+    "testURL": "http://localhost",
     "rootDir": "./src",
     "scriptPreprocessor": "../preprocessor.js",
     "globals": {
