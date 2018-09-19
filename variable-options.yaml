@@ -34,3 +34,56 @@ pr:
   #decimalPrecision: 0
   #Note: in an ideal universe, pr would be measured in millimeters with 0
   #decimal places, but right now our pr data is in kg m-2 d-1 instead.
+
+
+#Decimal places are unhelpful for climdex values measured in days; a 
+#100.56 day growing season isn't a useful level of precision. Round
+#all day based climdex values except tropical nights to a whole number
+#of days.
+altcddETCCDI:
+  decimalPrecision: 0
+
+altcsdiETCCDI:
+  decimalPrecision: 0
+
+altcwdETCCDI:
+  decimalPrecision: 0
+
+altwsdiETCCDI:
+  decimalPrecision: 0
+
+cddETCCDI:
+  decimalPrecision: 0
+
+csdiETCCDI:
+  decimalPrecision: 0
+
+cwdETCCDI:
+  decimalPrecision: 0
+
+fdETCCDI:
+  decimalPrecision: 0
+
+gslETCCDI:
+  decimalPrecision: 0
+
+idETCCDI:
+  decimalPrecision: 0
+
+r1mmETCCDI:
+  decimalPrecision: 0
+
+r10mmETCCDI:
+  decimalPrecision: 0
+
+r20mmETCCDI:
+  decimalPrecision: 0
+
+suETCCDI:
+  decimalPrecision: 0
+
+trETCCDI:
+  decimalPrecision: 1
+
+wsdiETCCDI:
+  decimalPrecision: 0
