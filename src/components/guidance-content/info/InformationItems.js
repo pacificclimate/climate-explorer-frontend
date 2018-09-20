@@ -23,7 +23,7 @@ export const appContact = {
 
 
 ///////////////////////////////
-// MEV selectors (Model, Emission, Variable)
+// Dataset filters (Model, Emission, Variable)
 ///////////////////////////////
 
 export const datasetFilterPanelLabel = (
@@ -120,6 +120,27 @@ export const variable2SelectorLabel = (
   <LabelWithInfo label='Variable 2 (Isolines)'>
     <p>Second or 'secondary' variable to view.</p>
     <p>{isolinesVariable}</p>
+  </LabelWithInfo>
+);
+
+///////////////////////////////
+// Dataset summary
+///////////////////////////////
+
+export const filteredDatasetSummaryPanelLabel = (
+  <LabelWithInfo label='Filtered Dataset Summary'>
+    <p>Summary listing of all datasets selected by dataset filter criteria.</p>
+    <p>
+      Each row of the table represents a group of up to 3 datasets.
+      We group datasets by Model Run, Start Date and End Date,
+      and each such group is labelled accordingly as shown in the
+      "Label in selectors" column.
+    </p>
+    <p>
+      The "Yearly", "Seasonal", and "Monthly" columns indicate whether a
+      dataset with that timescale (averaging period) is available in the
+      group.
+    </p>
   </LabelWithInfo>
 );
 
