@@ -3,13 +3,43 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Button, Glyphicon, Table } from 'react-bootstrap';
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
-import { Glyphicon, Table } from 'react-bootstrap';
-import Information from '../../guidance-tools/Information/Information';
+import Information from '../../guidance-tools/Information';
+import css from './InformationItems.css';
 
 ///////////////////////////////
-// Selectors
+// Parts for building items
 ///////////////////////////////
+
+
+///////////////////////////////
+// Contact info
+///////////////////////////////
+
+export const appContact = {
+  email: 'mailto:rglover@uvic.ca',
+  name: 'Rod Glover',
+};
+
+
+///////////////////////////////
+// Dataset filters (Model, Emission, Variable)
+///////////////////////////////
+
+export const datasetFilterPanelLabel = (
+  <LabelWithInfo label='Dataset Filter'>
+    <p>
+      This is the primary filter for the datasets to be displayed.
+    </p>
+    <p>
+      Datasets matching these filter criteria can be displayed in the
+      map, on graphs, and in a statistical summary table.
+      Within each such presentation of data, you can independently select
+      which of the matching datasets to display.
+    </p>
+  </LabelWithInfo>
+);
 
 export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
@@ -63,12 +93,6 @@ export const emissionScenarioSelectorLabel = (
   </LabelWithInfo>
 );
 
-const downloadFormats = `
-  Data may be downloaded in Microsoft Excel compatible format (XSLX)
-  or in Comma Separated Values (CSV) format.
-  For details on these formats, see <Link to='/help/general'>Help</Link>.
-`;
-
 export const downloadDataLabel = (
   <LabelWithInfo label='Download Data'>
     <p>
@@ -114,6 +138,30 @@ export const variable2SelectorLabel = (
   </LabelWithInfo>
 );
 
+///////////////////////////////
+// Dataset summary
+///////////////////////////////
+
+export const filteredDatasetSummaryPanelLabel = (
+  <LabelWithInfo label='Filtered Dataset Summary'>
+    <p>Summary listing of all datasets selected by dataset filter criteria.</p>
+    <p>
+      Each row of the table represents a group of up to 3 datasets.
+      We group datasets by Model Run, Start Date and End Date,
+      and each such group is labelled accordingly as shown in the
+      "Label in selectors" column.
+    </p>
+    <p>
+      The "Yearly", "Seasonal", and "Monthly" columns indicate whether a
+      dataset with that timescale (averaging period) is available in the
+      group.
+    </p>
+  </LabelWithInfo>
+);
+
+///////////////////////////////
+// Dataset selectors
+///////////////////////////////
 
 export const datasetSelectorLabel = (
   <LabelWithInfo label='Dataset'>
@@ -126,8 +174,7 @@ export const datasetSelectorLabel = (
       That is, they may be displaying different datasets simultaneously.
     </p>
     <p>
-      On the map, use Map Settings <Glyphicon glyph='menu-hamburger'/>
-      button to access the Dataset selector.
+      On the map, use the {mapSettingsControl} button to access the Dataset selector.
       The selected dataset is shown in the legend in the lower left of the map.
     </p>
     <p>
@@ -150,15 +197,178 @@ export const timeOfYearSelectorLabel = (
   </LabelWithInfo>
 );
 
-// export const template = (
-//   <LabelWithInfo label=''>
-//      <p>
-//      </p>
-//   </LabelWithInfo>
-// );
+///////////////////////////////
+// Export/download controls
+///////////////////////////////
+
+const downloadFormats = (<span>
+  Data may be downloaded in Microsoft Excel compatible format (XSLX)
+  or in Comma Separated Values (CSV) format.
+  For details on these formats, see <Link to='/help/general'>Help</Link>.
+</span>);
+
+const exportDataLabel = 'Export Data';
+
+export const downloadGraphDataLabel = (
+  <LabelWithInfo label={exportDataLabel}>
+    <p>
+      Click a button to download the selected data to your computer.
+    </p>
+    <p>
+      The data downloaded is that shown on the graph.
+      For details on the layout and content of the exported data,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
+    <p>{downloadFormats}</p>
+  </LabelWithInfo>
+);
+
+export const xslxButtonLabel = 'XSLX';
+export const csvButtonLabel = 'CSV';
+
 
 ///////////////////////////////
-// Graph tabs
+// Map
+///////////////////////////////
+
+const LeafletControlContainer = ({ children }) => (
+  <span className='leaflet-touch'>
+      <span className='leaflet-control-container'>
+        {children}
+      </span>
+    </span>
+);
+
+const mapSettingsControl = (
+  <span>
+    <Button bsSize='small'><Glyphicon glyph='menu-hamburger'/></Button> {' '}
+    (Map Settings)
+  </span>
+);
+
+const mapZoomControls = (
+  <span>
+    <LeafletControlContainer>
+        <span className='leaflet-control-zoom leaflet-bar leaflet-control'>
+          <a className='leaflet-control-zoom-in' href='#'>+</a>
+          <a className='leaflet-control-zoom-out' href='#'>-</a>
+        </span>
+    </LeafletControlContainer>
+    {' '}
+    (Zoom In/Out)
+  </span>
+);
+
+const mapPolygonDrawControls = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-draw-polygon' href='#' title='Draw a polygon'>
+              <span className='sr-only'>Draw a polygon</span>
+            </a>
+            <a className='leaflet-draw-draw-rectangle' href='#' title='Draw a rectangle'>
+              <span className='sr-only'>Draw a rectangle</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Draw Polygon/Rectangle)
+  </span>
+);
+
+const mapPolygonEditControls = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-edit-edit' href='#' title='Edit layers'>
+              <span className='sr-only'>Edit layers</span>
+            </a>
+            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+              <span className='sr-only'>Delete layers</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Edit/Delete Polygon)
+  </span>
+);
+
+const mapPolygonImportExportControls = (
+  <span>
+    <Button bsSize='small'><Glyphicon glyph='open-file'/></Button> {' '}
+    <Button bsSize='small'><Glyphicon glyph='save-file'/></Button> {' '}
+    (Polygon Import/Export)
+  </span>
+);
+
+const mapColourScaleControls = (
+  <span>
+    (Colour Scale Bar)
+  </span>
+);
+
+const mapAutoScaleControl = (
+  <span>
+    <Button bsSize='small'>
+      <span style={{ fontWeight: 'bold' }}>AS</span>
+    </Button> {' '}
+    (Auto-Scale)
+  </span>
+);
+
+export const mapPanelLabel = (
+  <LabelWithInfo label='Data Map'>
+     <p>
+       Map displaying data selected by
+       Model, Emission Scenario, and Variable(s).
+     </p>
+    <p>
+      Summary of map tools and other controls.
+      For details, see <Link to='/help/general'>Help</Link>.
+    </p>
+    <ul className={css.controlsList}>
+      <li>
+        {mapZoomControls}: Zoom map in and out.
+      </li>
+      <li>
+        {mapPolygonDrawControls}: Draw polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapPolygonEditControls}: Edit and delete polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapPolygonImportExportControls}: Import and export polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapSettingsControl}: Select which dataset(s) are displayed and how.
+      </li>
+      <li>
+        {mapColourScaleControls}: Displays data value ⇄ colour mapping.
+      </li>
+      <li>
+        {mapAutoScaleControl}: Sets bounds of data value ⇄ colour mapping to
+        current range of data.
+      </li>
+    </ul>
+  </LabelWithInfo>
+);
+
+///////////////////////////////
+// Graphs
 ///////////////////////////////
 
 const annualCycleGraphDefn = `
@@ -181,6 +391,16 @@ const timeOfYearSelectorDefn = `
   Month, season, or annual average is selected by the Time of Year
   selector in the graph.
 `;
+
+export const graphsPanelLabel = (
+  <LabelWithInfo label='Data Graphs'>
+    <p>
+      Graphs showing various slices and views of the dataset(s)
+      selected by Model, Emission Scenario, and Variable(s).
+    </p>
+    <p>{spatialAveragingDefn}</p>
+  </LabelWithInfo>
+);
 
 export const singleAnnualCycleTabLabel = (
   <LabelWithInfo label='Annual Cycle'>
@@ -322,13 +542,18 @@ export const statsTableLabel = (
   </LabelWithInfo>
 );
 
-export const statsTableExportButtonsInfo = (
-  <Information>
+export const exportStatsTableDataLabel = (
+  <LabelWithInfo label={exportDataLabel}>
     <p>
       Click a button to export the contents of the statistical summary table.
     </p>
+    <p>
+      The data downloaded is that shown in the table.
+      For details on the layout and content of the exported data,
+      see <Link to='/help/general'>Help</Link>.
+    </p>
     <p>{downloadFormats}</p>
-  </Information>
+  </LabelWithInfo>
 );
 
 // export const infoTemplate = (
