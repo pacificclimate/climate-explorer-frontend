@@ -27,6 +27,7 @@ import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import DatasetsSummary from '../../data-presentation/DatasetsSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -103,6 +104,13 @@ export default createReactClass({
             </Panel>
           </FullWidthCol>
         </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
         <Row>
           <FullWidthCol>
             <DatasetsSummary
@@ -113,6 +121,16 @@ export default createReactClass({
             />
           </FullWidthCol>
         </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+        </Row>
+
         <Row>
           <HalfWidthCol>
             <SingleMapController
