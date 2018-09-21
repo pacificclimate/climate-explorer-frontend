@@ -35,6 +35,7 @@ import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import DatasetsSummary from '../../data-presentation/DatasetsSummary';
 
 import _ from 'underscore';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 export default createReactClass({
   displayName: 'DualAppController',
@@ -143,6 +144,13 @@ export default createReactClass({
             </Panel>
           </FullWidthCol>
         </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
         <Row>
           <FullWidthCol>
             <DatasetsSummary
@@ -156,6 +164,16 @@ export default createReactClass({
             />
           </FullWidthCol>
         </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+        </Row>
+
         <Row>
           <HalfWidthCol>
             <DualMapController

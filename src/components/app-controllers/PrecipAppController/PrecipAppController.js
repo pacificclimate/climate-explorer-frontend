@@ -36,6 +36,7 @@ import DatasetsSummary from '../../data-presentation/DatasetsSummary';
 
 
 import _ from 'underscore';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 export default createReactClass({
   displayName: 'PrecipAppController',
@@ -113,6 +114,13 @@ export default createReactClass({
             </Panel>
           </FullWidthCol>
         </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
         <Row>
           <FullWidthCol>
             <DatasetsSummary
@@ -125,6 +133,15 @@ export default createReactClass({
               dual
             />
           </FullWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
         </Row>
 
         <Row>
