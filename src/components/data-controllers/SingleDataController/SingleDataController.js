@@ -52,12 +52,13 @@ import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
   singleAnnualCycleTabLabel, futureAnomalyTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
-  timeSeriesTabLabel, exportStatsTableDataLabel, statsTableLabel,
-  graphsPanelLabel, xslxButtonLabel, csvButtonLabel,
+  timeSeriesTabLabel, statsTableLabel,
+  graphsPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
+import ExportButtons from '../../graphs/ExportButtons';
 
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -197,27 +198,46 @@ export default createReactClass({
               multiYearMeanSelected(this.props) ? (
 
                 <Tabs id='Graphs'>
-                  <Tab eventKey={1} title={singleAnnualCycleTabLabel}>
+                  <Tab
+                    eventKey={1} title={singleAnnualCycleTabLabel}
+                    className={styles.data_panel}
+                  >
                       <SingleAnnualCycleGraph {...this.props}/>
-                    </Tab>
-                    <Tab eventKey={2} title={singleLtaTabLabel}>
-                      <SingleLongTermAveragesGraph {...this.props}/>
-                    </Tab>
-                    <Tab eventKey={3} title={modelContextTabLabel}>
-                      <SingleContextGraph {...this.props}/>
-                    </Tab>
-                    <Tab eventKey={4} title={futureAnomalyTabLabel}>
-                      <AnomalyAnnualCycleGraph {...this.props} />
-                    </Tab>
-                    <Tab eventKey={5} title={snapshotTabLabel}>
-                      <SingleTimeSliceGraph {...this.props} />
-                    </Tab>
+                  </Tab>
+                  <Tab
+                    eventKey={2} title={singleLtaTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleLongTermAveragesGraph {...this.props}/>
+                  </Tab>
+                  <Tab
+                    eventKey={3} title={modelContextTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleContextGraph {...this.props}/>
+                  </Tab>
+                  <Tab
+                    eventKey={4} title={futureAnomalyTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <AnomalyAnnualCycleGraph {...this.props} />
+                  </Tab>
+                  <Tab
+                    eventKey={5} title={snapshotTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleTimeSliceGraph {...this.props} />
+                  </Tab>
                 </Tabs>
 
               ) : (
 
                 <Tabs id='Graphs'>
-                  <Tab eventKey={1} title={timeSeriesTabLabel}>
+                  <Tab
+                    eventKey={1}
+                    title={timeSeriesTabLabel}
+                    className={styles.data_panel}
+                  >
                     <SingleTimeSeriesGraph {...this.props}/>
                   </Tab>
                 </Tabs>
@@ -252,15 +272,10 @@ export default createReactClass({
                 />
               </Col>
               <Col lg={6} md={6} sm={6}>
-                <ControlLabel className={styles.exportlabel}>
-                  {exportStatsTableDataLabel}
-                </ControlLabel>
-                <Button onClick={this.exportDataTable.bind(this, 'xlsx')}>
-                  {xslxButtonLabel}
-                </Button>
-                <Button onClick={this.exportDataTable.bind(this, 'csv')}>
-                  {csvButtonLabel}
-                  </Button>
+                <ExportButtons
+                  onExportXlsx={this.exportDataTable.bind(this, 'xlsx')}
+                  onExportCsv={this.exportDataTable.bind(this, 'csv')}
+                />
               </Col>
             </Row>
             <DataTable data={statsData} options={this.state.statsTableOptions}/>
