@@ -8,6 +8,7 @@ import { filteredDatasetSummaryPanelLabel } from '../../guidance-content/info/In
 import FlowArrow from '../FlowArrow';
 
 import _ from 'underscore';
+import { HalfWidthCol } from '../../layout/rb-derived-components';
 
 
 export default class DatasetsSummary extends React.Component {
@@ -116,8 +117,6 @@ export default class DatasetsSummary extends React.Component {
       </BootstrapTable>
     );
 
-    const colWidth = this.props.dual ? 6 : 12;
-
     return (
       <Accordion>
         {
@@ -152,22 +151,25 @@ export default class DatasetsSummary extends React.Component {
           }
         >
           <Row>
-            <Col lg={colWidth}>
-              <p>
-                Variable 1 ({this.props.variable_id}){': '}
-                {this.props.meta.length} datasets
-              </p>
+            <HalfWidthCol>
+              {
+                this.props.dual &&
+                <p>
+                  Variable 1 ({this.props.variable_id}){': '}
+                  {this.props.meta.length} datasets
+                </p>
+              }
               <DataTable data={dataForTable}/>
-            </Col>
+            </HalfWidthCol>
             {
               this.props.dual &&
-              <Col lg={12 - colWidth}>
+              <HalfWidthCol>
                 <p>
                   Variable 2 ({this.props.comparand_id}){': '}
                   {this.props.comparandMeta.length} datasets
                 </p>
                 <DataTable data={comparandDataForTable}/>
-              </Col>
+              </HalfWidthCol>
             }
           </Row>
         </Accordion.Item>
