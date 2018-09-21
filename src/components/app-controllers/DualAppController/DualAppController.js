@@ -168,6 +168,7 @@ export default createReactClass({
               comparandMeta={filteredComparandMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
+              flowArrow='top'
             />
           </HalfWidthCol>
           <HalfWidthCol>
@@ -182,6 +183,7 @@ export default createReactClass({
               comparandMeta={
                 this.state.comparand_id ? filteredComparandMeta : filteredMeta
               }
+              flowArrow='top'
             />
           </HalfWidthCol>
         </Row>

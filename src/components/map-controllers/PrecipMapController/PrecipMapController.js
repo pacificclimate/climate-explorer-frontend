@@ -46,6 +46,7 @@ import { hasValidData, currentDataSpec,
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
 import { DualMEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -57,7 +58,13 @@ export default class PrecipMapController extends React.Component {
     comparandMeta: PropTypes.array,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    flowArrow: PropTypes.oneOf('none top bottom'.split()).isRequired,
   };
+
+  static defaultProps = {
+    flowArrow: 'none',
+  };
+
 
   constructor(props) {
     super(props);
@@ -229,6 +236,10 @@ export default class PrecipMapController extends React.Component {
   render() {
     return (
       <Panel>
+        {
+          this.props.flowArrow === 'top' &&
+          <FlowArrow position={this.props.flowArrow}/>
+        }
         <Panel.Heading>
           <Panel.Title>
             <Row>

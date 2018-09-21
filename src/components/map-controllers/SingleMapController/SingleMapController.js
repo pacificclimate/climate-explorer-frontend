@@ -40,6 +40,7 @@ import { hasValidData, selectRasterPalette,
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
 import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -49,6 +50,11 @@ export default class SingleMapController extends React.Component {
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    flowArrow: PropTypes.oneOf('none top bottom'.split()).isRequired,
+  };
+
+  static defaultProps = {
+    flowArrow: 'none',
   };
 
   constructor(props) {
@@ -67,7 +73,7 @@ export default class SingleMapController extends React.Component {
         palette: 'x-Occam',
         logscale: 'false',
         range: {},
-      }
+      },
     };
   }
 
@@ -208,9 +214,12 @@ export default class SingleMapController extends React.Component {
   }
 
   render() {
-    console.log('SingleMapController.props.meta', this.props.meta)
     return (
       <Panel>
+        {
+          this.props.flowArrow === 'top' &&
+          <FlowArrow position={this.props.flowArrow}/>
+        }
         <Panel.Heading>
           <Panel.Title>
             <Row>

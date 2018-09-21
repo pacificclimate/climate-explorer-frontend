@@ -58,6 +58,7 @@ import {
 
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -73,7 +74,13 @@ export default createReactClass({
     meta: PropTypes.array,
     contextMeta: PropTypes.array,
     ensemble_name: PropTypes.string,
+    flowArrow: PropTypes.oneOf('none top bottom'.split()).isRequired,
   },
+
+  defaultProps: {
+    flowArrow: 'none',
+  },
+
 
   mixins: [DataControllerMixin],
 
@@ -178,6 +185,10 @@ export default createReactClass({
     return (
       <div>
         <Panel>
+          {
+            this.props.flowArrow === 'top' &&
+            <FlowArrow position={this.props.flowArrow}/>
+          }
           <Panel.Heading>
             <Panel.Title>
               <Row>
