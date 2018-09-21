@@ -45,7 +45,7 @@ import { hasValidData, currentDataSpec,
 
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
+import { DualMEVSummary } from '../../data-presentation/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125

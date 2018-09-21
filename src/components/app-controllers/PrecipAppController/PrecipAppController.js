@@ -32,7 +32,7 @@ import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
 import _ from 'underscore';
-import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
+import { DualMEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
 
 export default createReactClass({
   displayName: 'PrecipAppController',

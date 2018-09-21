@@ -56,7 +56,7 @@ import {
 } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
-import { DualMEVSummary } from '../../MEVSummary/MEVSummary';
+import { MEVSummary } from '../../data-presentation/MEVSummary';
 
 
 export default createReactClass({
@@ -107,8 +107,8 @@ export default createReactClass({
                   {graphsPanelLabel}
                 </Col>
                 <Col lg={8}>
-                  <DualMEVSummary
-                    className={styles.mevSummary} {...this.props}
+                  <MEVSummary
+                    className={styles.mevSummary} {...this.props} dual
                   />
                 </Col>
               </Row>
