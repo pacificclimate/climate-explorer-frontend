@@ -1,26 +1,25 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row } from 'react-bootstrap';
-import { FullWidthCol } from '../../layout/rb-derived-components';
 import classnames from 'classnames';
 
 import css from './FlowArrow.css';
 
 
-const FlowArrow = ({ position }) => (
-  <Row className={classnames(css.flowArrow, css[position])}>
-    <FullWidthCol className='text-center'>
+const FlowArrow = ({ pullUp }) => (
+  <div className={classnames(
+      css.flowArrow, { [css.pullUp]: pullUp }, 'text-center'
+    )}
+  >
       <span className={css.icon}>{'⇣'}</span>
-    </FullWidthCol>
-  </Row>
+  </div>
 );
 
 FlowArrow.propTypes = {
-  position: PropTypes.oneOf('top bottom'.split()).isRequired,
+  pullUp: PropTypes.bool.isRequired,
 };
 
 FlowArrow.defaultProps = {
-  position: 'none',
+  pullUp: false,
 };
 
 export default FlowArrow;
