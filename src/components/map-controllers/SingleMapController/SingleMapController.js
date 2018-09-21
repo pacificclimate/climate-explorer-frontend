@@ -39,7 +39,7 @@ import { hasValidData, selectRasterPalette,
 
 import styles from '../MapController.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { SingleMEVSummary } from '../../MEVSummary/MEVSummary';
+import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -208,6 +208,7 @@ export default class SingleMapController extends React.Component {
   }
 
   render() {
+    console.log('SingleMapController.props.meta', this.props.meta)
     return (
       <Panel>
         <Panel.Heading>
@@ -217,7 +218,7 @@ export default class SingleMapController extends React.Component {
                 {mapPanelLabel}
               </Col>
               <Col lg={10}>
-                <SingleMEVSummary
+                <MEVSummary
                   className={styles.mevSummary} {...this.props}
                 />
                 {': '}
