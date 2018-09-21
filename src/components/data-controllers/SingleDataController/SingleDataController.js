@@ -176,6 +176,37 @@ export default createReactClass({
       this.state.dataTableTimeOfYear
     );
 
+    // Spec for generating tabs containing various graphs.
+    // Property names indicate whether the dataset is a multi-year mean or not.
+    const graphTabsSpec = {
+      mym: [
+        { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
+        { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
+        { title: modelContextTabLabel, graph: SingleContextGraph },
+        { title: futureAnomalyTabLabel, graph: AnomalyAnnualCycleGraph },
+        { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
+      ],
+      notMym: [
+        { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
+      ],
+    };
+
+    // Convert graph tabs spec to list of tabs.
+    const graphTabs =
+      graphTabsSpec[multiYearMeanSelected(this.props) ? 'mym' : 'notMym'].map(
+        (spec, i) => {
+          const Graph = spec.graph;
+          return (
+            <Tab
+              eventKey={i} title={spec.title}
+              className={styles.data_panel}
+            >
+              <Graph {...this.props}/>
+            </Tab>
+          );
+        }
+    );
+
     return (
       <div>
         <Panel>
@@ -194,56 +225,9 @@ export default createReactClass({
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
-            {
-              multiYearMeanSelected(this.props) ? (
-
-                <Tabs id='Graphs'>
-                  <Tab
-                    eventKey={1} title={singleAnnualCycleTabLabel}
-                    className={styles.data_panel}
-                  >
-                      <SingleAnnualCycleGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={2} title={singleLtaTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleLongTermAveragesGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={3} title={modelContextTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleContextGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={4} title={futureAnomalyTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <AnomalyAnnualCycleGraph {...this.props} />
-                  </Tab>
-                  <Tab
-                    eventKey={5} title={snapshotTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleTimeSliceGraph {...this.props} />
-                  </Tab>
-                </Tabs>
-
-              ) : (
-
-                <Tabs id='Graphs'>
-                  <Tab
-                    eventKey={1}
-                    title={timeSeriesTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleTimeSeriesGraph {...this.props}/>
-                  </Tab>
-                </Tabs>
-
-              )
-            }
+             <Tabs id='Graphs'>
+               {graphTabs}
+             </Tabs>
           </Panel.Body>
         </Panel>
 
