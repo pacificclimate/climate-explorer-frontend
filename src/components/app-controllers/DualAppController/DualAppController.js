@@ -153,7 +153,6 @@ export default createReactClass({
               meta={filteredMeta}
               comparandMeta={filteredComparandMeta}
               dual
-              flowArrow='top'
             />
           </FullWidthCol>
         </Row>

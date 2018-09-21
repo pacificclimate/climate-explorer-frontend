@@ -5,7 +5,6 @@ import Accordion from '../../guidance-tools/Accordion';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { MEVSummary } from '../MEVSummary/MEVSummary';
 import { filteredDatasetSummaryPanelLabel } from '../../guidance-content/info/InformationItems';
-import FlowArrow from '../FlowArrow';
 
 import _ from 'underscore';
 import { HalfWidthCol } from '../../layout/rb-derived-components';
@@ -20,13 +19,11 @@ export default class DatasetsSummary extends React.Component {
     meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array.isRequired,
     dual: PropTypes.bool.isRequired,
-    flowArrow: PropTypes.oneOf('none top bottom'.split()).isRequired,
   };
 
   static defaultProps = {
     dual: false,
     comparandMeta: null,
-    flowArrow: 'none',
   };
 
   render() {
@@ -119,10 +116,6 @@ export default class DatasetsSummary extends React.Component {
 
     return (
       <Accordion>
-        {
-          this.props.flowArrow === 'top' &&
-          <FlowArrow position={this.props.flowArrow}/>
-        }
         <Accordion.Item
           eventKey={2}
           title={
@@ -173,10 +166,6 @@ export default class DatasetsSummary extends React.Component {
             }
           </Row>
         </Accordion.Item>
-        {
-          this.props.flowArrow === 'bottom' &&
-          <FlowArrow position={this.props.flowArrow}/>
-        }
       </Accordion>
     );
   }

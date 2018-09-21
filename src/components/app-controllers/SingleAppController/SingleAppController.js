@@ -110,7 +110,6 @@ export default createReactClass({
               experiment={this.state.experiment}
               variable_id={this.state.variable_id}
               meta = {filteredMeta}
-              flowArrow='top'
             />
           </FullWidthCol>
         </Row>
