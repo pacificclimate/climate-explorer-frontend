@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Button, Glyphicon, Table } from 'react-bootstrap';
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
+import css from './InformationItems.css';
 
 ///////////////////////////////
 // Parts for building items
@@ -159,7 +160,7 @@ export const datasetSelectorLabel = (
       That is, they may be displaying different datasets simultaneously.
     </p>
     <p>
-      On the map, use the {mapSettingsButton} button to access the Dataset selector.
+      On the map, use the {mapSettingsControl} button to access the Dataset selector.
       The selected dataset is shown in the legend in the lower left of the map.
     </p>
     <p>
@@ -216,10 +217,96 @@ export const csvButtonLabel = 'CSV';
 // Map
 ///////////////////////////////
 
-const mapSettingsButton = (
+const LeafletControlContainer = ({ children }) => (
+  <span className='leaflet-touch'>
+      <span className='leaflet-control-container'>
+        {children}
+      </span>
+    </span>
+);
+
+const mapSettingsControl = (
   <span>
-    Map Settings
-    <Button bsSize='small'><Glyphicon glyph='menu-hamburger'/></Button>
+    <Button bsSize='small'><Glyphicon glyph='menu-hamburger'/></Button> {' '}
+    (Map Settings)
+  </span>
+);
+
+const mapZoomControls = (
+  <span>
+    <LeafletControlContainer>
+        <span className='leaflet-control-zoom leaflet-bar leaflet-control'>
+          <a className='leaflet-control-zoom-in' href='#'>+</a>
+          <a className='leaflet-control-zoom-out' href='#'>-</a>
+        </span>
+    </LeafletControlContainer>
+    {' '}
+    (Zoom In/Out)
+  </span>
+);
+
+const mapPolygonDrawControls = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-draw-polygon' href='#' title='Draw a polygon'>
+              <span className='sr-only'>Draw a polygon</span>
+            </a>
+            <a className='leaflet-draw-draw-rectangle' href='#' title='Draw a rectangle'>
+              <span className='sr-only'>Draw a rectangle</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Draw Polygon/Rectangle)
+  </span>
+);
+
+const mapPolygonEditControls = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-edit-edit' href='#' title='Edit layers'>
+              <span className='sr-only'>Edit layers</span>
+            </a>
+            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+              <span className='sr-only'>Delete layers</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Edit/Delete Polygon)
+  </span>
+);
+
+const mapPolygonImportExportControls = (
+  <span>
+    <Button bsSize='small'><Glyphicon glyph='open-file'/></Button> {' '}
+    <Button bsSize='small'><Glyphicon glyph='save-file'/></Button> {' '}
+    (Polygon Import/Export)
+  </span>
+);
+
+const mapColourScaleControls = (
+  <span>
+    (Colour Scale Bar)
+  </span>
+);
+
+const mapAutoScaleControl = (
+  <span>
+    <Button bsSize='small'>
+      <span style={{ fontWeight: 'bold' }}>AS</span>
+    </Button> {' '}
+    (Auto-Scale)
   </span>
 );
 
@@ -229,12 +316,40 @@ export const mapPanelLabel = (
        Map displaying data selected by
        Model, Emission Scenario, and Variable(s).
      </p>
-     <p>
-       The specific dataset displayed is selected in the Dataset selector
-       accessed through the {mapSettingsButton} button.
-       The selected dataset is shown in the legend in the lower left of the map.
-     </p>
-    <p><em>TBD: More about Map Settings and other controls.</em></p>
+    <p>
+      Summary of map tools and other controls.
+      For details, see <Link to='/help/general'>Help</Link>.
+    </p>
+    <ul className={css.controlsList}>
+      <li>
+        {mapZoomControls}: Zoom map in and out.
+      </li>
+      <li>
+        {mapPolygonDrawControls}: Draw polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapPolygonEditControls}: Edit and delete polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapPolygonImportExportControls}: Import and export polygons on the map.
+        Polygons determine the extents over which spatial data averaging is
+        performed.
+      </li>
+      <li>
+        {mapSettingsControl}: Select which dataset(s) are displayed and how.
+      </li>
+      <li>
+        {mapColourScaleControls}: Displays data value ⇄ colour mapping.
+      </li>
+      <li>
+        {mapAutoScaleControl}: Sets bounds of data value ⇄ colour mapping to
+        current range of data.
+      </li>
+    </ul>
   </LabelWithInfo>
 );
 
