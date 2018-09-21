@@ -139,7 +139,6 @@ export default createReactClass({
               comparandMeta = {filteredComparandMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
-              flowArrow='top'
             />
           </HalfWidthCol>
           <HalfWidthCol>
@@ -152,7 +151,6 @@ export default createReactClass({
               area={g.geojson(this.state.area).toWKT()}
               meta = {filteredMeta}
               comparandMeta = {filteredComparandMeta}
-              flowArrow='top'
             />
           </HalfWidthCol>
         </Row>

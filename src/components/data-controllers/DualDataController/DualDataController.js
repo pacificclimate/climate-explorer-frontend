@@ -56,7 +56,6 @@ import {
 
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
-import FlowArrow from '../../data-presentation/FlowArrow';
 
 
 export default createReactClass({
@@ -71,11 +70,6 @@ export default createReactClass({
     area: PropTypes.string,
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
-    flowArrow: PropTypes.oneOf('none top bottom'.split()).isRequired,
-  },
-
-  defaultProps: {
-    flowArrow: 'none',
   },
 
   mixins: [DataControllerMixin],
@@ -105,10 +99,6 @@ export default createReactClass({
     return (
       <div>
         <Panel>
-          {
-            this.props.flowArrow === 'top' &&
-            <FlowArrow position={this.props.flowArrow}/>
-          }
           <Panel.Heading>
             <Panel.Title>
               <Row>

@@ -123,7 +123,6 @@ export default createReactClass({
               meta = {filteredMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
-              flowArrow='top'
             />
           </HalfWidthCol>
           <HalfWidthCol>
@@ -136,7 +135,6 @@ export default createReactClass({
               area={g.geojson(this.state.area).toWKT()}
               meta = {filteredMeta}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
-              flowArrow='top'
             />
           </HalfWidthCol>
         </Row>
