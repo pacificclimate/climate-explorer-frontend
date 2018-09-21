@@ -31,8 +31,11 @@ import {
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
+import DatasetsSummary from '../../data-presentation/DatasetsSummary';
+
+
 import _ from 'underscore';
-import { DualMEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
 
 export default createReactClass({
   displayName: 'PrecipAppController',
@@ -63,68 +66,93 @@ export default createReactClass({
     const modOptions = this.getMetadataItems('model_id');
     const expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    
+
+    const filteredMeta = this.getFilteredMeta();
+
+    const comparand_id = 'pr';
+    const comparand_name = 'Precipitation';
+    const filteredComparandMeta = this.getFilteredMeta(comparand_id, comparand_name);
+
     return (
       <Grid fluid>
-        <Panel>
-          <Panel.Heading>
-            <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body>
-            <Row>
-              <Col lg={2} md={2}>
-                <Selector
-                  label={modelSelectorLabel}
-                  onChange={this.updateSelection.bind(this, 'model_id')}
-                  items={modOptions}
-                  value={this.state.model_id}
-                />
-              </Col>
-                <Col lg={2} md={2}>
-                <Selector
-                  label={emissionScenarioSelectorLabel}
-                  onChange={this.updateSelection.bind(this, 'experiment')}
-                  items={expOptions}
-                  value={this.state.experiment}
-                />
-              </Col>
-              <Col lg={4} md={4}>
-                <VariableDescriptionSelector
-                  label={variableSelectorLabel}
-                  onChange={this.handleSetVariable.bind(this, "variable")}
-                  meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
-                  constraints={_.pick(this.state, "model_id", "experiment")}
-                  value={_.pick(this.state, "variable_id", "variable_name")}
-                />
-              </Col>
-            </Row>
-          </Panel.Body>
-        </Panel>
         <Row>
-          <Col lg={6}>
+          <FullWidthCol>
+            <Panel>
+              <Panel.Heading>
+                <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <Row>
+                  <Col lg={2} md={2}>
+                    <Selector
+                      label={modelSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'model_id')}
+                      items={modOptions}
+                      value={this.state.model_id}
+                    />
+                  </Col>
+                    <Col lg={2} md={2}>
+                    <Selector
+                      label={emissionScenarioSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'experiment')}
+                      items={expOptions}
+                      value={this.state.experiment}
+                    />
+                  </Col>
+                  <Col lg={4} md={4}>
+                    <VariableDescriptionSelector
+                      label={variableSelectorLabel}
+                      onChange={this.handleSetVariable.bind(this, "variable")}
+                      meta={_.filter(this.state.meta, m=> {return m.variable_id != "pr"})}
+                      constraints={_.pick(this.state, "model_id", "experiment")}
+                      value={_.pick(this.state, "variable_id", "variable_name")}
+                    />
+                  </Col>
+                </Row>
+              </Panel.Body>
+            </Panel>
+          </FullWidthCol>
+        </Row>
+        <Row>
+          <FullWidthCol>
+            <DatasetsSummary
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              variable_id={this.state.variable_id}
+              comparand_id={comparand_id}
+              meta={filteredMeta}
+              comparandMeta={filteredComparandMeta}
+              dual
+              flowArrow='top'
+            />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
             <PrecipMapController
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
               experiment={this.state.experiment}
-              meta = {this.getFilteredMeta()}
-              comparand_id={"pr"}
-              comparandMeta = {this.getFilteredMeta("pr", "Precipitation")}
+              meta = {filteredMeta}
+              comparand_id={comparand_id}
+              comparandMeta = {filteredComparandMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
             />
-          </Col>
-          <Col lg={6}>
+          </HalfWidthCol>
+          <HalfWidthCol>
             <DualDataController
               ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
               variable_id={this.state.variable_id}
-              comparand_id='pr'
+              comparand_id={comparand_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getFilteredMeta()}
-              comparandMeta = {this.getFilteredMeta("pr")}
+              meta = {filteredMeta}
+              comparandMeta = {filteredComparandMeta}
             />
-          </Col>
+          </HalfWidthCol>
         </Row>
       </Grid>
 
