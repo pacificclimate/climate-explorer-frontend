@@ -147,7 +147,8 @@ export default function HelpGeneral() {
             datasets selected from the filtered collection. It shows a spatial
             slice of the data for a specific point in time.</p>
           <p>A single variable (or the primary variable in a comparison view)
-            is represented as a grid of coloured blocks overlaid on the base map.
+            is represented as a raster (a grid of coloured blocks)
+            overlaid on the base map.
             Colours encode the variable’s value.</p>
           <p>The secondary variable (in a comparison view) is represented as a
             set of isolines (contours of constant value) overlaid on the base
@@ -351,11 +352,12 @@ export default function HelpGeneral() {
               </li>
             </li>
           </ul>
-          <p>When only one variable is displayed on the map (as coloured
-            blocks), there is one colour scale reference.</p>
-          <p>When two variables are displayed on the map (coloured blocks and
+          <p>
+            When only one variable is displayed on the map (as a raster),
+            there is one colour scale reference.</p>
+          <p>When two variables are displayed on the map (raster and
             isolines), there are two colour scale references. The upper reference
-            is for isolines and the lower reference is for colour blocks.</p>
+            is for isolines and the lower reference is for raster.</p>
           <h2>Data available in Climate Explorer</h2>
           <h2>Meanings of variables</h2>
           

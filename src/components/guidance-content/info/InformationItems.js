@@ -94,7 +94,7 @@ export const emissionScenarioSelectorLabel = (
 );
 
 const colourBlocksVariable = `
-  This variable is represented in the map as a grid of coloured blocks
+  This variable is represented in the map as a raster (grid of coloured blocks)
   overlaid on the map.
 `;
 
@@ -111,7 +111,7 @@ export const variableSelectorLabel = (
 );
 
 export const variable1SelectorLabel = (
-  <LabelWithInfo label='Variable 1 (Colour blocks)'>
+  <LabelWithInfo label='Variable 1 (Raster)'>
     <p>First or 'primary' variable to view.</p>
     <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
