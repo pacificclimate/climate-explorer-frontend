@@ -134,15 +134,15 @@ export default function HelpGeneral() {
               eventKey={2}
             >
               <p>
-              Measures of weather extremes calculated from model output.
-              Climdex defines 27 <a href='https://www.climdex.org/indices.html'>climate extremes indices</a>,
-              encompassing extreme precipitation, extremes of temperature,
-              or lack thereof in different ways.
-              This is a heterogeneous dataset; a given extreme may be calculated
-              either as a monthly index averaged over thirty year periods
-              from 1960 to 2100, or an annual index calculated individually
-              for each year from 1950 to 2100.
-              This data is available for all of Canada.
+                Measures of weather extremes calculated from model output.
+                Climdex defines 27 <a href='https://www.climdex.org/indices.html'>climate extremes indices</a>,
+                encompassing extreme precipitation, extremes of temperature,
+                or lack thereof in different ways.
+                This is a heterogeneous dataset; a given extreme may be calculated
+                either as a monthly index averaged over thirty year periods
+                from 1960 to 2100, or an annual index calculated individually
+                for each year from 1950 to 2100.
+                This data is available for all of Canada.
               </p>
               <h5>Variable names and meanings</h5>
               <ListGroup>
@@ -169,7 +169,7 @@ export default function HelpGeneral() {
                   <p>
                     This is an alternative version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CSDI</em>.
                     It represents the full length of continuous cold spells
-                    that extend across the (artifical) December-January boundary 
+                    that extend across the (artifical) December-January boundary
                     of a calendar year.
                   </p>
                 </ListGroupItem>
@@ -765,16 +765,16 @@ export default function HelpGeneral() {
           <ListGroup>
             <ListGroupItem header='Model'>
               Which GCM produced the base data for the dataset.
-                (Almost all data available in Climate Explorer is further
-                processed
-                from this base data. Specifically, most of the data available
-                has
-                been downscaled from the relatively coarse global grid of the
-                GCM to
-                a finer grid suited to regional analysis. Other post-processing
-                includes forming long-term averages and forming derived
-                variables
-                such as climate indices.)
+              (Almost all data available in Climate Explorer is further
+              processed
+              from this base data. Specifically, most of the data available
+              has
+              been downscaled from the relatively coarse global grid of the
+              GCM to
+              a finer grid suited to regional analysis. Other post-processing
+              includes forming long-term averages and forming derived
+              variables
+              such as climate indices.)
             </ListGroupItem>
             <ListGroupItem header='Emissions Scenario'>
               Which scenario of climate-changing emissions (greenhouse gases,
@@ -782,8 +782,8 @@ export default function HelpGeneral() {
             </ListGroupItem>
             <ListGroupItem header='Variable(s)'>
               Which output variable(s) from the model runs
-                you are interested in. (For example: maximum temperature,
-                precipitation, number of frost-free days.)
+              you are interested in. (For example: maximum temperature,
+              precipitation, number of frost-free days.)
             </ListGroupItem>
           </ListGroup>
           <p>The result of data filtering is a collection of one or
