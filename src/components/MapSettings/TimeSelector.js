@@ -10,7 +10,7 @@ import _ from 'underscore';
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
 import NullTimeSelector from './NullTimeSelector';
 import Selector from '../Selector';
-import LabelWithInfo from '../guidance-tools/LabelWithInfo';
+import { TimeSelectorLabel } from '../guidance-content/info/InformationItems';
 
 export default class TimeSelector extends React.Component {
   static propTypes = {
@@ -50,11 +50,9 @@ export default class TimeSelector extends React.Component {
       return <NullTimeSelector/>;
     }
 
-    const label = (
-      <LabelWithInfo label={`${this.props.name} ${this.temporalLabelPart()}`}>
-        Explanation TBD
-      </LabelWithInfo>
-    );
+    const label =
+      <TimeSelectorLabel temporalLabelPart={this.temporalLabelPart()}/>
+    ;
 
     return (
         <Selector

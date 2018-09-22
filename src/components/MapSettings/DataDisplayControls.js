@@ -3,7 +3,7 @@ import React from 'react';
 
 import TimeSelector from './TimeSelector';
 import PaletteSelector from './PaletteSelector';
-import ScaleSelector from './ScaleSelector';
+import ColourMapTypeSelector from './ColourMapTypeSelector';
 
 
 export default class DataDisplayControls extends React.Component {
@@ -43,7 +43,7 @@ export default class DataDisplayControls extends React.Component {
           value={this.props.palette}
           onChange={this.props.onChangePalette}
         />
-        <ScaleSelector
+        <ColourMapTypeSelector
           name={this.props.name}
           variableId={this.props.variableId}
           layerMin={this.props.range.min}
