@@ -71,6 +71,8 @@ export default class MapSettingsDialog extends React.Component {
   };
 
   render() {
+    const rasterColLg = this.props.hasComparand ? 6 : 12;
+
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
 
@@ -89,8 +91,10 @@ export default class MapSettingsDialog extends React.Component {
                 />
               </Col>
             </Row>
+
             <Row>
-              <Col lg={this.props.hasComparand ? 6 : 12}>
+              <Col lg={rasterColLg}>
+                <h4>Raster</h4>
                 <DataDisplayControls
                   name='Raster'
                   {..._.omit(this.props.raster, 'onChangeTime')}
@@ -110,6 +114,7 @@ export default class MapSettingsDialog extends React.Component {
               {
                 this.props.hasComparand &&
                 <Col lg={5}>
+                  <h4>Isolines</h4>
                   <DataDisplayControls
                     name='Isoline'
                     timeLinked={this.state.linkTimes}

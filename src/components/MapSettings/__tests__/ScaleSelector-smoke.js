@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ScaleSelector from '../ScaleSelector';
+import ScaleSelector from '../ColourMapTypeSelector';
 import { noop } from 'underscore';
 
 it('renders without crashing', () => {

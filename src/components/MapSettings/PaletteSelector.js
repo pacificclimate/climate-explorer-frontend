@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Selector from '../Selector';
-import LabelWithInfo from '../guidance-tools/LabelWithInfo';
+import {
+  paletteSelectorLabel,
+} from '../guidance-content/info/InformationItems';
 
 
 export default class PaletteSelector extends React.Component {
@@ -30,15 +32,9 @@ export default class PaletteSelector extends React.Component {
   ];
 
   render() {
-    const label = (
-      <LabelWithInfo label={`${this.props.name} Palette`}>
-        Explanation TBD
-      </LabelWithInfo>
-    );
-
     return (
       <Selector
-        label={label}
+        label={paletteSelectorLabel}
         items={PaletteSelector.palettes}
         value={this.props.value}
         onChange={this.props.onChange}

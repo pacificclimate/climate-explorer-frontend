@@ -192,7 +192,7 @@ export const timeOfYearSelectorLabel = (
   <LabelWithInfo label='Time of Year'>
     <p>
       Select the portion of the year over which data values are averaged
-      before being averaged over a multi-decadal period.
+      before those portion averages are averaged over a multi-decadal period.
     </p>
   </LabelWithInfo>
 );
@@ -332,7 +332,7 @@ export const mapPanelLabel = (
      </p>
     <p>
       Summary of map tools and other controls.
-      For details, see <Link to='/help/general'>Help</Link>.
+      (For details, see <Link to='/help/general'>Help</Link>.)
     </p>
     <ul className={css.controlsList}>
       <li>
@@ -364,6 +364,38 @@ export const mapPanelLabel = (
         current range of data.
       </li>
     </ul>
+  </LabelWithInfo>
+);
+
+// The following items are rendered in the Map Settings dialog.
+// Using <Link/> components in the body cause the info popup not to appear.
+// Specific cause unknown. Avoid them in these items.
+
+export const TimeSelectorLabel = ({ temporalLabelPart }) => (
+  <LabelWithInfo label={temporalLabelPart}>
+    <p>
+      Select the portion of the year over which data values are averaged
+      before those portion averages are averaged over a multi-decadal period.
+    </p>
+  </LabelWithInfo>
+);
+
+export const paletteSelectorLabel = (
+  <LabelWithInfo label={`${name} Colour Palette`}>
+    <p>
+      Select the set of colours to which data values are mapped
+      for representation on the map.
+    </p>
+  </LabelWithInfo>
+);
+
+export const colourMapTypeSelectorLabel = (
+  <LabelWithInfo label='Colour Map Type'>
+    <p>
+      Select how data values are mapped to colours.
+      For details on linear and logarithmic mappings,
+      see Help.
+    </p>
   </LabelWithInfo>
 );
 
