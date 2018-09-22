@@ -566,11 +566,24 @@ export const statsTableLabel = (
     <p>
       The matching datasets are identified by Averaging Period and Model Run.
     </p>
+    <p>
+      Statistics are computed for averages of portions of the year selected
+      by Time Of Year, which portions are then averaged over the averaging period.
+    </p>
     <p>{spatialAveragingDefn}</p>
     <p>
-      The data statistically summarized for a selected subperiod (Time of Year)
-      within the averaging period.
+      The table can be sorted by column content.
     </p>
+    <ul>
+      <li>Small triangles in column headings indicate sortable columns.</li>
+      <li>A single darker triangle indicates the current sort column.</li>
+      <li>Click on a column to sort by it.</li>
+      <li>Click on the sort column to change the direction of sorting.</li>
+    </ul>
+
+
+
+    .
   </LabelWithInfo>
 );
 
