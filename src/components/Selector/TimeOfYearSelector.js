@@ -20,6 +20,9 @@
  *
  * Those three functions provide a standard ordering and encoding for
  * the TimeOfYearSelector component.
+ *
+ * Optionally, the hideMonths, hideSeasons, and hideYears props may
+ * be passed to surpress some of the options.
  ******************************************************************/
 
 import PropTypes from 'prop-types';
@@ -33,6 +36,9 @@ class TimeOfYearSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     value: PropTypes.any,
+    hideMonths: PropTypes.bool,
+    hideSeasons: PropTypes.bool,
+    hideYears: PropTypes.bool,
     inlineLabel: PropTypes.bool,
   };
 
@@ -41,10 +47,21 @@ class TimeOfYearSelector extends React.Component {
   };
 
   render() {
-
     var timesofyear = [];
-    for (var index = 0; index < 17; index++) {
-      timesofyear.push([index, timeKeyToTimeOfYear(index)]);
+    function addTimeRange(start, end) {
+      for (const index = start; index <= end; index++) {
+        timesofyear.push([index, timeKeyToTimeOfYear(index)]);
+      }
+    }
+
+    if (!this.props.hideMonths) {
+      addTimeRange(0, 11);
+    }
+    if (!this.props.hideSeasons){
+      addTimeRange(12, 15);
+    }
+    if (!this.props.hideYears){
+      addTimeRange(16, 16);
     }
 
     return (

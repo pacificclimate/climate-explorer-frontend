@@ -16,6 +16,7 @@ import {
 } from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
+  timeKeyToTimeOfYear,
   validateLongTermAverageData,
 } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
@@ -55,9 +56,22 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    const timeResolutions = _.pluck(props.meta, "timescale");
+    //default to Annual, but use higher resolution if available.
+    let timeOfYear = 16; //Annual
+    if(_.contains(timeResolutions, "monthly")) {
+      timeOfYear = 0; //January
+    }
+    else if(_.contains(timeResolutions, "seasonal")) {
+      timeOfYear = 12; //Winter
+    }
+
     this.state = {
-      timeOfYear: 0,
+      timeOfYear: timeOfYear,
       graphSpec: blankGraphSpec,
+      monthlyData: _.contains(timeResolutions, "monthly"),
+      seasonalData: _.contains(timeResolutions, "seasonal"),
+      annualData: _.contains(timeResolutions, "yearly")
     };
   }
 
@@ -143,6 +157,9 @@ export default class LongTermAveragesGraph extends React.Component {
             <TimeOfYearSelector
               value={this.state.timeOfYear}
               onChange={this.handleChangeTimeOfYear}
+              hideMonths={!this.state.monthlyData}
+              hideSeasons={!this.state.seasonalData}
+              hideYear={!this.state.yearlyData}
               inlineLabel
             />
           </Col>
