@@ -34,11 +34,16 @@ import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import './NavRoutes.css';
 
 
-export default function NavRoutes({ navSpec, navIndex, onNavigate, children }) {
+export default function NavRoutes(
+  { navSpec, navIndex, onNavigate, match, children }
+) {
   const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
 
   const navItems = navSpec.items.map((item, index) =>
-    <LinkContainer key={index} to={withBasePath(item.subpath)}>
+    <LinkContainer
+      key={index}
+      to={withBasePath(item.navSubpath || item.subpath)}
+    >
       <NavItem eventKey={index}>
         <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
       </NavItem>
@@ -55,7 +60,10 @@ export default function NavRoutes({ navSpec, navIndex, onNavigate, children }) {
   );
 
   const basePathRedirectTo =
-    withBasePath(navSpec.items[navIndex].subpath);
+    withBasePath(
+      navSpec.items[navIndex].navSubpath ||
+      navSpec.items[navIndex].subpath
+    );
 
   return (
     <div>
@@ -83,11 +91,37 @@ NavRoutes.propTypes = {
     basePath: PropTypes.string, // base of all route paths in this page
     items: PropTypes.arrayOf(
       PropTypes.shape({
-        label: PropTypes.string,  // label for navigation for this item
-        info: PropTypes.node, // content for Information for this item (placed with label)
-        subpath: PropTypes.string,  // route subpath for this item
-        component: PropTypes.func, // component to render for this item
-        render: PropTypes.func,  // functional component to render for this item
+        // Navigation label for this item
+        label: PropTypes.string,
+
+        // Content for Information for this item (placed with nav label)
+        info: PropTypes.node,
+
+        // It's not clear the arrangement here with `subpath` and `navSubpath`
+        // is a good idea. It's an attempt to exploit path params AND be able
+        // to form a valid path for a nav link (which of course cannot contain
+        // path params). But it doesn't really help us avoid repetition when
+        // there is more than one matching path param.
+        // TODO: Implement some fancy path param stuff to automatically generate
+        // links from subpath.
+
+        // Route subpath for this item.
+        // This item CAN contain path params (e.g., /item/:itemId), which
+        // are passed to the item rendered as part of the Route props
+        subpath: PropTypes.string,
+
+        // Navigation subpath for this item (if different from routeSubpath)
+        // This item CANNOT contain path params (e.g., /item/:itemId);
+        // it is used to form the nav link.
+        navSubpath: PropTypes.string,
+
+        // Component to render for this item.
+        // (one of component or render must be specified)
+        component: PropTypes.func,
+
+        // Functional component to render for this item.
+        // (one of component or render must be specified)
+        render: PropTypes.func,
       }),
     ),
   }).isRequired,

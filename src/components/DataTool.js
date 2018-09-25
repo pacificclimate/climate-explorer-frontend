@@ -10,19 +10,25 @@ const navSpec = {
   basePath: '/data',
   items: [
     {
-      label: 'Single dataset',
-      subpath: 'climo/ce_files',
-      render: () => <SingleAppController/>,
+      label: 'Single Variable',
+      info: 'View a single climate variable from a selected GCM and emission scenario.',
+      subpath: 'climo/:ensemble_name(ce_files)',
+      navSubpath: 'climo/ce_files',
+      render: (props) => <SingleAppController {...props} />,
     },
     {
-      label: 'Compare datasets',
-      subpath: 'compare/ce_files',
-      render: () => <DualAppController/>,
+      label: 'Compare Variables',
+      info: 'Simulataneously view and compare two climate variables from a selected GCM and emission scenario.',
+      subpath: 'compare/:ensemble_name(ce_files)',
+      navSubpath: 'compare/ce_files',
+      render: (props) => <DualAppController {...props} />,
     },
     {
       label: 'Extreme Precipitation',
-      subpath: 'precipitation/extreme_precipitation',
-      render: () => <PrecipAppController/>,
+      info: 'View data representing extreme precipitation based on a selected GCM and emission scenario.',
+      subpath: 'precipitation/:ensemble_name(extreme_precipitation)',
+      navSubpath: 'precipitation/extreme_precipitation',
+      render: (props) => <PrecipAppController {...props} />,
     },
   ],
 };
