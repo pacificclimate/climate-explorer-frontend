@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Grid, Row } from 'react-bootstrap';
+import {
+  Grid, Row, ListGroup, ListGroupItem
+} from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import overviewImg from '../../../assets/overview.png';
 
@@ -72,13 +74,332 @@ export default function HelpGeneral() {
           <p>
             <img src={overviewImg} alt='Overview of app'/>
           </p>
+
+          <h2>Data available in Climate Explorer</h2>
+          <p>
+            There are four types of data available in Climate Explorer:
+          </p>
+
+          <ListGroup>
+            <ListGroupItem header='Model output'>
+              <p>
+                Daily temperature and precipitation data output
+                by global or regional climate models based on a
+                combination of historical data and possible future greenhouse
+                gas projections. The data is averaged by month over thirty year
+                periods; there are six such periods from 1960 to 2100.
+                This data is available for all of Canada.
+              </p>
+              <h5>Variable names and meanings</h5>
+              <ListGroup>
+                <ListGroupItem header='pr'>
+                  Precipitation at ground level
+                </ListGroupItem>
+                <ListGroupItem header='tasmax'>
+                  Daily maximum near-surface air temperature
+                </ListGroupItem>
+                <ListGroupItem header='tasmin'>
+                  Daily minimum near-surface air temperature
+                </ListGroupItem>
+              </ListGroup>
+            </ListGroupItem>
+
+            <ListGroupItem header='Climdex (climate extremes indices)'>
+              <p>
+              Measures of weather extremes calculated from model output.
+              Climdex defines 27 <a href='https://www.climdex.org/indices.html'>climate extremes indices</a>,
+              encompassing extreme precipitation, extremes of temperature,
+              or lack thereof in different ways.
+              This is a heterogeneous dataset; a given extreme may be calculated
+              either as a monthly index averaged over thirty year periods
+              from 1960 to 2100, or an annual index calculated individually
+              for each year from 1950 to 2100.
+              This data is available for all of Canada.
+              </p>
+              <h5>Variable names and meanings</h5>
+              <ListGroup>
+                <ListGroupItem header='altcddETCCDI'>
+                  <p>
+                    Maximum number of consecutive days per year with less than 1mm
+                    of precipitation
+                  </p>
+                  <p>
+                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                  </p>
+                </ListGroupItem>
+                <ListGroupItem header='altcsdiETCCDI'>
+                  <p>
+                    Cold spell duration index spanning years
+                  </p>
+                  <p>
+                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CSDI</em>.
+                  </p>
+                </ListGroupItem>
+                <ListGroupItem header='altcwdETCCDI'>
+                  <p>
+                    Maximum number of consecutive days per year with at least 1mm of
+                    precipitation
+                  </p>
+                  <p>
+                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                  </p>
+                </ListGroupItem>
+                <ListGroupItem header='altwsdiETCCDI'>
+                  <p>
+                    Warm spell duration index spanning years
+                  </p>
+                  <p>
+                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                  </p>
+                </ListGroupItem>
+                <ListGroupItem header='cddETCCDI'>
+                  <p>
+                    Maximum number of consecutive days with less than 1mm of
+                    precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CDD</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='csdiETCCDI'>
+                  <p>
+                    Cold spell duration index
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CSDI</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='cwdETCCDI'>
+                  <p>
+                    Maximum number of consecutive days with at least 1mm of
+                    precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CWD</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='dtrETCCDI'>
+                  <p>
+                    Mean diurnal temperature range
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>DTR</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='fdETCCDI'>
+                  <p>
+                    Number of frost days
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>FD</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='gslETCCDI'>
+                  <p>
+                    Growing season length
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>GSL</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='idETCCDI'>
+                  <p>
+                    Number of icing days
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>ID</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='prcptotETCCDI'>
+                  <p>
+                    Annual total precipitation in wet days
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>PRCPTOT</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='r10mmETCCDI'>
+                  <p>
+                    Annual count of days with at least 10mm of precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R10MM</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='r1mmETCCDI'>
+                  <p>
+                    Annual count of days with at least 1mm of precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R1MM</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='r20mmETCCDI'>
+                  <p>
+                    Annual count of days with at least 20mm of precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R20MM</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='r95pETCCDI'>
+                  <p>
+                    Annual total precipitation when daily precipitation exceeds the
+                    95th percentile of wet day precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R95P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='r99pETCCDI'>
+                  <p>
+                    Annual total precipitation when daily precipitation exceeds the
+                    99th percentile of wet day precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R99P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='rx1dayETCCDI'>
+                  <p>
+                    Annual Maximum 1-day Precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX1DAY</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='rx1dayETCCDI'>
+                  <p>
+                    Monthly Maximum 1-day Precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX1DAY</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='rx5dayETCCDI'>
+                  <p>
+                    Annual Maximum Consecutive 5-day Precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX5DAY</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='rx5dayETCCDI'>
+                  <p>
+                    Monthly Maximum Consecutive 5-day Precipitation
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX5DAY</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='sdiiETCCDI'>
+                  <p>
+                    Simple precipitation intensity index
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>SDII</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='suETCCDI'>
+                  <p>
+                    Number of summer days
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>SU</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tn10pETCCDI'>
+                  <p>
+                    Percentage of days when daily minimum temperature is below the
+                    10th percentile
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TN10P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tn90pETCCDI'>
+                  <p>
+                    Percentage of days when daily minimum temperature is above the
+                    90th percentile
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TN90P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tnnETCCDI'>
+                  <p>
+                    Annual minimum of daily minimum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TNN</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tnnETCCDI'>
+                  <p>
+                    Monthly minimum of daily minimum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TNN</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tnxETCCDI'>
+                  <p>
+                    Annual maximum of daily minimum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TNX</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tnxETCCDI'>
+                  <p>
+                    Monthly maximum of daily minimum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TNX</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='trETCCDI'>
+                  <p>
+                    Number of tropical nights
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TR</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tx10pETCCDI'>
+                  <p>
+                    Percentage of days when daily maximum temperature is below the
+                    10th percentile
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TX10P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='tx90pETCCDI'>
+                  <p>
+                    Percentage of days when daily maximum temperature is above the
+                    90th percentile
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TX90P</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='txnETCCDI'>
+                  <p>
+                    Annual minimum of daily maximum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXN</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='txnETCCDI'>
+                  <p>
+                    Monthly minimum of daily maximum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXN</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='txxETCCDI'>
+                  <p>
+                    Annual maximum of daily maximum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXX</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='txxETCCDI'>
+                  <p>
+                    Monthly maximum of daily maximum temperature
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXX</em>.</p>
+                </ListGroupItem>
+                <ListGroupItem header='wsdiETCCDI'>
+                  <p>
+                    Warm spell duration index
+                  </p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>WSDI</em>.</p>
+                </ListGroupItem>
+              </ListGroup>
+            </ListGroupItem>
+
+            <ListGroupItem header='Degree-days'>
+              <p>
+              Counts of how many days fall below or above a given temperature
+              threshold multiplied by how much the threshold is exceeded,
+              calculated from model output, usually over a period of a year
+              (although seasonal and monthly degree-day counts are also
+              possible).
+              The data is averaged over several thirty year periods between
+              1970 to 2100.
+              This data is available for all of British Columbia.
+              </p>
+              <h5>Variable names and meanings</h5>
+              <ListGroup>
+              </ListGroup>
+            </ListGroupItem>
+
+            <ListGroupItem header='Return periods'>
+              <p>
+              Calculated from model output using a generalized extreme value
+              distribution, this dataset describes extreme temperature or
+              precipitation events that would be expected to occur once every
+              twenty years. T
+              his data is available for six thirty year periods from
+              1960 to 2100.
+              This data is available for all of British Columbia.
+              </p>
+              <h5>Variable names and meanings</h5>
+              <ListGroup>
+              </ListGroup>
+            </ListGroupItem>
+          </ListGroup>
+
           <h2>Datasets and data filtering</h2>
           <p>Climate Explorer has a huge base of data available—far too much
             to present usefully in any single view. A selection (filtering)
             process must come between data and presentation.</p>
           <h3>Datasets</h3>
           <p>A <i>dataset</i> is a collection of data for a specific model,
-            emissions scenario, and variable, model run, and time period. It
+            emissions scenario, variable, model run, and time period. It
             comprises values of the variable for specific points in space and
             time, usually over a regular spatial grid and sequence of time
             points.
@@ -91,13 +412,13 @@ export default function HelpGeneral() {
           <h3>Dataset filtering</h3>
           <p>The first step of any effort to examine all the available data is
             to select a smaller, more digestible subset of it to be examined.
-            This selection goes by the name of <i>dataset filtering</i> or just
-            <i>filtering</i>.
+            This selection goes by the name of <i>dataset filtering</i> or
+            just <i>filtering</i>.
           </p>
           <p>The criteria by which datasets are filtered  are:</p>
-          <ul>
-            <li>
-              <p>Model: Which GCM produced the base data for the dataset.
+          <ListGroup>
+            <ListGroupItem header='Model'>
+              Which GCM produced the base data for the dataset.
                 (Almost all data available in Climate Explorer is further
                 processed
                 from this base data. Specifically, most of the data available
@@ -107,22 +428,20 @@ export default function HelpGeneral() {
                 a finer grid suited to regional analysis. Other post-processing
                 includes forming long-term averages and forming derived
                 variables
-                such as climate indices.)</p>
-            </li>
-            <li>
-              <p>Emissions Scenario: Which scenario of climate-changing
-                emissions (greenhouse gases, etc.) was used as an input to the
-                model
-                runs.</p>
-            </li>
-            <li>
-              <p>Variable(s): Which output variable(s) from the model runs
+                such as climate indices.)
+            </ListGroupItem>
+            <ListGroupItem header='Emissions Scenario'>
+              Which scenario of climate-changing emissions (greenhouse gases,
+              etc.) was used as an input to the model runs.
+            </ListGroupItem>
+            <ListGroupItem header='Variable(s)'>
+              Which output variable(s) from the model runs
                 you are interested in. (For example: maximum temperature,
-                precipitation, number of frost-free days.)</p>
-            </li>
-          </ul>
-          <p>The result of data filtering is a collection of one or more
-            <i>datasets</i>.
+                precipitation, number of frost-free days.)
+            </ListGroupItem>
+          </ListGroup>
+          <p>The result of data filtering is a collection of one or
+            more <i>datasets</i>.
           </p>
           <h4>Distinguishing datasets within a filtered
             collection</h4>
@@ -131,48 +450,88 @@ export default function HelpGeneral() {
           </p>
           <p>Individual datasets within a filtered collection are characterized
             by:</p>
-          <ul>
-            <li>
-              <p>Model Run: explain</p>
-            </li>
-            <li>
-              <p>Time Period: The time the dataset spans.</p>
-            </li>
-          </ul>
+          <ListGroup>
+            <ListGroupItem header='Model Run'>
+              <p>
+                The following explanation is taken
+                from <a href='https://portal.enes.org/data/enes-model-data/cmip5/datastructure'>ENES</a>:
+              </p>
+              <blockquote>
+                Many CMIP5 experiments, the so-called ensemble calculations,
+                were calculated using several initial states, initialisation
+                methods or physics details. Ensemble calculations facilitate
+                quantifying the variability of simulation data concerning a
+                single model. For example, climate model simulations are
+                dependent on the initial state. The variability we know from
+                weather is also existent in climate simulations. The ensemble
+                members with different initial states are usually called
+                realizations. Initialisation method and physics details may also
+                have an influence. Physics details may be parameterisation
+                constants, for example. In the CMIP5 project, ensemble members
+                are named in the rip-nomenclature, r for realization, i for
+                initialisation and p for physics, followed by an integer, e.g.
+                r1i1p1.
+              </blockquote>
+              <p>
+                You will find all datasets in CE labelled by a rip code as above.
+              </p>
+            </ListGroupItem>
+            <ListGroupItem header='Time Period'>
+              The time period the dataset spans.
+            </ListGroupItem>
+          </ListGroup>
+
           <h2>Data presentations</h2>
           <p>Climate Explorer presents data in several different ways. The
             following is a summary of the different presentations available.</p>
-          <h3>Data Map</h3>
-          <p>The Data Map is an interactive web map that presents one or two
-            datasets selected from the filtered collection. It shows a spatial
-            slice of the data for a specific point in time.</p>
-          <p>A single variable (or the primary variable in a comparison view)
-            is represented as a raster (a grid of coloured blocks)
-            overlaid on the base map.
-            Colours encode the variable’s value.</p>
-          <p>The secondary variable (in a comparison view) is represented as a
-            set of isolines (contours of constant value) overlaid on the base
-            map. Isolines are colour-coded by value.</p>
-          <p>The data map is the most complex data presentation tool, and has a
-            substantial collection of generic web mapping features and data
-            presentation features. See below for details of these features.</p>
-          <h3>Data Graphs</h3>
-          <p>A data graph typically presents a non-spatial view of one or more
-            datasets. Typically this view is temporal, that is, it is a graph
-            with time as the horizontal axis.</p>
-          <p>Depending on the specific graph, more than one dataset may be
-            represented. This is useful for comparing  datasets and/or giving
-            context to the dataset(s) displayed in the data map.</p>
-          <p>IMPORTANT: Spatial averaging: Data shown in all graphs is averaged
-            over either the entire spatial extent of the dataset or over the
-            spatial extent you select by drawing a polygon on the map.</p>
-          <h3>Statistical Summary</h3>
-          <p>The Statistical Summary table presents a statistical summary of a
-            single dataset. The summary includes the usual statistics such as
-            mean, minimum, maximum, standard deviation, etc.</p>
-          <p>IMPORTANT: Spatial averaging: Data summarized in this table is
-            averaged over either the entire spatial extent of the dataset or over
-            the spatial extent you select by drawing a polygon on the map.</p>
+          <ListGroup>
+            <ListGroupItem header='Data Map'>
+              <p>The Data Map is an interactive web map that presents one or two
+                datasets selected from the filtered collection. It shows a
+                spatial
+                slice of the data for a specific point in time.</p>
+              <p>A single variable (or the primary variable in a comparison
+                view)
+                is represented as a raster (a grid of coloured blocks)
+                overlaid on the base map.
+                Colours encode the variable’s value.</p>
+              <p>The secondary variable (in a comparison view) is represented as
+                a set of isolines (contours of constant value) overlaid on the
+                base map. Isolines are colour-coded by value.</p>
+              <p>The data map is the most complex data presentation tool, and
+                has a
+                substantial collection of generic web mapping features and data
+                presentation features. See below for details of these
+                features.</p>
+            </ListGroupItem>
+            <ListGroupItem header='Data Graphs'>
+              <p>A data graph typically presents a non-spatial view of one or
+                more
+                datasets. Typically this view is temporal, that is, it is a
+                graph
+                with time as the horizontal axis.</p>
+              <p>Depending on the specific graph, more than one dataset may be
+                represented. This is useful for comparing datasets and/or giving
+                context to the dataset(s) displayed in the data map.</p>
+              <p>IMPORTANT: Spatial averaging: Data shown in all graphs is
+                averaged
+                over either the entire spatial extent of the dataset or over the
+                spatial extent you select by drawing a polygon on the map.</p>
+            </ListGroupItem>
+            <ListGroupItem header='Statistical Summary'>
+              <p>The Statistical Summary table presents a statistical summary of
+                a
+                single dataset. The summary includes the usual statistics such
+                as
+                mean, minimum, maximum, standard deviation, etc.</p>
+              <p>IMPORTANT: Spatial averaging: Data summarized in this table is
+                averaged over either the entire spatial extent of the dataset or
+                over
+                the spatial extent you select by drawing a polygon on the
+                map.</p>
+            </ListGroupItem>
+          </ListGroup>
+
           <h2>Data Map features</h2>
           <h3>Map tools</h3>
           <p>On the left-hand side of the map you will find a standard
@@ -358,10 +717,6 @@ export default function HelpGeneral() {
           <p>When two variables are displayed on the map (raster and
             isolines), there are two colour scale references. The upper reference
             is for isolines and the lower reference is for raster.</p>
-          <h2>Data available in Climate Explorer</h2>
-          <h2>Meanings of variables</h2>
-          
-          
         </HalfWidthCol>
       </Row>
     </Grid>
