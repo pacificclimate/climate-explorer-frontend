@@ -10,7 +10,7 @@ import _ from 'underscore';
 import { HalfWidthCol } from '../../layout/rb-derived-components';
 
 
-export default class DatasetsSummary extends React.Component {
+export default class FilteredDatasetsSummary extends React.Component {
   static propTypes = {
     model_id: PropTypes.string.isRequired,
     experiment: PropTypes.string.isRequired,
