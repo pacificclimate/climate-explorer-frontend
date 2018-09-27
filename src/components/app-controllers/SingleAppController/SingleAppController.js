@@ -26,7 +26,7 @@ import {
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import DatasetsSummary from '../../data-presentation/DatasetsSummary';
+import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
 import FlowArrow from '../../data-presentation/FlowArrow';
 
 export default createReactClass({
@@ -113,7 +113,7 @@ export default createReactClass({
 
         <Row>
           <FullWidthCol>
-            <DatasetsSummary
+            <FilteredDatasetsSummary
               model_id={this.state.model_id}
               experiment={this.state.experiment}
               variable_id={this.state.variable_id}

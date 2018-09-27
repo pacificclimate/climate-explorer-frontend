@@ -1,6 +1,0 @@
-{
-  "name": "DatasetsSummary",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./DatasetsSummary.js"
-}
