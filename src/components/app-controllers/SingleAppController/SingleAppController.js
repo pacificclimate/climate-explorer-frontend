@@ -11,16 +11,24 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
-import styles from '../AppController.css';
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
+import {
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
+  datasetFilterPanelLabel,
+} from '../../guidance-content/info/InformationItems';
+
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
+import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
+import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -36,65 +44,118 @@ export default createReactClass({
   //only datasets the filter returns a truthy value for are available.
   //Filters out noisy multi-year monthly datasets.
   datasetFilter: function (datafile) {
-    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
+    return !(datafile.multi_year_mean === false && datafile.timescale === 'monthly');
   },
 
   //Returns metadata for datasets with thethe selected variable + scenario, any model.
   //Passed as a prop for SingleDataController to generate model comparison graphs.
   getModelContextMetadata: function () {
     return _.where(this.state.meta,
-        {variable_id: this.state.variable_id, experiment: this.state.experiment});
+        { variable_id: this.state.variable_id, experiment: this.state.experiment });
   },
 
   render: function () {
     //hierarchical selection: model, then variable, then experiment
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
-        this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id, variable_id: this.state.variable_id}));
+        this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id, variable_id: this.state.variable_id }));
+
+    const filteredMeta = this.getFilteredMeta();
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
+
     return (
       <Grid fluid>
         <Row>
-          <Col lg={4} md={4}>
-            <Selector 
-              label={"Model Selection"} 
-              onChange={this.updateSelection.bind(this, 'model_id')} 
-              items={modOptions} 
-              value={this.state.model_id}
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <VariableDescriptionSelector
-              label={"Variable Selection"}
-              onChange={this.handleSetVariable.bind(this, "variable")}
-              meta={this.state.meta}
-              constraints={{model_id: this.state.model_id}}
-              value={_.pick(this.state, "variable_id", "variable_name")} 
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <Selector
-              label={"Emission Scenario Selection"}
-              onChange={this.updateSelection.bind(this, 'experiment')}
-              items={expOptions}
-              value={this.state.experiment}
-            />
-          </Col>
+          <FullWidthCol>
+            <UnfilteredDatasetsSummary meta={this.state.meta} />
+          </FullWidthCol>
         </Row>
+
         <Row>
-          <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <SingleMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
-          </Col>
-          <Col lg={6}>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <Panel>
+              <Panel.Heading>
+                <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <Row>
+                  <Col lg={2} md={2}>
+                    <Selector
+                      label={modelSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'model_id')}
+                      items={modOptions}
+                      value={this.state.model_id}
+                    />
+                  </Col>
+                  <Col lg={2} md={2}>
+                    <Selector
+                      label={emissionScenarioSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'experiment')}
+                      items={expOptions}
+                      value={this.state.experiment}
+                    />
+                  </Col>
+                  <Col lg={4} md={4}>
+                    <VariableDescriptionSelector
+                      label={variableSelectorLabel}
+                      onChange={this.handleSetVariable.bind(this, 'variable')}
+                      meta={this.state.meta}
+                      constraints={{ model_id: this.state.model_id }}
+                      value={_.pick(this.state, 'variable_id', 'variable_name')}
+                    />
+                  </Col>
+                </Row>
+              </Panel.Body>
+            </Panel>
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FilteredDatasetsSummary
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              variable_id={this.state.variable_id}
+              meta = {filteredMeta}
+            />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <SingleMapController
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              variable_id={this.state.variable_id}
+              meta = {filteredMeta}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
+          </HalfWidthCol>
+          <HalfWidthCol>
             <SingleDataController
               ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
@@ -102,10 +163,10 @@ export default createReactClass({
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getFilteredMeta()}
+              meta = {filteredMeta}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
-          </Col>
+          </HalfWidthCol>
         </Row>
       </Grid>
 

@@ -1,0 +1,6 @@
+{
+  "name": "FlowArrow",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./FlowArrow.js"
+}

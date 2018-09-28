@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Selector from '../Selector/Selector';
 import _ from 'underscore';
+import { datasetSelectorLabel } from '../guidance-content/info/InformationItems';
 /******************************************************************
  * DataSpecSelector.js - Data Specification selecting widget
  * 
@@ -33,6 +34,11 @@ export default class DataSpecSelector extends React.Component {
     meta: PropTypes.array,
     value: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    inlineLabel: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    inlineLabel: false,
   };
 
   makeDataSpecs() {
@@ -51,10 +57,11 @@ export default class DataSpecSelector extends React.Component {
     return (
       dataSpecs.length > 0 &&
       <Selector
-        label='Select Dataset'
+        label={datasetSelectorLabel}
         items={dataSpecs}
         value={this.props.value}
         onChange={this.props.onChange}
+        inlineLabel={this.props.inlineLabel}
       />
     );
   }

@@ -28,15 +28,16 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import {
+  Button, Row, Col, Tab, Tabs, Panel, ControlLabel,
+}
+from 'react-bootstrap';
 import _ from 'underscore';
-
-import styles from './SingleDataController.css';
 
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
          resolutionIndexToTimeKey,
-         validateStatsData} from '../../../core/util';
+         validateStatsData } from '../../../core/util';
 import DataTable from '../../DataTable/DataTable';
 import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
 import DataControllerMixin from '../../DataControllerMixin';
@@ -48,6 +49,17 @@ import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
+import {
+  singleAnnualCycleTabLabel, futureAnomalyTabLabel,
+  singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
+  timeSeriesTabLabel, exportStatsTableDataLabel, statsTableLabel,
+  graphsPanelLabel, downloadGraphDataLabel, xslxButtonLabel, csvButtonLabel,
+} from '../../guidance-content/info/InformationItems';
+
+import styles from '../DataController.css';
+import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
+import ExportButtons from '../../graphs/ExportButtons';
+
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -69,7 +81,7 @@ export default createReactClass({
   getInitialState: function () {
     return {
       dataTableTimeOfYear: 0,
-      dataTableTimeScale: "monthly",
+      dataTableTimeScale: 'monthly',
       statsData: undefined,
     };
   },
@@ -86,12 +98,12 @@ export default createReactClass({
       this.loadDataTable(props);
     }
     else {
-      this.loadDataTable(props, {timeidx: 0, timescale: "yearly"});
+      this.loadDataTable(props, { timeidx: 0, timescale: "yearly" });
     }
   },
 
   //Removes all data from the Stats Table and displays a message
-  setStatsTableNoDataMessage: function(message) {
+  setStatsTableNoDataMessage: function (message) {
     this.setState({
       statsTableOptions: { noDataText: message },
       statsData: [],
@@ -133,11 +145,11 @@ export default createReactClass({
     var timeres = time ? time.timescale : this.state.dataTableTimeScale;
 
     //load stats table
-    this.setStatsTableNoDataMessage("Loading Data");
+    this.setStatsTableNoDataMessage('Loading Data');
     var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
 
     myStatsPromise.then(response => {
-      if(_.allKeys(response.data).length > 0) {
+      if (_.allKeys(response.data).length > 0) {
         this.setState({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
@@ -149,7 +161,7 @@ export default createReactClass({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
         });
-        this.setStatsTableNoDataMessage("Statistics unavailable for this time period.");
+        this.setStatsTableNoDataMessage('Statistics unavailable for this time period.');
       }
     }).catch(error => {
       displayError(error, this.setStatsTableNoDataMessage);
@@ -164,56 +176,95 @@ export default createReactClass({
       this.state.dataTableTimeOfYear
     );
 
+    // Spec for generating tabs containing various graphs.
+    // Property names indicate whether the dataset is a multi-year mean or not.
+    const graphTabsSpec = {
+      mym: [
+        { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
+        { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
+        { title: modelContextTabLabel, graph: SingleContextGraph },
+        { title: futureAnomalyTabLabel, graph: AnomalyAnnualCycleGraph },
+        { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
+      ],
+      notMym: [
+        { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
+      ],
+    };
+
+    // Convert graph tabs spec to list of tabs.
+    const graphTabs =
+      graphTabsSpec[multiYearMeanSelected(this.props) ? 'mym' : 'notMym'].map(
+        (spec, i) => {
+          const Graph = spec.graph;
+          return (
+            <Tab
+              eventKey={i} title={spec.title}
+              className={styles.data_panel}
+            >
+              <Graph {...this.props}/>
+            </Tab>
+          );
+        }
+    );
+
     return (
       <div>
-        <h3>
-          {this.props.model_id} {' '}
-          {this.props.variable_id} {' '}
-          {this.props.experiment}
-        </h3>
-        
-        {
-          multiYearMeanSelected(this.props) ? (
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              <Row>
+                <Col lg={4}>
+                  {graphsPanelLabel}
+                </Col>
+                <Col lg={8}>
+                  <MEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body className={styles.data_panel}>
+             <Tabs id='Graphs'>
+               {graphTabs}
+             </Tabs>
+          </Panel.Body>
+        </Panel>
 
-            <Tabs id="Graphs">
-              <Tab eventKey={1} title='Annual Cycle'>
-                <SingleAnnualCycleGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={2} title='Long Term Averages'>
-                <SingleLongTermAveragesGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={3} title='Model Context'>
-                <SingleContextGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={4} title='Future Anomaly'>
-                <AnomalyAnnualCycleGraph {...this.props} />
-              </Tab>
-              <Tab eventKey={5} title='Snapshot'>
-                <SingleTimeSliceGraph {...this.props} />
-              </Tab>
-            </Tabs>
-
-          ) : (
-
-            <Tabs id="Graphs">
-              <Tab eventKey={1} title='Time Series'>
-                <SingleTimeSeriesGraph {...this.props}/>
-              </Tab>
-            </Tabs>
-
-          )
-        }
-
-        <Row>
-          <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
-            <TimeOfYearSelector onChange={this.updateDataTableTimeOfYear} value={dataTableSelected} />
-          </Col>
-        </Row>
-        <DataTable data={statsData}  options={this.state.statsTableOptions}/>
-        <div style={{ marginTop: '10px' }}>
-          <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
-          <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
-        </div>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              <Row>
+                <Col lg={4}>
+                  {statsTableLabel}
+                </Col>
+                <Col lg={8}>
+                  <MEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body className={styles.data_panel}>
+            <Row>
+              <Col lg={6} md={6} sm={6}>
+                <TimeOfYearSelector
+                  onChange={this.updateDataTableTimeOfYear}
+                  value={dataTableSelected}
+                  inlineLabel
+                />
+              </Col>
+              <Col lg={6} md={6} sm={6}>
+                <ExportButtons
+                  onExportXlsx={this.exportDataTable.bind(this, 'xlsx')}
+                  onExportCsv={this.exportDataTable.bind(this, 'csv')}
+                />
+              </Col>
+            </Row>
+            <DataTable data={statsData} options={this.state.statsTableOptions}/>
+          </Panel.Body>
+        </Panel>
       </div>
     );
   },

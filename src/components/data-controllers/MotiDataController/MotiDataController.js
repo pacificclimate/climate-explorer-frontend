@@ -27,7 +27,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, ControlLabel } from 'react-bootstrap';
+import { Panel, Button } from 'react-bootstrap';
 
 import { parseBootstrapTableData, validateStatsData } from '../../../core/util';
 import DataGraph from '../../graphs/DataGraph/DataGraph';
@@ -40,7 +40,14 @@ import _ from 'underscore';
 
 import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';
 import TimeSeriesGraph from '../../graphs/TimeSeriesGraph';
-import styles from './MotiDataController.css';
+import {
+  graphsPanelLabel,
+  exportStatsTableDataLabel,
+  statsTableLabel,
+} from '../../guidance-content/info/InformationItems';
+
+import styles from '../DataController.css';
+
 
 export default createReactClass({
   displayName: 'MotiDataController',
@@ -159,29 +166,53 @@ export default createReactClass({
 
     return (
       <div>
-        <h3>{this.props.model_id + ' ' + this.props.variable_id + ' ' + this.props.experiment}</h3>
-        {
-          this.multiYearMeanSelected() ? (
-            <AnnualCycleGraph
-              meta={this.props.meta}
-              dataSpec={this.state.annualCycleDataSpec}
-              onChangeDataset={this.updateAnnualCycleDataset}
-              graphSpec={this.state.annualCycleData || this.blankGraph}
-              onExportXlsx={this.exportAnnualCycle.bind(this, 'xlsx')}
-              onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
-            />
-          ) : (
-            <TimeSeriesGraph
-              graphSpec={this.state.timeseriesData || this.blankGraph}
-            />
-          )
-        }
+        <h3>
+          {this.props.model_id} {' '}
+          {this.props.variable_id} {' '}
+          {this.props.experiment}
+        </h3>
 
-        <DataTable data={statsData} options={this.state.statsTableOptions} />
-        <div style={{ marginTop: '10px' }}>
-          <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
-          <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
-        </div>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              {graphsPanelLabel}
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            {
+              this.multiYearMeanSelected() ? (
+                <AnnualCycleGraph
+                  meta={this.props.meta}
+                  dataSpec={this.state.annualCycleDataSpec}
+                  onChangeDataset={this.updateAnnualCycleDataset}
+                  graphSpec={this.state.annualCycleData || this.blankGraph}
+                  onExportXlsx={this.exportAnnualCycle.bind(this, 'xlsx')}
+                  onExportCsv={this.exportAnnualCycle.bind(this, 'csv')}
+                />
+              ) : (
+                <TimeSeriesGraph
+                  graphSpec={this.state.timeseriesData || this.blankGraph}
+                />
+              )
+            }
+          </Panel.Body>
+        </Panel>
+
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              {statsTableLabel}
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body className={styles.data_panel}>
+            <DataTable data={statsData} options={this.state.statsTableOptions} />
+            <div style={{ marginTop: '10px' }}>
+              <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
+              <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
+              {exportStatsTableDataLabel}
+            </div>
+          </Panel.Body>
+        </Panel>
       </div>
     );
   },

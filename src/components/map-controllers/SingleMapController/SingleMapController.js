@@ -21,6 +21,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
+import { Panel, Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -34,7 +35,11 @@ import GeoExporter from '../../GeoExporter';
 
 import { hasValidData, selectRasterPalette,
          currentDataSpec, updateLayerSimpleState,
-         updateLayerTime, getTimeParametersPromise, scalarParams} from '../map-helpers.js';
+         updateLayerTime, getTimeParametersPromise, scalarParams } from '../map-helpers.js';
+
+import styles from '../MapController.css';
+import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
+import { MEVSummary } from '../../data-presentation/MEVSummary/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -95,7 +100,7 @@ export default class SingleMapController extends React.Component {
     rasterParamsPromise.then(params => {
       //if the variable has changed, use the default palette and logscale,
       //otherwise use the previous (user-selected) values from state.
-      if(!newVariable) {
+      if (!newVariable) {
         params.palette = this.state.raster.palette;
         params.logscale = this.state.raster.logscale;
       }
@@ -203,59 +208,89 @@ export default class SingleMapController extends React.Component {
   }
 
   render() {
+    console.log('SingleMapController.props.meta', this.props.meta)
     return (
-      this.state.raster.times ? (
-        <DataMap
-          raster={{
-            dataset: this.getDatasetId(
-              'variable', this.props.meta, this.state.raster.timeIdx),
-            ...this.state.raster,
-            onChangeRange: this.handleChangeRasterRange,
-          }}
+      <Panel>
+        <Panel.Heading>
+          <Panel.Title>
+            <Row>
+              <Col lg={2}>
+                {mapPanelLabel}
+              </Col>
+              <Col lg={10}>
+                <MEVSummary
+                  className={styles.mevSummary} {...this.props}
+                />
+                {': '}
+                { this.state.run }
+                {' '}
+                { this.state.start_date }-{ this.state.end_date }
+              </Col>
+            </Row>
+        </Panel.Title>
+        </Panel.Heading>
+        <Panel.Body className={styles.mapcontroller}>
+          {
+            this.state.raster.times ? (
+              <DataMap
+                raster={{
+                  dataset: this.getDatasetId(
+                    'variable', this.props.meta, this.state.raster.timeIdx),
+                  ...this.state.raster,
+                  onChangeRange: this.handleChangeRasterRange,
+                }}
 
-          onSetArea={this.props.onSetArea}
-          area={this.props.area}
-        >
+                onSetArea={this.props.onSetArea}
+                area={this.props.area}
+              >
 
-          <StaticControl position='topleft'>
-            <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoLoader
+                    onLoadArea={this.props.onSetArea}
+                    title='Import polygon' />
+                </StaticControl>
 
-          <StaticControl position='topleft'>
-            <GeoExporter area={this.props.area} title='Export polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoExporter area={this.props.area} title='Export polygon' />
+                </StaticControl>
 
-          <StaticControl position='topright' style={{ marginRight: '70px' }}>
-            <MapSettings
-              title='Map Settings'
-              meta={this.props.meta}
+                <StaticControl
+                  position='topright'
+                  style={{ marginRight: '70px' }}
+                >
+                  <MapSettings
+                    title='Map Settings'
+                    meta={this.props.meta}
 
-              dataSpec={currentDataSpec.bind(this)()}
-              onDataSpecChange={this.updateDataSpec}
+                    dataSpec={currentDataSpec.bind(this)()}
+                    onDataSpecChange={this.updateDataSpec}
 
-              raster={{
-                ...this.state.raster,
-                onChangeTime: this.handleChangeVariableTime,
-                onChangePalette: this.handleChangeRasterPalette,
-                onChangeScale: this.handleChangeRasterScale,
-              }}
+                    raster={{
+                      ...this.state.raster,
+                      onChangeTime: this.handleChangeVariableTime,
+                      onChangePalette: this.handleChangeRasterPalette,
+                      onChangeScale: this.handleChangeRasterScale,
+                    }}
 
-              hasComparand={false}
-              timesLinkable={false}
-            />
-          </StaticControl>
+                    hasComparand={false}
+                    timesLinkable={false}
+                  />
+                </StaticControl>
 
-          <StaticControl position='bottomleft'>
-            <MapFooter
-              {...this.state}
-              hasValidComparand={false}
-            />
-          </StaticControl>
+                <StaticControl position='bottomleft'>
+                  <MapFooter
+                    {...this.state}
+                    hasValidComparand={false}
+                  />
+                </StaticControl>
 
-        </DataMap>
-      ) : (
-        <Loader/>
-      )
+              </DataMap>
+            ) : (
+              <Loader/>
+            )
+          }
+        </Panel.Body>
+      </Panel>
     );
   }
 }

@@ -1,0 +1,10 @@
+.controlsList {
+    list-style: none;
+    padding: 0 0 0 0.5em;
+}
+
+.controlsList li {
+    margin: 0;
+    padding: 0.5em 0;
+    clear: both;
+}

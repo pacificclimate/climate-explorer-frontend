@@ -42,8 +42,8 @@ export default class GeoloaderMainDialog extends React.Component {
             onChange={(e) => this.importPolygon(e.currentTarget.files[0])}
           />
           <p>
-            Accepts a zipped Shapefile or a single geojson Feature
-            (not FeatureCollection)
+            Accepts a zipped Shapefile or a GeoJSON file containing a
+            single Feature (not a FeatureCollection).
           </p>
         </Modal.Body>
   

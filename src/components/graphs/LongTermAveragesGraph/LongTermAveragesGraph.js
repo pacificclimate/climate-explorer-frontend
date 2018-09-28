@@ -139,13 +139,14 @@ export default class LongTermAveragesGraph extends React.Component {
     return (
       <React.Fragment>
         <Row>
-          <Col lg={4} lgPush={8} md={6} mdPush={6} sm={6} smPush={6}>
+          <Col lg={6} md={6} sm={6}>
             <TimeOfYearSelector
               value={this.state.timeOfYear}
               onChange={this.handleChangeTimeOfYear}
+              inlineLabel
             />
           </Col>
-          <Col>
+          <Col lg={6} md={6} sm={6}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}

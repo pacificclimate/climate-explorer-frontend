@@ -1,10 +1,14 @@
-.selectorlabel {
+.selectorlabel_stacked {
 	display: block;
-	}
+}
+
+.selectorlabel_inline {
+	display: inline-block;
+	margin-right: 1em;
+}
 
 .selectortitle {
 	text-align: left;
-	
 }
 
 /*leaflet controls have z index 1000, need the menu to be above them.*/

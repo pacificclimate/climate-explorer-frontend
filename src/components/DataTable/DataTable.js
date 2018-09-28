@@ -11,14 +11,69 @@ class DataTable extends React.Component {
     return (
       <div id={'table'}>
         <BootstrapTable data={this.props.data} options={this.props.options} striped hover >
-          <TableHeaderColumn dataField='model_period' isKey dataAlign='center' dataSort>Model Period</TableHeaderColumn>
-          <TableHeaderColumn dataField='run' dataAlign='center' dataSort>Run</TableHeaderColumn>
-          <TableHeaderColumn dataField='min' dataAlign='center' dataSort>Min</TableHeaderColumn>
-          <TableHeaderColumn dataField='max' dataAlign='center' dataSort>Max</TableHeaderColumn>
-          <TableHeaderColumn dataField='mean' dataAlign='center' dataSort>Mean</TableHeaderColumn>
-          <TableHeaderColumn dataField='median' dataAlign='center' dataSort>Median</TableHeaderColumn>
-          <TableHeaderColumn dataField='stdev' dataAlign='center' dataSort>Std.Dev</TableHeaderColumn>
-          <TableHeaderColumn dataField='units' dataAlign='center' dataSort>Units</TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='run'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Run
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='model_period' isKey
+            dataAlign='center'
+            dataSort
+            width='15%'
+          >
+            Averaging Period
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='min'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Min
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='max'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Max
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='mean'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Mean
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='median'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Median
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='stdev'
+            dataAlign='center'
+            dataSort
+            width='12%'
+          >
+            Std.Dev
+          </TableHeaderColumn>
+          <TableHeaderColumn
+            dataField='units'
+            dataAlign='center'
+            width='15%'
+          >
+            Units
+          </TableHeaderColumn>
         </BootstrapTable>
       </div>
     );

@@ -2,6 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 
+import {
+  csvButtonLabel,
+  downloadGraphDataLabel, xslxButtonLabel,
+}
+  from '../../guidance-content/info/InformationItems';
+
 import styles from './ExportButtons.css';
 
 
@@ -14,9 +20,11 @@ export default class ExportButtons extends React.Component {
   render() {
     return (
       <div>
-        <ControlLabel className={styles.exportlabel}>Download Data</ControlLabel>
-        <Button onClick={this.props.onExportXlsx}>XLSX</Button>
-        <Button onClick={this.props.onExportCsv}>CSV</Button>
+        <ControlLabel className={styles.exportlabel}>
+          {downloadGraphDataLabel}
+        </ControlLabel>
+        <Button onClick={this.props.onExportXlsx}>{xslxButtonLabel}</Button>
+        <Button onClick={this.props.onExportCsv}>{csvButtonLabel}</Button>
       </div>
     );
   }
