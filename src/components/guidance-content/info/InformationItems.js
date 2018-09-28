@@ -125,11 +125,21 @@ export const variable2SelectorLabel = (
 );
 
 ///////////////////////////////
-// Dataset summary
+// Dataset summaries
 ///////////////////////////////
 
+export const unfilteredDatasetSummaryPanelLabel = (
+  <LabelWithInfo label='All Datasets Summary'>
+    <p>Summary listing of all datasets available on this portal.</p>
+    <p>
+    </p>
+    <p>
+    </p>
+  </LabelWithInfo>
+);
+
 export const filteredDatasetSummaryPanelLabel = (
-  <LabelWithInfo label='Filtered Dataset Summary'>
+  <LabelWithInfo label='Filtered Datasets Summary'>
     <p>Summary listing of all datasets selected by dataset filter criteria.</p>
     <p>
       Each row of the table represents a group of up to 3 datasets.
