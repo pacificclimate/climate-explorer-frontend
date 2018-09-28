@@ -28,6 +28,7 @@ import g from '../../../core/geo';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
 import FlowArrow from '../../data-presentation/FlowArrow';
+import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -66,6 +67,18 @@ export default createReactClass({
 
     return (
       <Grid fluid>
+        <Row>
+          <FullWidthCol>
+            <UnfilteredDatasetsSummary meta={this.state.meta} />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
         <Row>
           <FullWidthCol>
             <Panel>

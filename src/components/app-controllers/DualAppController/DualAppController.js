@@ -36,6 +36,7 @@ import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSum
 
 import _ from 'underscore';
 import FlowArrow from '../../data-presentation/FlowArrow';
+import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
 export default createReactClass({
   displayName: 'DualAppController',
@@ -97,6 +98,18 @@ export default createReactClass({
 
     return (
       <Grid fluid>
+        <Row>
+          <FullWidthCol>
+            <UnfilteredDatasetsSummary meta={this.state.meta} />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
         <Row>
           <FullWidthCol>
             <Panel>
