@@ -6,3 +6,9 @@ export const FullWidthCol = ({ children, ...rest }) =>
 
 export const HalfWidthCol = ({ children, ...rest }) =>
   <Col lg={6} md={6} sm={12} {...rest}>{children}</Col>;
+
+export const ThirdWidthCol = ({ children, ...rest }) =>
+  <Col lg={4} md={12} sm={12} {...rest}>{children}</Col>;
+
+export const QuarterWidthCol = ({ children, ...rest }) =>
+  <Col lg={3} md={12} sm={12} {...rest}>{children}</Col>;
