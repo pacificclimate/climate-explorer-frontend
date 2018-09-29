@@ -50,6 +50,10 @@ import DualAnnualCycleGraph from '../../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';
 import DualTimeSeriesGraph from '../../graphs/DualTimeSeriesGraph';
 import DualVariableResponseGraph from '../../graphs/DualVariableResponseGraph';
+import {
+  singleLtaTabLabel, timeSeriesTabLabel,
+  variableResponseTabLabel, dualAnnualCycleTabLabel,
+} from '../../guidance-content/info/LabelWithInfoItems';
 
 export default createReactClass({
   displayName: 'DualDataController',
@@ -98,25 +102,25 @@ export default createReactClass({
         {
           multiYearMeanSelected(this.props) ? (
 
-            <Tabs id={"Graphs"}>
-              <Tab eventKey={1} title='Annual Cycle'>
+            <Tabs id='Graphs'>
+              <Tab eventKey={1} title={dualAnnualCycleTabLabel}>
                 <DualAnnualCycleGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title='Long Term Averages'>
+              <Tab eventKey={2} title={singleLtaTabLabel}>
                 <DualLongTermAveragesGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={3} title='Variable Response'>
+              <Tab eventKey={3} title={variableResponseTabLabel}>
                 <DualVariableResponseGraph {...this.props}/>
               </Tab>
             </Tabs>
 
           ) : (
 
-            <Tabs id={"Graphs"}>
-              <Tab eventKey={1} title='Time Series'>
+            <Tabs id='Graphs'>
+              <Tab eventKey={1} title={timeSeriesTabLabel}>
                 <DualTimeSeriesGraph {...this.props}/>
               </Tab>
-              <Tab eventKey={2} title='Variable Response'>
+              <Tab eventKey={2} title={variableResponseTabLabel}>
                 <DualVariableResponseGraph {...this.props}/>
               </Tab>
             </Tabs>
