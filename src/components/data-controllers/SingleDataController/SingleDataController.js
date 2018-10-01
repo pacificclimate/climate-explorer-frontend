@@ -53,7 +53,7 @@ import {
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel,
   statsTableLabel, statsTableExportButtonsInfo,
-} from '../../help-etc/LabelWithInfoItems';
+} from '../../help-etc/InformationItems';
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
