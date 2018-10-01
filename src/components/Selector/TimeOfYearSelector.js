@@ -27,7 +27,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Selector from './Selector';
 import { timeKeyToTimeOfYear } from '../../core/util';
-import { timeOfYearSelectorLabel } from '../guidance-content/info/LabelWithInfoItems';
+import { timeOfYearSelectorLabel } from '../help-etc/LabelWithInfoItems';
 
 class TimeOfYearSelector extends React.Component {
   static propTypes = {
