@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, ControlLabel } from 'react-bootstrap';
 
 import styles from './ExportButtons.css';
-import { downloadDataLabel } from '../../help-etc/InformationItems';
+import { downloadDataLabel } from '../../guidance-content/info/InformationItems';
 
 
 export default class ExportButtons extends React.Component {

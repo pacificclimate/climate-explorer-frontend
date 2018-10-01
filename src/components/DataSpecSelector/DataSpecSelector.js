@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Selector from '../Selector/Selector';
 import _ from 'underscore';
-import { datasetSelectorLabel } from '../help-etc/InformationItems';
+import { datasetSelectorLabel } from '../guidance-content/info/InformationItems';
 /******************************************************************
  * DataSpecSelector.js - Data Specification selecting widget
  * 
