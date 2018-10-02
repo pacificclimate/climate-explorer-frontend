@@ -15,24 +15,19 @@ describe('with one variable', () => {
         dataSpec='r1i1p1 1961-1990'
         onDataSpecChange={noop}
 
-        variableTimes={times}
-        variableTimeIdx={Object.keys(times)[0]}
-        onChangeVariableTime={noop}
+        raster={{
+          times,
+          timeIdx: Object.keys(times)[0],
+          palette: 'seq-Blues',
+          range: { min: -23 },
+          logscale: 'false',
+          onChangeTime: noop,
+          onChangePalette: noop,
+          onChangeScale: noop,
+        }}
 
         hasComparand={false}
-        onChangeComparandTime={noop}
-
-        rasterPalette={'seq-Blues'}
-        onChangeRasterPalette={noop}
-
-        onChangeIsolinePalette={noop}
-
-        rasterLayerMin={-23}
-        rasterLogscale={'false'}
-        onChangeRasterScale={noop}
-
-        onChangeIsolineScale={noop}
-
+        timesLinkable={false}
       />,
       div
     );
