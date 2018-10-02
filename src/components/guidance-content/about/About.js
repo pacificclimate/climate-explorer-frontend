@@ -1,6 +1,6 @@
 import React from 'react';
-import NavRoutes from './NavRoutes';
-import ClimateExplorer from "../guidance-content/about/ClimateExplorer";
+import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
+import ClimateExplorer from "./ClimateExplorer";
 
 const navSpec = {
   basePath: '/about',
