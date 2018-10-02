@@ -31,11 +31,6 @@ describe('with one variable', () => {
         }}
 
         hasComparand={false}
-        isoline={{
-          onChangeTime: noop,
-          onChangePalette: noop,
-          onChangeScale: noop,
-        }}
       />,
       div
     );
