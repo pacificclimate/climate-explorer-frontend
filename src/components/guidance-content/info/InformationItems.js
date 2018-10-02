@@ -187,7 +187,7 @@ export const datasetSelectorLabel = (
       That is, they may be displaying different datasets simultaneously.
     </p>
     <p>
-      On the map, use the {mapSettingsButton} button to access the Dataset selector.
+      On the map, use the {mapSettingsControl} to access the Dataset selector.
       The selected dataset is shown in the legend in the lower left of the map.
     </p>
     <p>
