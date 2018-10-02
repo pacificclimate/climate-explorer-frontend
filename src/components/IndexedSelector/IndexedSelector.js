@@ -33,7 +33,7 @@ export default class IndexedSelector extends React.Component {
     onChange: PropTypes.any,
     value: PropTypes.any,
     itemsDisabled: PropTypes.bool,
-    disabled: PropTypes.array
+    disabled: PropTypes.bool,
   };
   
   componentWillReceiveProps(newProps) {
