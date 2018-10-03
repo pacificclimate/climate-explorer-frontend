@@ -17,13 +17,12 @@ export default class FilteredDatasetsSummary extends React.Component {
     variable_id: PropTypes.string.isRequired,
     comparand_id: PropTypes.string,
     meta: PropTypes.array.isRequired,
-    comparandMeta: PropTypes.array.isRequired,
+    comparandMeta: PropTypes.array,
     dual: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
     dual: false,
-    comparandMeta: null,
   };
 
   render() {
