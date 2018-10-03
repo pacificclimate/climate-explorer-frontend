@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Navbar } from 'react-bootstrap';
@@ -16,10 +15,6 @@ import styles from './App.css';
 
 
 export default class App extends React.Component {
-  static propTypes = {
-    children: PropTypes.element,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
