@@ -17,7 +17,11 @@ import axios from 'axios';
 import {timestampToYear} from '../../core/util';
 
 var findEnsemble = function(props) {
-    return (props.params && props.params.ensemble_name) || props.ensemble_name || CE_ENSEMBLE_NAME;
+  return (
+    (props.match && props.match.params && props.match.params.ensemble_name) ||
+    props.ensemble_name ||
+    CE_ENSEMBLE_NAME
+  );
 };
 
 var AppMixin = {
