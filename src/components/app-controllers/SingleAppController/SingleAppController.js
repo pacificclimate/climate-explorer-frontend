@@ -82,7 +82,7 @@ export default createReactClass({
               label={variableSelectorLabel}
               onChange={this.handleSetVariable.bind(this, 'variable')}
               meta={this.state.meta}
-              constraints={{ model_id: this.state.model_id }}
+              constraints={{ model_id: this.state.model_id, experiment: this.state.experiment }}
               value={_.pick(this.state, 'variable_id', 'variable_name')}
             />
           </Col>
