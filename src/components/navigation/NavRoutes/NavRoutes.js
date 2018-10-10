@@ -29,8 +29,9 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Route, Redirect } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import './NavRoutes.css';
+import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
+import './NavRoutes.css';
 
 export default function NavRoutes(
   { navSpec, navIndex, onNavigate, match, children }
@@ -43,7 +44,7 @@ export default function NavRoutes(
       to={withBasePath(item.navSubpath || item.subpath)}
     >
       <NavItem eventKey={index}>
-        {item.label}
+        <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
       </NavItem>
     </LinkContainer>
   );

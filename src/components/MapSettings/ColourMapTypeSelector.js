@@ -12,9 +12,12 @@ import React from 'react';
 
 import Selector from '../Selector';
 import { getVariableOptions } from '../../core/util';
+import {
+  colourMapTypeSelectorLabel,
+} from '../guidance-content/info/InformationItems';
 
 
-export default class ScaleSelector extends React.Component {
+export default class ColourMapTypeSelector extends React.Component {
   static propTypes = {
     name: PropTypes.string, // 'Raster' | 'Isoline'
     variableId: PropTypes.string,
@@ -27,16 +30,15 @@ export default class ScaleSelector extends React.Component {
     const override = getVariableOptions(
       this.props.variableId, 'overrideLogarithmicScale');
     const layerMin = this.props.layerMin || -1;
-    const colourScales = [
+    const colourMapTypes = [
       ['false', 'Linear', false],
       ['true', 'Logarithmic', layerMin <= 0 && !override],
     ];
 
-
     return (
       <Selector
-        label={`${this.props.name} Scale`}
-        items={colourScales}
+        label={colourMapTypeSelectorLabel}
+        items={colourMapTypes}
         value={this.props.value}
         onChange={this.props.onChange}
       />

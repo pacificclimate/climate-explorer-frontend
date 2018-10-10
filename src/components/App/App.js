@@ -6,7 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import DataTool from '../DataTool';
 import NavRoutes from '../navigation/NavRoutes';
 import Help from '../navigation/Help';
-import Science from '../help-etc/Science';
+import Science from '../guidance-content/science/Science';
 import About from '../navigation/About';
 
 import logo from '../../assets/logo.png';
