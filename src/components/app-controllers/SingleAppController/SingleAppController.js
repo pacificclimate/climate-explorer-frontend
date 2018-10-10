@@ -54,7 +54,7 @@ export default createReactClass({
     //hierarchical selection: model, then variable, then experiment
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
-        this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id, variable_id: this.state.variable_id }));
+        this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id }));
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
