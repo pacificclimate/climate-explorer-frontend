@@ -30,7 +30,7 @@ export const appContact = {
 export const datasetFilterPanelLabel = (
   <LabelWithInfo label='Dataset Filter'>
     <p>
-      This is the primary filter for the datasets to be displayed.
+      This filter determines which datasets can be displayed.
     </p>
     <p>
       Datasets matching these filter criteria can be displayed in the
@@ -45,6 +45,19 @@ export const modelSelectorLabel = (
   <LabelWithInfo label='Model'>
     <p>
       GCM model with which the climate data was generated.
+    </p>
+    <p>
+      A <
+      a href='http://www.ipcc-data.org/guidelines/pages/gcm_guide.html'
+        target='_blank'
+      >GCM
+      (General Circulation Model)</a> is
+      a numerical model representing
+      physical processes in the atmosphere, ocean, cryosphere and land surface
+      of the Earth.
+      GCMs are the most advanced tools currently available for simulating the
+      response of the global climate system to increasing greenhouse gas
+      concentrations.
     </p>
     <p>
       Models are identified by short codes. For full model identification,
@@ -459,8 +472,8 @@ export const dualAnnualCycleTabLabel = (
 const ltaGraphDefn = `
   A long term average graph presents average values of the selected variable
   for the selected month, season, or the year, averaged
-  over several different multi-decade period. 
-  There is one data point per mulit-decade averaging period.
+  over several different multi-decade periods. 
+  There is one data point per multi-decade averaging period.
   Horizontal axis indicates midpoint of multi-decade averaging period.
 `;
 
