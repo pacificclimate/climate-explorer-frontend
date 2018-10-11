@@ -7,34 +7,60 @@ import { appContact } from '../info/InformationItems';
 
 const faqs = [
   {
-    question: 'What is the meaning of life?',
+    question: 'Which model should I select?',
     answer: <div>
       <p>
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae
-        ab illo inventore veritatis et quasi architecto beatae vitae dicta
-        sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-        aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-        eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est,
-        qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit,
-        sed quia non numquam eius modi tempora incidunt ut labore et dolore
-        magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis
-        nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut
-        aliquid ex ea commodi consequatur? Quis autem vel eum iure
-        reprehenderit qui in ea voluptate velit esse quam nihil molestiae
-        consequatur, vel illum qui dolorem eum fugiat quo voluptas
-        nulla pariatur?
-      </p>
-      <p>
-        &mdash; Cicero, <i>de Finibus Bonorum et Malorum</i>
+        Canada's own Global Climate Model, CanESM2, is the most representative
+        model for Canada. It is a good default choice if you do not have
+        specialized needs that would be better represented by a different model.
       </p>
     </div>,
   },
 
   {
-    question: 'How can I get rich quickly?',
-    answer: `Buy low, sell high.`,
+    question: 'What emissions scenario should I select?',
+    answer: <div>
+      <p>
+        The worst-case emissions scenario, RCP 8.5
+        (presented in the selectors as <code>historical, rcp85</code>),
+        is a good choice for making decisions that adapt to climate change.
+      </p>
+    </div>,
   },
+
+  {
+    question: 'How do I zoom in on the map?',
+    answer: <div>
+      <p>
+        Click the <code>+</code> button to zoom in, and the <code>-</code>
+        button to zoom out.
+        Test: <span className='leaflet-control-zoom leaflet-bar leaflet-control'>
+          <a className='leaflet-control-zoom-in' href='#'>+</a>
+        </span>
+      </p>
+    </div>,
+  },
+
+  {
+    question: `What are the small triangles in the column labels of tables 
+      like the Statistical Summary for?`,
+    answer: <div>
+      <p>
+        They are used to sort the table by that column.
+        Click on a column header to sort by that column.
+        Click again to change the direction of sorting.
+      </p>
+    </div>,
+  },
+  //
+  // {
+  //   question: 'question',
+  //   answer: <div>
+  //     <p>
+  //
+  //     </p>
+  //   </div>,
+  // },
 ];
 
 const items = faqs.map((faq, i) => (
