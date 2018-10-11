@@ -41,16 +41,11 @@ export const datasetFilterPanelLabel = (
   </LabelWithInfo>
 );
 
-export const modelSelectorLabel = (
-  <LabelWithInfo label='Model'>
-    <p>
-      GCM model with which the climate data was generated.
-    </p>
-    <p>
+export const gcmDefn = (<span>
       A <
-      a href='http://www.ipcc-data.org/guidelines/pages/gcm_guide.html'
-        target='_blank'
-      >GCM
+  a href='http://www.ipcc-data.org/guidelines/pages/gcm_guide.html'
+    target='_blank'
+>GCM
       (General Circulation Model)</a> is
       a numerical model representing
       physical processes in the atmosphere, ocean, cryosphere and land surface
@@ -58,8 +53,16 @@ export const modelSelectorLabel = (
       GCMs are the most advanced tools currently available for simulating the
       response of the global climate system to increasing greenhouse gas
       concentrations.
+
+</span>);
+
+export const modelSelectorLabel = (
+  <LabelWithInfo label='Model'>
+    <p>
+      GCM model with which the climate data was generated.
     </p>
     <p>
+    </p>{gcmDefn}<p>
       Models are identified by short codes. For full model identification,
       see <Link to='/help/general'>Help</Link>.
     </p>

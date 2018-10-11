@@ -1,10 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Grid, Row, ListGroup, ListGroupItem
+  Grid, Row, ListGroup, ListGroupItem,
 } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import overviewImg from '../../../assets/overview.png';
+import { gcmDefn } from '../info/InformationItems';
+
+const cddCaution = (<span>
+  Please note the distinction between the variable we label <code>cdd</code>,
+  meaning cooling degree-days,
+  and the Climdex variable <code>CDD</code>,
+  meaning maximum length of dry spell,
+  which we label <code>cddETCCDI</code>.
+</span>);
 
 export default function HelpGeneral() {
   return (
@@ -19,8 +28,10 @@ export default function HelpGeneral() {
         <HalfWidthCol>
           <p>
             Please forgive the partial and scattered content in this
-            section. This is a work in progress.
-            <Link to='/about/contact'>Feedback and suggestions</Link> are always welcome!
+            section.
+            This is a work in progress. {' '}
+            <Link to='/about/contact'>Feedback and suggestions</Link> are
+            always welcome!
           </p>
         </HalfWidthCol>
       </Row>
@@ -93,13 +104,13 @@ export default function HelpGeneral() {
               <h5>Variable names and meanings</h5>
               <ListGroup>
                 <ListGroupItem header='pr'>
-                  Precipitation at ground level
+                  Precipitation at ground level.
                 </ListGroupItem>
                 <ListGroupItem header='tasmax'>
-                  Daily maximum near-surface air temperature
+                  Daily maximum near-surface air temperature.
                 </ListGroupItem>
                 <ListGroupItem header='tasmin'>
-                  Daily minimum near-surface air temperature
+                  Daily minimum near-surface air temperature.
                 </ListGroupItem>
               </ListGroup>
             </ListGroupItem>
@@ -120,103 +131,133 @@ export default function HelpGeneral() {
               <ListGroup>
                 <ListGroupItem header='altcddETCCDI'>
                   <p>
-                    Maximum number of consecutive days per year with less than 1mm
-                    of precipitation
+                    Dry spell duration index spanning years:
+                    Maximum number of consecutive days in one year with less
+                    than 1 mm of precipitation.
                   </p>
                   <p>
-                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                    This is an alternative version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                    It represents the full length of continuous dry spells
+                    that extend across the (artifical) December-January boundary
+                    of a calendar year.
                   </p>
+                  <p>{cddCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='altcsdiETCCDI'>
                   <p>
-                    Cold spell duration index spanning years
+                    Cold spell duration index spanning years:
+                    Count of days with at least 6 consecutive days when
+                    daiy minimum temperature &lt; 10th percentile.
                   </p>
                   <p>
-                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CSDI</em>.
+                    This is an alternative version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CSDI</em>.
+                    It represents the full length of continuous cold spells
+                    that extend across the (artifical) December-January boundary 
+                    of a calendar year.
                   </p>
                 </ListGroupItem>
                 <ListGroupItem header='altcwdETCCDI'>
                   <p>
-                    Maximum number of consecutive days per year with at least 1mm of
-                    precipitation
+                    Maximum length of wet spell spanning years:
+                    Maximum number of consecutive days with at
+                    least 1 mm of precipitation.
                   </p>
                   <p>
-                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                    This is an alternative version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CWD</em>.
+                    It represents the full length of continuous wet spells
+                    that extend across the (artifical) December-January boundary
+                    of a calendar year.
                   </p>
                 </ListGroupItem>
                 <ListGroupItem header='altwsdiETCCDI'>
                   <p>
-                    Warm spell duration index spanning years
+                    Warm spell duration index spanning years:
+                    Count of days with at least 6 consecutive days when
+                    daily maximum temperature &gt; 90th percentile.
                   </p>
                   <p>
-                    This is a variant ('alt') version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>CDD</em>.
+                    This is an alternative version of the <a href='https://www.climdex.org/indices.html'>Climdex</a> variable <em>WSDI</em>.
+                    It represents the full length of continuous warm spells
+                    that extend across the (artifical) December-January boundary
+                    of a calendar year.
                   </p>
                 </ListGroupItem>
                 <ListGroupItem header='cddETCCDI'>
                   <p>
-                    Maximum number of consecutive days with less than 1mm of
-                    precipitation
+                    Maximum length of dry spell:
+                    Maximum number of consecutive days with less than 1 mm of
+                    precipitation.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CDD</em>.</p>
+                  <p>{cddCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='csdiETCCDI'>
                   <p>
-                    Cold spell duration index
+                    Cold spell duration index:
+                    Annual count of days with at least 6 consecutive days when
+                    daiy minimum temperature &lt; 10th percentile.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CSDI</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='cwdETCCDI'>
                   <p>
-                    Maximum number of consecutive days with at least 1mm of
-                    precipitation
+                    Maximum length of wet spell:
+                    Maximum number of consecutive days with at least 1 mm of
+                    precipitation.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>CWD</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='dtrETCCDI'>
                   <p>
-                    Mean diurnal temperature range
+                    Mean diurnal temperature range:
+                    Monthly mean difference between daily maximum temperature
+                    and daily minimum temperature.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>DTR</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='fdETCCDI'>
                   <p>
-                    Number of frost days
+                    Number of frost days:
+                    Annual count of days when daily minimum temperature.
+                    &lt; 0&deg;C.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>FD</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='gslETCCDI'>
                   <p>
-                    Growing season length
+                    Growing season length.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>GSL</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='idETCCDI'>
                   <p>
-                    Number of icing days
+                    Number of icing days:
+                    Annual count of days when daily maximum temperature.
+                    &lt; 0&deg;C.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>ID</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='prcptotETCCDI'>
                   <p>
-                    Annual total precipitation in wet days
+                    Annual total precipitation in wet days.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>PRCPTOT</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='r10mmETCCDI'>
                   <p>
-                    Annual count of days with at least 10mm of precipitation
+                    Annual count of days with at least 10 mm of precipitation.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R10MM</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='r1mmETCCDI'>
                   <p>
-                    Annual count of days with at least 1mm of precipitation
+                    Annual count of days with at least 1 mm of precipitation.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R1MM</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='r20mmETCCDI'>
                   <p>
-                    Annual count of days with at least 20mm of precipitation
+                    Annual count of days with at least 20 mm of precipitation.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R20MM</em>.</p>
                 </ListGroupItem>
@@ -225,14 +266,14 @@ export default function HelpGeneral() {
                     Annual total precipitation when daily precipitation exceeds the
                     95th percentile of wet day precipitation
                   </p>
-                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R95P</em>.</p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R95pTOT</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='r99pETCCDI'>
                   <p>
                     Annual total precipitation when daily precipitation exceeds the
                     99th percentile of wet day precipitation
                   </p>
-                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R99P</em>.</p>
+                  <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>R99pTOT</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='rx1dayETCCDI'>
                   <p>
@@ -260,20 +301,21 @@ export default function HelpGeneral() {
                 </ListGroupItem>
                 <ListGroupItem header='sdiiETCCDI'>
                   <p>
-                    Simple precipitation intensity index
+                    Simple precipitation intensity index.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>SDII</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='suETCCDI'>
                   <p>
-                    Number of summer days
+                    Number of summer days:
+                    Annual count of days when daily maximum temperature &gt; 25&deg;C.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>SU</em>.</p>
                 </ListGroupItem>
                 <ListGroupItem header='tn10pETCCDI'>
                   <p>
                     Percentage of days when daily minimum temperature is below the
-                    10th percentile
+                    10th percentile.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TN10P</em>.</p>
                 </ListGroupItem>
@@ -310,7 +352,8 @@ export default function HelpGeneral() {
                 </ListGroupItem>
                 <ListGroupItem header='trETCCDI'>
                   <p>
-                    Number of tropical nights
+                    Number of tropical nights:
+                    Annual count of days when daily minimum temperature) exceeds 20&deg;C.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TR</em>.</p>
                 </ListGroupItem>
@@ -354,7 +397,9 @@ export default function HelpGeneral() {
                 </ListGroupItem>
                 <ListGroupItem header='wsdiETCCDI'>
                   <p>
-                    Warm spell duration index
+                    Warm spell duration index:
+                    Count of days with at least 6 consecutive days when
+                    daily maximum temperature &gt; 90th percentile.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>WSDI</em>.</p>
                 </ListGroupItem>
@@ -365,31 +410,291 @@ export default function HelpGeneral() {
               <p>
               Counts of how many days fall below or above a given temperature
               threshold multiplied by how much the threshold is exceeded,
-              calculated from model output, usually over a period of a year
-              (although seasonal and monthly degree-day counts are also
-              possible).
-              The data is averaged over several thirty year periods between
+              calculated from model output, over a period of one year.
+              The data is averaged over four thirty year periods between
               1970 to 2100.
               This data is available for all of British Columbia.
               </p>
+              <p>
+                A degree-day is a measure of the how much
+                the actual temperature (usually the mean average temperature)
+                falls either above or below a threshold temperature that
+                represents a temperature of
+                interest (e.g., freezing, temperature at which cooling is
+                required).
+                For a given degree-day measure,
+                the difference is only counted when the actual
+                temperature is either above or below the threshold,
+                the condition (above, below) being given as part of the
+                measure's definition.
+                One degree day is one day with a temperature
+                difference from threshold of 1 degree (in Canada, &deg;C).
+                A day with a temperature difference of 3 degrees represents
+                3 degree-days. The total degree-days over a given period
+                (e.g., a month, a year) is the total degree-days for each day
+                in that period, always respecting both the threshold and the
+                condition (above, below) in counting each day.
+              </p>
               <h5>Variable names and meanings</h5>
-              <ListGroup>
-              </ListGroup>
+              <ListGroupItem header='cdd'>
+                <p>
+                  Cooling Degree Days:
+                  Degree-days in one year above 18&deg;C.
+                </p>
+                <p>{cddCaution}</p>
+              </ListGroupItem>
+              <ListGroupItem header='hdd'>
+                Heating Degree Days:
+                Degree-days in one year below 18&deg;C.
+              </ListGroupItem>
+              <ListGroupItem header='gdd'>
+                Growing Degree Days:
+                Degree-days in one year above 5&deg;C.
+              </ListGroupItem>
+              <ListGroupItem header='fdd'>
+                Frost Degree Days:
+                Degree-days in one year below 0&deg;C.
+              </ListGroupItem>
             </ListGroupItem>
 
             <ListGroupItem header='Return periods'>
               <p>
-              Calculated from model output using a generalized extreme value
-              distribution, this dataset describes extreme temperature or
-              precipitation events that would be expected to occur once every
-              twenty years. T
-              his data is available for six thirty year periods from
-              1960 to 2100.
-              This data is available for all of British Columbia.
+                This dataset describes extreme temperature or
+                precipitation events that would be expected to occur once
+                during a specified "return period," for example once every
+                20 years.
+                These datasets are calculated from model output using a
+                generalized extreme value distribution.
+                This data is available for four thirty year climatological
+                periods from 1970 to 2100.
+                This data is available for all of British Columbia.
               </p>
               <h5>Variable names and meanings</h5>
               <ListGroup>
+                <ListGroupItem header='rp5pr'>
+                  5-year annual maximum one day precipitation amount
+                </ListGroupItem>
+                <ListGroupItem header='rp20pr'>
+                  20-year annual maximum one day precipitation amount
+                </ListGroupItem>
+                <ListGroupItem header='rp50pr'>
+                  50-year annual maximum one day precipitation amount
+                </ListGroupItem>
+                <ListGroupItem header='rp5tasmax'>
+                  5-year annual maximum daily maximum temperature
+                </ListGroupItem>
+                <ListGroupItem header='rp20tasmax'>
+                  20-year annual maximum daily maximum temperature
+                </ListGroupItem>
+                <ListGroupItem header='rp50tasmax'>
+                  50-year annual maximum daily maximum temperature
+                </ListGroupItem>
+                <ListGroupItem header='rp5tasmin'>
+                  5-year annual minimum daily minimum temperature
+                </ListGroupItem>
+                <ListGroupItem header='rp20tasmin'>
+                  20-year annual minimum daily minimum temperature
+                </ListGroupItem>
+                <ListGroupItem header='rp50tasmin'>
+                  50-year annual minimum daily minimum temperature
+                </ListGroupItem>
               </ListGroup>
+            </ListGroupItem>
+          </ListGroup>
+
+          <h2>Models (GCMs)</h2>
+          <p>{gcmDefn}</p>
+          <p>
+            In Climate Explorer, models are indentified by short codes.
+            The following table gives the full name and provenance of these
+            models.
+          </p>
+          <ListGroup>
+            <ListGroupItem header='GFDL-CM3'>
+              <a
+                href='https://www.gfdl.noaa.gov/coupled-physical-model-cm3/'
+                target='_blank'
+              >
+                U.S. Geophysical Fluid Dynamics Laboratory
+                Coupled Physical Model CM3
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='GFDL-ESM2G'>
+              <a
+                href='https://www.gfdl.noaa.gov/earth-system-model/'
+                target='_blank'
+              >
+                U.S. Geophysical Fluid Dynamics Laboratory
+                ESM2G model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='GFDL-ESM2M'>
+              <a
+                href='https://www.gfdl.noaa.gov/earth-system-model/'
+                target='_blank'
+              >
+                U.S. Geophysical Fluid Dynamics Laboratory
+                ESM2M model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='HadGEM2-AO'>
+              <a
+                href='https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf'
+                target='_blank'
+              >
+                U.K. Met Office
+                HadGEM2 AO
+                (Troposphere, Land Surface &amp; Hydrology,
+                Aerosols, Ocean &amp; Sea-ice) model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='HadGEM2-ES'>
+              <a
+                href='https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf'
+                target='_blank'
+              >
+                U.K. Met Office
+                HadGEM2 ES
+                (Troposphere, Land Surface & Hydrology,
+                Aerosols, Ocean & Sea-ice, Terrestrial
+                Carbon Cycle, Ocean Biogeochemistry,
+                Chemistry)
+                model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='HadGEM2-CC'>
+              <a
+                href='https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf'
+                target='_blank'
+              >
+                U.K. Met Office
+                HadGEM2 CC
+                (Troposphere, Land Surface &amp; Hydrology,
+                Aerosols, Ocean &amp; Sea-ice, Terrestrial
+                Carbon Cycle, Ocean Biogeochemistry)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='MRI-CGCM3'>
+              <a
+                href='https://www.jstage.jst.go.jp/article/jmsj/90A/0/90A_2012-A02/_pdf'
+                target='_blank'
+              >
+                Japan Meteorological Research Institute
+                CCGM3 model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='CNRM-CM5'>
+              <a
+                href='http://www.umr-cnrm.fr/spip.php?article126&lang=en'
+                target='_blank'
+              >
+                France Centre National de Recherches Météorologiques
+                (National Centre for Meteorological Research)
+                CNRM-CM5 model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='CCSM4'>
+              <a
+                href='http://www.cesm.ucar.edu/models/ccsm4.0/'
+                target='_blank'
+              >
+                U.S. National Center for Atmospheric Research
+                CCSM4 4.0 model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='CSIRO-Mk3-6-0'>
+              <a
+                href='https://confluence.csiro.au/public/CSIROMk360'
+                target='_blank'
+              >
+                Australia Commonwealth Scientific and Industrial Research Organisation
+                CSIRO-Mk3.6.0 model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='inmcm4'>
+              <a
+                href='http://www.glisaclimate.org/node/2220'
+                target='_blank'
+              >
+                Russia Institute for Numerical Mathematics
+                Climate Model Version 4
+              </a>
+              We are unable to find a more authoritative reference in English
+              for this model.
+            </ListGroupItem>
+            <ListGroupItem header='bcc-csm1-1-m'>
+              <a
+                href='http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm'
+                target='_blank'
+              >
+                China Beijing Climate Center
+                Climate System Model version 1.1 (m)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='FGOALS-g2'>
+              <a
+                href='http://www.lasg.ac.cn/fgoals/index2.asp'
+                target='_blank'
+              >
+                China LASG
+                (Laboratory of Numerical Modeling for Atmospheric Sciences
+                and Geophysical Fluid Dynamics)
+                FGOALS-g2 model
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='CanESM2'>
+              <a
+                href='https://www.ec.gc.ca/ccmac-cccma/default.asp?lang=En&n=1A3B7DF1-1&wbdisable=true'
+                target='_blank'
+              >
+                Canadian Centre for Climate Modelling and Analysis
+                ESM2 (Earth System Model ver. 2)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='MIROC5'>
+              <a
+                href='https://journals.ametsoc.org/doi/10.1175/2010JCLI3679.1'
+                target='_blank'
+              >
+                Japan Agency for Marine-Earth Science and Technology;
+                Atmosphere and Ocean Research Institute;
+                Centre for Climate System Research -
+                National Institute for Environmental Studies
+                MIROC5
+                (Model for Interdisciplinary Research on Climate, ver. 5)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='MIROC-ESM-CHEM'>
+              <a
+                href='https://www.researchgate.net/publication/253418457_MIROC-ESM_model_description_and_basic_results_of_CMIP5-20c3m_experiments'
+                target='_blank'
+              >
+                Japan Agency for Marine-Earth Science and Technology;
+                Atmosphere and Ocean Research Institute;
+                Centre for Climate System Research -
+                National Institute for Environmental Studies
+                MIROC-ESM-CHEM
+                (Model for Interdisciplinary Research on Climate
+                Earth System Model with Atmospheric Chemistry)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='MPI-ESM-LR'>
+              <a
+                href='https://www.mpimet.mpg.de/en/science/models/mpi-esm/'
+                target='_blank'
+              >
+                Germany Max Planck Institute
+                ESM (Earth System Model)
+              </a>
+            </ListGroupItem>
+            <ListGroupItem header='ACCESS1-0'>
+              <a
+                href='http://climate-cms.unsw.wikispaces.net/file/view/Bi_AMOJ_ACCESS-CM_revision.pdf'
+                target='_blank'
+              >
+                Australian Community Climate and Earth System Simulator
+                coupled model
+              </a>
             </ListGroupItem>
           </ListGroup>
 
@@ -405,7 +710,8 @@ export default function HelpGeneral() {
             points.
           </p>
           <p>Specifically, a dataset is a collection of geospatial
-            (longitude-latitude) grids. Each grid holds the data for a particular
+            (longitude-latitude) grids. Each geospatial grid holds the data for
+            a particular
             time. (Conversely, you could think of a dataset as a geospatial grid
             of time series, but the data is in fact stored as a grid per time
             value.)</p>
@@ -666,7 +972,7 @@ export default function HelpGeneral() {
             datasets. To convey the maximum amount of information to the human
             user, the minimum and maximum values should be close to the dataset’s
             minimum and maximum values.</p>
-          <p>We offer two different types of color scale, linear and
+          <p>We offer two different types of colour scale, linear and
             logarithmic. These are distinguished by how data values are mapped
             onto the colour index:</p>
           <ul>
@@ -714,7 +1020,7 @@ export default function HelpGeneral() {
           <p>
             When only one variable is displayed on the map (as a raster),
             there is one colour scale reference.</p>
-          <p>When two variables are displayed on the map (raster and
+          <p>When two colour-mapped variables are displayed on the map (raster and
             isolines), there are two colour scale references. The upper reference
             is for isolines and the lower reference is for raster.</p>
         </HalfWidthCol>
