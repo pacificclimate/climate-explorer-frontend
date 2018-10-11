@@ -8,14 +8,14 @@ const navSpec = {
   basePath: '/help',
   items: [
     {
-      label: 'FAQ',
-      subpath: 'faq',
-      component: FAQ,
-    },
-    {
       label: 'General',
       subpath: 'general',
       component: HelpGeneral,
+    },
+    {
+      label: 'FAQ',
+      subpath: 'faq',
+      component: FAQ,
     },
     {
       label: 'Glossary',
