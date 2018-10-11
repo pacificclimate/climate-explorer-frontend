@@ -10,7 +10,7 @@ const faqs = [
     question: 'Which model should I select?',
     answer: <div>
       <p>
-        Canada's own Global Climate Model, CanESM2, is the most representative
+        Canada's own General Circulation Model, CanESM2, is the most representative
         model for Canada. It is a good default choice if you do not have
         specialized needs that would be better represented by a different model.
       </p>
@@ -32,11 +32,29 @@ const faqs = [
     question: 'How do I zoom in on the map?',
     answer: <div>
       <p>
-        Click the <code>+</code> button to zoom in, and the <code>-</code>
-        button to zoom out.
-        Test: <span className='leaflet-control-zoom leaflet-bar leaflet-control'>
-          <a className='leaflet-control-zoom-in' href='#'>+</a>
+        Click the
+        <span
+          className='leaflet-control-zoom leaflet-bar leaflet-control'
+          style={{ float: 'none' }}
+        >
+          <a
+            className='leaflet-control-zoom-in' href='#'>+</a>
         </span>
+        button to zoom in.
+      </p>
+      <p>
+        Click the
+        <span
+          className='leaflet-control-zoom leaflet-bar leaflet-control'
+          style={{ float: 'none' }}
+        >
+          <a className='leaflet-control-zoom-out' href='#'>-</a>
+        </span>
+        button to zoom out.
+      </p>
+      <p>
+        Alternatively, use the scroll wheel on your mouse, or, with a touch
+        screen, pinch to zoom in and spread to zoom out.
       </p>
     </div>,
   },
@@ -92,13 +110,10 @@ export default function FAQ() {
             The content of our FAQ is driven by our users' needs and questions.
           </p>
           <p>
-            At present, we have no questions or answers here, because we don't
+            At present, we have few questions or answers here, because we don't
             yet know what you, our user, needs to know.
             Please <a href={appContact.email}>email us</a> with questions you
             would like to see in the FAQ.
-          </p>
-          <p>
-            In the meantime, we offer the following pearls of wisdom.
           </p>
         </HalfWidthCol>
       </Row>
