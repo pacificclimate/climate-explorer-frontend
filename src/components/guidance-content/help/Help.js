@@ -17,11 +17,11 @@ const navSpec = {
       subpath: 'faq',
       component: FAQ,
     },
-    {
-      label: 'Glossary',
-      subpath: 'glossary',
-      component: Glossary,
-    },
+    // {
+    //   label: 'Glossary',
+    //   subpath: 'glossary',
+    //   component: Glossary,
+    // },
   ],
 };
 
