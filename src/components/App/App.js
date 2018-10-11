@@ -20,7 +20,7 @@ import About from '../guidance-content/about/About';
 
 import logo from '../../assets/logo.png';
 import marmot from '../../assets/marmot.png';
-import styles from './App.css';
+import css from './App.css';
 
 
 export default class App extends React.Component {
@@ -73,9 +73,12 @@ export default class App extends React.Component {
     return (
       <Router basename={'/#'}>
         <div>
-          <NavRoutes navSpec={this.navSpec}>
+          <NavRoutes
+            navSpec={this.navSpec}
+            navClassName={css.mainNav}
+          >
             <Navbar.Header>
-              <Navbar.Brand className={styles.pcic_logo}>
+              <Navbar.Brand className={css.pcic_logo}>
                 <a href='https://pacificclimate.org/'>
                   <img
                     src={logo}
@@ -85,7 +88,7 @@ export default class App extends React.Component {
                   />
                 </a>
               </Navbar.Brand>
-              <Navbar.Brand className={styles.marmot_logo}>
+              <Navbar.Brand className={css.marmot_logo}>
                 <img
                   src={marmot} height={68}
                   alt='Vancouver Island Marmot'

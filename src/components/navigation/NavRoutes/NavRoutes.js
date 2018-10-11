@@ -34,7 +34,10 @@ import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import './NavRoutes.css';
 
 export default function NavRoutes(
-  { navSpec, navIndex, onNavigate, match, children }
+  {
+    navSpec, navIndex, onNavigate, navClassName,
+    match, children,
+  }
 ) {
   const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
 
@@ -66,7 +69,7 @@ export default function NavRoutes(
 
   return (
     <div>
-      <Navbar fluid>
+      <Navbar fluid className={navClassName}>
         { children }
         <Nav
           bsStyle='pills'

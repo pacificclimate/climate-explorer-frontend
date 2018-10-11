@@ -1,3 +1,16 @@
+.mainNav {
+    background: #a2c6d4;
+}
+
+.mainNav li a {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.mainNav .navbar-header {
+    padding: 5px 0;
+}
+
 :local(.pcic_logo) {
     margin-top: -10px;
 }
