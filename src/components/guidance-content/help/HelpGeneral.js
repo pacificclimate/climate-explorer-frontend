@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Grid, Row, ListGroup, ListGroupItem,
+  Grid, Row, ListGroup, ListGroupItem, Table,
 } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import overviewImg from '../../../assets/overview.png';
@@ -418,12 +418,16 @@ export default function HelpGeneral() {
               eventKey={3}
             >
               <p>
-              Counts of how many days fall below or above a given temperature
-              threshold multiplied by how much the threshold is exceeded,
-              calculated from model output, over a period of one year.
-              The data is averaged over four thirty year periods between
-              1970 to 2100.
-              This data is available for all of British Columbia.
+                Counts of how many days fall below or above a given temperature
+                threshold multiplied by how much the threshold is exceeded,
+                calculated from model output, over a period of one year.
+                The data is averaged over four thirty year periods between
+                1970 to 2100, namely
+                1971-2000,
+                2011-2040,
+                2041-2070, and
+                2071-2100.
+                This data is available for all of British Columbia.
               </p>
               <p>
                 A degree-day is a measure of the how much
@@ -479,7 +483,11 @@ export default function HelpGeneral() {
                 These datasets are calculated from model output using a
                 generalized extreme value distribution.
                 This data is available for four thirty year climatological
-                periods from 1970 to 2100.
+                periods from 1970 to 2100, namely
+                1971-2000,
+                2011-2040,
+                2041-2070, and
+                2071-2100.
                 This data is available for all of British Columbia.
               </p>
               <h5>Variable names and meanings</h5>
@@ -1036,6 +1044,200 @@ export default function HelpGeneral() {
           <p>When two colour-mapped variables are displayed on the map (raster and
             isolines), there are two colour scale references. The upper reference
             is for isolines and the lower reference is for raster.</p>
+
+          <h2>Exported data file formats</h2>
+          <h3>File formats: XSLX and CSV</h3>
+          <p>
+            Both file formats convey information as table with rows and
+            columns, as typically managed by spreadsheet programs.
+          </p>
+          <h4>XSLX</h4>
+          <p>
+            This format is compatible with Microsoft Excel.
+          </p>
+          <h4>CSV</h4>
+          <p>
+            This format is plain text in the comma-separated variables format,
+            with column separator being the comma (<code>,</code>).
+          </p>
+          <h3>Content formats</h3>
+          <p>
+            Each graph or data table is exported in a table layout suitable
+            to its content. The following sections detail each such layout.
+          </p>
+          <h4>Annual Cycle graph</h4>
+          <Table bordered condensed responsive>
+            <thead>
+              <tr>
+                <th>Row number(s)</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1&ndash;2</td>
+                <td>Information identifying the dataset(s) presented in this
+                graph.</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Names of dataset selection criteria
+                  (e.g., Model, Emissions Scenario). These define the dataset
+                filter criteria and data subselections within the graph.</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Values of dataset selection criteria.</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>blank</td>
+              </tr>
+              <tr>
+                <td>4&ndash;</td>
+                <td>Values of data points presented in this graph.</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>
+                  Headings for data columns.
+                </td>
+              </tr>
+              <tr>
+                <td>5&ndash;</td>
+                <td>
+                  <p>Data point values.</p>
+
+                  <p>
+                    Column <code>Time Series</code> identifies the curve on
+                    the graph,
+                    one of yearly, seasonal, or monthly mean values.</p>
+                  <p>
+                    The next 12 columns give the monthly values for each curve.
+                    Note that there is a monthly value for each curve; for curves
+                    with less than monthly resolution (seasonal, yearly),
+                    values are repeated for the appropriate groups of months.
+                  </p>
+                  <p>
+                    The <code>units</code> column gives the units of measure
+                    for the data values.</p>
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+
+          <h4>Long Term Average graph</h4>
+          <Table bordered condensed responsive>
+            <thead>
+            <tr>
+              <th>Row number(s)</th>
+              <th>Contents</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1&ndash;2</td>
+              <td>Information identifying the dataset(s) presented in this
+                graph.</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Names of dataset selection criteria
+                (e.g., Model, Emissions Scenario). These define the dataset
+                filter criteria and data subselections within the graph.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Values of dataset selection criteria.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>blank</td>
+            </tr>
+            <tr>
+              <td>4&ndash;</td>
+              <td>Values of data points presented in this graph.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
+                Headings for data columns.
+              </td>
+            </tr>
+            <tr>
+              <td>5&ndash;</td>
+              <td>
+                <p>Data point values.</p>
+
+                <p>
+                  Column <code>Run</code> identifies the curve on the graph,
+                  one the <em>r-i-p</em> run codes.</p>
+                <p>
+                  The next 6 columns give the values for each data point
+                  on the curve, identified by the mid-point of the averaging
+                  period (e.g., <code>2085-01-15</code>).
+                </p>
+                <p>
+                  The <code>units</code> column gives the units of measure
+                  for the data values.</p>
+              </td>
+            </tr>
+            </tbody>
+          </Table>
+
+          <h4>Change from Baseline graph</h4>
+          <p>See Annual Cycle graph</p>
+
+          <h4>Statistical Summary table</h4>
+          <Table bordered condensed responsive>
+            <thead>
+            <tr>
+              <th>Row number(s)</th>
+              <th>Contents</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1&ndash;2</td>
+              <td>Information identifying the dataset(s) presented in this
+                table.</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Names of dataset selection criteria
+                (e.g., Model, Emissions Scenario). These define the dataset
+                filter criteria and data subselections within the graph.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Values of dataset selection criteria.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>blank</td>
+            </tr>
+            <tr>
+              <td>4&ndash;</td>
+              <td>
+                Values shown in table.
+                Layout and content is the same as the table.
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
+                Headings for data columns.
+              </td>
+            </tr>
+            <tr>
+              <td>5&ndash;</td>
+              <td>
+                Data values.
+              </td>
+            </tr>
+            </tbody>
+          </Table>
+
         </HalfWidthCol>
       </Row>
     </Grid>
