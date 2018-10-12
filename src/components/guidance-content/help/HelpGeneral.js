@@ -6,6 +6,7 @@ import {
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import overviewImg from '../../../assets/overview.png';
 import { gcmDefn } from '../info/InformationItems';
+import Accordion from '../../guidance-tools/Accordion';
 
 const cddCaution = (<span>
   Please note the distinction between the variable we label <code>cdd</code>,
@@ -91,8 +92,11 @@ export default function HelpGeneral() {
             There are four types of data available in Climate Explorer:
           </p>
 
-          <ListGroup>
-            <ListGroupItem header='Model output'>
+          <Accordion>
+            <Accordion.Item
+              title='Model output'
+              eventKey={1}
+            >
               <p>
                 Daily temperature and precipitation data output
                 by global or regional climate models based on a
@@ -113,9 +117,12 @@ export default function HelpGeneral() {
                   Daily minimum near-surface air temperature.
                 </ListGroupItem>
               </ListGroup>
-            </ListGroupItem>
+            </Accordion.Item>
 
-            <ListGroupItem header='Climdex (climate extremes indices)'>
+            <Accordion.Item
+              title='Climdex (climate extremes indices)'
+              eventKey={2}
+            >
               <p>
               Measures of weather extremes calculated from model output.
               Climdex defines 27 <a href='https://www.climdex.org/indices.html'>climate extremes indices</a>,
@@ -404,9 +411,12 @@ export default function HelpGeneral() {
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>WSDI</em>.</p>
                 </ListGroupItem>
               </ListGroup>
-            </ListGroupItem>
+            </Accordion.Item>
 
-            <ListGroupItem header='Degree-days'>
+            <Accordion.Item
+              title='Degree-days'
+              eventKey={3}
+            >
               <p>
               Counts of how many days fall below or above a given temperature
               threshold multiplied by how much the threshold is exceeded,
@@ -455,9 +465,12 @@ export default function HelpGeneral() {
                 Frost Degree Days:
                 Degree-days in one year below 0&deg;C.
               </ListGroupItem>
-            </ListGroupItem>
+            </Accordion.Item>
 
-            <ListGroupItem header='Return periods'>
+            <Accordion.Item
+              title='Return periods'
+              eventKey={4}
+            >
               <p>
                 This dataset describes extreme temperature or
                 precipitation events that would be expected to occur once
@@ -499,8 +512,8 @@ export default function HelpGeneral() {
                   50-year annual minimum daily minimum temperature
                 </ListGroupItem>
               </ListGroup>
-            </ListGroupItem>
-          </ListGroup>
+            </Accordion.Item>
+          </Accordion>
 
           <h2>Models (GCMs)</h2>
           <p>{gcmDefn}</p>
