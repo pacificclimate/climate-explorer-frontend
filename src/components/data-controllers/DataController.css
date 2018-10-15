@@ -1,0 +1,17 @@
+.data_panel {
+    padding: 15px 5px;
+}
+
+.exportlabel {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.graphlabel {
+    display: block;
+    text-align: center;
+}
+
+.mevSummary {
+    text-align: right;
+}

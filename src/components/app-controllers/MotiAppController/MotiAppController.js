@@ -19,7 +19,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import styles from '../AppController.css';
 import SingleMapController from '../../map-controllers/SingleMapController/SingleMapController';
 import MotiDataController from '../../data-controllers/MotiDataController';
 import Selector from '../../Selector';
@@ -55,7 +54,7 @@ export default createReactClass({
     return (
       <Grid fluid>
         <Row>
-          <Col lg={4} md={4}>
+          <Col lg={2} md={2}>
             <VariableDescriptionSelector
               label={"Variable Selection"}
               onChange={this.handleSetVariable.bind(this, "variable")}
@@ -64,7 +63,7 @@ export default createReactClass({
               value={_.pick(this.state, "variable_id", "variable_name")} 
             />
           </Col>
-          <Col lg={4} md={4}>
+          <Col lg={2} md={2}>
             <Selector
               label={"Emission Scenario Selection"}
               onChange={this.updateSelection.bind(this, 'experiment')}
@@ -72,18 +71,18 @@ export default createReactClass({
               value={this.state.experiment}
             />
           </Col>
-          <Col lg={4} md={4} />
+          <Col lg={8} md={8}>
+            <SingleAppHeading {...this.state} />
+          </Col>
         </Row>
         <Row>
           <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <SingleMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
+            <SingleMapController
+              variable_id={this.state.variable_id}
+              meta = {this.getFilteredMeta()}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
           </Col>
           <Col lg={6}>
             <MotiDataController

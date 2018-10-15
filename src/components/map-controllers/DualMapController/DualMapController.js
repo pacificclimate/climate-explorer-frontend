@@ -24,6 +24,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Loader from 'react-loader';
+import { Panel, Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
@@ -40,6 +41,10 @@ import { hasValidData, currentDataSpec,
   selectRasterPalette, selectIsolinePalette,
   updateLayerSimpleState, updateLayerTime,
   getDatasetId} from '../map-helpers.js';
+
+import styles from '../MapController.css';
+import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
+import { MEVSummary } from '../../data-presentation/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -247,72 +252,107 @@ export default class DualMapController extends React.Component {
 
   render() {
     return (
-      this.state.raster.times || this.state.isoline.times ? (
-        <DataMap
-          raster={{
-            dataset: getDatasetId.bind(
-              this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
-            ...this.state.raster,
-            onChangeRange: this.handleChangeRasterRange,
-          }}
+      <Panel>
+        <Panel.Heading>
+          <Panel.Title>
+            <Row>
+              <Col lg={2}>
+                {mapPanelLabel}
+              </Col>
+              <Col lg={10}>
+                <MEVSummary
+                  className={styles.mevSummary} {...this.props} dual
+                />
+                {': '}
+                { this.state.run }
+                {' '}
+                { this.state.start_date }-{ this.state.end_date }
+              </Col>
+            </Row>
 
-          isoline={{
-            dataset: getDatasetId.bind(
-              this, 'comparand', this.props.comparandMeta, this.state.isoline.timeIdx)(),
-            ...this.state.isoline,
-            onChangeRange: this.handleChangeIsolineRange,
-          }}
+          </Panel.Title>
+        </Panel.Heading>
+        <Panel.Body className={styles.mapcontroller}>
+          {
+            this.state.raster.times || this.state.isoline.times ? (
+              <DataMap
+                raster={{
+                  dataset: getDatasetId.bind(
+                    this, 'variable',
+                    this.props.meta, this.state.raster.timeIdx
+                  )(),
+                  ...this.state.raster,
+                  onChangeRange: this.handleChangeRasterRange,
+                }}
 
-          onSetArea={this.props.onSetArea}
-          area={this.props.area}
-        >
+                isoline={{
+                  dataset: getDatasetId.bind(
+                    this, 'comparand',
+                    this.props.comparandMeta, this.state.isoline.timeIdx
+                  )(),
+                  ...this.state.isoline,
+                  onChangeRange: this.handleChangeIsolineRange,
+                }}
 
-          <StaticControl position='topleft'>
-            <GeoLoader onLoadArea={this.props.onSetArea} title='Import polygon' />
-          </StaticControl>
+                onSetArea={this.props.onSetArea}
+                area={this.props.area}
+              >
 
-          <StaticControl position='topleft'>
-            <GeoExporter area={this.props.area} title='Export polygon' />
-          </StaticControl>
+                <StaticControl position='topleft'>
+                  <GeoLoader
+                    onLoadArea={this.props.onSetArea}
+                    title='Import polygon'
+                  />
+                </StaticControl>
 
-          <StaticControl position='topright' style={{ marginRight: '70px' }}>
-            <MapSettings
-              title='Map Settings'
-              meta={this.props.meta}
-              comparandMeta={this.props.comparandMeta}
+                <StaticControl position='topleft'>
+                  <GeoExporter area={this.props.area} title='Export polygon' />
+                </StaticControl>
 
-              dataSpec={currentDataSpec.bind(this)()}
-              onDataSpecChange={this.updateDataSpec}
+                <StaticControl
+                  position='topright'
+                  style={{ marginRight: '70px' }}
+                >
+                  <MapSettings
+                    title='Map Settings'
+                    meta={this.props.meta}
+                    comparandMeta={this.props.comparandMeta}
 
-              raster={{
-                ...this.state.raster,
-                onChangeTime: this.handleChangeVariableTime,
-                onChangePalette: this.handleChangeRasterPalette,
-                onChangeScale: this.handleChangeRasterScale,
-              }}
+                    dataSpec={currentDataSpec.bind(this)()}
+                    onDataSpecChange={this.updateDataSpec}
 
-              hasComparand={hasValidData('comparand', this.props)}
-              timesLinkable={this.timesMatch()}
-              isoline={{
-                ...this.state.isoline,
-                onChangeTime: this.handleChangeComparandTime,
-                onChangePalette: this.handleChangeIsolinePalette,
-                onChangeScale: this.handleChangeIsolineScale,
-              }}
-            />
-          </StaticControl>
+                    raster={{
+                      ...this.state.raster,
+                      onChangeTime: this.handleChangeVariableTime,
+                      onChangePalette: this.handleChangeRasterPalette,
+                      onChangeScale: this.handleChangeRasterScale,
+                    }}
 
-          <StaticControl position='bottomleft'>
-            <MapFooter
-              {...this.state}
-              hasValidComparand={hasValidData('comparand', this.props)}
-            />
-          </StaticControl>
+                    hasComparand={hasValidData('comparand', this.props)}
+                    timesLinkable={this.timesMatch()}
+                    isoline={{
+                      ...this.state.isoline,
+                      onChangeTime: this.handleChangeComparandTime,
+                      onChangePalette: this.handleChangeIsolinePalette,
+                      onChangeScale: this.handleChangeIsolineScale,
+                    }}
+                  />
+                </StaticControl>
 
-        </DataMap>
-      ) : (
-        <Loader/>
-      )
+                <StaticControl position='bottomleft'>
+                  <MapFooter
+                    {...this.state}
+                    hasValidComparand={hasValidData('comparand', this.props)}
+                  />
+                </StaticControl>
+
+              </DataMap>
+            ) : (
+              <Loader/>
+            )
+          }
+        </Panel.Body>
+      </Panel>
     );
   }
 }

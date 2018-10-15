@@ -81,50 +81,36 @@ export const emissionScenarioSelectorLabel = (
       Emission scenarios use the following coding:
       <Table condensed>
         <thead>
-          <tr>
-            <th>Code</th>
-            <th>Meaning</th>
-          </tr>
+        <tr>
+          <th>Code</th>
+          <th>Meaning</th>
+        </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>historical</td>
-            <td>Emission values based on historical records</td>
-          </tr>
-          <tr>
-            <td>rcp26</td>
-            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6</td>
-          </tr>
-          <tr>
-            <td>rcp45</td>
-            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5</td>
-          </tr>
-          <tr>
-            <td>rcp85</td>
-            <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5</td>
-          </tr>
+        <tr>
+          <td>historical</td>
+          <td>Emission values based on historical records</td>
+        </tr>
+        <tr>
+          <td>rcp26</td>
+          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6</td>
+        </tr>
+        <tr>
+          <td>rcp45</td>
+          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5</td>
+        </tr>
+        <tr>
+          <td>rcp85</td>
+          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5</td>
+        </tr>
         </tbody>
       </Table>
     </p>
   </LabelWithInfo>
 );
 
-export const downloadDataLabel = (
-  <LabelWithInfo label='Download Data'>
-    <p>
-      Click a button to download the selected data to your computer.
-    </p>
-    <p>
-      The data downloaded is that shown on the graph.
-      For details on the layout and content of the exported data,
-      see <Link to='/help/general'>Help</Link>.
-    </p>
-    <p>{downloadFormats}</p>
-  </LabelWithInfo>
-);
-
 const colourBlocksVariable = `
-  This variable is represented in the map as a grid of coloured blocks
+  This variable is represented in the map as a raster (grid of coloured blocks)
   overlaid on the map.
 `;
 
@@ -141,7 +127,7 @@ export const variableSelectorLabel = (
 );
 
 export const variable1SelectorLabel = (
-  <LabelWithInfo label='Variable 1 (Colour blocks)'>
+  <LabelWithInfo label='Variable 1 (Raster)'>
     <p>First or 'primary' variable to view.</p>
     <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
@@ -155,11 +141,21 @@ export const variable2SelectorLabel = (
 );
 
 ///////////////////////////////
-// Dataset summary
+// Dataset summaries
 ///////////////////////////////
 
+export const unfilteredDatasetSummaryPanelLabel = (
+  <LabelWithInfo label='All Datasets Summary'>
+    <p>Summary listing of all datasets available on this portal.</p>
+    <p>
+    </p>
+    <p>
+    </p>
+  </LabelWithInfo>
+);
+
 export const filteredDatasetSummaryPanelLabel = (
-  <LabelWithInfo label='Filtered Dataset Summary'>
+  <LabelWithInfo label='Filtered Datasets Summary'>
     <p>Summary listing of all datasets selected by dataset filter criteria.</p>
     <p>
       Each row of the table represents a group of up to 3 datasets.
@@ -190,7 +186,7 @@ export const datasetSelectorLabel = (
       That is, they may be displaying different datasets simultaneously.
     </p>
     <p>
-      On the map, use the {mapSettingsControl} to access the Dataset selector.
+      On the map, use the {mapSettingsControl} button to access the Dataset selector.
       The selected dataset is shown in the legend in the lower left of the map.
     </p>
     <p>
@@ -342,10 +338,10 @@ const mapAutoScaleControl = (
 
 export const mapPanelLabel = (
   <LabelWithInfo label='Data Map'>
-     <p>
-       Map displaying data selected by
-       Model, Emission Scenario, and Variable(s).
-     </p>
+    <p>
+      Map displaying data selected by
+      Model, Emission Scenario, and Variable(s).
+    </p>
     <p>
       Summary of map tools and other controls.
       (For details, see <Link to='/help/general'>Help</Link>.)
@@ -426,7 +422,8 @@ const annualCycleGraphDefn = `
 `;
 
 const spatialAveragingDefn = `
-  Values are spatially averaged over the area selected by the polygon
+  Data values shown in each graph are spatially averaged over the area 
+  selected by the polygon
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
@@ -508,7 +505,7 @@ export const modelContextTabLabel = (
       context with other similar model runs.
     </p>
     <p>{spatialAveragingDefn}</p>
-</LabelWithInfo>
+  </LabelWithInfo>
 );
 
 export const futureAnomalyTabLabel = (
@@ -596,6 +593,10 @@ export const statsTableLabel = (
       <li>Click on a column to sort by it.</li>
       <li>Click on the sort column to change the direction of sorting.</li>
     </ul>
+
+
+
+    .
   </LabelWithInfo>
 );
 
@@ -626,4 +627,3 @@ export const exportStatsTableDataLabel = (
 //     </p>
 //   </LabelWithInfo>
 // );
-

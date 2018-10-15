@@ -34,6 +34,11 @@ export default class DataSpecSelector extends React.Component {
     meta: PropTypes.array,
     value: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    inlineLabel: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    inlineLabel: false,
   };
 
   makeDataSpecs() {
@@ -56,6 +61,7 @@ export default class DataSpecSelector extends React.Component {
         items={dataSpecs}
         value={this.props.value}
         onChange={this.props.onChange}
+        inlineLabel={this.props.inlineLabel}
       />
     );
   }

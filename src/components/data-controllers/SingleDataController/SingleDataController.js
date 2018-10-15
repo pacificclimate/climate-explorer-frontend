@@ -28,10 +28,11 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import {
+  Button, Row, Col, Tab, Tabs, Panel, ControlLabel,
+}
+from 'react-bootstrap';
 import _ from 'underscore';
-
-import styles from './SingleDataController.css';
 
 import { parseBootstrapTableData,
          timeKeyToResolutionIndex,
@@ -51,9 +52,14 @@ import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
   singleAnnualCycleTabLabel, futureAnomalyTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
-  timeSeriesTabLabel,
-  statsTableLabel, statsTableExportButtonsInfo,
+  timeSeriesTabLabel, statsTableLabel,
+  graphsPanelLabel,
 } from '../../guidance-content/info/InformationItems';
+
+import styles from '../DataController.css';
+import { MEVSummary } from '../../data-presentation/MEVSummary';
+import ExportButtons from '../../graphs/ExportButtons';
+
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
 // no more dependencies on DataControllerMixin remain
@@ -172,62 +178,109 @@ export default createReactClass({
 
     return (
       <div>
-        <h3>
-          {this.props.model_id} {' '}
-          {this.props.variable_id} {' '}
-          {this.props.experiment}
-        </h3>
-        
-        {
-          multiYearMeanSelected(this.props) ? (
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              <Row>
+                <Col lg={4}>
+                  {graphsPanelLabel}
+                </Col>
+                <Col lg={8}>
+                  <MEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body className={styles.data_panel}>
+            {
+              multiYearMeanSelected(this.props) ? (
 
-            <Tabs id='Graphs'>
-              <Tab eventKey={1} title={singleAnnualCycleTabLabel}>
-                <SingleAnnualCycleGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={2} title={singleLtaTabLabel}>
-                <SingleLongTermAveragesGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={3} title={modelContextTabLabel}>
-                <SingleContextGraph {...this.props}/>
-              </Tab>
-              <Tab eventKey={4} title={futureAnomalyTabLabel}>
-                <AnomalyAnnualCycleGraph {...this.props} />
-              </Tab>
-              <Tab eventKey={5} title={snapshotTabLabel}>
-                <SingleTimeSliceGraph {...this.props} />
-              </Tab>
-            </Tabs>
+                <Tabs id='Graphs'>
+                  <Tab
+                    eventKey={1} title={singleAnnualCycleTabLabel}
+                    className={styles.data_panel}
+                  >
+                      <SingleAnnualCycleGraph {...this.props}/>
+                  </Tab>
+                  <Tab
+                    eventKey={2} title={singleLtaTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleLongTermAveragesGraph {...this.props}/>
+                  </Tab>
+                  <Tab
+                    eventKey={3} title={modelContextTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleContextGraph {...this.props}/>
+                  </Tab>
+                  <Tab
+                    eventKey={4} title={futureAnomalyTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <AnomalyAnnualCycleGraph {...this.props} />
+                  </Tab>
+                  <Tab
+                    eventKey={5} title={snapshotTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleTimeSliceGraph {...this.props} />
+                  </Tab>
+                </Tabs>
 
-          ) : (
+              ) : (
 
-            <Tabs id='Graphs'>
-              <Tab eventKey={1} title={timeSeriesTabLabel}>
-                <SingleTimeSeriesGraph {...this.props}/>
-              </Tab>
-            </Tabs>
+                <Tabs id='Graphs'>
+                  <Tab
+                    eventKey={1}
+                    title={timeSeriesTabLabel}
+                    className={styles.data_panel}
+                  >
+                    <SingleTimeSeriesGraph {...this.props}/>
+                  </Tab>
+                </Tabs>
 
-          )
-        }
+              )
+            }
+          </Panel.Body>
+        </Panel>
 
-        <Row>
-          <Col lg={8} md={6} sm={6}>
-            <h4>{statsTableLabel}</h4>
-          </Col>
-          <Col lg={4} md={6} sm={6}>
-            <TimeOfYearSelector
-              onChange={this.updateDataTableTimeOfYear}
-              value={dataTableSelected}
-              inlineLabel
-            />
-          </Col>
-        </Row>
-        <DataTable data={statsData} options={this.state.statsTableOptions}/>
-        <div style={{ marginTop: '10px' }}>
-          <Button style={{ marginRight: '10px' }} onClick={this.exportDataTable.bind(this, 'xlsx')}>Export To XLSX</Button>
-          <Button onClick={this.exportDataTable.bind(this, 'csv')}>Export To CSV</Button>
-          {statsTableExportButtonsInfo}
-        </div>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>
+              <Row>
+                <Col lg={4}>
+                  {statsTableLabel}
+                </Col>
+                <Col lg={8}>
+                  <MEVSummary
+                    className={styles.mevSummary} {...this.props}
+                  />
+                </Col>
+              </Row>
+            </Panel.Title>
+          </Panel.Heading>
+          <Panel.Body className={styles.data_panel}>
+            <Row>
+              <Col lg={6} md={6} sm={6}>
+                <TimeOfYearSelector
+                  onChange={this.updateDataTableTimeOfYear}
+                  value={dataTableSelected}
+                  inlineLabel
+                />
+              </Col>
+              <Col lg={6} md={6} sm={6}>
+                <ExportButtons
+                  onExportXlsx={this.exportDataTable.bind(this, 'xlsx')}
+                  onExportCsv={this.exportDataTable.bind(this, 'csv')}
+                />
+              </Col>
+            </Row>
+            <DataTable data={statsData} options={this.state.statsTableOptions}/>
+          </Panel.Body>
+        </Panel>
       </div>
     );
   },

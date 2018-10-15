@@ -18,14 +18,13 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
 
-import styles from '../AppController.css';
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
 import Selector from '../../Selector';
 import {
   modelSelectorLabel, emissionScenarioSelectorLabel,
-  variable1SelectorLabel, variable2SelectorLabel,
+  variable1SelectorLabel, variable2SelectorLabel, datasetFilterPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -77,7 +76,6 @@ export default createReactClass({
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
   render: function () {
-    console.log(JSON.stringify(styles));
     //hierarchical data selection: model, then experiments (filtered by model),
     // then variable (filtered by model and experiments),
     // then comparison variable (filtered by model and experiment, must be MYM if var is.)
@@ -92,54 +90,61 @@ export default createReactClass({
     
     return (
       <Grid fluid>
-        <Row>
-          <Col lg={3} md={3}>
-            <Selector 
-              label={modelSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'model_id')}
-              items={modOptions}
-              value={this.state.model_id}
-            />
-          </Col>
-          <Col lg={3} md={3}>
-            <Selector
-              label={emissionScenarioSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'experiment')}
-              items={expOptions}
-              value={this.state.experiment}
-            />
-          </Col>
-          <Col lg={3} md={3}>
-            <VariableDescriptionSelector
-              label={variable1SelectorLabel}
-              onChange={this.handleSetVariable.bind(this, "variable")}
-              meta={this.state.meta}
-              constraints={{model_id: this.state.model_id, experiment: this.state.experiment}}
-              value={_.pick(this.state, "variable_id", "variable_name")} 
-            />
-          </Col>
-          <Col lg={3} md={3}>
-            <VariableDescriptionSelector
-              label={variable2SelectorLabel}
-              onChange={this.handleSetVariable.bind(this, "comparand")}
-              meta={this.state.meta}
-              constraints={comparandConstraints}
-              value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
-            />
-          </Col>
-        </Row>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            <Row>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={modelSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'model_id')}
+                  items={modOptions}
+                  value={this.state.model_id}
+                />
+              </Col>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={emissionScenarioSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'experiment')}
+                  items={expOptions}
+                  value={this.state.experiment}
+                />
+              </Col>
+              <Col lg={3} md={3}>
+                <VariableDescriptionSelector
+                  label={variable1SelectorLabel}
+                  onChange={this.handleSetVariable.bind(this, "variable")}
+                  meta={this.state.meta}
+                  constraints={{model_id: this.state.model_id, experiment: this.state.experiment}}
+                  value={_.pick(this.state, "variable_id", "variable_name")}
+                />
+              </Col>
+              <Col lg={3} md={3}>
+                <VariableDescriptionSelector
+                  label={variable2SelectorLabel}
+                  onChange={this.handleSetVariable.bind(this, "comparand")}
+                  meta={this.state.meta}
+                  constraints={comparandConstraints}
+                  value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
+                />
+              </Col>
+            </Row>
+          </Panel.Body>
+        </Panel>
         <Row>
           <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <DualMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-                comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
+            <DualMapController
+              variable_id={this.state.variable_id}
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              meta = {this.getFilteredMeta()}
+              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
+              comparandMeta = {this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name)}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
           </Col>
           <Col lg={6}>
             <DualDataController

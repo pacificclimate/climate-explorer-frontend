@@ -11,16 +11,16 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
-import styles from '../AppController.css';
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel
+  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
+  datasetFilterPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
@@ -60,43 +60,50 @@ export default createReactClass({
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
     return (
       <Grid fluid>
-        <Row>
-          <Col lg={4} md={4}>
-            <Selector
-              label={modelSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'model_id')}
-              items={modOptions}
-              value={this.state.model_id}
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <Selector
-              label={emissionScenarioSelectorLabel}
-              onChange={this.updateSelection.bind(this, 'experiment')}
-              items={expOptions}
-              value={this.state.experiment}
-            />
-          </Col>
-          <Col lg={4} md={4}>
-            <VariableDescriptionSelector
-              label={variableSelectorLabel}
-              onChange={this.handleSetVariable.bind(this, 'variable')}
-              meta={this.state.meta}
-              constraints={{ model_id: this.state.model_id, experiment: this.state.experiment }}
-              value={_.pick(this.state, 'variable_id', 'variable_name')}
-            />
-          </Col>
-        </Row>
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            <Row>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={modelSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'model_id')}
+                  items={modOptions}
+                  value={this.state.model_id}
+                />
+              </Col>
+              <Col lg={2} md={2}>
+                <Selector
+                  label={emissionScenarioSelectorLabel}
+                  onChange={this.updateSelection.bind(this, 'experiment')}
+                  items={expOptions}
+                  value={this.state.experiment}
+                />
+              </Col>
+              <Col lg={4} md={4}>
+                <VariableDescriptionSelector
+                  label={variableSelectorLabel}
+                  onChange={this.handleSetVariable.bind(this, 'variable')}
+                  meta={this.state.meta}
+                  constraints={{ model_id: this.state.model_id }}
+                  value={_.pick(this.state, 'variable_id', 'variable_name')}
+                />
+              </Col>
+            </Row>
+          </Panel.Body>
+        </Panel>
         <Row>
           <Col lg={6}>
-            <div className={styles.mapcontroller}>
-              <SingleMapController
-                variable_id={this.state.variable_id}
-                meta = {this.getFilteredMeta()}
-                area={this.state.area}
-                onSetArea={this.handleSetArea}
-              />
-            </div>
+            <SingleMapController
+              variable_id={this.state.variable_id}
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              meta = {this.getFilteredMeta()}
+              area={this.state.area}
+              onSetArea={this.handleSetArea}
+            />
           </Col>
           <Col lg={6}>
             <SingleDataController
