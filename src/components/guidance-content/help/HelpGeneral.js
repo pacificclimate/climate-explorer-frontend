@@ -98,7 +98,8 @@ export default function HelpGeneral() {
 
           <h2>Data available in Climate Explorer</h2>
           <p>
-            There are four types of data available in Climate Explorer:
+            There are four types of data available in Climate Explorer.
+            (Click on a heading to expand the full explanation of each type.)
           </p>
 
           <Accordion>
