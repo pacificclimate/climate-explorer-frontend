@@ -16,6 +16,15 @@ const cddCaution = (<span>
   which we label <code>cddETCCDI</code>.
 </span>);
 
+const monthlyAnnualVarNameAmbiguityCaution = (<span>
+  Unlike most Climdex variable names used in Climate Explorer,
+  this variable name can refer to either an annual version
+  (calculation spanning a calendar year) or to the standard
+  Climdex monthly version. The distinction is shown in the
+  English description part of labels in selectors, so that the
+  meaning in each specific context is unambiguous.
+</span>);
+
 export default function HelpGeneral() {
   return (
     <Grid fluid>
@@ -287,24 +296,28 @@ export default function HelpGeneral() {
                     Annual Maximum 1-day Precipitation
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX1DAY</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='rx1dayETCCDI'>
                   <p>
                     Monthly Maximum 1-day Precipitation
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX1DAY</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='rx5dayETCCDI'>
                   <p>
                     Annual Maximum Consecutive 5-day Precipitation
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX5DAY</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='rx5dayETCCDI'>
                   <p>
                     Monthly Maximum Consecutive 5-day Precipitation
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>RX5DAY</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='sdiiETCCDI'>
                   <p>
@@ -383,24 +396,28 @@ export default function HelpGeneral() {
                     Annual minimum of daily maximum temperature
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXN</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='txnETCCDI'>
                   <p>
                     Monthly minimum of daily maximum temperature
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXN</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='txxETCCDI'>
                   <p>
                     Annual maximum of daily maximum temperature
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXX</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='txxETCCDI'>
                   <p>
                     Monthly maximum of daily maximum temperature
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>TXX</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
                 <ListGroupItem header='wsdiETCCDI'>
                   <p>
@@ -409,6 +426,7 @@ export default function HelpGeneral() {
                     daily maximum temperature &gt; 90th percentile.
                   </p>
                   <p>For details, see <a href='https://www.climdex.org/indices.html'>Climdex</a>, <em>WSDI</em>.</p>
+                  <p>{monthlyAnnualVarNameAmbiguityCaution}</p>
                 </ListGroupItem>
               </ListGroup>
             </Accordion.Item>
