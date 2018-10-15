@@ -98,8 +98,7 @@ export default createReactClass({
 
   render: function () {
     return (
-      <div>
-        <Panel>
+      <Panel>
           <Panel.Heading>
             <Panel.Title>
               <Row>
@@ -145,7 +144,6 @@ export default createReactClass({
             }
           </Panel.Body>
         </Panel>
-      </div>
     );
   },
 });
