@@ -70,42 +70,58 @@ export const modelSelectorLabel = (
 );
 
 export const emissionScenarioSelectorLabel = (
-  <LabelWithInfo label='Emission Scenario'>
-    <p>Emission scenario used to drive the model run.</p>
+  <LabelWithInfo label='Emissions Scenario'>
+    <p>Emissions scenario used to drive the model run.</p>
     <p>
-      Emission scenarios represent a range of possible future projections for
+      Emissions scenarios represent a range of possible future projections for
       greenhouse gas emissions, which are input into climate models.
       Higher RCP values represent greater projected greenhouse gas emissions.
     </p>
     <p>
-      Emission scenarios use the following coding:
-      <Table condensed>
-        <thead>
-        <tr>
-          <th>Code</th>
-          <th>Meaning</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>historical</td>
-          <td>Emission values based on historical records</td>
-        </tr>
-        <tr>
-          <td>rcp26</td>
-          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6</td>
-        </tr>
-        <tr>
-          <td>rcp45</td>
-          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5</td>
-        </tr>
-        <tr>
-          <td>rcp85</td>
-          <td><a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5</td>
-        </tr>
-        </tbody>
-      </Table>
+      Emissions scenarios use the following coding.
+      Note that all scenarios include <code>historical</code>,
+      coupled with one of the future RCP emissions scenarios.
+      For example <code>historical, rcp85</code> indicates an emissions
+      scenario that uses historical data up to roughly the date of the
+      model run, followed by the RCP 8.5 future emissions scenario from
+      then until the final date of the model run.
     </p>
+    <Table condensed>
+      <thead>
+      <tr>
+        <th>Code</th>
+        <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>historical</td>
+        <td>
+          Emission values based on historical records up to the "present day"
+          of the model run.
+        </td>
+      </tr>
+      <tr>
+        <td>rcp26</td>
+        <td>
+          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6 (very low emissions).
+        </td>
+      </tr>
+      <tr>
+        <td>rcp45</td>
+        <td>
+          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5 (moderate emissions, below current levels).
+        </td>
+      </tr>
+      <tr>
+        <td>rcp85</td>
+        <td>
+          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5  ("business as usual"; high emissions).
+          This is the most appropriate sceanario to select for future planning.
+        </td>
+      </tr>
+      </tbody>
+    </Table>
   </LabelWithInfo>
 );
 
@@ -340,7 +356,7 @@ export const mapPanelLabel = (
   <LabelWithInfo label='Data Map'>
     <p>
       Map displaying data selected by
-      Model, Emission Scenario, and Variable(s).
+      Model, Emissions scenario, and Variable(s).
     </p>
     <p>
       Summary of map tools and other controls.
@@ -441,7 +457,7 @@ export const graphsPanelLabel = (
   <LabelWithInfo label='Data Graphs'>
     <p>
       Graphs showing various slices and views of the dataset(s)
-      selected by Model, Emission Scenario, and Variable(s).
+      selected by Model, Emissions scenario, and Variable(s).
     </p>
     <p>{spatialAveragingDefn}</p>
   </LabelWithInfo>
@@ -499,7 +515,7 @@ export const modelContextTabLabel = (
   <LabelWithInfo label='Model Context'>
     <p>
       Graph of average value of the selected value, taken over a multi-decade
-      period, for each model and run available for the selected emission scenario
+      period, for each model and run available for the selected Emissions scenario
       and variable.
       The selected model run is highlighted. This puts the selected model into
       context with other similar model runs.
