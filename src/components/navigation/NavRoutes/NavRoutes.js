@@ -31,10 +31,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
-import './NavRoutes.css';
+import styles from './NavRoutes.css';
+import classnames from 'classnames';
 
 export default function NavRoutes(
-  { navSpec, navIndex, onNavigate, match, children }
+  {
+    navSpec, navIndex, onNavigate, children,
+    navClassName, pullUp,
+  }
 ) {
   const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
 
@@ -66,7 +70,10 @@ export default function NavRoutes(
 
   return (
     <div>
-      <Navbar fluid>
+      <Navbar
+        fluid
+        className={classnames(navClassName, { [styles.pullUp]: pullUp })}
+      >
         { children }
         <Nav
           bsStyle='pills'
@@ -126,9 +133,12 @@ NavRoutes.propTypes = {
   }).isRequired,
   navIndex: PropTypes.number,
   onNavigate: PropTypes.func,
+  pullUp: PropTypes.bool.isRequired,
+  navClassName: PropTypes.string,
   children: PropTypes.any,
 };
 
 NavRoutes.defaultProps = {
   navIndex: 0,
+  pullUp: false,
 };

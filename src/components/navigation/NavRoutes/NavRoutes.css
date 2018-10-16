@@ -1,0 +1,7 @@
+:global(.navbar) {
+    background: hsl(30, 100%, 95%);
+}
+
+.pullUp {
+    margin-top: -15px;
+}
