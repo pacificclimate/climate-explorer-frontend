@@ -59,6 +59,7 @@ import {
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 import ExportButtons from '../../graphs/ExportButtons';
+import FlowArrow from '../../data-presentation/FlowArrow';
 
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -246,6 +247,8 @@ export default createReactClass({
             }
           </Panel.Body>
         </Panel>
+
+        <FlowArrow>filtered datasets</FlowArrow>
 
         <Panel>
           <Panel.Heading>
