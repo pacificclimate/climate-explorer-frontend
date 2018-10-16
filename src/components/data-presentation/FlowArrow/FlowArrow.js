@@ -5,17 +5,19 @@ import classnames from 'classnames';
 import css from './FlowArrow.css';
 
 
-const FlowArrow = ({ pullUp }) => (
+const FlowArrow = ({ pullUp, children }) => (
   <div className={classnames(
       css.flowArrow, { [css.pullUp]: pullUp }, 'text-center'
     )}
   >
-      <span className={css.icon}>{'⇣'}</span>
+    {children}
+    <span className={css.icon}>{'⇣'}</span>
   </div>
 );
 
 FlowArrow.propTypes = {
   pullUp: PropTypes.bool.isRequired,
+  children: PropTypes.node,
 };
 
 FlowArrow.defaultProps = {
