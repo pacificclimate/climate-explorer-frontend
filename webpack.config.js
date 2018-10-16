@@ -14,7 +14,8 @@ const GLOBALS = {
   NCWMS_URL : JSON.stringify(process.env.NCWMS_URL
       || 'http://tools.pacificclimate.org/ncWMS-PCIC/wms'),
   CE_ENSEMBLE_NAME : JSON.stringify(process.env.CE_ENSEMBLE_NAME || 'ce'),
-  CE_CURRENT_VERSION : JSON.stringify(process.env.CE_CURRENT_VERSION || 'Climate Explorer')
+  CE_CURRENT_VERSION : JSON.stringify(process.env.CE_CURRENT_VERSION || 'Climate Explorer'),
+  CE_BASE_PATH: JSON.stringify(process.env.CE_BASE_PATH || ''),
 };
 
 const AUTOPREFIXER_BROWSERS = [ 'Chrome >= 35', 'Firefox >= 31',

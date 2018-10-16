@@ -26,7 +26,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
@@ -83,11 +83,11 @@ export default function NavRoutes(
           { navItems }
         </Nav>
       </Navbar>
-      <Route
-        exact path={navSpec.basePath}
-        render={() => <Redirect to={basePathRedirectTo}/>}
-      />
-      { routes }
+
+      <Switch>
+        { routes }
+        <Redirect to={basePathRedirectTo}/>
+      </Switch>
     </div>
   );
 }
