@@ -25,6 +25,10 @@ import {
 
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
+import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
+import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
+import FlowArrow from '../../data-presentation/FlowArrow';
+import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -56,56 +60,102 @@ export default createReactClass({
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id }));
 
+    const filteredMeta = this.getFilteredMeta();
+
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
+
     return (
       <Grid fluid>
-        <Panel>
-          <Panel.Heading>
-            <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body>
-            <Row>
-              <Col lg={2} md={2}>
-                <Selector
-                  label={modelSelectorLabel}
-                  onChange={this.updateSelection.bind(this, 'model_id')}
-                  items={modOptions}
-                  value={this.state.model_id}
-                />
-              </Col>
-              <Col lg={2} md={2}>
-                <Selector
-                  label={emissionScenarioSelectorLabel}
-                  onChange={this.updateSelection.bind(this, 'experiment')}
-                  items={expOptions}
-                  value={this.state.experiment}
-                />
-              </Col>
-              <Col lg={4} md={4}>
-                <VariableDescriptionSelector
-                  label={variableSelectorLabel}
-                  onChange={this.handleSetVariable.bind(this, 'variable')}
-                  meta={this.state.meta}
-                  constraints={{ model_id: this.state.model_id }}
-                  value={_.pick(this.state, 'variable_id', 'variable_name')}
-                />
-              </Col>
-            </Row>
-          </Panel.Body>
-        </Panel>
         <Row>
-          <Col lg={6}>
-            <SingleMapController
-              variable_id={this.state.variable_id}
+          <FullWidthCol>
+            <UnfilteredDatasetsSummary meta={this.state.meta} />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <Panel>
+              <Panel.Heading>
+                <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <Row>
+                  <Col lg={2} md={2}>
+                    <Selector
+                      label={modelSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'model_id')}
+                      items={modOptions}
+                      value={this.state.model_id}
+                    />
+                  </Col>
+                  <Col lg={2} md={2}>
+                    <Selector
+                      label={emissionScenarioSelectorLabel}
+                      onChange={this.updateSelection.bind(this, 'experiment')}
+                      items={expOptions}
+                      value={this.state.experiment}
+                    />
+                  </Col>
+                  <Col lg={4} md={4}>
+                    <VariableDescriptionSelector
+                      label={variableSelectorLabel}
+                      onChange={this.handleSetVariable.bind(this, 'variable')}
+                      meta={this.state.meta}
+                      constraints={{ model_id: this.state.model_id }}
+                      value={_.pick(this.state, 'variable_id', 'variable_name')}
+                    />
+                  </Col>
+                </Row>
+              </Panel.Body>
+            </Panel>
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FlowArrow pullUp />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <FullWidthCol>
+            <FilteredDatasetsSummary
               model_id={this.state.model_id}
               experiment={this.state.experiment}
-              meta = {this.getFilteredMeta()}
+              variable_id={this.state.variable_id}
+              meta = {filteredMeta}
+            />
+          </FullWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+          <HalfWidthCol>
+            <FlowArrow pullUp />
+          </HalfWidthCol>
+        </Row>
+
+        <Row>
+          <HalfWidthCol>
+            <SingleMapController
+              model_id={this.state.model_id}
+              experiment={this.state.experiment}
+              variable_id={this.state.variable_id}
+              meta = {filteredMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
             />
-          </Col>
-          <Col lg={6}>
+          </HalfWidthCol>
+          <HalfWidthCol>
             <SingleDataController
               ensemble_name={this.state.ensemble_name}
               model_id={this.state.model_id}
@@ -113,10 +163,10 @@ export default createReactClass({
               comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
               experiment={this.state.experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {this.getFilteredMeta()}
+              meta = {filteredMeta}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
-          </Col>
+          </HalfWidthCol>
         </Row>
       </Grid>
 

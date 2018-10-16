@@ -1,6 +1,9 @@
 import React from 'react';
 import { Panel, PanelGroup } from 'react-bootstrap';
 
+let idNum = 0;
+const nextId = () => `accordion-${idNum++}`;
+
 const AccordionItem = ({ eventKey, title, children }) => (
   <Panel eventKey={eventKey}>
     <Panel.Heading>
@@ -15,7 +18,10 @@ const AccordionItem = ({ eventKey, title, children }) => (
 );
 
 const Accordion = ({ children }) => (
-  <PanelGroup accordion>
+  <PanelGroup
+    accordion
+    id={nextId()}
+  >
     {children}
   </PanelGroup>
 );
