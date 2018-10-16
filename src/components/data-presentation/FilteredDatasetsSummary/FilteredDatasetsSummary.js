@@ -46,18 +46,14 @@ export default class FilteredDatasetsSummary extends React.Component {
     };
 
     const keyedData = this.props.meta.map(metaToKeyedData);
-    console.log('keyedData', keyedData)
     const keyedComparandData =
       this.props.comparandMeta &&
       this.props.comparandMeta.map(metaToKeyedData);
-    console.log('keyedComparandData', keyedComparandData)
 
     const dataGroupedByKey = _.groupBy(keyedData, 'key');
-    console.log('dataGroupedByKey', dataGroupedByKey)
     const comparandDataGroupedByKey =
       keyedComparandData &&
       _.groupBy(keyedComparandData, 'key');
-    console.log('comparandDataGroupedByKey', comparandDataGroupedByKey)
 
     const dataForTable = _.map(dataGroupedByKey, keyedDataToTableRowData);
     const comparandDataForTable =
