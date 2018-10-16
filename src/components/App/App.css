@@ -1,7 +1,16 @@
-:local(.pcic_logo) {
+.pcic_logo {
     margin-top: -10px;
 }
 
-:local(.marmot_logo) {
+.marmot_logo {
     padding: 0px 15px;
+}
+
+.mainNav :global(.navbar-nav>li>a) {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.mainNav :global(.navbar-header) {
+    padding: 5px 0;
 }

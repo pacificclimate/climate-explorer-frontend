@@ -73,7 +73,7 @@ export default class App extends React.Component {
     return (
       <Router basename={'/#'}>
         <div>
-          <NavRoutes navSpec={this.navSpec}>
+          <NavRoutes navSpec={this.navSpec} navClassName={styles.mainNav}>
             <Navbar.Header>
               <Navbar.Brand className={styles.pcic_logo}>
                 <a href='https://pacificclimate.org/'>
