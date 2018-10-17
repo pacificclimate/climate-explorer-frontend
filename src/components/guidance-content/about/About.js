@@ -32,5 +32,5 @@ const navSpec = {
 };
 
 export default function About(props) {
-  return <NavRoutes { ...{ navSpec, ...props } }/>;
+  return <NavRoutes pullUp { ...{ navSpec, ...props } }/>;
 }

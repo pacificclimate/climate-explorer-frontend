@@ -26,15 +26,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
-import './NavRoutes.css';
+import styles from './NavRoutes.css';
+import classnames from 'classnames';
 
 export default function NavRoutes(
-  { navSpec, navIndex, onNavigate, match, children }
+  {
+    navSpec, navIndex, onNavigate, children,
+    navClassName, pullUp,
+  }
 ) {
   const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
 
@@ -66,7 +70,10 @@ export default function NavRoutes(
 
   return (
     <div>
-      <Navbar fluid>
+      <Navbar
+        fluid
+        className={classnames(navClassName, { [styles.pullUp]: pullUp })}
+      >
         { children }
         <Nav
           bsStyle='pills'
@@ -76,11 +83,11 @@ export default function NavRoutes(
           { navItems }
         </Nav>
       </Navbar>
-      <Route
-        exact path={navSpec.basePath}
-        render={() => <Redirect to={basePathRedirectTo}/>}
-      />
-      { routes }
+
+      <Switch>
+        { routes }
+        <Redirect to={basePathRedirectTo}/>
+      </Switch>
     </div>
   );
 }
@@ -126,9 +133,12 @@ NavRoutes.propTypes = {
   }).isRequired,
   navIndex: PropTypes.number,
   onNavigate: PropTypes.func,
+  pullUp: PropTypes.bool.isRequired,
+  navClassName: PropTypes.string,
   children: PropTypes.any,
 };
 
 NavRoutes.defaultProps = {
   navIndex: 0,
+  pullUp: false,
 };

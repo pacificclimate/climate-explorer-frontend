@@ -34,7 +34,7 @@ const navSpec = {
 };
 
 export default function DataTool(props) {
-  return <NavRoutes { ...{ navSpec, ...props } } />;
+  return <NavRoutes pullUp { ...{ navSpec, ...props } } />;
 }
 
 DataTool.propTypes = {

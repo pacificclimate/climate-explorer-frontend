@@ -63,26 +63,54 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 ### Setup using Docker
 
+
+#### Build docker image
+
+Clone repo:
+
 ```bash
 git clone https://github.com/pacificclimate/climate-explorer-frontend
 cd climate-explorer-frontend
 ```
 
-Then build a docker image:
+Build a docker image:
 
 ```bash
 docker build -t pcic/climate-explorer-frontend-image .
 ```
 
-You can set the environmental configuration variables each time you run the image using docker's -e flag. You probably only need to set `CE_BACKEND_URL` to point to wherever you've set up the data server, and maybe `CE_ENSEMBLE_NAME`. 
+#### Run docker image
 
+The following environment variables must be set:
+
+- `NODE_ENV` 
+  (set to `'production'` for production environment; 
+  anything other value, including undefined, defaults to dev)
+- `CE_BACKEND_URL` (base URL of backend API)
+- `CE_ENSEMBLE_NAME` 
+   (final last-ditch fallback in case invalid ensemble name is used in URLs; 
+   in all normal use cases is ignored; could reasonably omit)
+- `NCWMS_URL` (base URL of ncWMS server)
+- `TILECACHE_URL` (base URL of TileCache server)
+- `CE_BASE_PATH` 
+  (base **path** of the URL for the Marmot frontend app; 
+  set this to the path component of the URL for Marmot configured in 
+  our proxy server;
+  e.g., `/marmot/app`)
+
+Typical production run:
 
 ```bash
-docker run -it -e "CE_BACKEND_URL=http://location.of.dataserver:dataserverport/api"
-               -e "CE_ENSEMBLE_NAME=ce" 
-               -p whateverexternalport:8080 
-               --name climate-explorer-frontend
-               climate-explorer-frontend-image
+docker run --restart=unless-stopped -d 
+  -p <external port>:8080 
+  -e NODE_ENV=production 
+  -e CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api 
+  -e CE_ENSEMBLE_NAME=ce 
+  -e NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms 
+  -e TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py 
+  -e CE_BASE_PATH=/marmot/app 
+  --name climate-explorer-frontend
+  pcic/climate-explorer-frontend:latest
 ```
 
 ## Releasing

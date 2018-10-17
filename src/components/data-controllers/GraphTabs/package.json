@@ -1,0 +1,6 @@
+{
+  "name": "GraphTabs",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./GraphTabs.js"
+}

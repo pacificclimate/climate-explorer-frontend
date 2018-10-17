@@ -28,10 +28,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {
-  Button, Row, Col, Tab, Tabs, Panel, ControlLabel,
-}
-from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
 import { parseBootstrapTableData,
@@ -60,6 +57,7 @@ import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 import ExportButtons from '../../graphs/ExportButtons';
 import FlowArrow from '../../data-presentation/FlowArrow';
+import GraphTabs from '../GraphTabs';
 
 
 // TODO: Remove DataControllerMixin and convert to class extension style when 
@@ -169,6 +167,19 @@ export default createReactClass({
     });
   },
 
+  graphTabsSpecs: {
+    mym: [
+      { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
+      { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
+      { title: modelContextTabLabel, graph: SingleContextGraph },
+      { title: futureAnomalyTabLabel, graph: AnomalyAnnualCycleGraph },
+      { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
+    ],
+    notMym: [
+      { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
+    ],
+  },
+
   render: function () {
     const statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
 
@@ -177,6 +188,8 @@ export default createReactClass({
       this.state.dataTableTimeOfYear
     );
 
+    // Spec for generating tabs containing various graphs.
+    // Property names indicate whether the dataset is a multi-year mean or not.
     return (
       <div>
         <Panel>
@@ -195,56 +208,10 @@ export default createReactClass({
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
-            {
-              multiYearMeanSelected(this.props) ? (
-
-                <Tabs id='Graphs'>
-                  <Tab
-                    eventKey={1} title={singleAnnualCycleTabLabel}
-                    className={styles.data_panel}
-                  >
-                      <SingleAnnualCycleGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={2} title={singleLtaTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleLongTermAveragesGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={3} title={modelContextTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleContextGraph {...this.props}/>
-                  </Tab>
-                  <Tab
-                    eventKey={4} title={futureAnomalyTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <AnomalyAnnualCycleGraph {...this.props} />
-                  </Tab>
-                  <Tab
-                    eventKey={5} title={snapshotTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleTimeSliceGraph {...this.props} />
-                  </Tab>
-                </Tabs>
-
-              ) : (
-
-                <Tabs id='Graphs'>
-                  <Tab
-                    eventKey={1}
-                    title={timeSeriesTabLabel}
-                    className={styles.data_panel}
-                  >
-                    <SingleTimeSeriesGraph {...this.props}/>
-                  </Tab>
-                </Tabs>
-
-              )
-            }
+            <GraphTabs
+              {...this.props}
+              specs={this.graphTabsSpecs}
+            />
           </Panel.Body>
         </Panel>
 

@@ -38,13 +38,12 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Panel, Tab, Tabs, Row, Col } from 'react-bootstrap';
+import { Panel, Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
 
 
 import DataControllerMixin from '../../DataControllerMixin';
 
-import { multiYearMeanSelected } from '../../graphs/graph-helpers';
 import DualAnnualCycleGraph from '../../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';
 import DualTimeSeriesGraph from '../../graphs/DualTimeSeriesGraph';
@@ -57,6 +56,7 @@ import {
 
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
+import GraphTabs from '../GraphTabs';
 
 
 export default createReactClass({
@@ -96,6 +96,18 @@ export default createReactClass({
       _.isEqual(nextProps.area, this.props.area));
   },
 
+  graphTabsSpecs: {
+    mym: [
+      { title: dualAnnualCycleTabLabel, graph: DualAnnualCycleGraph },
+      { title: singleLtaTabLabel, graph: DualLongTermAveragesGraph },
+      { title: variableResponseTabLabel, graph: DualVariableResponseGraph },
+    ],
+    notMym: [
+      { title: timeSeriesTabLabel, graph: DualTimeSeriesGraph },
+      { title: variableResponseTabLabel, graph: DualVariableResponseGraph },
+    ],
+  },
+
   render: function () {
     return (
       <Panel>
@@ -114,34 +126,10 @@ export default createReactClass({
             </Panel.Title>
           </Panel.Heading>
           <Panel.Body className={styles.data_panel}>
-            {
-              multiYearMeanSelected(this.props) ? (
-
-                <Tabs id='Graphs'>
-                  <Tab eventKey={1} title={dualAnnualCycleTabLabel}>
-                    <DualAnnualCycleGraph {...this.props}/>
-                  </Tab>
-                  <Tab eventKey={2} title={singleLtaTabLabel}>
-                    <DualLongTermAveragesGraph {...this.props}/>
-                  </Tab>
-                  <Tab eventKey={3} title={variableResponseTabLabel}>
-                    <DualVariableResponseGraph {...this.props}/>
-                  </Tab>
-                </Tabs>
-
-              ) : (
-
-                <Tabs id='Graphs'>
-                  <Tab eventKey={1} title={timeSeriesTabLabel}>
-                    <DualTimeSeriesGraph {...this.props}/>
-                  </Tab>
-                  <Tab eventKey={2} title={variableResponseTabLabel}>
-                    <DualVariableResponseGraph {...this.props}/>
-                  </Tab>
-                </Tabs>
-
-              )
-            }
+            <GraphTabs
+              {...this.props}
+              specs={this.graphTabsSpecs}
+            />
           </Panel.Body>
         </Panel>
     );

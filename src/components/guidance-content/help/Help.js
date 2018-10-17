@@ -26,5 +26,5 @@ const navSpec = {
 };
 
 export default function Help(props) {
-  return <NavRoutes { ...{ navSpec, ...props } }/>;
+  return <NavRoutes pullUp { ...{ navSpec, ...props } }/>;
 }
