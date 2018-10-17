@@ -26,7 +26,8 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 export default function AnomalyAnnualCycleGraph(props) {
   
   function getDateRangeMetadatas(start = undefined, end = undefined) {
-    //returns metadata for all datasets whose start year is greater 
+    // returns metadata for all datasets whose model, experiment, and variable 
+    // match the values specified in props, and whose start year is greater 
     //than start, and whose end year is less than end.
     //the interval is exclusive. optionally leave either endpoint undefined.
     return _.filter(props.meta, md => {
