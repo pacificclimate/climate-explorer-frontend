@@ -56,22 +56,25 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
-    const timeResolutions = _.pluck(props.meta, "timescale");
+    const timeResolutions = _.pluck(props.meta, 'timescale');
+    const monthlyData = _.contains(timeResolutions, 'monthly');
+    const seasonalData = _.contains(timeResolutions, 'seasonal');
+    const annualData = _.contains(timeResolutions, 'yearly');
+    
     //default to Annual, but use higher resolution if available.
     let timeOfYear = 16; //Annual
-    if(_.contains(timeResolutions, "monthly")) {
+    if (monthlyData) {
       timeOfYear = 0; //January
-    }
-    else if(_.contains(timeResolutions, "seasonal")) {
+    } else if (seasonalData) {
       timeOfYear = 12; //Winter
     }
 
     this.state = {
-      timeOfYear: timeOfYear,
+      timeOfYear,
       graphSpec: blankGraphSpec,
-      monthlyData: _.contains(timeResolutions, "monthly"),
-      seasonalData: _.contains(timeResolutions, "seasonal"),
-      annualData: _.contains(timeResolutions, "yearly")
+      monthlyData,
+      seasonalData,
+      annualData,
     };
   }
 
