@@ -49,7 +49,7 @@ class TimeOfYearSelector extends React.Component {
   render() {
     var timesofyear = [];
     function addTimeRange(start, end) {
-      for (const index = start; index <= end; index++) {
+      for (let index = start; index <= end; index++) {
         timesofyear.push([index, timeKeyToTimeOfYear(index)]);
       }
     }
