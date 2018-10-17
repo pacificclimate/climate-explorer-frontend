@@ -242,8 +242,10 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(util.timestampToTimeOfYear("1977-04-15T00:00:00Z", "monthly", false)).toBe("April");
     });
     it('converts timestamps into seasonal values', function () {
-      expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z", "seasonal", false)).toBe("Summer-JJA");
+      expect(util.timestampToTimeOfYear("1977-01-15T00:00:00Z", "seasonal", false)).toBe("Winter-DJF");
       expect(util.timestampToTimeOfYear("1977-04-15T00:00:00Z", "seasonal", false)).toBe("Spring-MAM");
+      expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z", "seasonal", false)).toBe("Summer-JJA");
+      expect(util.timestampToTimeOfYear("1977-10-15T00:00:00Z", "seasonal", false)).toBe("Fall-SON");
     });
     it('converts timestamps into annual values', function () {
       expect(util.timestampToTimeOfYear("1977-07-15T00:00:00Z", "yearly", true)).toBe("Annual 1977");
