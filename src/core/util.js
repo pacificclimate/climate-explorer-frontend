@@ -284,8 +284,8 @@ var timestampToTimeOfYear = function (timestamp, resolution="monthly", disambigu
         break;
       case "September":
       case "October":
-      case "December":
-        return `Winter-SON${year}`;
+      case "November":
+        return `Fall-SON${year}`;
         break;
     }
   }
