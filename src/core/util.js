@@ -2,8 +2,8 @@
  * util.js - a collection of data-handling functions 
  ***********************************************************/
 
-var moment = require('moment/moment');
-var _ = require('underscore');
+import moment from 'moment/moment';
+import _ from 'underscore';
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 
@@ -15,7 +15,7 @@ import * as filesaver from 'filesaver.js';
  * Decimal precision of numbers displayed onscreen (graphs and tables)
  * Used in functions in util.js, chart.js, and export.js.
  */
-var PRECISION = 2;
+const PRECISION = 2;
 
 /*
  * Takes a multistats object of the following form and 1) flattens it, and 2)
@@ -35,19 +35,19 @@ var PRECISION = 2;
  *   { ... }
  *   };
  */
-var parseBootstrapTableData = function (data, metadata) {
+const parseBootstrapTableData = function (data, metadata) {
   return _.map(data, function (stats, model) {
-    var modelMetadata = _.find(metadata, m => m.unique_id == model);
-    var period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
-    var modelInfo = {
-      'model_period': period,
-      'run': stats.run,
-      'min': +stats.min.toFixed(PRECISION),
-      'max': +stats.max.toFixed(PRECISION),
-      'mean': +stats.mean.toFixed(PRECISION),
-      'median': +stats.median.toFixed(PRECISION),
-      'stdev': +stats.stdev.toFixed(PRECISION),
-      'units': stats.units
+    const modelMetadata = _.find(metadata, m => m.unique_id === model);
+    const period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
+    const modelInfo = {
+      model_period: period,
+      run: stats.run,
+      min: +stats.min.toFixed(PRECISION),
+      max: +stats.max.toFixed(PRECISION),
+      mean: +stats.mean.toFixed(PRECISION),
+      median: +stats.median.toFixed(PRECISION),
+      stdev: +stats.stdev.toFixed(PRECISION),
+      units: stats.units,
     };
     return modelInfo;
   });
@@ -58,13 +58,13 @@ var parseBootstrapTableData = function (data, metadata) {
  * explorer backend. Accepts an axios response object, throws an error if
  * anything is missing, otherwise returns the object unaltered.
  */
-var validateLongTermAverageData = function(response){
-  if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-    throw new Error("Error: long term data unavailable for this model.");
+const validateLongTermAverageData = function (response) {
+  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
+    throw new Error('Error: long term data unavailable for this model.');
   }
-  for(var run in response.data) {
-    if(!('data' in response.data[run]) || !('units' in response.data[run])) {
-      throw new Error("Error: long term data for this model is incomplete.");
+  for (const run in response.data) {
+    if (!('data' in response.data[run]) || !('units' in response.data[run])) {
+      throw new Error('Error: long term data for this model is incomplete.');
     }
   }
   return response;
@@ -75,16 +75,16 @@ var validateLongTermAverageData = function(response){
  * explorer API. Accepts an axios response object, throws an error if
  * any of the expected stats are missing, otherwise, returns the object unaltered.
  */
-var validateStatsData = function (response) {
-  if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-    throw new Error("Error: statistical data unavailable for this model");
+const validateStatsData = function (response) {
+  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
+    throw new Error('Error: statistical data unavailable for this model');
   }
-  for(var file in response.data) {
-    if(_.some('mean stdev min max median ncells'.split(' '),
+  for (const file in response.data) {
+    if (_.some('mean stdev min max median ncells'.split(' '),
         attr => !(attr in response.data[file]) || isNaN(response.data[file][attr])) ||
         _.some('units time'.split(' '),
             attr => !(attr in response.data[file]))) {
-      throw new Error("Error: statistical data for this model is incomplete");
+      throw new Error('Error: statistical data for this model is incomplete');
     }
   }
   return response;
@@ -96,16 +96,16 @@ var validateStatsData = function (response) {
  * any expected data is missing, or if the time resolution isn't monthly, 
  * seasonal, or yearly. Otherwise returns the axios response object unaltered.
  */
-var validateAnnualCycleData = function(response) {
-  if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-    throw new Error("Error: timeseries data is unavailable for this model.");
+const validateAnnualCycleData = function (response) {
+  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
+    throw new Error('Error: timeseries data is unavailable for this model.');
   }
-  if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
-    throw new Error("Error: timeseries data for this model is incomplete");
+  if (!_.every('id units data'.split(' '), attr => attr in response.data)) {
+    throw new Error('Error: timeseries data for this model is incomplete');
   }
-  var resolution = Object.keys(response.data.data).length;
-  if([1, 4, 12].indexOf(resolution) == -1) {
-    throw new Error("Error: unrecognized time resolution for timeseries");
+  const resolution = Object.keys(response.data.data).length;
+  if ([1, 4, 12].indexOf(resolution) === -1) {
+    throw new Error('Error: unrecognized time resolution for timeseries');
   }
   return response;
 };
@@ -115,15 +115,15 @@ var validateAnnualCycleData = function(response) {
  * climate explorer API. Accepts an axios response object and checks to make
  * sure it has id, units, and at least one timestamp.
  */
-var validateUnstructuredTimeseriesData = function(response) {
-  if(_.isEmpty(response.data) || (typeof response.data == "string")) {
-    throw new Error("Error: timeseries data is unavailable for this model.");
+const validateUnstructuredTimeseriesData = function (response) {
+  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
+    throw new Error('Error: timeseries data is unavailable for this model.');
   }
-  if(!_.every('id units data'.split(' '), attr => attr in response.data)) {
-    throw new Error("Error: timeseries data for this model is incomplete");
+  if (!_.every('id units data'.split(' '), attr => attr in response.data)) {
+    throw new Error('Error: timeseries data for this model is incomplete');
   }
-  if(_.isEmpty(response.data.data)) {
-    throw new Error("Error: no timestamps available for time series");
+  if (_.isEmpty(response.data.data)) {
+    throw new Error('Error: no timestamps available for time series');
   }
   return response;
 };
@@ -143,14 +143,12 @@ var validateUnstructuredTimeseriesData = function(response) {
  * so callers of this function need to distinguish between "false" 
  * and "undefined" when acting on its results.
  */
-var getVariableOptions = function(variable, option) {
-  var vOptions = require('../../variable-options.yaml');
-  if(nestedAttributeIsDefined(vOptions, variable, option)){
+const getVariableOptions = function (variable, option) {
+  const vOptions = require('../../variable-options.yaml');
+  if (nestedAttributeIsDefined(vOptions, variable, option)) {
     return vOptions[variable][option];
   }
-  else {
-    return undefined;
-  }
+  return undefined;
 };
 
 /************************************************************
@@ -181,11 +179,11 @@ var getVariableOptions = function(variable, option) {
  * Helper function for the TimeOfYearSelector component and its controllers.
  * Converts the numerical time key generated by TimeOfYearSelector to a UI string.
  */
-var timeKeyToTimeOfYear = function (timeidx) {
-  var timesOfYear = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-    'October', 'November', 'December', 'Winter-DJF', 'Spring-MAM', 'Summer-JJA',
-    'Fall-SON', 'Annual'
+const timeKeyToTimeOfYear = function (timeidx) {
+  const timesOfYear = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+    'Winter-DJF', 'Spring-MAM', 'Summer-JJA', 'Fall-SON', 'Annual',
   ];
   return timesOfYear[timeidx];
 };
@@ -197,16 +195,15 @@ var timeKeyToTimeOfYear = function (timeidx) {
  *   January would be {timescale: monthly, index: 1}
  *   Summer would be {timescale: seasonal, index:2}
  */
-var timeKeyToResolutionIndex = function (index) {
-  if(index == 16) {
-    return {timescale: "yearly", timeidx: 0};
+const timeKeyToResolutionIndex = function (index) {
+  if (index === 16) {
+    return { timescale: 'yearly', timeidx: 0 };
   } else if (index > 11 && index < 16) {
-    return {timescale: "seasonal", timeidx: index - 12};
-  } else if(index >= 0 && index < 12) {
-    return {timescale: "monthly", timeidx: index};
-  } else {
-    return undefined;
+    return { timescale: 'seasonal', timeidx: index - 12 };
+  } else if (index >= 0 && index < 12) {
+    return { timescale: 'monthly', timeidx: index };
   }
+  return undefined;
 };
 
 /*
@@ -214,9 +211,9 @@ var timeKeyToResolutionIndex = function (index) {
  * Encodes an object containing an index (0-11) and a resolution (yearly, 
  * seasonal, or monthly) as a numerical key for TimeOfYearSelector.
  */
-var resolutionIndexToTimeKey = function(res, idx) {
+const resolutionIndexToTimeKey = function (res, idx) {
   idx = parseInt(idx);
-  var offset = {"monthly": 0, "seasonal": 12, "yearly": 16}[res];
+  const offset = { monthly: 0, seasonal: 12, yearly: 16 }[res];
   return idx + offset;
 };
 
@@ -224,22 +221,20 @@ var resolutionIndexToTimeKey = function(res, idx) {
  * Converts a combination of a timescale (yearly, seasonal, or monthly)
  * and index (0-11) to a string.
  */
-var timeResolutionIndexToTimeOfYear = function(res, idx) {
-  var timesOfYear = {
-      "monthly": [
-        'January', 'February', 'March', 'April', 'May', 'June', 
-        'July', 'August', 'September','October', 'November', 'December'
-        ],
-      "seasonal": ["Winter-DJF", "Spring-MAM", "Summer-JJA", "Fall-SON"],
-      "yearly": ["Annual"]
+const timeResolutionIndexToTimeOfYear = function (res, idx) {
+  const timesOfYear = {
+    monthly: [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ],
+    seasonal: ['Winter-DJF', 'Spring-MAM', 'Summer-JJA', 'Fall-SON'],
+    yearly: ['Annual'],
   };
-  if(res in timesOfYear && idx in timesOfYear[res]) {
+  if (res in timesOfYear && idx in timesOfYear[res]) {
     return timesOfYear[res][idx];
   }
-  else {
-    //fall back to just stringifying the arguments.
-    return `${res} ${idx}`;
-  }
+  //fall back to just stringifying the arguments.
+  return `${res} ${idx}`;
 };
 
 /*
@@ -247,7 +242,7 @@ var timeResolutionIndexToTimeOfYear = function(res, idx) {
  * (like "1997-01-15T00:00:00Z") to an ISO8601 basic-formatted date 
  * (like "1997-01-15")
  */
-var extendedDateToBasicDate = function(timestamp) {
+const extendedDateToBasicDate = function (timestamp) {
   return moment(timestamp, moment.ISO_8601).utc().format('YYYY-MM-DD');
 };
 
@@ -255,41 +250,34 @@ var extendedDateToBasicDate = function(timestamp) {
  * Produces a human-readable string describing the time of year of displayed data.
  * Used by MapController, since ncWMS doesn't provide any human-friendly time info.
  */
-var timestampToTimeOfYear = function (timestamp, resolution="monthly", disambiguateYear = true) {
-  var year = disambiguateYear ? " ".concat(timestampToYear(timestamp)) : "";
-  var month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
+const timestampToTimeOfYear = function (timestamp, resolution='monthly', disambiguateYear = true) {
+  const year = disambiguateYear ? ' '.concat(timestampToYear(timestamp)) : '';
+  const month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
   
-  if(resolution == "yearly") {
+  if (resolution === 'yearly') {
     return `Annual${year}`;
-  }
-  else if(resolution == "monthly") {
+  } else if (resolution === 'monthly') {
     return `${month}${year}`;
-  }
-  else if(resolution == "seasonal") {
-    switch(month) {
-      case "December":
-      case "January":
-      case "February":
+  } else if (resolution === 'seasonal') {
+    switch (month) {
+      case 'December':
+      case 'January':
+      case 'February':
         return `Winter-DJF${year}`;
-        break;
-      case "March":
-      case "April":
-      case "May":
+      case 'March':
+      case 'April':
+      case 'May':
         return `Spring-MAM${year}`;
-        break;
-      case "June":
-      case "July":
-      case "August":
+      case 'June':
+      case 'July':
+      case 'August':
         return `Summer-JJA${year}`;
-        break;
-      case "September":
-      case "October":
-      case "November":
+      case 'September':
+      case 'October':
+      case 'November':
         return `Fall-SON${year}`;
-        break;
     }
-  }
-  else {
+  } else {
     return timestamp;
   }
 };
@@ -297,7 +285,7 @@ var timestampToTimeOfYear = function (timestamp, resolution="monthly", disambigu
 /*
  * extract the four digit year from an ISO 8601 timestamp
  */
-var timestampToYear = function (date) {
+const timestampToYear = function (date) {
   return moment(date, moment.ISO_8601).utc().format('YYYY');
 };
 
@@ -306,9 +294,9 @@ var timestampToYear = function (date) {
  * Predicate that calculates whether two dates are the same calendar year. 
  * (Not whether they're 365 days apart.)
  */
-var sameYear = function(date1, date2) {
+const sameYear = function (date1, date2) {
   return timestampToYear(date1) === timestampToYear(date2);
-}
+};
 
 /*****************************************************
  * String-related helper functions
@@ -318,7 +306,7 @@ var sameYear = function(date1, date2) {
  * Returns a string with the first letter of each word capitalized
  * "a 1st string" -> "A 1st String"
  */
-var capitalizeWords = function(s) {
+const capitalizeWords = function (s) {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 };
 
@@ -326,7 +314,7 @@ var capitalizeWords = function(s) {
  * Returns true if the second argument is a substring of the first,
  * ignoring case.
  */
-var caseInsensitiveStringSearch = function (s1, s2) {
+const caseInsensitiveStringSearch = function (s1, s2) {
   return s1.toLowerCase().search(s2.toLowerCase()) !== -1;
 };
 
@@ -338,18 +326,18 @@ var caseInsensitiveStringSearch = function (s1, s2) {
  * Given an object and any number of arguments arg1, arg2, arg3,
  * et cetera, returns true if object.arg1.arg2.arg3 is defined
  */
-var nestedAttributeIsDefined = function (o, ...attributes) {
+const nestedAttributeIsDefined = function (o, ...attributes) {
   if (_.isUndefined(o)) {
     return false;
   }
-  for(var i = 0; i < attributes.length; i++) {
-    if(_.isUndefined(o[attributes[i]])) {
-      return false
+  for (let i = 0; i < attributes.length; i++) {
+    if (_.isUndefined(o[attributes[i]])) {
+      return false;
     }
     o = o[attributes[i]];
   }
   return true;
-}
+};
 
 module.exports = { PRECISION, parseBootstrapTableData, validateLongTermAverageData,
     validateStatsData, validateAnnualCycleData, validateUnstructuredTimeseriesData,
@@ -358,4 +346,4 @@ module.exports = { PRECISION, parseBootstrapTableData, validateLongTermAverageDa
     resolutionIndexToTimeKey, extendedDateToBasicDate, timestampToTimeOfYear, timestampToYear,
     sameYear,
     capitalizeWords, caseInsensitiveStringSearch,
-    nestedAttributeIsDefined};
+    nestedAttributeIsDefined };
