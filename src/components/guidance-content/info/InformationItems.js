@@ -524,22 +524,21 @@ export const modelContextTabLabel = (
   </LabelWithInfo>
 );
 
-export const futureAnomalyTabLabel = (
+export const changeFromBaselineTabLabel = (
   <LabelWithInfo label='Change from Baseline'>
     <p>
-      Annual cycle graphs showing the anomaly
-      (difference from values in baseline period)
-      for averages over variable values over future periods
-      (2040-2069, 2070-2099).
-      Baseline is 2010-2039 period.
+      Annual cycle graphs showing the difference from values in baseline period
+      for averages over variable values the future periods
+      2010-2039, 2040-2069, and 2070-2099.
+      Baseline is the average over the period 1981-2010.
     </p>
     <p>
-      Absolute values are shown in upper graphs (including baseline).
+      Absolute values, including baseline, are shown in upper graphs.
       Scale for absolute values is on left-hand vertical axis.
     </p>
     <p>
-      Anomaly values are shown in lower graphs.
-      Scale for anomaly values is on right-hand vertical axis.
+      Change from baseline, expressed as percentages, are shown in lower graphs.
+      Scale for % change values is on right-hand vertical axis.
     </p>
     <p>{annualCycleGraphDefn}</p>
     <p>{spatialAveragingDefn}</p>

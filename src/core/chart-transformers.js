@@ -14,10 +14,14 @@
  *  
  *  - makeAnomalyGraph: using one of the existing data series as the base, 
  *    adds additional data series representing the difference between the
- *    base series and each other data series (including itself)
+ *    base series and each other data series
+ *
+ *  - makeTimeSliceGraph: accepts a graph showing one or more timeseries
+ *    and a timestamp, returns a simplified narrow vertical graph showing
+ *    only that timestamp. Intended for use as a sidebar.
  ***************************************************************************/
 import _ from 'underscore';
-import {caseInsensitiveStringSearch} from './util';
+import {caseInsensitiveStringSearch, getVariableOptions} from './util';
 import {fixedPrecision} from './chart-generators';
 import {assignColoursByGroup, hideSeriesInTooltip,
         hideSeriesInLegend, padYAxis,
@@ -177,20 +181,30 @@ function getAxisTextForVariable (graph, variable) {
  ***************************************************************************/
 /*
  * Graph transformation function that accepts a graph containing one or more
- * timeseries associated with a single axis, and the name of one of the 
- * timeseries to use as a base. Adds a secondary y axis, graphing a data series
- * showing the difference (anomaly) between each of the original series and the
- * base series. (Including the base series itself, shown as a flat line.)
- * 
- * The anomaly series will have the same hue, but somewhat desaturated colour 
- * as the original series they represent.They will not appear in legends or 
+ * timeseries associated with a single axis, the name of the displayed variable,
+ * and the name of one of the timeseries to use as a base.
+ *
+ * Adds a secondary y axis, graphing a data series showing the difference
+ * (anomaly) between each of the original series and the base series.
+ *
+ * The anomaly series will have the same hue, but somewhat desaturated colour
+ * as the original series they represent.They will not appear in legends or
  * tooltips, but their name (if needed for further graph manipulation)
  * will be "[original name] Anomaly."
- * 
+ *
  * This is intended to display change over time on a single graph.
+ *
+ * The variable argument should be left undefined if multiple
+ * variables are shown on the graph.
  */
 
-function makeAnomalyGraph (base, graph) {
+function makeAnomalyGraph (base, variable_id, graph) {
+
+  //anomalies for some variables are typically expressed as percentages.
+  //if this is a single variable graph, check the variable configuration 
+  //to see if this is one of them; if so, display percentages on the chart.
+  const displayPercent = !_.isUndefined(variable_id) &&
+                         getVariableOptions(variable_id, "percentageAnomalies");
   
   if(!_.isUndefined(graph.axis.y2)) {
     throw new Error("Error: Cannot calculate anomalies for multiple data types.");
@@ -200,6 +214,7 @@ function makeAnomalyGraph (base, graph) {
   if(_.isUndefined(baseSeries)) {
     throw new Error("Error: Invalid base data for anomaly calculation.");
   }
+  const baseSeriesName = baseSeries[0];
   
   const origLength = graph.data.columns.length;
   graph.data.axes = {};
@@ -216,17 +231,23 @@ function makeAnomalyGraph (base, graph) {
       let newSeries = [];
       newSeries.push(`${seriesName} Anomaly`);
       for(let j = 1; j < oldSeries.length; j++){
-        newSeries.push(oldSeries[j] - baseSeries[j]);
+        newSeries.push(
+          displayPercent ?
+            percentageChange(baseSeries[j], oldSeries[j]) :
+            oldSeries[j] - baseSeries[j]
+        );
       }
       graph.data.columns.push(newSeries);
       graph.data.axes[seriesName] = 'y';
       graph.data.axes[`${seriesName} Anomaly`] = 'y2';
-      graph.data.types[`${seriesName} Anomaly`] = "line";
+      graph.data.types[`${seriesName} Anomaly`] = oldSeries[0] === base? "line" : "bar";
     }
   }
   graph.axis.y2.label = {};
   graph.axis.y2.label.position = 'outer-middle';
-  graph.axis.y2.label.text = `${getAxisTextForVariable(graph, baseSeries[0])} anomaly from ${baseSeries[0]}`;
+  graph.axis.y2.label.text = displayPercent ?
+      `% change from ${baseSeriesName}` :
+      `change in ${getAxisTextForVariable(graph, baseSeriesName)} from ${baseSeriesName}`;
   graph.axis.y2.tick = {};
   graph.axis.y2.tick.format = graph.axis.y.tick.format;
   
@@ -259,7 +280,7 @@ function makeAnomalyGraph (base, graph) {
   graph = fadeSeriesByRank(graph, anomalyRanker);
   
   //show anomalies with nominal values in tooltip:
-  graph.tooltip.format.value = addAnomalyTooltipFormatter(graph.tooltip.format.value, baseSeries);
+  graph.tooltip.format.value = addAnomalyTooltipFormatter(graph.tooltip.format.value, baseSeries, displayPercent);
   
   //move the two sets of data apart for less confusing visuals
   graph = padYAxis(graph, 'y2', 'top', 1.1);
@@ -272,20 +293,39 @@ function makeAnomalyGraph (base, graph) {
 };
 
 /*
+ * Helper function for makeAnomalyGraph: returns the percent difference
+ * of two values.
+ */
+function percentageChange(a, b) {
+  if (a === 0) {
+    //this shouldn't happen, as percentage changes are only used for
+    //whitelisted variables like precip, which should always have a > 0.
+    //but if it does (bad data), return null, which will make the graph
+    //skip this data point.
+    return null;
+  }
+  return 100 * (b - a) / Math.abs(a);
+}
+
+/*
  * Helper function for makeAnomalyGraph: takes an existing tool tip number
  * formatting function, and adds a wrapper which appends the anomaly from
- * the specified base series.
+ * the specified base series, either as a percent or nominal value.
  */
-function addAnomalyTooltipFormatter (oldFormatter, baseSeries) {  
+function addAnomalyTooltipFormatter (oldFormatter, baseSeries, displayPercent) {  
   const newTooltipValueFormatter = function(value, ratio, id, index) {
     let nominal = oldFormatter(value, ratio, id, index);
     if(_.isUndefined(nominal)) { //this series doesn't display in tooltip.
       return undefined; 
     }
     else {
-      const anomaly = value - baseSeries[index + 1];
+      const anomaly = displayPercent ?
+          percentageChange(baseSeries[index+1], value) :
+          value - baseSeries[index+1];
       const sign = anomaly >= 0 ? "+" : "";
-      return nominal + " (" + sign + anomaly.toPrecision(2) + ")";
+      const percent = displayPercent ? "%" : "";
+      const anomPrint = _.isNull(anomaly) ? "-" : anomaly.toPrecision(2);
+      return nominal + " (" + sign + anomPrint + percent +")";
     }
   };
   return newTooltipValueFormatter;
@@ -356,4 +396,4 @@ function makeTimeSliceGraph (timestamp, graph) {
 module.exports = { makeVariableResponseGraph, makeAnomalyGraph,
     makeTimeSliceGraph,
     //exported only for testing purposes:
-    getAxisTextForVariable};
+    getAxisTextForVariable, percentageChange};

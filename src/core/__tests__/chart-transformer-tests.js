@@ -90,11 +90,25 @@ describe('makeAnomalyGraph', function() {
         mockAPI.monthlyTasmaxTimeseries,
         mockAPI.seasonalTasmaxTimeseries, 
         mockAPI.annualTasmaxTimeseries);
-    const anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", graph);
+    const anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", "tasmax", graph);
     expect(anomalyGraph.data.columns.length).toBe(5);
     expect(validate.allDefinedObject(anomalyGraph)).toBe(true);
     expect(validate.allDefinedArray(anomalyGraph.data.columns)).toBe(true);
     expect(anomalyGraph.axis.y2).toBeDefined();
+  });
+});
+
+describe('percentageChange', function() {
+  it('calculates the percentage different between two values', function () {
+    expect(ct.percentageChange(2, 3)).toBe(50);
+    expect(ct.percentageChange(4, 2)).toBe(-50);
+    expect(ct.percentageChange(-2, -3)).toBe(-50);
+    expect(ct.percentageChange(-4, -2)).toBe(50);
+  });
+  it('returns null when calculating percent change from 0', function () {
+    expect(ct.percentageChange(0, 0)).toBeNull();
+    expect(ct.percentageChange(0, 2)).toBeNull();
+    expect(ct.percentageChange(0, -1)).toBeNull();
   });
 });
 
@@ -105,10 +119,14 @@ describe('addAnomalyTooltipFormatter', function () {
       mockAPI.seasonalTasmaxTimeseries, 
       mockAPI.annualTasmaxTimeseries);
   const oldTooltipFormat = graph.tooltip.format.value;
-  const anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", graph);
+  const anomalyGraph = ct.makeAnomalyGraph("Monthly Mean", "tasmax", graph);
   const newTooltipFormat = anomalyGraph.tooltip.format.value;
   expect(oldTooltipFormat(-18, 0, "Monthly Mean", 1)).toBe("-18 degC");
   expect(newTooltipFormat(-18, 0, "Monthly Mean", 1)).toBe("-18 degC (+0.81)");
+  });
+  xit('displays anomaly as a percentage for precipitation', function () {
+    //this functionality relies on reading the variable config yaml, not yet
+    //available for testing.
   });
 });
 

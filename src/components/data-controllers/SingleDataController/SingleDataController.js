@@ -17,6 +17,12 @@
  *  - a SingleContextGraph similar to the Long Term Average graph, but with
  *    a separate line for each model and simplified presentation.
  *
+ *  - an AnomalyAnnualCycleGraph displaying future data as delta from a
+ *    "baseline" climatology (usually 1981 - 2010)
+ *
+ *  - a SingleTimeSliceGraph, which compares all available models
+ *    at a single timestamp.
+ *
  * If the selected dataset is not a multi year mean:
  *  - a freeform SingleTimeSeriesGraph showing each time point available.
  *
@@ -47,7 +53,7 @@ import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
-  singleAnnualCycleTabLabel, futureAnomalyTabLabel,
+  singleAnnualCycleTabLabel, changeFromBaselineTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel, statsTableLabel,
   graphsPanelLabel,
@@ -172,7 +178,7 @@ export default createReactClass({
       { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
       { title: modelContextTabLabel, graph: SingleContextGraph },
-      { title: futureAnomalyTabLabel, graph: AnomalyAnnualCycleGraph },
+      { title: changeFromBaselineTabLabel, graph: AnomalyAnnualCycleGraph },
       { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
     ],
     notMym: [
