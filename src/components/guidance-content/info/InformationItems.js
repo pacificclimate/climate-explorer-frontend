@@ -524,7 +524,7 @@ export const modelContextTabLabel = (
   </LabelWithInfo>
 );
 
-export const futureAnomalyTabLabel = (
+export const changeFromBaselineTabLabel = (
   <LabelWithInfo label='Change from Baseline'>
     <p>
       Annual cycle graphs showing the anomaly

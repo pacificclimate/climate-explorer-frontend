@@ -53,7 +53,7 @@ import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
-  singleAnnualCycleTabLabel, futureAnomalyTabLabel,
+  singleAnnualCycleTabLabel, changeFromBaselineTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
   timeSeriesTabLabel, statsTableLabel,
   graphsPanelLabel,
@@ -178,7 +178,7 @@ export default createReactClass({
       { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
       { title: modelContextTabLabel, graph: SingleContextGraph },
-      { title: futureAnomalyTabLabel, graph: AnomalyAnnualCycleGraph },
+      { title: changeFromBaselineTabLabel, graph: AnomalyAnnualCycleGraph },
       { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
     ],
     notMym: [
