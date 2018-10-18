@@ -20,6 +20,9 @@
  *
  * Those three functions provide a standard ordering and encoding for
  * the TimeOfYearSelector component.
+ *
+ * Optionally, the monthly, seasonal, and yearly props may
+ * be passed to show (true) or hide (false) some of the options.
  ******************************************************************/
 
 import PropTypes from 'prop-types';
@@ -33,18 +36,35 @@ class TimeOfYearSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     value: PropTypes.any,
+    monthly: PropTypes.bool,  // Show month options
+    seasonal: PropTypes.bool, // Show season options
+    yearly: PropTypes.bool,   // Show annual option
     inlineLabel: PropTypes.bool,
   };
 
   static defaultProps = {
     inlineLabel: false,
+    monthly: true,
+    seasonal: true,
+    yearly: true,
   };
 
   render() {
+    let timesofyear = [];
+    function addTimeRange(start, end) {
+      for (let index = start; index <= end; index++) {
+        timesofyear.push([index, timeKeyToTimeOfYear(index)]);
+      }
+    }
 
-    var timesofyear = [];
-    for (var index = 0; index < 17; index++) {
-      timesofyear.push([index, timeKeyToTimeOfYear(index)]);
+    if (this.props.monthly) {
+      addTimeRange(0, 11);
+    }
+    if (this.props.seasonal) {
+      addTimeRange(12, 15);
+    }
+    if (this.props.yearly) {
+      addTimeRange(16, 16);
     }
 
     return (
