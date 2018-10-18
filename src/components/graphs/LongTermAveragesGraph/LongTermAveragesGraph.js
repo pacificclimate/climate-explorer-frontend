@@ -56,25 +56,25 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
-    const timeResolutions = _.pluck(props.meta, 'timescale');
-    const monthlyData = _.contains(timeResolutions, 'monthly');
-    const seasonalData = _.contains(timeResolutions, 'seasonal');
-    const annualData = _.contains(timeResolutions, 'yearly');
-    
-    //default to Annual, but use higher resolution if available.
-    let timeOfYear = 16; //Annual
-    if (monthlyData) {
-      timeOfYear = 0; //January
-    } else if (seasonalData) {
-      timeOfYear = 12; //Winter
-    }
+    // const timeResolutions = _.pluck(props.meta, 'timescale');
+    // const monthlyData = _.contains(timeResolutions, 'monthly');
+    // const seasonalData = _.contains(timeResolutions, 'seasonal');
+    // const yearlyData = _.contains(timeResolutions, 'yearly');
+    //
+    // //default to Annual, but use higher resolution if available.
+    // let timeOfYear = 16; //Annual
+    // if (monthlyData) {
+    //   timeOfYear = 0; //January
+    // } else if (seasonalData) {
+    //   timeOfYear = 12; //Winter
+    // }
 
     this.state = {
-      timeOfYear,
+      // timeOfYear,
       graphSpec: blankGraphSpec,
-      monthlyData,
-      seasonalData,
-      annualData,
+      // monthlyData,
+      // seasonalData,
+      // yearlyData,
     };
   }
 
@@ -105,12 +105,32 @@ export default class LongTermAveragesGraph extends React.Component {
       return;
     }
 
+    const timeResolutions = _.pluck(this.props.meta, 'timescale');
+    const monthlyData = _.contains(timeResolutions, 'monthly');
+    const seasonalData = _.contains(timeResolutions, 'seasonal');
+    const yearlyData = _.contains(timeResolutions, 'yearly');
+
+    //default to Annual, but use higher resolution if available.
+    let timeOfYear = 16; //Annual
+    if (monthlyData) {
+      timeOfYear = 0; //January
+    } else if (seasonalData) {
+      timeOfYear = 12; //Winter
+    }
+
     const timeOfYearMetadatas =
       this.props.getMetadata(this.state.timeOfYear)
         .filter(metadata => !!metadata);
     const dataPromises = timeOfYearMetadatas.map(metadata =>
       this.getAndValidateData(metadata)
     );
+
+    this.setState({
+      monthlyData,
+      seasonalData,
+      yearlyData,
+      timeOfYear,
+    });
 
     Promise.all(dataPromises).then(data => {
       this.setState({
