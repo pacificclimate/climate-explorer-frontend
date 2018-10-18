@@ -17,6 +17,8 @@ import {
 import {
   timeKeyToResolutionIndex,
   validateLongTermAverageData,
+  timeResolutions,
+  defaultTimeOfYear,
 } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
 import { exportDataToWorksheet } from '../../../core/export';
@@ -79,28 +81,6 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  timeResolutions() {
-    const timescales = _.pluck(this.props.meta, 'timescale');
-    return {
-      monthly: _.contains(timescales, 'monthly'),
-      seasonal: _.contains(timescales, 'seasonal'),
-      yearly: _.contains(timescales, 'yearly'),
-    };
-  }
-
-  defaultTimeOfYear({ monthly, seasonal, yearly }) {
-    if (monthly) {
-      return 0;  // January
-    }
-    if (seasonal) {
-      return 12;  // Winter
-    }
-    if (yearly) {
-      return 16;  // Annual
-    }
-    return undefined;
-  }
-
   loadGraph() {
     // Fetch data for graph, then convert it to a graph spec and set state
     // accordingly.
@@ -110,7 +90,7 @@ export default class LongTermAveragesGraph extends React.Component {
     }
 
     this.setState({
-      timeOfYear: this.defaultTimeOfYear(this.timeResolutions()),
+      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
     });
 
     const timeOfYearMetadatas =
@@ -168,7 +148,7 @@ export default class LongTermAveragesGraph extends React.Component {
             <TimeOfYearSelector
               value={this.state.timeOfYear}
               onChange={this.handleChangeTimeOfYear}
-              {...this.timeResolutions()}
+              {...timeResolutions(this.props.meta)}
               inlineLabel
             />
           </Col>

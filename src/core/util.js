@@ -235,6 +235,28 @@ export function timeResolutionIndexToTimeOfYear(res, idx) {
   return `${res} ${idx}`;
 }
 
+export function timeResolutions(meta) {
+  const timescales = _.pluck(meta, 'timescale');
+  return {
+    monthly: _.contains(timescales, 'monthly'),
+    seasonal: _.contains(timescales, 'seasonal'),
+    yearly: _.contains(timescales, 'yearly'),
+  };
+}
+
+export function defaultTimeOfYear({ monthly, seasonal, yearly }) {
+  if (monthly) {
+    return 0;  // January
+  }
+  if (seasonal) {
+    return 12;  // Winter
+  }
+  if (yearly) {
+    return 16;  // Annual
+  }
+  return undefined;
+}
+
 /*
  * extendedDateToBasicDate: converts an ISO8601 extended-formatted date 
  * (like "1997-01-15T00:00:00Z") to an ISO8601 basic-formatted date 
