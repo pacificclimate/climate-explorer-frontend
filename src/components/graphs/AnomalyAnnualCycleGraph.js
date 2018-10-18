@@ -26,8 +26,8 @@ import AnnualCycleGraph from './AnnualCycleGraph';
 export default function AnomalyAnnualCycleGraph(props) {
   
   function getDateRangeMetadatas(start = undefined, end = undefined) {
-    // returns metadata for all datasets whose model, experiment, and variable 
-    // match the values specified in props, and whose start year is greater 
+    // returns metadata for all datasets whose model, experiment, and variable
+    // match the values specified in props, and whose start year is greater
     //than start, and whose end year is less than end.
     //the interval is exclusive. optionally leave either endpoint undefined.
     return _.filter(props.meta, md => {
@@ -38,31 +38,31 @@ export default function AnomalyAnnualCycleGraph(props) {
       (_.isUndefined(start) || md.start_date > start);
     });
   }
-  
+
   function currentYear() {
     return new Date().getFullYear();
   }
-  
+
   function getMetadata(dataSpec) {
 
     const {
       model_id, experiment,
       variable_id, meta,
     } = props;
-    
-    //Select a base historical dataset to be the baseline. 
+
+    //Select a base historical dataset to be the baseline.
     //The most recent dataset that does *not* include the present date is
     //used (usually 1981 - 2010). if there are two equally recent datasets
     //(such as 1971-2000 and 1981-2000) for some reason, one will be arbitrarily selected.
     let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
     const end_date = _.max(_.pluck(historicalMetadatas, "end_date"));
     historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
-    
+
     //pick the highest-resolution dataset available for that climatology
     const baselineMetadata = _.findWhere(historicalMetadatas, {timescale: "monthly"})
                              || _.findWhere(historicalMetadatas, {timescale: "seasonal"})
-                             || _.findWhere(historicalMetadatas, {timescale: "annual"});
-    
+                             || _.findWhere(historicalMetadatas, {timescale: "yearly"});
+
     //return the baseline dataset and every same-resolution dataset that starts after it.
     if(_.isUndefined(baselineMetadata)) {
       return [];
