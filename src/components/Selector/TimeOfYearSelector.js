@@ -1,7 +1,7 @@
 /******************************************************************
  * TimeOfYearSelector.js - dropdown for user to select time of year
  *
- * This selector offer a choice of 12 months, 4 seasonal, and annual
+ * This selector offer a choice of 12 months, 4 seasons, and annual
  * to the user. Internally, the available times are keyed with a
  * numerical index, which is passed as a key to any provided
  * callback function.
@@ -21,8 +21,8 @@
  * Those three functions provide a standard ordering and encoding for
  * the TimeOfYearSelector component.
  *
- * Optionally, the hideMonths, hideSeasons, and hideYears props may
- * be passed to surpress some of the options.
+ * Optionally, the monthly, seasonal, and yearly props may
+ * be passed to show (true) or hide (false) some of the options.
  ******************************************************************/
 
 import PropTypes from 'prop-types';
@@ -36,9 +36,9 @@ class TimeOfYearSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     value: PropTypes.any,
-    monthly: PropTypes.bool,
-    seasonal: PropTypes.bool,
-    yearly: PropTypes.bool,
+    monthly: PropTypes.bool,  // Show month options
+    seasonal: PropTypes.bool, // Show season options
+    yearly: PropTypes.bool,   // Show annual option
     inlineLabel: PropTypes.bool,
   };
 
