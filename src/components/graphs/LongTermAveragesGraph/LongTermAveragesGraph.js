@@ -16,7 +16,6 @@ import {
 } from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
-  timeKeyToTimeOfYear,
   validateLongTermAverageData,
 } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
@@ -56,25 +55,8 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
-    // const timeResolutions = _.pluck(props.meta, 'timescale');
-    // const monthlyData = _.contains(timeResolutions, 'monthly');
-    // const seasonalData = _.contains(timeResolutions, 'seasonal');
-    // const yearlyData = _.contains(timeResolutions, 'yearly');
-    //
-    // //default to Annual, but use higher resolution if available.
-    // let timeOfYear = 16; //Annual
-    // if (monthlyData) {
-    //   timeOfYear = 0; //January
-    // } else if (seasonalData) {
-    //   timeOfYear = 12; //Winter
-    // }
-
     this.state = {
-      // timeOfYear,
       graphSpec: blankGraphSpec,
-      // monthlyData,
-      // seasonalData,
-      // yearlyData,
     };
   }
 
@@ -98,11 +80,11 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   timeResolutions() {
-    const timeResolutions = _.pluck(this.props.meta, 'timescale');
+    const timescales = _.pluck(this.props.meta, 'timescale');
     return {
-      monthly: _.contains(timeResolutions, 'monthly'),
-      seasonal: _.contains(timeResolutions, 'seasonal'),
-      yearly: _.contains(timeResolutions, 'yearly'),
+      monthly: _.contains(timescales, 'monthly'),
+      seasonal: _.contains(timescales, 'seasonal'),
+      yearly: _.contains(timescales, 'yearly'),
     };
   }
 
