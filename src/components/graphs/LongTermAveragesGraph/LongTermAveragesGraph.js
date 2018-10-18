@@ -99,25 +99,21 @@ export default class LongTermAveragesGraph extends React.Component {
 
   timeResolutions() {
     const timeResolutions = _.pluck(this.props.meta, 'timescale');
-    const monthlyData = _.contains(timeResolutions, 'monthly');
-    const seasonalData = _.contains(timeResolutions, 'seasonal');
-    const yearlyData = _.contains(timeResolutions, 'yearly');
-
     return {
-      monthlyData,
-      seasonalData,
-      yearlyData,
+      monthly: _.contains(timeResolutions, 'monthly'),
+      seasonal: _.contains(timeResolutions, 'seasonal'),
+      yearly: _.contains(timeResolutions, 'yearly'),
     };
   }
 
-  defaultTimeOfYear({ monthlyData, seasonalData, yearlyData }) {
-    if (monthlyData) {
+  defaultTimeOfYear({ monthly, seasonal, yearly }) {
+    if (monthly) {
       return 0;  // January
     }
-    if (seasonalData) {
+    if (seasonal) {
       return 12;  // Winter
     }
-    if (yearlyData) {
+    if (yearly) {
       return 16;  // Annual
     }
     return undefined;
@@ -183,7 +179,6 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
-    const timeResolutions = this.timeResolutions();
     return (
       <React.Fragment>
         <Row>
@@ -191,9 +186,7 @@ export default class LongTermAveragesGraph extends React.Component {
             <TimeOfYearSelector
               value={this.state.timeOfYear}
               onChange={this.handleChangeTimeOfYear}
-              hideMonths={!timeResolutions.monthlyData}
-              hideSeasons={!timeResolutions.seasonalData}
-              hideYear={!timeResolutions.yearlyData}
+              {...this.timeResolutions()}
               inlineLabel
             />
           </Col>
