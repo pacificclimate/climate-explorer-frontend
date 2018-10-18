@@ -83,7 +83,8 @@ export default class LongTermAveragesGraph extends React.Component {
 
   loadGraph() {
     // Fetch data for graph, then convert it to a graph spec and set state
-    // accordingly.
+    // accordingly. Set default time of year appropriately for the data
+    // available.
 
     if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
       return;
