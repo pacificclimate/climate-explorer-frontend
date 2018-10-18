@@ -127,3 +127,28 @@ git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
   ```
+
+## Code style standard compliance
+
+We have nominally 
+[adopted](https://github.com/pacificclimate/climate-explorer-frontend/issues/138) 
+the default ESLint code style.
+We aren't enforcing it right now, unfortunately.
+
+Enforcement aside, we continue to commit code that is in violation of these
+standards, which is undesirable for at least two reasons: 
+
+- Following a coding standard makes the code _much_ easier to read.
+- For those of us with an IDE plugin that flags standards violations, 
+  they appear _all over the place_, which is distracting to say the least.
+
+The coding standard we adopted has a lot of rules, but the following are the
+ones we are violating most. A small effort could radically reduce the number 
+of new violations we introduce. In approximate order of frequency of violation:
+
+1. Limit line length to 80 characters.
+1. Use single quotes for strings. (Double quotes are visually noisier.)
+1. Place a space after a begin comment delimiter. (`// comment...`, not `//comment...`.)
+1. Place a space between `if` and `for` and the opening parenthesis. (`if (cond)`, not `if(cond)`)
+1. Declare variables with `const` or `let`, in that order of preference; avoid `var`. (`const` and `let` are scoped.)
+   - Use `for (const prop in obj)` and `for (const val of iterable)`, but `for (let i = 1; i < n; i++)`
