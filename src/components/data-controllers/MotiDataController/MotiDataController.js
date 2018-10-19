@@ -1,3 +1,13 @@
+// DEPRECATED: DO NOT MAINTAIN THIS COMPONENT.
+//
+// This component is not currently in use and it has not been kept up to date
+// with changes made to other data controllers. This component is being kept
+// for the sole purpose of keeping a record of what it was intended to do.
+//
+// If and when a MotiDataController is actually needed, it should be created
+// by cloning/interbreeding/genetically modifying one or more of the other data
+// controllers, which are much better structured.
+
 /************************************************************************
  * MotiDataController.js - controller to display summarized numerical data 
  *

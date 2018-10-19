@@ -1,3 +1,12 @@
+// DEPRECATED: DO NOT MAINTAIN THIS MODULE. REMOVE WHEN SOLE REMAINING
+// DEPENDENCY IS REMOVED.
+//
+// We are moving away from mixins.
+// (see [Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+// This mixin is no longer relevant, since it is only used in the deprecated
+// component MotiDataController. Dependence on it has been removed from all other
+// data controllers.
+
 /*********************************************************************
  * DataControllerMixin.js - shared functionality for data controllers
  * 
