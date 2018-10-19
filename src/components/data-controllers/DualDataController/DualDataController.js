@@ -73,17 +73,6 @@ export default createReactClass({
     comparandMeta: PropTypes.array,
   },
 
-  mixins: [DataControllerMixin],
-
-  getInitialState: function () {
-    return {
-      statsData: undefined,
-    };
-  },
-
-  // TODO: Remove when DataControllerMixin is removed
-  getData: function (props) {/* Legacy: NOOP*/},
-
   shouldComponentUpdate: function (nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
