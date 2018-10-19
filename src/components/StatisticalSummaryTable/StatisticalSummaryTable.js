@@ -17,7 +17,7 @@ import styles from './StatisticalSummaryTable.css';
 import { getStats } from '../../data-services/ce-backend';
 import {
   parseBootstrapTableData, resolutionIndexToTimeKey, timeKeyToResolutionIndex,
-  validateStatsData
+  validateStatsData,
 } from '../../core/util';
 import { displayError, multiYearMeanSelected } from '../graphs/graph-helpers';
 import { exportDataToWorksheet } from '../../core/export';
@@ -54,8 +54,7 @@ export default class StatisticalSummaryTable extends React.Component {
     //and long term average graphs, otherwise load a timeseries graph
     if (multiYearMeanSelected(props)) {
       this.loadDataTable(props);
-    }
-    else {
+    } else {
       this.loadDataTable(props, { timeidx: 0, timescale: 'yearly' });
     }
   }
@@ -84,12 +83,12 @@ export default class StatisticalSummaryTable extends React.Component {
    * (resolution: "monthly", index 0).
    */
   loadDataTable(props, time) {
-    var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
-    var timeres = time ? time.timescale : this.state.dataTableTimeScale;
+    const timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
+    const timeres = time ? time.timescale : this.state.dataTableTimeScale;
 
     //load stats table
     this.setStatsTableNoDataMessage('Loading Data');
-    var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
+    const myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
 
     myStatsPromise.then(response => {
       if (_.allKeys(response.data).length > 0) {
@@ -99,8 +98,7 @@ export default class StatisticalSummaryTable extends React.Component {
           statsData: parseBootstrapTableData(
             this.injectRunIntoStats(response.data), props.meta),
         });
-      }
-      else {
+      } else {
         this.setState({
           dataTableTimeOfYear: timeidx,
           dataTableTimeScale: timeres,
@@ -112,11 +110,8 @@ export default class StatisticalSummaryTable extends React.Component {
     });
   }
 
-  // Originally in DataControllerMixin. No mixins in _my_ components!
-  // TODO: Extract to a module and import here.
-
   verifyParams(props) {
-    var stringPropList = _.values(_.pick(props, 'ensemble_name', 'meta', 'model_id', 'variable_id', 'experiment'));
+    const stringPropList = _.values(_.pick(props, 'ensemble_name', 'meta', 'model_id', 'variable_id', 'experiment'));
     return (stringPropList.length > 0) && stringPropList.every(Boolean);
   }
 
@@ -126,21 +121,19 @@ export default class StatisticalSummaryTable extends React.Component {
     }
   }
 
-
   componentWillReceiveProps(nextProps) {
     if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
       this.getData(nextProps);
-    }
-    else { //Didn't receive any valid data.
+    } else { //Didn't receive any valid data.
       //Most likely cause in production would be the user selecting
-      //parameters (rcp, model, variable) for which no datasets have been
+      //parameters (rcp, model, constiable) for which no datasets have been
       //added to the database yet.
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
-      var text = "No data matching selected parameters available";
-      var viewerMessageDisplays = [this.setStatsTableNoDataMessage];
-      _.each(viewerMessageDisplays, function(display) {
-        if(typeof display == 'function') {
+      const text = 'No data matching selected parameters available';
+      const viewerMessageDisplays = [this.setStatsTableNoDataMessage];
+      _.each(viewerMessageDisplays, function (display) {
+        if (typeof display === 'function') {
           display(text);
         }
       });
@@ -158,9 +151,7 @@ export default class StatisticalSummaryTable extends React.Component {
   injectRunIntoStats(data) {
     // Injects model run information into object returned by stats call
     _.map(data, function (val, key) {
-      var selected = this.props.meta.filter(function (el) {
-        return el.unique_id === key;
-      });
+      const selected = this.props.meta.filter(el => el.unique_id === key);
       _.extend(val, { run: selected[0].ensemble_member });
     }.bind(this));
     return data;
@@ -168,10 +159,8 @@ export default class StatisticalSummaryTable extends React.Component {
 
   //Returns the metadata object that corresponds to a unique_id
   getMetadata(id, meta = this.props.meta) {
-    return _.find(meta, function(m) {return m.unique_id === id;} );
+    return _.find(meta, { unique_id: id });
   }
-
-  // End DataControllerMixin transplants
 
   shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
@@ -188,9 +177,7 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   render() {
-    const statsData =
-      // this.state.statsData ? this.state.statsData : this.blankStatsData;
-      this.state.statsData ? this.state.statsData : [];
+    const statsData = this.state.statsData ? this.state.statsData : [];
 
     const dataTableSelected = resolutionIndexToTimeKey(
       this.state.dataTableTimeScale,
