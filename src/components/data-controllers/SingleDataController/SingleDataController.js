@@ -33,7 +33,6 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
@@ -57,12 +56,8 @@ import GraphTabs from '../GraphTabs';
 import StatisticalSummaryTable from '../../StatisticalSummaryTable';
 
 
-// TODO: Remove DataControllerMixin and convert to class extension style when 
-// no more dependencies on DataControllerMixin remain
-export default createReactClass({
-  displayName: 'SingleDataController',
-
-  propTypes: {
+export default class SingleDataController extends React.Component {
+  static propTypes = {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
@@ -70,10 +65,10 @@ export default createReactClass({
     meta: PropTypes.array,
     contextMeta: PropTypes.array,
     ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
-  },
+  };
 
   // TODO: Is this necessary?
-  shouldComponentUpdate: function (nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
     // TODO: Consider making shallow comparisons. Deep ones are expensive.
@@ -83,12 +78,12 @@ export default createReactClass({
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.area, this.props.area)
      );
-  },
+  }
 
   // Spec for generating tabs containing various graphs.
   // Property names indicate whether the dataset is a multi-year mean or not.
   // TODO: Pull this out into new component SingleVariableGraphs
-  graphTabsSpecs: {
+  static graphTabsSpecs = {
     mym: [
       { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
@@ -99,9 +94,9 @@ export default createReactClass({
     notMym: [
       { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
     ],
-  },
+  };
 
-  render: function () {
+  render() {
     return (
       <div>
         <Panel>
@@ -122,7 +117,7 @@ export default createReactClass({
           <Panel.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
-              specs={this.graphTabsSpecs}
+              specs={SingleDataController.graphTabsSpecs}
             />
           </Panel.Body>
         </Panel>
@@ -133,5 +128,5 @@ export default createReactClass({
 
       </div>
     );
-  },
-});
+  }
+}
