@@ -186,6 +186,7 @@ class DataMap extends React.Component {
             position='topleft'
             draw={{
               marker: false,
+              circlemarker: false,
               circle: false,
               polyline: false,
             }}
