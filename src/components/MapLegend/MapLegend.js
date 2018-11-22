@@ -8,25 +8,27 @@ import { sameYear, timestampToTimeOfYear } from '../../core/util';
 import { currentDataSpec } from '../map-controllers/map-helpers';
 
 
-class MapFooter extends React.Component {
+export default class MapLegend extends React.Component {
   static propTypes = {
+    model_id: PropTypes.string,
+    experiment: PropTypes.string,
     start_date: PropTypes.string,
     end_date: PropTypes.string,
     run: PropTypes.string,
     raster: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     isoline: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     annotated: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     hasValidComparand: PropTypes.bool,
   };
@@ -45,6 +47,12 @@ class MapFooter extends React.Component {
   }
 
   render() {
+    // When the props for this component don't have useful values,
+    // we want to display a less obnoxious result.
+    // The following test is minimal and sufficient for this condition.
+    if (!_.every(_.pick(this.props, 'model_id', 'start_date'))) {
+      return <span>Loading...</span>;
+    }
     return (
       <span>
         {`${this.props.model_id}; ${this.props.experiment};`}
@@ -61,5 +69,3 @@ class MapFooter extends React.Component {
     );
   }
 }
-
-export default MapFooter;
