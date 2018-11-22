@@ -30,7 +30,7 @@ import _ from 'underscore';
 
 import '../MapController.css';
 import DataMap from '../../DataMap';
-import MapFooter from '../../MapFooter';
+import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
@@ -50,7 +50,9 @@ import { MEVSummary } from '../../data-presentation/MEVSummary';
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class DualMapController extends React.Component {
   static propTypes = {
-    variable_id: PropTypes.string.isRequired,    
+    model_id: PropTypes.string.isRequired,
+    experiment: PropTypes.string.isRequired,
+    variable_id: PropTypes.string.isRequired,
     meta: PropTypes.array.isRequired,
     comparand_id: PropTypes.string,
     comparandMeta: PropTypes.array,
@@ -251,6 +253,12 @@ export default class DualMapController extends React.Component {
   }
 
   render() {
+    const mapLegend = (<MapLegend
+      {...this.props}
+      {...this.state}
+      hasValidComparand={hasValidData('comparand', this.props)}
+    />);
+
     return (
       <Panel>
         <Panel.Heading>
@@ -260,13 +268,7 @@ export default class DualMapController extends React.Component {
                 {mapPanelLabel}
               </Col>
               <Col lg={10}>
-                <MEVSummary
-                  className={styles.mevSummary} {...this.props} dual
-                />
-                {': '}
-                { this.state.run }
-                {' '}
-                { this.state.start_date }-{ this.state.end_date }
+                {mapLegend}
               </Col>
             </Row>
 
@@ -318,7 +320,7 @@ export default class DualMapController extends React.Component {
                     meta={this.props.meta}
                     comparandMeta={this.props.comparandMeta}
 
-                    dataSpec={currentDataSpec.bind(this)()}
+                    dataSpec={currentDataSpec(this.state)}
                     onDataSpecChange={this.updateDataSpec}
 
                     raster={{
@@ -340,10 +342,7 @@ export default class DualMapController extends React.Component {
                 </StaticControl>
 
                 <StaticControl position='bottomleft'>
-                  <MapFooter
-                    {...this.state}
-                    hasValidComparand={hasValidData('comparand', this.props)}
-                  />
+                  {mapLegend}
                 </StaticControl>
 
               </DataMap>
