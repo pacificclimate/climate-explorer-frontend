@@ -145,9 +145,9 @@ function selectIsolinePalette(params) {
  **************************************************************************/
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-function currentDataSpec() {
+function currentDataSpec({ run, start_date, end_date }) {
   // Return encoding of currently selected dataspec
-  return `${this.state.run} ${this.state.start_date}-${this.state.end_date}`;
+  return `${run} ${start_date}-${end_date}`;
 }
 
 function updateLayerSimpleState(layerType, name, value) {
@@ -165,7 +165,7 @@ function updateLayerTime(layerType, timeIdx) {
   // and an index denoting the timestamp's position with the file
   this.setState((prevState) => ({
     [layerType]: {
-      ...prevState[layerType],
+      ...prevState[layerType],  // This should not be necessary
       timeIdx,
       wmsTime: prevState[layerType].times[timeIdx],
     },
