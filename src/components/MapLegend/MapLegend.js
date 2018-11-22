@@ -3,8 +3,9 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import './MapFooter.css';
+import './MapLegend.css';
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
+import { currentDataSpec } from '../map-controllers/map-helpers';
 
 
 class MapFooter extends React.Component {
@@ -44,20 +45,19 @@ class MapFooter extends React.Component {
   }
 
   render() {
-    let comparandText = "";
-    if(this.props.hasValidComparand) {
-      const comparand = this.props.isoline || this.props.annotated;
-      comparandText = ` ${comparand.wmsTime ? "vs." : " |"} ${this.timeAndVariable(comparand)}`;
-    }
     return (
-        <h5>
-          Dataset {`${this.props.start_date}-${this.props.end_date}`} {this.props.run}:
-          {' '}
-          {this.timeAndVariable(this.props.raster)}
-          {
-            this.props.hasValidComparand && comparandText
-          }
-        </h5>
+      <span>
+        {`${this.props.model_id}; ${this.props.experiment};`}
+        {` ${currentDataSpec(this.props)}:`}
+        {` ${this.timeAndVariable(this.props.raster)} (raster)`}
+        {
+          this.props.hasValidComparand ?
+            (this.props.variable_id === this.props.comparand_id ?
+              ' only' :
+              ` & ${this.timeAndVariable(this.props.isoline || this.props.annotated)} (isolines)`) :
+            ''
+        }
+      </span>
     );
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import MapFooter from '../MapFooter';
+import MapFooter from '../';
 import { times } from '../../../test_support/data';
 
 it('renders without crashing', () => {
