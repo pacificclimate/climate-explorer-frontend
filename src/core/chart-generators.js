@@ -143,6 +143,8 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
 
   let yUnits = "";
   let y2Units = "";
+  let yVariable = "";
+  let y2Variable = "";
   let seriesVariables = {};
   
   const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
@@ -153,7 +155,8 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
     //get metadata for this timeseries
     const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});  
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
-    seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
+    const seriesVariable = timeseriesMetadata.variable_id;
+    seriesVariables[timeseriesName] = seriesVariable;
        
     //add the actual data to the graph
     c3Data.columns.push([timeseriesName].concat(getMonthlyData(timeseries.data, timeseriesMetadata.timescale)));
@@ -163,22 +166,38 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
     c3Data.types[timeseriesName] = timeseriesMetadata.timescale == "monthly" ? "line" : "step";
 
     //Each timeseries needs to be associated with a y-axis.
-    //Two different variables measured with the same units, 
-    //like tasmin (degrees C) and tasmax (degrees C)
-    //can share a y-axis. 
-    //Variables with different units require seperate axes.
+    //Each y-axis represents one variable.
     //C3 can theoretically support indefinite numbers of y-axes,
     //but that would be hard for a user to make sense of, 
     //so it's capped at two here.
-    if((!yUnits) || timeseries.units == yUnits) {
+    if(!yVariable) {
+      //create new primary axis
+      yVariable = seriesVariable;
       yUnits = timeseries.units;
       c3Data.axes[timeseriesName] = "y";
     }
-    else if((!y2Units) || timeseries.units == y2Units) {
+    else if (yVariable === seriesVariable) {
+      //add series to existing primary axis
+      if(timeseries.units != yUnits) {
+        throw new Error("Error: mismatched units for " + yVariable);
+      }
+      c3Data.axes[timeseriesName] = "y";
+    }
+    else if (!y2Variable) {
+      //create new secondary axis
+      y2Variable = seriesVariable;
       y2Units = timeseries.units;
       c3Data.axes[timeseriesName] = "y2";
     }
+    else if (y2Variable == seriesVariable) {
+      //add series to existing secondary axis
+      if(timeseries.units != y2Units) {
+        throw new Error("Error: mismatched units for " + y2Variable);
+      }
+      c3Data.axes[timeseriesName] = "y2";
+    }
     else {
+      //a problem: we already have two variables axes; third disallowed
       throw new Error("Error: too many data axes required for graph");
     }
   }
@@ -186,9 +205,9 @@ function timeseriesToAnnualCycleGraph (metadata, ...data) {
   //whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = monthlyXAxis;
-  c3Axis.y = formatYAxis(yUnits);
+  c3Axis.y = formatYAxis(`${yVariable} ${yUnits}`);
   if(y2Units) { 
-    c3Axis.y2 = formatYAxis(y2Units);
+    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
     }
 
   const precision = makePrecisionBySeries(seriesVariables);
@@ -371,6 +390,8 @@ function dataToLongTermAverageGraph (data, contexts = []){
   
   let yUnits = "";
   let y2Units = "";
+  let yVariable = "";
+  let y2Variable = "";
   
   let seriesVariables = {};
   let nameSeries;
@@ -400,7 +421,8 @@ function dataToLongTermAverageGraph (data, contexts = []){
     //add each individual dataset from the API to the chart
     for(let run in call) {
       const runName = nameSeries(run, context);
-      seriesVariables[runName] = _.isEmpty(context) ? undefined : context.variable_id;
+      const seriesVariable = _.isEmpty(context) ? undefined : context.variable_id;
+      seriesVariables[runName] = seriesVariable;
       const series = [runName];
       
       //if a given timestamp is present in some, but not all
@@ -414,21 +436,37 @@ function dataToLongTermAverageGraph (data, contexts = []){
       c3Data.types[runName] = "line";
       
       //Each line on the graph needs to be associated with a y-axis
-      //and a y-scale. Datasets that share units (like tasmax and tasmin)
-      //can be graphed on the same y-axis, but datasets with
-      //different units (like tasmax and precipitation) need seperate
-      //y-axes. While in theory C3 supports an arbitrary number of
-      //axes, more than two is hard for a user to make sense of,
-      //so this function only supports up to two y-axes.
-      if((!yUnits) || call[run].units == yUnits) {
+      //and a y-scale. Each variable gets its own y-axis, up to the
+      //limit of two variables. (c3 supports more axis, but it looks
+      //terrible.)
+      if(!yVariable) {
+        //create new primary axis
+        yVariable = seriesVariable;
         yUnits = call[run].units;
         c3Data.axes[runName] = "y";
       }
-      else if((!y2Units) || call[run].units == y2Units) {
+      else if (yVariable === seriesVariable) {
+        //add series to existing primary axis
+        if(run.units != yUnits) {
+          throw new Error("Error: mismatched units for " + yVariable);
+        }
+        c3Data.axes[runName] = "y";
+      }
+      else if (!y2Variable) {
+        //create new secondary axis
+        y2Variable = seriesVariable;
         y2Units = call[run].units;
         c3Data.axes[runName] = "y2";
       }
+      else if (y2Variable == seriesVariable) {
+        //add series to existing secondary axis
+        if(run.units != y2Units) {
+          throw new Error("Error: mismatched units for " + y2Variable);
+        }
+        c3Data.axes[runName] = "y2";
+      }
       else {
+        //a problem: we already have two variables axes; third disallowed
         throw new Error("Error: too many data axes required for graph");
       }
     }
@@ -437,9 +475,9 @@ function dataToLongTermAverageGraph (data, contexts = []){
   //whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
-  c3Axis.y = formatYAxis(yUnits);
+  c3Axis.y = formatYAxis(`${yVariable || ""} ${yUnits || ""}`);
   if(y2Units) { 
-    c3Axis.y2 = formatYAxis(y2Units);
+    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
     }
 
   //The long term average graph doesn't require every series to have the exact
@@ -607,6 +645,8 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
 
   let yUnits = "";
   let y2Units = "";
+  let yVariable = "";
+  let y2Variable = "";
   let seriesVariables = {};
 
   const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
@@ -621,7 +661,8 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
     //get metadata for this timeseries
     const timeseriesMetadata = _.find(metadata, function(m) {return m.unique_id === timeseries.id;});
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
-    seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
+    const seriesVariable = timeseriesMetadata.variable_id;
+    seriesVariables[timeseriesName] = seriesVariable;
 
     //add the actual data to the graph
     let column = [timeseriesName];
@@ -635,33 +676,47 @@ function timeseriesToTimeseriesGraph (metadata, ...data) {
     c3Data.columns.push(column);
     c3Data.types[timeseriesName] = "line";
 
-    //Each timeseries needs to be associated with a y-axis.
-    //Two different variables measured with the same units,
-    //like tasmin (degrees C) and tasmax (degrees C)
-    //can share a y-axis.
-    //Variables with different units require seperate axes.
-    //C3 can theoretically support indefinite numbers of y-axes,
-    //but that would be hard for a user to make sense of,
-    //so it's capped at two here.
-    if((!yUnits) || timeseries.units == yUnits) {
+    //Each timeseries needs to be associated with a y-axis
+    //by variable. Only two variables are allowed at present -
+    // more than two y-axes is too hard to read.
+    if(!yVariable) {
+      //create new primary axis
+      yVariable = seriesVariable;
       yUnits = timeseries.units;
       c3Data.axes[timeseriesName] = "y";
     }
-    else if((!y2Units) || timeseries.units == y2Units) {
+    else if (yVariable === seriesVariable) {
+      //add series to existing primary axis
+      if(timeseries.units != yUnits) {
+        throw new Error("Error: mismatched units for " + yVariable);
+      }
+      c3Data.axes[timeseriesName] = "y";
+    }
+    else if (!y2Variable) {
+      //create new secondary axis
+      y2Variable = seriesVariable;
       y2Units = timeseries.units;
       c3Data.axes[timeseriesName] = "y2";
     }
+    else if (y2Variable === seriesVariable) {
+      //add series to existing secondary axis
+      if(timeseries.units != y2Units) {
+        throw new Error("Error: mismatched units for " + y2Variable);
+      }
+      c3Data.axes[timeseriesName] = "y2";
+    }
     else {
+      //a problem: we already have two variables axes; third disallowed
       throw new Error("Error: too many data axes required for graph");
     }
   }
-
+ 
   //whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
-  c3Axis.y = formatYAxis(yUnits);
+  c3Axis.y = formatYAxis(`${yVariable} ${yUnits}`);
   if(y2Units) {
-    c3Axis.y2 = formatYAxis(y2Units);
+    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
     }
 
   const c3Subchart = {show: true,
