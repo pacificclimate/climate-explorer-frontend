@@ -24,7 +24,8 @@ import _ from 'underscore';
 import { PRECISION,
         extendedDateToBasicDate,
         capitalizeWords,
-        getVariableOptions } from './util';
+        getVariableOptions,
+        nestedAttributeIsDefined } from './util';
 
 /* **************************************************
  * 0. Helper functions used by all graph generators *
@@ -89,13 +90,152 @@ function makeTooltipDisplayNumbersWithUnits(axes, axis, precisionFunction) {
 
   // build a dictionary between timeseries names and units
   for (let series in axes) {
-    unitsDictionary[series] = axis[axes[series]].label.text;
+    if (axis[axes[series]].units) { // use explicit units if present
+      unitsDictionary[series] = axis[axes[series]].units;
+    } else { // fall back to axis text label
+      unitsDictionary[series] = axis[axes[series]].label.text;
+    }
   }
 
   return function (value, ratio, id) {
     return `${pf(value, id)} ${unitsDictionary[id]}`;
   };
 }
+
+
+/*
+ * This helper function accepts a graph object already populated
+ * with data series and a metadata object containing variable and
+ * unit attributes about each data series, like this:
+ *
+ * {
+ *   "Monthly Tasmax": {
+ *     variable: "tasmax",
+ *     units: "degC",
+ *   },
+ *   "Annual Tasmin": {
+ *     variable: "tasmin",
+ *     units: "degC",
+ *   },
+ * }
+ *
+ * If no y-axis is defined, it will create and format up to two as
+ * needed (c3 supports >2, but we limit to 2 for readability). If one
+ * or more axes is defined, it will assign data to pre-existing axes.
+ * It returns the resulting graph spec object.
+ *
+ * Series can be assigned to axes based on either unit or variable.
+ * The default is grouping by variable; calling it with groupByUnits =
+ * true will group by units instead. For example, tasmax and tasmin
+ * will be graphed with the same y axis if grouped by units (degC) but
+ * graphed on separate axes if grouped by variable (tasmin vs tasmax).
+ *
+ * In addition to standard c3 axis formatting, this function creates
+ * and uses the custom "groupBy" and "units" attributes of axis.y and
+ * axis.y2. These support adding additional data series to
+ * previously-created y-axes.
+ *
+ * axis.[y|y2].units is a string giving the units.
+ * axis.[y|y2].groupBy looks like this:
+ * {
+ *   type: "variable" | "units",
+ *   value: "degC" | "tasmin" | "tasmax" | "days" | etc.
+ * }
+ *
+ * It returns a graph object with formatted axes.
+ */
+function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
+  let groupBy = groupByUnits ? 'units' : 'variable';
+  let yGroup = '';
+  let y2Group = '';
+  let yUnits = '';
+  let y2Units = '';
+
+  // if a y axis already exists, add new data to it.
+  if (nestedAttributeIsDefined(graph, 'axis', 'y')) {
+    if (nestedAttributeIsDefined(graph, 'axis', 'y', 'groupBy')
+        && nestedAttributeIsDefined(graph, 'axis', 'y', 'units')) {
+      // y axis already defined; sort new data according to it.
+      groupBy = graph.axis.y.groupBy.type;
+      yGroup = graph.axis.y.groupBy.value;
+      yUnits = graph.axis.y.units;
+    } else {
+      // a defined y axis exists, but sorting metadata is missing. Error.
+      throw new Error('Error: unable to add data to y axis ' + graph.axis.y.label.text);
+    }
+  }
+  // if a second y axis already exists, use it.
+  if (nestedAttributeIsDefined(graph, 'axis', 'y2')) {
+    if (nestedAttributeIsDefined(graph, 'axis', 'y2', 'groupBy')
+        && nestedAttributeIsDefined(graph, 'axis', 'y2', 'units')) {
+      // y axis already defined; sort new data according to it.
+      groupBy = graph.axis.y.groupBy.type;
+      y2Group = graph.axis.y2.groupBy.value;
+      y2Units = graph.axis.y2.units;
+    } else {
+      // a defined y axis exists, but sorting metadata is missing. Error.
+      throw new Error('Error: unable to add data to y axis ' + graph.axis.y2.label.text);
+    }
+  }
+
+  for (let i = 0; i < graph.data.columns.length; i++) {
+    const seriesName = graph.data.columns[i][0];
+    // skip series consisting of x-axis labels
+    // or that have an axis already.
+    if (_.isUndefined(graph.data.axes[seriesName])
+        && seriesName !== 'x') {
+      const group = seriesMetadata[seriesName][groupBy];
+      const units = seriesMetadata[seriesName].units;
+      if (!yGroup) {
+        // create new primary y axis.
+        yGroup = group;
+        yUnits = units;
+        graph.data.axes[seriesName] = 'y';
+      } else if (group === yGroup) {
+        // assign to existing primary y axis
+        if (units !== yUnits) {
+          throw new Error('Error: mismatched units for graph axis ' + yGroup);
+        }
+        graph.data.axes[seriesName] = 'y';
+      } else if (!y2Group) {
+        // create new secondary y axis
+        y2Group = group;
+        y2Units = units;
+        graph.data.axes[seriesName] = 'y2';
+      } else if (group === y2Group) {
+        // assign to existing secondary y axis
+        if (units !== y2Units) {
+          throw new Error('Error: mismatched units for graph axis' + y2Group);
+        }
+        graph.data.axes[seriesName] = 'y2';
+      } else {
+        // we already have two axes and this data fits with neither.
+        throw new Error('Error: too many data axes required for graph');
+      }
+    }
+  }
+
+  graph.axis = graph.axis ? graph.axis : {};
+  const yLabel = groupByUnits ? yUnits : `${yGroup} ${yUnits}`;
+  graph.axis.y = formatYAxis(yLabel);
+  graph.axis.y.units = yUnits;
+  graph.axis.y.groupBy = {
+    type: groupBy,
+    value: yGroup,
+  };
+
+  if (y2Group) {
+    const y2Label = groupByUnits ? y2Units : `${y2Group} ${y2Units}`;
+    graph.axis.y2 = formatYAxis(y2Label);
+    graph.axis.y.units = y2Units;
+    graph.axis.y.groupBy = {
+      type: groupBy,
+      value: y2Group,
+    };
+  }
+  return graph;
+}
+
 
 /* ************************************************************
  * 1. timeseriesToAnnualCycleGraph() and its helper functions *
@@ -242,10 +382,7 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
     axes: {},
   };
 
-  let yUnits = '';
-  let y2Units = '';
-  let yVariable = '';
-  let y2Variable = '';
+  let seriesMetadata = {};
   let seriesVariables = {};
 
   const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
@@ -257,8 +394,6 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
       return m.unique_id === timeseries.id;
     });
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
-    const seriesVariable = timeseriesMetadata.variable_id;
-    seriesVariables[timeseriesName] = seriesVariable;
 
     // add the actual data to the graph
     c3Data.columns.push([timeseriesName].concat(
@@ -268,57 +403,31 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
     // display as step graphs.
     c3Data.types[timeseriesName] = timeseriesMetadata.timescale === 'monthly' ? 'line' : 'step';
 
-    // Each timeseries needs to be associated with a y-axis.
-    // Each y-axis represents one variable.
-    // C3 can theoretically support indefinite numbers of y-axes,
-    // but that would be hard for a user to make sense of,
-    // so it's capped at two here.
-    if (!yVariable) {
-      // create new primary axis
-      yVariable = seriesVariable;
-      yUnits = timeseries.units;
-      c3Data.axes[timeseriesName] = 'y';
-    } else if (yVariable === seriesVariable) {
-      // add series to existing primary axis
-      if (timeseries.units !== yUnits) {
-        throw new Error('Error: mismatched units for ' + yVariable);
-      }
-      c3Data.axes[timeseriesName] = 'y';
-    } else if (!y2Variable) {
-      // create new secondary axis
-      y2Variable = seriesVariable;
-      y2Units = timeseries.units;
-      c3Data.axes[timeseriesName] = 'y2';
-    } else if (y2Variable === seriesVariable) {
-      // add series to existing secondary axis
-      if (timeseries.units !== y2Units) {
-        throw new Error('Error: mismatched units for ' + y2Variable);
-      }
-      c3Data.axes[timeseriesName] = 'y2';
-    } else {
-      // a problem: we already have two variables axes; third disallowed
-      throw new Error('Error: too many data axes required for graph');
-    }
+    seriesMetadata[timeseriesName] = {
+      units: timeseries.units,
+      variable: timeseriesMetadata.variable_id,
+    };
+    seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
   }
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
-  c3Axis.x = monthlyXAxis;
-  c3Axis.y = formatYAxis(`${yVariable} ${yUnits}`);
-  if (y2Units) {
-    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
-  }
+  c3Axis.x = monthlyXAxis; // format x axis
+  let graph = {
+    data: c3Data,
+    axis: c3Axis,
+  };
+  graph = assignDataToYAxis(graph, seriesMetadata); // format y axes
 
+  // create tooltip
   const precision = makePrecisionBySeries(seriesVariables);
   let c3Tooltip = { format: {} };
   c3Tooltip.grouped = 'true';
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
+      graph.axis, precision);
 
-  return {
-    data: c3Data,
-    tooltip: c3Tooltip,
-    axis: c3Axis,
-  };
+  graph.tooltip = c3Tooltip;
+  return graph;
 }
 
 /* **********************************************************
@@ -468,12 +577,8 @@ function dataToLongTermAverageGraph(data, contexts = []) {
     axes: {},
   };
 
-  let yUnits = '';
-  let y2Units = '';
-  let yVariable = '';
-  let y2Variable = '';
-
   let seriesVariables = {};
+  let seriesMetadata = {};
   let nameSeries;
 
   if (data.length === 1) {
@@ -501,6 +606,10 @@ function dataToLongTermAverageGraph(data, contexts = []) {
       const runName = nameSeries(run, context);
       const seriesVariable = _.isEmpty(context) ? undefined : context.variable_id;
       seriesVariables[runName] = seriesVariable;
+      seriesMetadata[runName] = {
+        variable: seriesVariable,
+        units: call[run].units,
+      };
       const series = [runName];
 
       // if a given timestamp is present in some, but not all
@@ -512,47 +621,12 @@ function dataToLongTermAverageGraph(data, contexts = []) {
       }
       c3Data.columns.push(series);
       c3Data.types[runName] = 'line';
-
-      // Each line on the graph needs to be associated with a y-axis
-      // and a y-scale. Each variable gets its own y-axis, up to the
-      // limit of two variables. (c3 supports more axis, but it looks
-      // terrible.)
-      if (!yVariable) {
-        // create new primary axis
-        yVariable = seriesVariable;
-        yUnits = call[run].units;
-        c3Data.axes[runName] = 'y';
-      } else if (yVariable === seriesVariable) {
-        // add series to existing primary axis
-        if (run.units !== yUnits) {
-          throw new Error('Error: mismatched units for ' + yVariable);
-        }
-        c3Data.axes[runName] = 'y';
-      } else if (!y2Variable) {
-        // create new secondary axis
-        y2Variable = seriesVariable;
-        y2Units = call[run].units;
-        c3Data.axes[runName] = 'y2';
-      } else if (y2Variable === seriesVariable) {
-        // add series to existing secondary axis
-        if (run.units !== y2Units) {
-          throw new Error('Error: mismatched units for ' + y2Variable);
-        }
-        c3Data.axes[runName] = 'y2';
-      } else {
-        // a problem: we already have two variables axes; third disallowed
-        throw new Error('Error: too many data axes required for graph');
-      }
     }
   }
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
-  c3Axis.y = formatYAxis(`${yVariable || ''} ${yUnits || ''}`);
-  if (y2Units) {
-    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
-  }
 
   // The long term average graph doesn't require every series to have the exact
   // same timestamps, since it's comparing long term trends anyway. Allow C3
@@ -561,20 +635,24 @@ function dataToLongTermAverageGraph(data, contexts = []) {
     connectNull: true,
   };
 
+  let graph = {
+    data: c3Data,
+    axis: c3Axis,
+    line: c3Line,
+  };
+
+  graph = assignDataToYAxis(graph, seriesMetadata);
+
   // Note: if context is empty (dataToLongTermAverageGraph was called with only
   // one time series), variable-determined precision will not be available and
   // numbers will be formatted with default precision.
   const precision = makePrecisionBySeries(seriesVariables);
-  let c3Tooltip = { format: {} };
-  c3Tooltip.grouped = 'true';
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
+  graph.tooltip = { format: {} };
+  graph.tooltip.grouped = 'true';
+  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
+      graph.axis, precision);
 
-  return {
-    data: c3Data,
-    tooltip: c3Tooltip,
-    axis: c3Axis,
-    line: c3Line,
-  };
+  return graph;
 }
 
 /* ************************************************************
@@ -624,12 +702,8 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
     labels: {},
     axes: {},
   };
-
-  let yUnits = '';
-  let y2Units = '';
-  let yVariable = '';
-  let y2Variable = '';
   let seriesVariables = {};
+  let seriesMetadata = {};
 
   const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
 
@@ -646,6 +720,10 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
     const seriesVariable = timeseriesMetadata.variable_id;
     seriesVariables[timeseriesName] = seriesVariable;
+    seriesMetadata[timeseriesName] = {
+      units: timeseries.units,
+      variable: seriesVariable,
+    };
 
     // add the actual data to the graph
     let column = [timeseriesName];
@@ -658,46 +736,11 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
 
     c3Data.columns.push(column);
     c3Data.types[timeseriesName] = 'line';
-
-    // Each timeseries needs to be associated with a y-axis
-    // by variable. Only two variables are allowed at present -
-    // more than two y-axes is too hard to read.
-    if (!yVariable) {
-      // create new primary axis
-      yVariable = seriesVariable;
-      yUnits = timeseries.units;
-      c3Data.axes[timeseriesName] = 'y';
-    } else if (yVariable === seriesVariable) {
-      // add series to existing primary axis
-      if (timeseries.units !== yUnits) {
-        throw new Error('Error: mismatched units for ' + yVariable);
-      }
-      c3Data.axes[timeseriesName] = 'y';
-    } else if (!y2Variable) {
-      // create new secondary axis
-      y2Variable = seriesVariable;
-      y2Units = timeseries.units;
-      c3Data.axes[timeseriesName] = 'y2';
-    } else if (y2Variable === seriesVariable) {
-      // add series to existing secondary axis
-      if (timeseries.units !== y2Units) {
-        throw new Error('Error: mismatched units for ' + y2Variable);
-      }
-      c3Data.axes[timeseriesName] = 'y2';
-    } else {
-      // already have two axes, throw an error.
-      throw new Error('Error: too many data axes required for graph');
-    }
   }
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
-  c3Axis.y = formatYAxis(`${yVariable} ${yUnits}`);
-  if (y2Units) {
-    c3Axis.y2 = formatYAxis(`${y2Variable} ${y2Units}`);
-  }
-
   const c3Subchart = { show: true,
       size: { height: 20 } };
 
@@ -710,18 +753,21 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
     connectNull: true,
   };
 
-  const precision = makePrecisionBySeries(seriesVariables);
-  let c3Tooltip = { format: {} };
-  c3Tooltip.grouped = 'true';
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(c3Data.axes, c3Axis, precision);
-
-  return {
+  let graph = {
     data: c3Data,
     subchart: c3Subchart,
-    tooltip: c3Tooltip,
     axis: c3Axis,
     line: c3Line,
   };
+  graph = assignDataToYAxis(graph, seriesMetadata);
+
+  const precision = makePrecisionBySeries(seriesVariables);
+  graph.tooltip = { format: {} };
+  graph.tooltip.grouped = 'true';
+  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
+      graph.axis, precision);
+
+  return graph;
 }
 
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
