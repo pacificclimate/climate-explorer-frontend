@@ -44,8 +44,8 @@ describe('getAxisTextForVariable', function () {
     const c = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
         mockAPI.monthlyTasmaxTimeseries,
         mockAPI.monthlyPrTimeseries);
-    expect(ct.getAxisTextForVariable(c, "tasmax")).toBe("degC");
-    expect(ct.getAxisTextForVariable(c, "pr")).toBe("kg m-2 d-1");
+    expect(ct.getAxisTextForVariable(c, "tasmax")).toBe("tasmax degC");
+    expect(ct.getAxisTextForVariable(c, "pr")).toBe("pr kg m-2 d-1");
   });
   it('throws an error on a single-variable graph', function () {
     const c2 = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),

@@ -123,7 +123,7 @@ describe('timeseriesToAnnualCycleGraph', function () {
     expect(validate.allDefinedArray(c.data.columns)).toBe(true);
     expect(c.axis.x).toBeDefined();
     expect(c.axis.y).toBeDefined();
-    expect(c.axis.y2).not.toBeDefined();
+    expect(c.axis.y2).toBeDefined();
   });
   it('displays two variables with different units at once', function () {
     const c = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
@@ -212,7 +212,7 @@ describe('dataToLongTermAverageGraph', function() {
     expect(c.axis.y).toBeDefined();
     expect(c.axis.y2).not.toBeDefined();
   });
-  it('graphs multiple data series', function () {
+  it('graphs two data series', function () {
     const tasmaxQuery = {"variable_id": "tasmax", "model_id": "bcc-csm1-1-m"};
     const tasminQuery = {"variable_id": "tasmin", "model_id": "bcc-csm1-1-m"};
     const c = cg.dataToLongTermAverageGraph(
@@ -223,22 +223,18 @@ describe('dataToLongTermAverageGraph', function() {
     expect(validate.allDefinedArray(c.data.columns)).toBe(true);
     expect(c.axis.x).toBeDefined();
     expect(c.axis.y).toBeDefined();
-    expect(c.axis.y2).not.toBeDefined();
+    expect(c.axis.y2).toBeDefined();
   });
-  it('graphs data series with distinct units', function () {
+  it('throw an error on more than two data series with different variables', function () {
     const tasmaxQuery = {"variable_id": "tasmax", "model_id": "bcc-csm1-1-m"};
     const tasminQuery = {"variable_id": "tasmin", "model_id": "bcc-csm1-1-m"};
     const prQuery = {"variable_id": "pr", "model_id": "bcc-csm1-1-m"};
-    const c = cg.dataToLongTermAverageGraph(
+    const func = function () {
+      cg.dataToLongTermAverageGraph(
         [mockAPI.tasmaxData, mockAPI.tasminData, mockAPI.prData],
         [tasmaxQuery, tasminQuery, prQuery]);
-    expect(validate.allDefinedObject(c)).toBe(true);
-    expect(validate.isRectangularArray(c.data.columns, 4, 7)).toBe(true);
-    expect(validate.allDefinedArray(c.data.columns)).toBe(true);
-    expect(c.axis.x).toBeDefined();
-    expect(c.axis.y).toBeDefined();
-    expect(c.axis.y2).toBeDefined();
-    expect(c.data.axes["tasmin r1i1p1"]).not.toBe(c.data.axes["pr r1i1p1"]);
+    };
+    expect(func).toThrow();
   });
 });
 

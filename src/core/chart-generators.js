@@ -216,7 +216,7 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   }
 
   graph.axis = graph.axis ? graph.axis : {};
-  const yLabel = groupByUnits ? yUnits : `${yGroup} ${yUnits}`;
+  const yLabel = groupByUnits || _.isEmpty(yGroup) ? yUnits : `${yGroup} ${yUnits}`;
   graph.axis.y = formatYAxis(yLabel);
   graph.axis.y.units = yUnits;
   graph.axis.y.groupBy = {
@@ -595,7 +595,6 @@ function dataToLongTermAverageGraph(data, contexts = []) {
   c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
   c3Data.x = 'x';
 
-
   // add each API call to the chart
   for (let i = 0; i < data.length; i++) {
     const context = contexts.length ? contexts[i] : {};
@@ -607,7 +606,7 @@ function dataToLongTermAverageGraph(data, contexts = []) {
       const seriesVariable = _.isEmpty(context) ? undefined : context.variable_id;
       seriesVariables[runName] = seriesVariable;
       seriesMetadata[runName] = {
-        variable: seriesVariable,
+        variable: seriesVariable || '', // single-run has no var metadata
         units: call[run].units,
       };
       const series = [runName];

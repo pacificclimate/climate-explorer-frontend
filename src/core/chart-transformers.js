@@ -245,9 +245,12 @@ function makeAnomalyGraph (base, variable_id, graph) {
   }
   graph.axis.y2.label = {};
   graph.axis.y2.label.position = 'outer-middle';
+  
+  let oldAxisText = getAxisTextForVariable(graph, baseSeriesName);
+  oldAxisText = oldAxisText.replace(variable_id, ""); // avoid repetition with base series name 
   graph.axis.y2.label.text = displayPercent ?
       `% change from ${baseSeriesName}` :
-      `change in ${getAxisTextForVariable(graph, baseSeriesName)} from ${baseSeriesName}`;
+      `change in ${oldAxisText} from ${baseSeriesName}`;
   graph.axis.y2.tick = {};
   graph.axis.y2.tick.format = graph.axis.y.tick.format;
   
