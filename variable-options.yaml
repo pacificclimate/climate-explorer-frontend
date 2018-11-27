@@ -65,6 +65,9 @@ csdiETCCDI:
 cwdETCCDI:
   decimalPrecision: 0
 
+dtrETCCDI:
+  decimalPrecision: 1
+
 fdETCCDI:
   decimalPrecision: 0
 
@@ -76,12 +79,15 @@ idETCCDI:
 
 prcptotETCCDI:
   percentageAnomalies: true
+  decimalPrecision: 0
 
 rx1dayETCCDI:
-  percentageAnomalies: true  
+  percentageAnomalies: true
+  decimalPrecision: 0
 
 rx5dayETCCDI:
   percentageAnomalies: true
+  decimalPrecision: 0
 
 r1mmETCCDI:
   decimalPrecision: 0
@@ -94,18 +100,89 @@ r20mmETCCDI:
   
 r95pETCCDI:
   percentageAnomalies: true
+  decimalPrecision: 0
 
 r99pETCCDI:
   percentageAnomalies: true
+  decimalPrecision: 0
 
 sdiiETCCDI:
   percentageAnomalies: true
+  decimalPrecision: 0
 
 suETCCDI:
   decimalPrecision: 0
 
+tn10pETCCDI:
+  decimalPrecision: 0
+
+tn90pETCCDI:
+  decimalPrecision: 0
+
+tnnETCCDI:
+  decimalPrecision: 1
+
+tnxETCCDI:
+  decimalPrecision: 1
+
 trETCCDI:
+  decimalPrecision: 1
+
+tx10pETCCDI:
+  decimalPrecision: 0
+
+tx90pETCCDI:
+  decimalPrecision: 0
+
+txnETCCDI:
+  decimalPrecision: 1
+
+txxETCCDI:
   decimalPrecision: 1
 
 wsdiETCCDI:
   decimalPrecision: 0
+
+#degree-day variables
+cdd:
+  decimalPrecision: 0
+
+fdd:
+  decimalPrecision: 0
+
+gdd:
+  decimalPrecision: 0
+
+hdd:
+  decimalPrecision: 0
+
+#return period variables
+rp20pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp20tasmax:
+  decimalPrecision: 1
+
+rp20tasmin:
+  decimalPrecision: 1
+
+rp50pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp50tasmax:
+  decimalPrecision: 1
+
+rp50tasmin:
+  decimalPrecision: 1
+
+rp5pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp5tasmax:
+  decimalPrecision: 1
+
+rp5tasmin:
+  decimalPrecision: 1
