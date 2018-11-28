@@ -15,10 +15,8 @@ import React from 'react';
 import { Path, withLeaflet } from 'react-leaflet';
 import { FeatureGroup as LeafletFeatureGroup } from 'leaflet';
 
-import _ from 'underscore';
 
-
-class ExtendedFeatureGroup extends Path {
+class LayerControlledFeatureGroup extends Path {
   static propTypes = {
     // Array of *Leaflet* layers. Controls content of Feature Group.
     layers: PropTypes.arrayOf(PropTypes.object),
@@ -30,16 +28,9 @@ class ExtendedFeatureGroup extends Path {
   };
 
   createLeafletElement(props) {
-    console.log('ExtendedFeatureGroup props=', props);
     const { layers, ...rest } = props;
-    console.log('ExtendedFeatureGroup layers=', layers);
-    const leafletLayers = layers;
-    // const leafletLayers = [poly];
-    console.log('ExtendedFeatureGroup leafletLayers=', leafletLayers);
     const options = this.getOptions(rest);
-    console.log('ExtendedFeatureGroup options=', options);
-    // const el = new LeafletFeatureGroup(options);
-    const el = new LeafletFeatureGroup(leafletLayers, options);
+    const el = new LeafletFeatureGroup(layers, options);
     this.contextValue = {
       ...props.leaflet,
       layerContainer: el,
@@ -49,7 +40,10 @@ class ExtendedFeatureGroup extends Path {
   }
 
   componentDidUpdate() {
-    super.componentDidUpdate();
+    // TODO: The component breaks if it calls `super.componentDidUpdate()`
+    // However, the model component, React Leaflet `FeatureGroup`, does
+    // in fact call it. Figure out why and fix this.
+    // super.componentDidUpdate();
     this.leafletElement.clearLayers();
     for (const layer of this.props.layers) {
       this.leafletElement.addLayer(layer);
@@ -57,4 +51,4 @@ class ExtendedFeatureGroup extends Path {
   }
 }
 
-export default withLeaflet(ExtendedFeatureGroup);
+export default withLeaflet(LayerControlledFeatureGroup);
