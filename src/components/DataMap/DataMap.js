@@ -3,7 +3,6 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import { FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -19,6 +18,13 @@ import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
 import {layerParamsPropTypes} from '../../types/types.js';
+import SimpleGeoJSON from '../SimpleGeoJSON';
+import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
+import StaticControl from '../StaticControl';
+
+// For testing TODO: Remove
+import { Button } from 'react-bootstrap';
+import { Polygon as LeafletPolygon } from 'leaflet';
 
 class DataMap extends React.Component {
   // This component provides data display layers (DataLayer) for up to two
@@ -41,6 +47,7 @@ class DataMap extends React.Component {
       rasterLayer: null,
       isolineLayer: null,
       annotatedLayer: null,
+      geometryLayers: [],
     };
   }
 
@@ -67,7 +74,7 @@ class DataMap extends React.Component {
         // with one edge at 0.)
         // Passing a bounding box with identical eastmost and westmost bounds to
         // ncWMS results in an error, so create a new Canada-only bounding box and
-        // ignore the worldwide extent of this map.
+        // ignore the worldwide extent o[[-122.949219,63.632813],[-113.769531,68.222656],[-110.742187,63.242187],[-122.949219,63.632813]]f this map.
         const corner1 = L.latLng(90, -50);
         const corner2 = L.latLng(40, -150);
         bounds = L.latLngBounds(corner1, corner2);
@@ -110,15 +117,72 @@ class DataMap extends React.Component {
 
   // Handlers for area selection. Converts area to GeoJSON.
 
-  handleAreaCreatedOrEdited = (e) => {
-    const area = e.layer.toGeoJSON();
-    area.properties.source = 'PCIC Climate Explorer';
+  layersToGeoJSON = (layers) => ({
+    type: 'Feature',
+    geometry: {
+      type: 'GeometryCollection',
+      geometries: layers.map(layer => layer.toGeoJSON()),
+    },
+  });
+
+  onSetArea = () => {
+    // const area = this.layersToGeoJSON(this.state.geometryLayers);
+    // TODO: Fix this ...
+    // The thing that receives this GeoJSON doesn't like GeometryCollections.
+    // Right now we are therefore only updating with the first Feature, i.e.,
+    // first layer. This is undesirable. Best would be to fix the receiver
+    // to handle feature selections; next
+    const layer0 = this.state.geometryLayers[0];
+    const area = layer0 && layer0.toGeoJSON();
+    console.log('onSetArea', area);
     this.props.onSetArea(area);
   };
 
-  handleAreaDeleted = () => {
-    this.props.onSetArea(undefined);
+  addGeometryLayer = layer => {
+    let geometryLayers;
+    this.setState(prevState => {
+      geometryLayers = prevState.geometryLayers.concat([layer]);
+      console.log('addGeometryLayer layer =', layer)
+      console.log('addGeometryLayer prevState.geometryLayers =', prevState.geometryLayers)
+      console.log('addGeometryLayer newGeometryLayers =', geometryLayers);
+      return { geometryLayers };
+    }, this.onSetArea);
   };
+
+  deleteGeometryLayers = layers => {
+    let geometryLayers;
+    this.setState(prevState => {
+      geometryLayers = _.without(prevState.geometryLayers, ...layers);
+      console.log('deleteGeometryLayers layers =', layers)
+      console.log('deleteGeometryLayers prevState.geometryLayers =', prevState.geometryLayers)
+      console.log('deleteGeometryLayers newGeometryLayers =', geometryLayers);
+      return { geometryLayers };
+    }, this.onSetArea);
+  };
+
+  handleAreaCreated = e => this.addGeometryLayer(e.layer);
+
+  handleAreaEdited = e => {
+    // May not need to do anything to maintain `state.geometryLayers` here.
+    // The contents of the layers are changed, but the layers themselves
+    // (as identities) are not changed in number or identity.
+    // `geometryLayers` is a list of such identities, so doesn't need to change.
+    // Only need to communicate change via onSetArea.
+    // Maybe not; maybe better to create a new copy of geometryLayers. Hmmm.
+    console.log('handleAreaEdited', this.state.geometryLayers);
+    this.onSetArea();
+  };
+
+  handleAreaDeleted = e => {
+    let layers = [];
+    e.layers.eachLayer(layer => layers.push(layer));
+    this.deleteGeometryLayers(layers);
+  };
+
+  testPolygon = () => new LeafletPolygon([
+    [50.449219,-127.514648,],[52.426758,-127.514648,],
+    [52.426758,-125.024414,],[50.449219,-125.024414,]
+  ]);
 
   // Lifecycle event handlers
 
@@ -181,7 +245,9 @@ class DataMap extends React.Component {
           {...this.props.isoline}  // update when any isoline prop changes
         />
 
-        <FeatureGroup>
+        <LayerControlledFeatureGroup
+          layers={this.state.geometryLayers}
+        >
           <EditControl
             position='topleft'
             draw={{
@@ -189,18 +255,22 @@ class DataMap extends React.Component {
               circle: false,
               polyline: false,
             }}
-            onCreated={this.handleAreaCreatedOrEdited}
-            onEdited={this.handleAreaCreatedOrEdited}
+            onCreated={this.handleAreaCreated}
+            onEdited={this.handleAreaEdited}
             onDeleted={this.handleAreaDeleted}
           />
-        </FeatureGroup>
+          {/*<SimpleGeoJSON data={﻿{"type":"Feature","properties":{"source":"PCIC Climate Explorer"},"geometry":{"type":"Polygon","coordinates":[[[-127.514648,50.449219],[-127.514648,52.426758],[-125.024414,52.426758],[-125.024414,50.449219],[-127.514648,50.449219]]]}}}/>*/}
+        </LayerControlledFeatureGroup>
 
-        {
-          this.props.area &&
-          <GeoJSON
-            data={this.props.area}
-          />
-        }
+        <StaticControl position='topleft'>
+          <Button
+            onClick={
+              () => this.addGeometryLayer(this.testPolygon())
+            }
+          >
+            Foo
+          </Button>
+        </StaticControl>
 
         { this.props.children }
 
