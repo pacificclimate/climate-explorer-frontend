@@ -1,6 +1,6 @@
 import React from 'react';  // Necessary?
 
-import { MapControl } from 'react-leaflet';
+import { MapControl, withLeaflet } from 'react-leaflet';
 
 import LeafletNcWMSAutosetColorscaleControl from './LeafletNcWMSAutosetColorscaleControl';
 
@@ -15,4 +15,4 @@ class NcWMSAutosetColorscaleControl extends MapControl {
   }
 }
 
-export default NcWMSAutosetColorscaleControl;
+export default withLeaflet(NcWMSAutosetColorscaleControl);

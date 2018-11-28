@@ -1,6 +1,6 @@
 import React from 'react';  // Necessary?
 
-import { MapControl } from 'react-leaflet';
+import { MapControl, withLeaflet } from 'react-leaflet';
 
 import LeafletNcWMSColorbarControl from './LeafletNcWMSColorbarControl';
 
@@ -8,6 +8,7 @@ import LeafletNcWMSColorbarControl from './LeafletNcWMSColorbarControl';
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 class NcWMSColorbarControl extends MapControl {
   createLeafletElement(props) {
+    console.log('NcWMSColorbarControl.createLeafletElement', props)
     return new LeafletNcWMSColorbarControl(props);
   }
 
@@ -16,4 +17,4 @@ class NcWMSColorbarControl extends MapControl {
   }
 }
 
-export default NcWMSColorbarControl;
+export default withLeaflet(NcWMSColorbarControl);
