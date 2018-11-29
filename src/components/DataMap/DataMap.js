@@ -1,3 +1,46 @@
+// This component provides data display layers (DataLayer) for up to two
+// variables, plus a geometry layer, geometry creation and editing tools,
+// and geometry import/export tools, all rendered within the base map
+// (CanadaBaseMap).
+//
+// Renders its children within the base map.
+//
+// Notes on geometry layer group:
+//
+//  - Leaflet uses the term 'layer' for all single polygons, markers, etc.
+//    Leaflet uses the term 'layer group' for an object (technically also a
+//    layer, i.e, a subclass of `Layer`) that groups layers together.
+//
+//  - The purpose of the geometry layer group is to allow the user to define
+//    a spatial area of interest. This area drives the spatial data averaging
+//    performed by various other data display tools (graphs, tables).
+//
+//  - The geometry layer group is initially empty. Geometry can be added to
+//    it by any combination of drawing (on the map), uploading (e.g., a
+//    from GeoJSON file), and editing existing geometry.
+//
+//  - All changes (add, edit) to the contents of this layer group are
+//    communicated by the callback prop `onSetArea`. Currently only one
+//    geometry item, the first created, is communicated. All other items
+//    are ignored.
+//
+//  - In order to integrate upload and download of geometry with the in-app
+//    geometry editing tool, a new React Leaflet component,
+//    `LayerControlledFeatureGroup`, has been created. As its name implies,
+//    its contents are controlled by a prop `layers`. This prop is controlled
+//    by `DataMap` state `geometryLayers`, which is maintained according to
+//    what is communicated by `on` callbacks from the geometry layer group
+//    draw/edit and upload tools.
+//
+//  - The geometry export feature (`GeoExporter` component), *unlike
+//    `onSetArea`*, exports *all* geometry present in the geometry layer
+//    group, not just the first feature.
+//
+//  - `DataMap` currently receives a prop `area`, which, alongside `onSetArea`,
+//    is suggestive that `DataMap` is a controlled component with respect to
+//    `area`. It is not. The `area` prop is currently entirely ignored.
+//    TODO: The `area` prop should probably be removed.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -30,11 +73,6 @@ import { Polygon as LeafletPolygon } from 'leaflet';
 import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
-  // This component provides data display layers (DataLayer) for up to two
-  // variables, plus a polygon layer and polygon editing tools, all rendered
-  // within a base map (CanadaBaseMap).
-  // Renders its children within the base map.
-
   static propTypes = {
     raster: layerParamsPropTypes,
     isoline: layerParamsPropTypes,
@@ -120,7 +158,7 @@ class DataMap extends React.Component {
 
   // Handlers for area selection. Converts area to GeoJSON.
 
-  layersToGeoJSON = (layers) => ({
+  layersToGeoJSONFeature = (layers) => ({
     type: 'Feature',
     geometry: {
       type: 'GeometryCollection',
@@ -128,17 +166,25 @@ class DataMap extends React.Component {
     },
   });
 
-  onSetArea = () => {
-    // const area = this.layersToGeoJSON(this.state.geometryLayers);
+  layersToGeoJSONFeatureCollection = (layers) => ({
+    type: 'FeatureCollection',
+    features: layers.map(layer => layer.toGeoJSON()),
+  });
+
+  layersToArea = (layers) => {
+    // const area = this.layersToGeoJSONFeature(layers);
     // TODO: Fix this ...
-    // The thing that receives this GeoJSON doesn't like GeometryCollections.
+    // The thing that receives this GeoJSON doesn't like `FeatureCollection`s
+    // or `GeometryCollection`s.
     // Right now we are therefore only updating with the first Feature, i.e.,
     // first layer. This is undesirable. Best would be to fix the receiver
     // to handle feature selections; next
-    const layer0 = this.state.geometryLayers[0];
-    const area = layer0 && layer0.toGeoJSON();
-    console.log('onSetArea', area);
-    this.props.onSetArea(area);
+    const layer0 = layers[0];
+    return layer0 && layer0.toGeoJSON();
+  };
+
+  onSetArea = () => {
+    this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
   };
 
   addGeometryLayer = layer => {
@@ -294,7 +340,13 @@ class DataMap extends React.Component {
         </StaticControl>
 
         <StaticControl position='topleft'>
-          <GeoExporter area={this.props.area} title='Export polygon' />
+          {/* See comments above regarding current GeoExporter arrangement. */}
+          <GeoExporter
+            area={
+              this.layersToGeoJSONFeatureCollection(this.state.geometryLayers)
+            }
+            title='Export polygon'
+          />
         </StaticControl>
 
         { this.props.children }
