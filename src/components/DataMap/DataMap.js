@@ -104,6 +104,7 @@ class DataMap extends React.Component {
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    children: PropTypes.node,
   };
 
   constructor(props) {
