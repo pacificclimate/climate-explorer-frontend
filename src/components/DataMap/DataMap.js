@@ -258,24 +258,22 @@ class DataMap extends React.Component {
 
   render() {
     // TODO: Add positioning for autoset
+
+    const dataLayers = ['raster', 'isoline', 'annotated'].map(layerType => (
+      this.props[layerType] && (
+        <DataLayer
+          layerType={layerType}
+          layerParams={this.props[layerType]}
+          onLayerRef={this.handleLayerRef.bind(this, layerType)}
+        />
+      )
+    ));
+
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        {
-          ['raster', 'isoline', 'annotated'].map(lType => {
-            if (!_.isUndefined(this.props[lType])) {
-                return (
-                  <DataLayer
-                    layerType={lType}
-                    layerParams={this.props[lType]}
-                    onLayerRef={this.handleLayerRef.bind(this, lType)}
-                  />
-                );
-              }
-            }
-          )
-        }
+        {dataLayers}
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
