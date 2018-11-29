@@ -7,6 +7,9 @@ import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
+import GeoLoader from '../GeoLoader';
+import GeoExporter from '../GeoExporter';
+
 import './DataMap.css';
 import { getLayerMinMax } from '../../data-services/ncwms';
 import {
@@ -17,14 +20,14 @@ import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-import {layerParamsPropTypes} from '../../types/types.js';
-import SimpleGeoJSON from '../SimpleGeoJSON';
+import { layerParamsPropTypes } from '../../types/types.js';
 import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
 // For testing TODO: Remove
 import { Button } from 'react-bootstrap';
 import { Polygon as LeafletPolygon } from 'leaflet';
+import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
   // This component provides data display layers (DataLayer) for up to two
@@ -149,6 +152,12 @@ class DataMap extends React.Component {
     }, this.onSetArea);
   };
 
+  addGeometryLayers = layers => {
+    for (const layer of layers) {
+      this.addGeometryLayer(layer);
+    }
+  };
+
   deleteGeometryLayers = layers => {
     let geometryLayers;
     this.setState(prevState => {
@@ -179,10 +188,15 @@ class DataMap extends React.Component {
     this.deleteGeometryLayers(layers);
   };
 
+  // TODO: Remove
   testPolygon = () => new LeafletPolygon([
     [50.449219,-127.514648,],[52.426758,-127.514648,],
     [52.426758,-125.024414,],[50.449219,-125.024414,]
   ]);
+
+  handleUploadArea = (geoJSON) => {
+    this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
+  };
 
   // Lifecycle event handlers
 
@@ -259,9 +273,9 @@ class DataMap extends React.Component {
             onEdited={this.handleAreaEdited}
             onDeleted={this.handleAreaDeleted}
           />
-          {/*<SimpleGeoJSON data={﻿{"type":"Feature","properties":{"source":"PCIC Climate Explorer"},"geometry":{"type":"Polygon","coordinates":[[[-127.514648,50.449219],[-127.514648,52.426758],[-125.024414,52.426758],[-125.024414,50.449219],[-127.514648,50.449219]]]}}}/>*/}
         </LayerControlledFeatureGroup>
 
+        {/* TODO: Remove */}
         <StaticControl position='topleft'>
           <Button
             onClick={
@@ -270,6 +284,17 @@ class DataMap extends React.Component {
           >
             Foo
           </Button>
+        </StaticControl>
+
+        <StaticControl position='topleft'>
+          <GeoLoader
+            onLoadArea={this.handleUploadArea}
+            title='Import polygon'
+          />
+        </StaticControl>
+
+        <StaticControl position='topleft'>
+          <GeoExporter area={this.props.area} title='Export polygon' />
         </StaticControl>
 
         { this.props.children }
