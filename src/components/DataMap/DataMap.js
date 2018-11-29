@@ -7,39 +7,68 @@
 //
 // Notes on geometry layer group:
 //
+//  Terminology
+//
 //  - Leaflet uses the term 'layer' for all single polygons, markers, etc.
-//    Leaflet uses the term 'layer group' for an object (technically also a
+//    Leaflet uses the term 'layer group' for an object (iteself also a
 //    layer, i.e, a subclass of `Layer`) that groups layers together.
+//
+//  Purpose
 //
 //  - The purpose of the geometry layer group is to allow the user to define
 //    a spatial area of interest. This area drives the spatial data averaging
 //    performed by various other data display tools (graphs, tables).
 //
+//  Behaviour
+//
 //  - The geometry layer group is initially empty. Geometry can be added to
 //    it by any combination of drawing (on the map), uploading (e.g., a
-//    from GeoJSON file), and editing existing geometry.
+//    from GeoJSON file), and editing and/or deleting existing geometry.
 //
-//  - All changes (add, edit) to the contents of this layer group are
-//    communicated by the callback prop `onSetArea`. Currently only one
-//    geometry item, the first created, is communicated. All other items
-//    are ignored.
+//  `onSetArea` callback
 //
-//  - In order to integrate upload and download of geometry with the in-app
-//    geometry editing tool, a new React Leaflet component,
-//    `LayerControlledFeatureGroup`, has been created. As its name implies,
-//    its contents are controlled by a prop `layers`. This prop is controlled
-//    by `DataMap` state `geometryLayers`, which is maintained according to
-//    what is communicated by `on` callbacks from the geometry layer group
-//    draw/edit and upload tools.
+//  - All changes (add, edit) to the contents of the geometry layer group are
+//    communicated by the `DataMap` callback prop `onSetArea`. This callback
+//    is more or less the whole point of the geometry layer group.
 //
-//  - The geometry export feature (`GeoExporter` component), *unlike
-//    `onSetArea`*, exports *all* geometry present in the geometry layer
-//    group, not just the first feature.
+//  - `onSetArea` is called with a single GeoJSON object representing the the
+//    contents of the layer group. But see next point.
+//
+//  - Currently only one geometry item (layer), the first created, is passed to
+//    `onSetArea`. All other layers are ignored. This is because the receiver(s)
+//    (ultimately) of the object passed can handle only a single feature.
+//    This is
+//
+//      (a) a failing of the receivers, which possibly can be rectified,
+//      (b) not a good design, in that `DataMap` shouldn't have to know that
+//        some other component external to it is crippled. Filtering the
+//        contents of the geometry layer group should happen outside this
+//        component, not within. Alas.
 //
 //  - `DataMap` currently receives a prop `area`, which, alongside `onSetArea`,
-//    is suggestive that `DataMap` is a controlled component with respect to
+//    suggests that `DataMap` is a controlled component with respect to
 //    `area`. It is not. The `area` prop is currently entirely ignored.
 //    TODO: The `area` prop should probably be removed.
+//
+//  Geometry upload and download
+//
+//  - In order to integrate upload and download of geometry with the
+//    geometry editing tool, a new React Leaflet component,
+//    `LayerControlledFeatureGroup`, has been created. As its name implies,
+//    its contents are controlled by a prop `layers`.
+//
+//    - The `LayerControlledFeatureGroup` prop `layers`  is controlled
+//    by `DataMap` state `geometryLayers`, which is maintained according to
+//    what is communicated by callbacks from the geometry layer group
+//    draw/edit and upload tools.
+//
+//  - The geometry export (download) feature (`GeoExporter` component), *unlike
+//    `onSetArea`*, exports *all* geometry present in the geometry layer
+//    group, not just the first feature. It currently exports this geometry
+//    as a single Feature containing a GeometryCollection representing all
+//    layers. Alternatively, it could export a FeatureCollection. It's not
+//    clear which is better.
+//
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -55,10 +84,7 @@ import GeoExporter from '../GeoExporter';
 
 import './DataMap.css';
 import { getLayerMinMax } from '../../data-services/ncwms';
-import {
-  makeHandleLeafletRef,
-  updateSingleStateLeaflet,
-} from '../../core/react-leaflet-utils';
+import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
@@ -67,10 +93,9 @@ import { layerParamsPropTypes } from '../../types/types.js';
 import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
-// For testing TODO: Remove
-import { Button } from 'react-bootstrap';
-import { Polygon as LeafletPolygon } from 'leaflet';
-import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
+import {
+  geoJSONToLeafletLayers, layersToGeoJSONFeatureCollection,
+} from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
   static propTypes = {
@@ -106,16 +131,19 @@ class DataMap extends React.Component {
     try {
       let bounds = this.map.getBounds();
       if (bounds.getWest() === bounds.getEast()) {
-        // This netCDF file has an invalid bounding box, presumably because it has been
-        // through a longitude normalization process.
+        // This netCDF file has an invalid bounding box, presumably because
+        // it has been through a longitude normalization process.
         // See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
         // As a result, longitudes in the file go from 0 to 180, then -180 to
         // 0. This means the westmost boundary and the eastmost boundary
-        // are both zero (actually -.5675 or something like that, the center of a cell
-        // with one edge at 0.)
-        // Passing a bounding box with identical eastmost and westmost bounds to
-        // ncWMS results in an error, so create a new Canada-only bounding box and
-        // ignore the worldwide extent o[[-122.949219,63.632813],[-113.769531,68.222656],[-110.742187,63.242187],[-122.949219,63.632813]]f this map.
+        // are both zero (actually -.5675 or something like that, the center
+        // of a cell with one edge at 0.)
+        // Passing a bounding box with identical eastmost and westmost bounds
+        // to ncWMS results in an error, so create a new Canada-only bounding
+        // box and ignore the worldwide extent
+        // [[-122.949219,63.632813],[-113.769531,68.222656],
+        // [-110.742187,63.242187],[-122.949219,63.632813]]
+        // of this map.
         const corner1 = L.latLng(90, -50);
         const corner2 = L.latLng(40, -150);
         bounds = L.latLngBounds(corner1, corner2);
@@ -152,27 +180,11 @@ class DataMap extends React.Component {
     this.setState({ [`${layerType}Layer`]: leafletElement });  // Ewww
   }
 
-  handleRasterLayerRef = this.handleLayerRef.bind(this, 'raster');
-  handleIsolineLayerRef = this.handleLayerRef.bind(this, 'isoline');
-  handleAnnotatedLayerRef = this.handleLayerRef.bind(this, 'annotated');
-
   // Handlers for area selection. Converts area to GeoJSON.
 
-  layersToGeoJSONFeature = (layers) => ({
-    type: 'Feature',
-    geometry: {
-      type: 'GeometryCollection',
-      geometries: layers.map(layer => layer.toGeoJSON()),
-    },
-  });
-
-  layersToGeoJSONFeatureCollection = (layers) => ({
-    type: 'FeatureCollection',
-    features: layers.map(layer => layer.toGeoJSON()),
-  });
-
   layersToArea = (layers) => {
-    // const area = this.layersToGeoJSONFeature(layers);
+    // const area = layersToGeoJSONFeature(layers);
+    // const area = layersToGeoJSONFeatureCollection(layers);
     // TODO: Fix this ...
     // The thing that receives this GeoJSON doesn't like `FeatureCollection`s
     // or `GeometryCollection`s.
@@ -188,14 +200,9 @@ class DataMap extends React.Component {
   };
 
   addGeometryLayer = layer => {
-    let geometryLayers;
-    this.setState(prevState => {
-      geometryLayers = prevState.geometryLayers.concat([layer]);
-      console.log('addGeometryLayer layer =', layer)
-      console.log('addGeometryLayer prevState.geometryLayers =', prevState.geometryLayers)
-      console.log('addGeometryLayer newGeometryLayers =', geometryLayers);
-      return { geometryLayers };
-    }, this.onSetArea);
+    this.setState(prevState => ({
+      geometryLayers: prevState.geometryLayers.concat([layer]),
+    }), this.onSetArea);
   };
 
   addGeometryLayers = layers => {
@@ -204,41 +211,37 @@ class DataMap extends React.Component {
     }
   };
 
-  deleteGeometryLayers = layers => {
-    let geometryLayers;
-    this.setState(prevState => {
-      geometryLayers = _.without(prevState.geometryLayers, ...layers);
-      console.log('deleteGeometryLayers layers =', layers)
-      console.log('deleteGeometryLayers prevState.geometryLayers =', prevState.geometryLayers)
-      console.log('deleteGeometryLayers newGeometryLayers =', geometryLayers);
-      return { geometryLayers };
-    }, this.onSetArea);
-  };
-
-  handleAreaCreated = e => this.addGeometryLayer(e.layer);
-
-  handleAreaEdited = e => {
+  editGeometryLayers = layers => {
     // May not need to do anything to maintain `state.geometryLayers` here.
     // The contents of the layers are changed, but the layers themselves
     // (as identities) are not changed in number or identity.
     // `geometryLayers` is a list of such identities, so doesn't need to change.
     // Only need to communicate change via onSetArea.
     // Maybe not; maybe better to create a new copy of geometryLayers. Hmmm.
-    console.log('handleAreaEdited', this.state.geometryLayers);
     this.onSetArea();
   };
 
-  handleAreaDeleted = e => {
-    let layers = [];
-    e.layers.eachLayer(layer => layers.push(layer));
-    this.deleteGeometryLayers(layers);
+  deleteGeometryLayers = layers => {
+    this.setState(prevState => ({
+      geometryLayers: _.without(prevState.geometryLayers, ...layers),
+    }), this.onSetArea);
   };
 
-  // TODO: Remove
-  testPolygon = () => new LeafletPolygon([
-    [50.449219,-127.514648,],[52.426758,-127.514648,],
-    [52.426758,-125.024414,],[50.449219,-125.024414,]
-  ]);
+  eventLayers = e => {
+    // Extract the Leaflet layers from an editing event, returning them
+    // as an array of layers.
+    // Note: `e.layers` is a special class, not an array of layers, so we
+    // have to go through this rigmarole to get the layers.
+    // The alternative of accessing the private property `e.layers._layers`
+    // (a) is naughty, and (b) fails.
+    let layers = [];
+    e.layers.eachLayer(layer => layers.push(layer));
+    return layers;
+  }
+
+  handleAreaCreated = e => this.addGeometryLayer(e.layer);
+  handleAreaEdited = e => this.editGeometryLayers(this.eventLayers(e));
+  handleAreaDeleted = e => this.deleteGeometryLayers(this.eventLayers(e));
 
   handleUploadArea = (geoJSON) => {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
@@ -251,23 +254,6 @@ class DataMap extends React.Component {
     const stateChange = !_.isEqual(nextState, this.state);
     const b = propChange || stateChange;
     return b;
-  }
-  
-  // Helper function for render, generates JSX for DataLayer
-  dataLayerProps(layertype) {
-    if(_.isUndefined(this.props[layertype])) {
-      return "";
-    }
-    else {
-      const handlerName = `handle${layertype.charAt(0).toUpperCase() + layertype.slice(1)}LayerRef`;
-      return (
-          <DataLayer
-            layerType={layertype}
-            {...this.props[layertype]}
-            onLayerRef={this[handlerName]}
-          />
-      );
-    }
   }
 
   render() {
@@ -321,17 +307,6 @@ class DataMap extends React.Component {
           />
         </LayerControlledFeatureGroup>
 
-        {/* TODO: Remove */}
-        <StaticControl position='topleft'>
-          <Button
-            onClick={
-              () => this.addGeometryLayer(this.testPolygon())
-            }
-          >
-            Foo
-          </Button>
-        </StaticControl>
-
         <StaticControl position='topleft'>
           <GeoLoader
             onLoadArea={this.handleUploadArea}
@@ -342,9 +317,7 @@ class DataMap extends React.Component {
         <StaticControl position='topleft'>
           {/* See comments above regarding current GeoExporter arrangement. */}
           <GeoExporter
-            area={
-              this.layersToGeoJSONFeatureCollection(this.state.geometryLayers)
-            }
+            area={layersToGeoJSONFeatureCollection(this.state.geometryLayers)}
             title='Export polygon'
           />
         </StaticControl>
