@@ -28,3 +28,21 @@ export function geoJSONToLeafletLayers(geoJSON) {
       throw new Error('Invalid GeoJSON object');
   }
 }
+
+export const layersToGeoJSONFeature = (layers) => ({
+  // Convert an array of Leaflet layers to a single GeoJSON Feature with
+  // geometry that is a GeometryCollection containing all the Leaflet layers.
+  type: 'Feature',
+  geometry: {
+    type: 'GeometryCollection',
+    geometries: layers.map(layer => layer.toGeoJSON()),
+  },
+});
+
+export const layersToGeoJSONFeatureCollection = (layers) => ({
+  // Convert an array of Leaflet layers to a GeoJSON FeatureCollection.
+  // Each layer becomes a Feature.
+  type: 'FeatureCollection',
+  features: layers.map(layer => layer.toGeoJSON()),
+});
+
