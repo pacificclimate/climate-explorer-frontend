@@ -265,6 +265,8 @@ class DataMap extends React.Component {
       )
     ));
 
+    const allowGeometryDraw = this.state.geometryLayers.length === 0;
+
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
@@ -285,6 +287,20 @@ class DataMap extends React.Component {
           {...this.props.isoline}  // update when any isoline prop changes
         />
 
+        <StaticControl position='topleft'>
+          <GeoLoader
+            onLoadArea={this.handleUploadArea}
+            title='Import polygon'
+          />
+          { // See comments at module head regarding current GeoExporter
+            // arrangement.
+          }
+          <GeoExporter
+            area={this.layersToArea(this.state.geometryLayers)}
+            title='Export polygon'
+          />
+        </StaticControl>
+
         <LayerControlledFeatureGroup
           layers={this.state.geometryLayers}
         >
@@ -295,11 +311,11 @@ class DataMap extends React.Component {
               circlemarker: false,
               circle: false,
               polyline: false,
-              polygon: {
+              polygon: allowGeometryDraw && {
                 showArea: false,
                 showLength: false,
               },
-              rectangle: {
+              rectangle: allowGeometryDraw && {
                 showArea: false,
                 showLength: false,
               },
@@ -309,23 +325,6 @@ class DataMap extends React.Component {
             onDeleted={this.handleAreaDeleted}
           />
         </LayerControlledFeatureGroup>
-
-        <StaticControl position='topleft'>
-          <GeoLoader
-            onLoadArea={this.handleUploadArea}
-            title='Import polygon'
-          />
-        </StaticControl>
-
-        <StaticControl position='topleft'>
-          { // See comments at module head regarding current GeoExporter
-            // arrangement.
-          }
-          <GeoExporter
-            area={this.layersToArea(this.state.geometryLayers)}
-            title='Export polygon'
-          />
-        </StaticControl>
 
         { this.props.children }
 
