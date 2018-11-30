@@ -99,14 +99,14 @@ class DataMap extends React.Component {
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
-    activeGeometryColor: PropTypes.string.isRequired,
-    inactiveGeometryColor: PropTypes.string.isRequired,
+    activeGeometryStyle: PropTypes.string.isRequired,
+    inactiveGeometryStyle: PropTypes.string.isRequired,
     children: PropTypes.node,
   };
 
   static defaultProps = {
-    activeGeometryColor: '#3388ff',
-    inactiveGeometryColor: '#777777',
+    activeGeometryStyle: { color: '#3388ff' },
+    inactiveGeometryStyle: { color: '#777777' },
   };
 
   constructor(props) {
@@ -203,8 +203,8 @@ class DataMap extends React.Component {
   };
 
   layerStyle = (index) => index > 0 ?
-    { color: this.props.inactiveGeometryColor } :
-    { color: this.props.activeGeometryColor };
+    this.props.inactiveGeometryStyle :
+    this.props.activeGeometryStyle;
 
   addGeometryLayer = layer => {
     this.setState(prevState => {
