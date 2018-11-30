@@ -94,7 +94,7 @@ import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
 import {
-  geoJSONToLeafletLayers, layersToGeoJSONFeatureCollection,
+  geoJSONToLeafletLayers, layersToGeoJSONFeature,
 } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
@@ -316,7 +316,7 @@ class DataMap extends React.Component {
         <StaticControl position='topleft'>
           {/* See comments above regarding current GeoExporter arrangement. */}
           <GeoExporter
-            area={layersToGeoJSONFeatureCollection(this.state.geometryLayers)}
+            area={layersToGeoJSONFeature(this.state.geometryLayers)}
             title='Export polygon'
           />
         </StaticControl>
