@@ -94,7 +94,7 @@ import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
 import {
-  geoJSONToLeafletLayers, layersToGeoJSONFeature,
+  geoJSONToLeafletLayers, layersToGeoJSON,
 } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
@@ -184,8 +184,8 @@ class DataMap extends React.Component {
   // Handlers for area selection. Converts area to GeoJSON.
 
   layersToArea = (layers) => {
-    // const area = layersToGeoJSONFeature(layers);
-    // const area = layersToGeoJSONFeatureCollection(layers);
+    // const area = layersToGeoJSON('GeometryCollection', layers);
+    // const area = layersToGeoJSON('FeatureCollection', layers);
     // TODO: Fix this ...
     // The thing that receives this GeoJSON doesn't like `FeatureCollection`s
     // or `GeometryCollection`s.
@@ -316,7 +316,9 @@ class DataMap extends React.Component {
         <StaticControl position='topleft'>
           {/* See comments above regarding current GeoExporter arrangement. */}
           <GeoExporter
-            area={layersToGeoJSONFeature(this.state.geometryLayers)}
+            area={
+              layersToGeoJSON('GeometryCollection', this.state.geometryLayers)
+            }
             title='Export polygon'
           />
         </StaticControl>
