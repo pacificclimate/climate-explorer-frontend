@@ -99,7 +99,14 @@ class DataMap extends React.Component {
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    activeGeometryColor: PropTypes.string.isRequired,
+    inactiveGeometryColor: PropTypes.string.isRequired,
     children: PropTypes.node,
+  };
+
+  static defaultProps = {
+    activeGeometryColor: '#3388ff',
+    inactiveGeometryColor: '#777777',
   };
 
   constructor(props) {
@@ -195,10 +202,15 @@ class DataMap extends React.Component {
     this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
   };
 
+  layerStyle = (index) => index > 0 ?
+    { color: this.props.inactiveGeometryColor } :
+    { color: this.props.activeGeometryColor };
+
   addGeometryLayer = layer => {
-    this.setState(prevState => ({
-      geometryLayers: prevState.geometryLayers.concat([layer]),
-    }), this.onSetArea);
+    this.setState(prevState => {
+      layer.setStyle(this.layerStyle(prevState.geometryLayers.length));
+      return { geometryLayers: prevState.geometryLayers.concat([layer]) };
+    }, this.onSetArea);
   };
 
   addGeometryLayers = layers => {
@@ -218,9 +230,11 @@ class DataMap extends React.Component {
   };
 
   deleteGeometryLayers = layers => {
-    this.setState(prevState => ({
-      geometryLayers: _.without(prevState.geometryLayers, ...layers),
-    }), this.onSetArea);
+    this.setState(prevState => {
+      const geometryLayers = _.without(prevState.geometryLayers, ...layers);
+      geometryLayers.forEach((layer, i) => layer.setStyle(this.layerStyle(i)));
+      return { geometryLayers };
+    }, this.onSetArea);
   };
 
   eventLayers = e => {
