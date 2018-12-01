@@ -5,7 +5,67 @@ import { parse, stringify } from 'wellknown';
 import _tokml from 'tokml';
 import _togpx from 'togpx';
 import shp from 'shpjs';
-import { download } from 'shp-write';
+import { write } from 'shp-write';
+const geojson = require('shp-write/src/geojson');
+const prj = require('shp-write/src/prj');
+import JSZip from 'jszip';  // Installed by `shp-write`
+
+function createZippedShapefile(gj, options) {
+  // Alternate to function `zip` in `shp-write/src/zip`, but with option to
+  // store files in root of zipped shapefile.
+  //
+  // All behaviour is the same as the original function, with the exception
+  // of that related to `options.folder`.
+  //
+  //  - When undefined, shapefiles are placed in the root folder.
+  //    This is different from the original behaviour. There is no
+  //    default subfolder name.
+  //
+  //  - When defined (a string), shapefiles are placed in a subfolder so
+  //    named. This is the same as the original behaviour.
+
+  const zip = new JSZip(),
+    folder = options && options.folder,
+    layers = folder ? zip : zip.folder(folder);
+
+  [geojson.point(gj), geojson.line(gj), geojson.polygon(gj)]
+  .forEach(function(l) {
+    if (l.geometries.length) {
+      write(
+        // field definitions
+        l.properties,
+        // geometry type
+        l.type,
+        // geometries
+        l.geometries,
+        function (err, files) {
+          const lType = l.type;
+          const optType =
+            options && options.types && options.types[lType.toLowerCase()];
+          const fileName = optType || lType;
+          layers.file(fileName + '.shp', files.shp.buffer, { binary: true });
+          layers.file(fileName + '.shx', files.shx.buffer, { binary: true });
+          layers.file(fileName + '.dbf', files.dbf.buffer, { binary: true });
+          layers.file(fileName + '.prj', prj);
+        });
+    }
+  });
+
+  const generateOptions = { compression: 'STORE' };
+
+  if (!process.browser) {
+    generateOptions.type = 'nodebuffer';
+  }
+
+  return zip.generate(generateOptions);
+}
+
+function saveZippedShapefile(gj, options) {
+  // Alternate to function `download` in `shp-write`, but with option to
+  // store files in root of zipped shapefile. See `createZippedShapefile`.
+  const content = createZippedShapefile(gj, options);
+  location.href = 'data:application/zip;base64,' + content;
+}
 
 var g = {
 
@@ -58,6 +118,7 @@ var g = {
   },
 
   save: function (format) {
+    console.log(`geo.save('${format}'):`, this.feature)
     switch (format) {
       case 'wkt':
         saveAs(
@@ -88,7 +149,7 @@ var g = {
         break;
 
       case 'shp':
-        download(this.toFeatureCollection(this.toGeoJSONobj()));
+        saveZippedShapefile(this.toFeatureCollection(this.toGeoJSONobj()));
         break;
 
       default:
