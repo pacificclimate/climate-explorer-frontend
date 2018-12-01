@@ -62,12 +62,9 @@
 //    what is communicated by callbacks from the geometry layer group
 //    draw/edit and upload tools.
 //
-//  - The geometry export (download) feature (`GeoExporter` component), *unlike
-//    `onSetArea`*, exports *all* geometry present in the geometry layer
-//    group, not just the first feature. It currently exports this geometry
-//    as a single Feature containing a GeometryCollection representing all
-//    layers. Alternatively, it could export a FeatureCollection. It's not
-//    clear which is better.
+//  - The geometry export (download) feature (`GeoExporter` component), like
+//    `onSetArea`, exports only the first geometry item present in the
+//    geometry layer group. See `onSetArea` for more details.
 //
 
 import PropTypes from 'prop-types';
@@ -93,9 +90,7 @@ import { layerParamsPropTypes } from '../../types/types.js';
 import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
-import {
-  geoJSONToLeafletLayers, layersToGeoJSON,
-} from '../../core/geoJSON-leaflet';
+import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
   static propTypes = {
@@ -316,9 +311,7 @@ class DataMap extends React.Component {
         <StaticControl position='topleft'>
           {/* See comments above regarding current GeoExporter arrangement. */}
           <GeoExporter
-            area={
-              layersToGeoJSON('GeometryCollection', this.state.geometryLayers)
-            }
+            area={this.layersToArea(this.state.geometryLayers)}
             title='Export polygon'
           />
         </StaticControl>
