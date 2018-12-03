@@ -298,10 +298,7 @@ export default class DualMapController extends React.Component {
                 area={this.props.area}
               >
 
-                <StaticControl
-                  position='topright'
-                  style={{ marginRight: '70px' }}
-                >
+                <StaticControl position='topright'>
                   <MapSettings
                     title='Map Settings'
                     meta={this.props.meta}

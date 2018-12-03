@@ -35,8 +35,6 @@ import DataMap from '../../DataMap';
 import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
-import GeoLoader from '../../GeoLoader';
-import GeoExporter from '../../GeoExporter';
 
 import { hasValidData, currentDataSpec,
          updateLayerSimpleState, updateLayerTime,
@@ -271,7 +269,7 @@ export default class PrecipMapController extends React.Component {
                 area={this.props.area}
               >
 
-                <StaticControl position='topright' style={{ marginRight: '70px' }}>
+                <StaticControl position='topright'>
                   <MapSettings
                     title='Map Settings'
                     meta={this.props.meta}
