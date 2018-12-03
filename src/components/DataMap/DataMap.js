@@ -74,12 +74,14 @@ import _ from 'underscore';
 
 import 'proj4';
 import 'proj4leaflet';
+import { LayersControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
 import './DataMap.css';
+
 import { getLayerMinMax } from '../../data-services/ncwms';
 import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
@@ -271,11 +273,16 @@ class DataMap extends React.Component {
 
     const dataLayers = ['raster', 'isoline', 'annotated'].map(layerType => (
       this.props[layerType] && (
-        <DataLayer
-          layerType={layerType}
-          layerParams={this.props[layerType]}
-          onLayerRef={this.handleLayerRef.bind(this, layerType)}
-        />
+        <LayersControl.Overlay
+          name={`Climate ${layerType}`}
+          checked={true}
+        >
+          <DataLayer
+            layerType={layerType}
+            layerParams={this.props[layerType]}
+            onLayerRef={this.handleLayerRef.bind(this, layerType)}
+          />
+        </LayersControl.Overlay>
       )
     ));
 
@@ -285,7 +292,9 @@ class DataMap extends React.Component {
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        {dataLayers}
+        <LayersControl>
+          {dataLayers}
+        </LayersControl>
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
