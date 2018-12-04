@@ -282,6 +282,7 @@ export default class DualMapController extends React.Component {
                     this.props.meta, this.state.raster.timeIdx
                   )(),
                   ...this.state.raster,
+                  defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
                 }}
 
@@ -291,6 +292,7 @@ export default class DualMapController extends React.Component {
                     this.props.comparandMeta, this.state.isoline.timeIdx
                   )(),
                   ...this.state.isoline,
+                  defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeIsolineRange,
                 }}
 

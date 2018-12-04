@@ -93,6 +93,7 @@ import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 import StaticControl from '../StaticControl';
 
 import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
+import LayerOpacityControl from '../LayerOpacityControl';
 
 class DataMap extends React.Component {
   static propTypes = {
@@ -103,6 +104,7 @@ class DataMap extends React.Component {
     onSetArea: PropTypes.func.isRequired,
     activeGeometryStyle: PropTypes.string.isRequired,
     inactiveGeometryStyle: PropTypes.string.isRequired,
+    defaultLayerOpacity: PropTypes.object.isRequired,
     children: PropTypes.node,
   };
 
@@ -110,6 +112,8 @@ class DataMap extends React.Component {
     activeGeometryStyle: { color: '#3388ff' },
     inactiveGeometryStyle: { color: '#777777' },
   };
+
+  static layerTypes = ['raster', 'isoline', 'annotated'];
 
   constructor(props) {
     super(props);
@@ -119,7 +123,14 @@ class DataMap extends React.Component {
       isolineLayer: null,
       annotatedLayer: null,
       geometryLayers: [],
+      layerOpacity: {},
     };
+
+    for (const layerType of DataMap.layerTypes) {
+      if (props[layerType]) {
+        this.state.layerOpacity[layerType] = props[layerType].defaultOpacity;
+      }
+    }
   }
 
   // Handler for base map ref.
@@ -259,6 +270,16 @@ class DataMap extends React.Component {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
   };
 
+  // Handlers for layer opacity
+
+  handleChangeLayerOpacity = (layerType, opacity) =>
+    this.setState(prevState => ({
+      layerOpacity: {
+        ...prevState.layerOpacity,
+        [layerType]: opacity,
+      },
+    }));
+
   // Lifecycle event handlers
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -271,15 +292,18 @@ class DataMap extends React.Component {
   render() {
     // TODO: Add positioning for autoset
 
-    const dataLayers = ['raster', 'isoline', 'annotated'].map(layerType => (
+    const dataLayers = DataMap.layerTypes.map(layerType => (
       this.props[layerType] && (
         <LayersControl.Overlay
-          name={`Climate ${layerType}`}
+          name={`Climate ${layerType} layer`}
           checked={true}
         >
           <DataLayer
             layerType={layerType}
-            layerParams={this.props[layerType]}
+            layerParams={{
+              ...this.props[layerType],
+              opacity: this.state.layerOpacity[layerType],
+            }}
             onLayerRef={this.handleLayerRef.bind(this, layerType)}
           />
         </LayersControl.Overlay>
@@ -295,6 +319,11 @@ class DataMap extends React.Component {
         <LayersControl>
           {dataLayers}
         </LayersControl>
+
+        <LayerOpacityControl
+          layerOpacity={this.state.layerOpacity}
+          onChange={this.handleChangeLayerOpacity}
+        />
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}

@@ -5,7 +5,9 @@ import axios from 'axios/index';
 import _ from 'underscore';
 
 
-function getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }) {
+export function getBaseWMSParams(
+  { dataset, variableId, wmsTime, opacity, logscale, range }
+) {
   const fixedParams = {
     layers: `${dataset}/${variableId}`,
     time: wmsTime,
@@ -16,6 +18,7 @@ function getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }) {
     version: '1.1.1',
     srs: 'EPSG:4326',
     logscale,
+    opacity,
   };
 
   if (logscale !== 'true' || _.isUndefined(range)) {
@@ -35,38 +38,35 @@ function getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }) {
 }
 
 
-function getRasterWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
+export function getRasterWMSParams({ palette, ...rest }) {
   return Object.assign(
-    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
+    getBaseWMSParams(rest),
     {
       styles: `default-scalar/${palette}`,
-      opacity: 0.7,
     }
   );
 }
 
 
-function getIsolineWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
+export function getIsolineWMSParams({ palette, ...rest }) {
   return Object.assign(
-    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
+    getBaseWMSParams(rest),
     {
       styles: `colored_contours/${palette}`,
-      opacity: 1.0,
     }
   );
 }
 
-function getAnnotatedWMSParams({ dataset, variableId, wmsTime, palette, logscale, range }) {
+function getAnnotatedWMSParams(props) {
   return Object.assign(
-    getBaseWMSParams({ dataset, variableId, wmsTime, logscale, range }),
+    getBaseWMSParams(props),
     {
       styles: `contours`,
-      opacity: 1.0,
     }
   );
 }
 
-function getWMSParams(layerType, props) {
+export function getWMSParams(layerType, props) {
   // Return parameters required for a call to the ncWMS tile layer API.
   // TODO: simplify
   if (layerType === 'raster') {
@@ -79,7 +79,7 @@ function getWMSParams(layerType, props) {
 }
 
 
-function getLayerMinMax(layer, props, bounds) {
+export function getLayerMinMax(layer, props, bounds) {
   // Request min and max values from ncWMS layer.
   // Returns a promise for the request response.
 
@@ -105,9 +105,3 @@ function getLayerMinMax(layer, props, bounds) {
     }
   );
 }
-
-
-export {
-  getRasterWMSParams, getIsolineWMSParams, getAnnotatedWMSParams, getWMSParams,
-  getLayerMinMax
-};

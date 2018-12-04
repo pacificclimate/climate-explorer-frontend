@@ -238,6 +238,7 @@ export default class SingleMapController extends React.Component {
                   dataset: this.getDatasetId(
                     'variable', this.props.meta, this.state.raster.timeIdx),
                   ...this.state.raster,
+                  defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
                 }}
 

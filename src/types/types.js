@@ -10,6 +10,7 @@ const layerParamsPropTypes = PropTypes.shape({
   dataset: PropTypes.string,
   variableId: PropTypes.string,
   time: PropTypes.string,
+  defaultOpacity: PropTypes.number,
   palette: PropTypes.string,
   logscale: PropTypes.string,
   range: PropTypes.object,
