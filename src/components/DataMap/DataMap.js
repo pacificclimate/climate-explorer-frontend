@@ -104,7 +104,6 @@ class DataMap extends React.Component {
     onSetArea: PropTypes.func.isRequired,
     activeGeometryStyle: PropTypes.string.isRequired,
     inactiveGeometryStyle: PropTypes.string.isRequired,
-    defaultLayerOpacity: PropTypes.object.isRequired,
     children: PropTypes.node,
   };
 
