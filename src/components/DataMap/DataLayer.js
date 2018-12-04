@@ -2,9 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { WMSTileLayer } from 'react-leaflet';
-import { getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams } from '../../data-services/ncwms';
-import _ from "underscore";
-import {layerParamsPropTypes} from '../../types/types.js';
+import {
+  getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams,
+} from '../../data-services/ncwms';
+import _ from 'underscore';
+import { layerParamsPropTypes } from '../../types/types.js';
 
 export default class DataLayer extends React.Component {
   static propTypes = {
@@ -30,7 +32,7 @@ export default class DataLayer extends React.Component {
     const wmsParams = {
       raster: getRasterWMSParams,
       isoline: getIsolineWMSParams,
-      annotated: getAnnotatedWMSParams
+      annotated: getAnnotatedWMSParams,
     }[layerType](layerParams);
 
     if (layerParams && layerParams.dataset) {
