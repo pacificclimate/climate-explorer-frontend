@@ -99,7 +99,14 @@ class DataMap extends React.Component {
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    activeGeometryStyle: PropTypes.string.isRequired,
+    inactiveGeometryStyle: PropTypes.string.isRequired,
     children: PropTypes.node,
+  };
+
+  static defaultProps = {
+    activeGeometryStyle: { color: '#3388ff' },
+    inactiveGeometryStyle: { color: '#777777' },
   };
 
   constructor(props) {
@@ -195,10 +202,15 @@ class DataMap extends React.Component {
     this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
   };
 
+  layerStyle = (index) => index > 0 ?
+    this.props.inactiveGeometryStyle :
+    this.props.activeGeometryStyle;
+
   addGeometryLayer = layer => {
-    this.setState(prevState => ({
-      geometryLayers: prevState.geometryLayers.concat([layer]),
-    }), this.onSetArea);
+    this.setState(prevState => {
+      layer.setStyle(this.layerStyle(prevState.geometryLayers.length));
+      return { geometryLayers: prevState.geometryLayers.concat([layer]) };
+    }, this.onSetArea);
   };
 
   addGeometryLayers = layers => {
@@ -218,9 +230,11 @@ class DataMap extends React.Component {
   };
 
   deleteGeometryLayers = layers => {
-    this.setState(prevState => ({
-      geometryLayers: _.without(prevState.geometryLayers, ...layers),
-    }), this.onSetArea);
+    this.setState(prevState => {
+      const geometryLayers = _.without(prevState.geometryLayers, ...layers);
+      geometryLayers.forEach((layer, i) => layer.setStyle(this.layerStyle(i)));
+      return { geometryLayers };
+    }, this.onSetArea);
   };
 
   eventLayers = e => {
@@ -265,6 +279,8 @@ class DataMap extends React.Component {
       )
     ));
 
+    const allowGeometryDraw = this.state.geometryLayers.length === 0;
+
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
@@ -285,6 +301,16 @@ class DataMap extends React.Component {
           {...this.props.isoline}  // update when any isoline prop changes
         />
 
+        {
+          allowGeometryDraw &&
+          <StaticControl position='topleft'>
+              <GeoLoader
+                onLoadArea={this.handleUploadArea}
+                title='Import polygon'
+              />
+          </StaticControl>
+        }
+
         <LayerControlledFeatureGroup
           layers={this.state.geometryLayers}
         >
@@ -295,11 +321,11 @@ class DataMap extends React.Component {
               circlemarker: false,
               circle: false,
               polyline: false,
-              polygon: {
+              polygon: allowGeometryDraw && {
                 showArea: false,
                 showLength: false,
               },
-              rectangle: {
+              rectangle: allowGeometryDraw && {
                 showArea: false,
                 showLength: false,
               },
@@ -310,22 +336,17 @@ class DataMap extends React.Component {
           />
         </LayerControlledFeatureGroup>
 
-        <StaticControl position='topleft'>
-          <GeoLoader
-            onLoadArea={this.handleUploadArea}
-            title='Import polygon'
-          />
-        </StaticControl>
-
-        <StaticControl position='topleft'>
-          { // See comments at module head regarding current GeoExporter
-            // arrangement.
-          }
-          <GeoExporter
-            area={this.layersToArea(this.state.geometryLayers)}
-            title='Export polygon'
-          />
-        </StaticControl>
+        {
+          // See comments at module head regarding current GeoExporter
+          // arrangement.
+          !allowGeometryDraw &&
+          <StaticControl position='topleft'>
+              <GeoExporter
+                area={this.layersToArea(this.state.geometryLayers)}
+                title='Export polygon'
+              />
+          </StaticControl>
+        }
 
         { this.props.children }
 

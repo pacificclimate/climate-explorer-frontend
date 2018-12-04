@@ -4,7 +4,7 @@ import { Button, Glyphicon } from 'react-bootstrap';
 
 export default function (props) {
   return (
-    <Button onClick={props.open} title={props.title}>
+    <Button bsSize='small' onClick={props.open} title={props.title}>
       <Glyphicon glyph='save-file'/>
     </Button>
   );

@@ -36,14 +36,23 @@ export default class GeoloaderMainDialog extends React.Component {
         </Modal.Header>
   
         <Modal.Body>
-          <FormControl
-            type='file'
-            label='Select file'
-            onChange={(e) => this.importPolygon(e.currentTarget.files[0])}
-          />
           <p>
-            Accepts a zipped Shapefile or a GeoJSON file containing a
+            <FormControl
+              type='file'
+              label='Select file'
+              onChange={(e) => this.importPolygon(e.currentTarget.files[0])}
+            />
+          </p>
+          <p>
+            We recommend importing only a file containing a
             single Feature (not a FeatureCollection).
+          </p>
+          <p>
+            If you import a file containing multiple features,
+            only the first feature (in the internal order within the file)
+            will become active and be used to form spatial averages.
+            The active feature is coloured blue.
+            Inactive features are coloured grey.
           </p>
         </Modal.Body>
   
