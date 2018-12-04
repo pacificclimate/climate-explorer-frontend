@@ -218,7 +218,7 @@ class DataMap extends React.Component {
   };
 
   deleteGeometryLayers = layers => {
-    this.setState(prevState => ({{}
+    this.setState(prevState => ({
       geometryLayers: _.without(prevState.geometryLayers, ...layers),
     }), this.onSetArea);
   };
