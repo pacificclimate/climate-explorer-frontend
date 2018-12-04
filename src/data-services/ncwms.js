@@ -57,7 +57,7 @@ export function getIsolineWMSParams({ palette, ...rest }) {
   );
 }
 
-function getAnnotatedWMSParams(props) {
+export function getAnnotatedWMSParams(props) {
   return Object.assign(
     getBaseWMSParams(props),
     {
