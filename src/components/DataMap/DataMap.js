@@ -1,37 +1,105 @@
+// This component provides data display layers (DataLayer) for up to two
+// variables, plus a geometry layer, geometry creation and editing tools,
+// and geometry import/export tools, all rendered within the base map
+// (CanadaBaseMap).
+//
+// Renders its children within the base map.
+//
+// Notes on geometry layer group:
+//
+//  Terminology
+//
+//  - Leaflet uses the term 'layer' for all single polygons, markers, etc.
+//    Leaflet uses the term 'layer group' for an object (iteself also a
+//    layer, i.e, a subclass of `Layer`) that groups layers together.
+//
+//  Purpose
+//
+//  - The purpose of the geometry layer group is to allow the user to define
+//    a spatial area of interest. This area drives the spatial data averaging
+//    performed by various other data display tools (graphs, tables).
+//
+//  Behaviour
+//
+//  - The geometry layer group is initially empty. Geometry can be added to
+//    it by any combination of drawing (on the map), uploading (e.g., a
+//    from GeoJSON file), and editing and/or deleting existing geometry.
+//
+//  `onSetArea` callback
+//
+//  - All changes (add, edit) to the contents of the geometry layer group are
+//    communicated by the `DataMap` callback prop `onSetArea`. This callback
+//    is more or less the whole point of the geometry layer group.
+//
+//  - `onSetArea` is called with a single GeoJSON object representing the the
+//    contents of the layer group. But see next point.
+//
+//  - Currently only one geometry item (layer), the first created, is passed to
+//    `onSetArea`. All other layers are ignored. This is because the receiver(s)
+//    (ultimately) of the object passed can handle only a single feature.
+//    This is
+//
+//      (a) a failing of the receivers, which possibly can be rectified,
+//      (b) not a good design, in that `DataMap` shouldn't have to know that
+//        some other component external to it is crippled. Filtering the
+//        contents of the geometry layer group should happen outside this
+//        component, not within. Alas.
+//
+//  - `DataMap` currently receives a prop `area`, which, alongside `onSetArea`,
+//    suggests that `DataMap` is a controlled component with respect to
+//    `area`. It is not. The `area` prop is currently entirely ignored.
+//    TODO: The `area` prop should probably be removed.
+//
+//  Geometry upload and download
+//
+//  - In order to integrate upload and download of geometry with the
+//    geometry editing tool, a new React Leaflet component,
+//    `LayerControlledFeatureGroup`, has been created. As its name implies,
+//    its contents are controlled by a prop `layers`.
+//
+//    - The `LayerControlledFeatureGroup` prop `layers`  is controlled
+//    by `DataMap` state `geometryLayers`, which is maintained according to
+//    what is communicated by callbacks from the geometry layer group
+//    draw/edit and upload tools.
+//
+//  - The geometry export (download) feature (`GeoExporter` component), like
+//    `onSetArea`, exports only the first geometry item present in the
+//    geometry layer group. See `onSetArea` for more details.
+//
+
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import _ from 'underscore';
 
-import { FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
+import GeoLoader from '../GeoLoader';
+import GeoExporter from '../GeoExporter';
+
 import './DataMap.css';
 import { getLayerMinMax } from '../../data-services/ncwms';
-import {
-  makeHandleLeafletRef,
-  updateSingleStateLeaflet,
-} from '../../core/react-leaflet-utils';
+import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
 import DataLayer from './DataLayer';
 import NcWMSColorbarControl from '../NcWMSColorbarControl';
 import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-import {layerParamsPropTypes} from '../../types/types.js';
+import { layerParamsPropTypes } from '../../types/types.js';
+import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
+import StaticControl from '../StaticControl';
+
+import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 
 class DataMap extends React.Component {
-  // This component provides data display layers (DataLayer) for up to two
-  // variables, plus a polygon layer and polygon editing tools, all rendered
-  // within a base map (CanadaBaseMap).
-  // Renders its children within the base map.
-
   static propTypes = {
     raster: layerParamsPropTypes,
     isoline: layerParamsPropTypes,
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    children: PropTypes.node,
   };
 
   constructor(props) {
@@ -41,6 +109,7 @@ class DataMap extends React.Component {
       rasterLayer: null,
       isolineLayer: null,
       annotatedLayer: null,
+      geometryLayers: [],
     };
   }
 
@@ -58,16 +127,19 @@ class DataMap extends React.Component {
     try {
       let bounds = this.map.getBounds();
       if (bounds.getWest() === bounds.getEast()) {
-        // This netCDF file has an invalid bounding box, presumably because it has been
-        // through a longitude normalization process.
+        // This netCDF file has an invalid bounding box, presumably because
+        // it has been through a longitude normalization process.
         // See https://github.com/pacificclimate/climate-explorer-data-prep/issues/11
         // As a result, longitudes in the file go from 0 to 180, then -180 to
         // 0. This means the westmost boundary and the eastmost boundary
-        // are both zero (actually -.5675 or something like that, the center of a cell
-        // with one edge at 0.)
-        // Passing a bounding box with identical eastmost and westmost bounds to
-        // ncWMS results in an error, so create a new Canada-only bounding box and
-        // ignore the worldwide extent of this map.
+        // are both zero (actually -.5675 or something like that, the center
+        // of a cell with one edge at 0.)
+        // Passing a bounding box with identical eastmost and westmost bounds
+        // to ncWMS results in an error, so create a new Canada-only bounding
+        // box and ignore the worldwide extent
+        // [[-122.949219,63.632813],[-113.769531,68.222656],
+        // [-110.742187,63.242187],[-122.949219,63.632813]]
+        // of this map.
         const corner1 = L.latLng(90, -50);
         const corner2 = L.latLng(40, -150);
         bounds = L.latLngBounds(corner1, corner2);
@@ -104,20 +176,71 @@ class DataMap extends React.Component {
     this.setState({ [`${layerType}Layer`]: leafletElement });  // Ewww
   }
 
-  handleRasterLayerRef = this.handleLayerRef.bind(this, 'raster');
-  handleIsolineLayerRef = this.handleLayerRef.bind(this, 'isoline');
-  handleAnnotatedLayerRef = this.handleLayerRef.bind(this, 'annotated');
-
   // Handlers for area selection. Converts area to GeoJSON.
 
-  handleAreaCreatedOrEdited = (e) => {
-    const area = e.layer.toGeoJSON();
-    area.properties.source = 'PCIC Climate Explorer';
-    this.props.onSetArea(area);
+  layersToArea = (layers) => {
+    // const area = layersToGeoJSON('GeometryCollection', layers);
+    // const area = layersToGeoJSON('FeatureCollection', layers);
+    // TODO: Fix this ...
+    // The thing that receives this GeoJSON doesn't like `FeatureCollection`s
+    // or `GeometryCollection`s.
+    // Right now we are therefore only updating with the first Feature, i.e.,
+    // first layer. This is undesirable. Best would be to fix the receiver
+    // to handle feature selections; next
+    const layer0 = layers[0];
+    return layer0 && layer0.toGeoJSON();
   };
 
-  handleAreaDeleted = () => {
-    this.props.onSetArea(undefined);
+  onSetArea = () => {
+    this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
+  };
+
+  addGeometryLayer = layer => {
+    this.setState(prevState => ({
+      geometryLayers: prevState.geometryLayers.concat([layer]),
+    }), this.onSetArea);
+  };
+
+  addGeometryLayers = layers => {
+    for (const layer of layers) {
+      this.addGeometryLayer(layer);
+    }
+  };
+
+  editGeometryLayers = layers => {
+    // May not need to do anything to maintain `state.geometryLayers` here.
+    // The contents of the layers are changed, but the layers themselves
+    // (as identities) are not changed in number or identity.
+    // `geometryLayers` is a list of such identities, so doesn't need to change.
+    // Only need to communicate change via onSetArea.
+    // Maybe not; maybe better to create a new copy of geometryLayers. Hmmm.
+    this.onSetArea();
+  };
+
+  deleteGeometryLayers = layers => {
+    this.setState(prevState => ({
+      geometryLayers: _.without(prevState.geometryLayers, ...layers),
+    }), this.onSetArea);
+  };
+
+  eventLayers = e => {
+    // Extract the Leaflet layers from an editing event, returning them
+    // as an array of layers.
+    // Note: `e.layers` is a special class, not an array of layers, so we
+    // have to go through this rigmarole to get the layers.
+    // The alternative of accessing the private property `e.layers._layers`
+    // (a) is naughty, and (b) fails.
+    let layers = [];
+    e.layers.eachLayer(layer => layers.push(layer));
+    return layers;
+  }
+
+  handleAreaCreated = e => this.addGeometryLayer(e.layer);
+  handleAreaEdited = e => this.editGeometryLayers(this.eventLayers(e));
+  handleAreaDeleted = e => this.deleteGeometryLayers(this.eventLayers(e));
+
+  handleUploadArea = (geoJSON) => {
+    this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
   };
 
   // Lifecycle event handlers
@@ -128,44 +251,25 @@ class DataMap extends React.Component {
     const b = propChange || stateChange;
     return b;
   }
-  
-  // Helper function for render, generates JSX for DataLayer
-  dataLayerProps(layertype) {
-    if(_.isUndefined(this.props[layertype])) {
-      return "";
-    }
-    else {
-      const handlerName = `handle${layertype.charAt(0).toUpperCase() + layertype.slice(1)}LayerRef`;
-      return (
-          <DataLayer
-            layerType={layertype}
-            {...this.props[layertype]}
-            onLayerRef={this[handlerName]}
-          />
-      );
-    }
-  }
 
   render() {
     // TODO: Add positioning for autoset
+
+    const dataLayers = ['raster', 'isoline', 'annotated'].map(layerType => (
+      this.props[layerType] && (
+        <DataLayer
+          layerType={layerType}
+          layerParams={this.props[layerType]}
+          onLayerRef={this.handleLayerRef.bind(this, layerType)}
+        />
+      )
+    ));
+
     return (
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        {
-          ['raster', 'isoline', 'annotated'].map(lType => {
-            if (!_.isUndefined(this.props[lType])) {
-                return (
-                  <DataLayer
-                    layerType={lType}
-                    layerParams={this.props[lType]}
-                    onLayerRef={this.handleLayerRef.bind(this, lType)}
-                  />
-                );
-              }
-            }
-          )
-        }
+        {dataLayers}
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
@@ -181,7 +285,9 @@ class DataMap extends React.Component {
           {...this.props.isoline}  // update when any isoline prop changes
         />
 
-        <FeatureGroup>
+        <LayerControlledFeatureGroup
+          layers={this.state.geometryLayers}
+        >
           <EditControl
             position='topleft'
             draw={{
@@ -189,19 +295,37 @@ class DataMap extends React.Component {
               circlemarker: false,
               circle: false,
               polyline: false,
+              polygon: {
+                showArea: false,
+                showLength: false,
+              },
+              rectangle: {
+                showArea: false,
+                showLength: false,
+              },
             }}
-            onCreated={this.handleAreaCreatedOrEdited}
-            onEdited={this.handleAreaCreatedOrEdited}
+            onCreated={this.handleAreaCreated}
+            onEdited={this.handleAreaEdited}
             onDeleted={this.handleAreaDeleted}
           />
-        </FeatureGroup>
+        </LayerControlledFeatureGroup>
 
-        {
-          this.props.area &&
-          <GeoJSON
-            data={this.props.area}
+        <StaticControl position='topleft'>
+          <GeoLoader
+            onLoadArea={this.handleUploadArea}
+            title='Import polygon'
           />
-        }
+        </StaticControl>
+
+        <StaticControl position='topleft'>
+          { // See comments at module head regarding current GeoExporter
+            // arrangement.
+          }
+          <GeoExporter
+            area={this.layersToArea(this.state.geometryLayers)}
+            title='Export polygon'
+          />
+        </StaticControl>
 
         { this.props.children }
 

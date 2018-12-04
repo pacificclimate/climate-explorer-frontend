@@ -1,6 +1,6 @@
 import ReactDom from 'react-dom';
 
-import { MapControl } from 'react-leaflet';
+import { MapControl, withLeaflet } from 'react-leaflet';
 import L from 'leaflet';
 
 import './StaticControl.css';
@@ -30,4 +30,4 @@ class StaticControl extends MapControl {
     }
 }
 
-export default StaticControl;
+export default withLeaflet(StaticControl);

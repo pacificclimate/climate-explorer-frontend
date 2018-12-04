@@ -1,6 +1,6 @@
 import React from 'react';  // Necessary?
 
-import { MapControl } from 'react-leaflet';
+import { MapControl, withLeaflet } from 'react-leaflet';
 
 import LeafletNcWMSColorbarControl from './LeafletNcWMSColorbarControl';
 
@@ -16,4 +16,4 @@ class NcWMSColorbarControl extends MapControl {
   }
 }
 
-export default NcWMSColorbarControl;
+export default withLeaflet(NcWMSColorbarControl);

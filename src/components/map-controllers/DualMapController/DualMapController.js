@@ -33,8 +33,6 @@ import DataMap from '../../DataMap';
 import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
-import GeoLoader from '../../GeoLoader';
-import GeoExporter from '../../GeoExporter';
 
 import { hasValidData, currentDataSpec,
   scalarParams, getTimeParametersPromise,
@@ -299,17 +297,6 @@ export default class DualMapController extends React.Component {
                 onSetArea={this.props.onSetArea}
                 area={this.props.area}
               >
-
-                <StaticControl position='topleft'>
-                  <GeoLoader
-                    onLoadArea={this.props.onSetArea}
-                    title='Import polygon'
-                  />
-                </StaticControl>
-
-                <StaticControl position='topleft'>
-                  <GeoExporter area={this.props.area} title='Export polygon' />
-                </StaticControl>
 
                 <StaticControl
                   position='topright'

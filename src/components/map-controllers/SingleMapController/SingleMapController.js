@@ -247,16 +247,6 @@ export default class SingleMapController extends React.Component {
                 area={this.props.area}
               >
 
-                <StaticControl position='topleft'>
-                  <GeoLoader
-                    onLoadArea={this.props.onSetArea}
-                    title='Import polygon' />
-                </StaticControl>
-
-                <StaticControl position='topleft'>
-                  <GeoExporter area={this.props.area} title='Export polygon' />
-                </StaticControl>
-
                 <StaticControl
                   position='topright'
                   style={{ marginRight: '70px' }}
