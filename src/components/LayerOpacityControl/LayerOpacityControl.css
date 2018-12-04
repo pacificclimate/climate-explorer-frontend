@@ -1,0 +1,30 @@
+/*:global(.LayerOpacityControl) {*/
+    /*width: 200px;*/
+/*}*/
+
+:global(.LayerOpacityControl .row) {
+    padding: 0.5em 0
+}
+
+:global(.LayerOpacityControl .input-range) {
+    height: 1.8em;
+    margin: 0em 0em 0.5em 0.5em;
+    width: 10em;
+}
+
+:global(.LayerOpacityControl .input-range__label) {
+    color: inherit;
+    font-family: inherit;
+    font-size: 90%;
+}
+
+
+:global(.LayerOpacityControl .input-range__label--min),
+:global(.LayerOpacityControl .input-range__label--max)
+{
+    bottom: -0.9em;
+}
+
+:global(.LayerOpacityControl .input-range__label--value) {
+    top: -2em;
+}
