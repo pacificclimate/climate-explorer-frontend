@@ -302,10 +302,13 @@ class DataMap extends React.Component {
         />
 
         <StaticControl position='topleft'>
-          <GeoLoader
-            onLoadArea={this.handleUploadArea}
-            title='Import polygon'
-          />
+          {
+            allowGeometryDraw &&
+            <GeoLoader
+              onLoadArea={this.handleUploadArea}
+              title='Import polygon'
+            />
+          }
           { // See comments at module head regarding current GeoExporter
             // arrangement.
           }
