@@ -25,6 +25,8 @@ export default class LayerOpacityControl extends PureComponent {
     handleMouseLeave = () => this.setState({ showControls: false });
 
     render() {
+      const show = this.state.showControls;
+      const titleSep = show ? ' ' : <br/>;
       return (
         <StaticControl position={'topright'}>
           <div
@@ -34,10 +36,12 @@ export default class LayerOpacityControl extends PureComponent {
           >
             <Grid fluid>
               <Row>
-                <Col lg={12}>Layer opacity</Col>
+                <Col lg={12} className='text-center'>
+                  Climate{titleSep}layer{titleSep}opacity
+                </Col>
               </Row>
               {
-                this.state.showControls &&
+                show &&
                 Object.entries(this.props.layerOpacity).map(
                   ([layerType, opacity]) => (
                     <Row key={layerType}>
@@ -60,11 +64,3 @@ export default class LayerOpacityControl extends PureComponent {
       );
     }
 }
-
-LayerOpacityControl.propTypes = {
-  faderOpacity: PropTypes.number,
-  faderColor: PropTypes.string,
-  onChangeFaderOpacity: PropTypes.func.isRequired,
-  onChangeFaderColor: PropTypes.func.isRequired,
-};
-

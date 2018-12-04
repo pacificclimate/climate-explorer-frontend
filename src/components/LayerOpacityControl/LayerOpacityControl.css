@@ -3,7 +3,8 @@
 /*}*/
 
 :global(.LayerOpacityControl .row) {
-    padding: 0.5em 0
+    line-height: 1.0em;
+    padding: 0.8em 0
 }
 
 :global(.LayerOpacityControl .input-range) {
