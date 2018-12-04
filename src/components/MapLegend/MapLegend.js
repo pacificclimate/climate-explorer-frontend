@@ -3,29 +3,32 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import './MapFooter.css';
+import './MapLegend.css';
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
+import { currentDataSpec } from '../map-controllers/map-helpers';
 
 
-class MapFooter extends React.Component {
+export default class MapLegend extends React.Component {
   static propTypes = {
+    model_id: PropTypes.string,
+    experiment: PropTypes.string,
     start_date: PropTypes.string,
     end_date: PropTypes.string,
     run: PropTypes.string,
     raster: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     isoline: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     annotated: PropTypes.shape({
       variableId: PropTypes.string,
       wmsTime: PropTypes.string,
-      times: PropTypes.object
+      times: PropTypes.object,
     }),
     hasValidComparand: PropTypes.bool,
   };
@@ -44,22 +47,25 @@ class MapFooter extends React.Component {
   }
 
   render() {
-    let comparandText = "";
-    if(this.props.hasValidComparand) {
-      const comparand = this.props.isoline || this.props.annotated;
-      comparandText = ` ${comparand.wmsTime ? "vs." : " |"} ${this.timeAndVariable(comparand)}`;
+    // When the props for this component don't have useful values,
+    // we want to display a less obnoxious result.
+    // The following test is minimal and sufficient for this condition.
+    if (!_.every(_.pick(this.props, 'model_id', 'start_date'))) {
+      return <span>Loading...</span>;
     }
     return (
-        <h5>
-          Dataset {`${this.props.start_date}-${this.props.end_date}`} {this.props.run}:
-          {' '}
-          {this.timeAndVariable(this.props.raster)}
-          {
-            this.props.hasValidComparand && comparandText
-          }
-        </h5>
+      <span>
+        {`${this.props.model_id}; ${this.props.experiment};`}
+        {` ${currentDataSpec(this.props)}:`}
+        {` ${this.timeAndVariable(this.props.raster)} (raster)`}
+        {
+          this.props.hasValidComparand ?
+            (this.props.variable_id === this.props.comparand_id ?
+              ' only' :
+              ` & ${this.timeAndVariable(this.props.isoline || this.props.annotated)} (isolines)`) :
+            ''
+        }
+      </span>
     );
   }
 }
-
-export default MapFooter;

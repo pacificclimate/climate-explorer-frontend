@@ -2,21 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-export const MEVSummary = (
+export function MEVSummary(
   { model_id, experiment, variable_id, comparand_id, dual }
-) =>
-  (
+) {
+  // When the props for this component don't have useful values,
+  // we want to display a less obnoxious result.
+  // The following test is minimal and sufficient for this condition.
+  if (!model_id) {
+    return <span>Loading...</span>;
+  }
+  return (
     <span>
       {`${model_id} ${experiment}: ${variable_id} `}
       {
         dual ?
           (variable_id === comparand_id ?
             ' only' :
-            ` vs ${comparand_id}`) :
+            ` & ${comparand_id}`) :
           ''
       }
-  </span>
+    </span>
   );
+}
 
 MEVSummary.propTypes = {
   model_id: PropTypes.string.isRequired,

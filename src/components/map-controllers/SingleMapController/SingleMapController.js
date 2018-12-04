@@ -27,7 +27,7 @@ import _ from 'underscore';
 
 import '../MapController.css';
 import DataMap from '../../DataMap';
-import MapFooter from '../../MapFooter';
+import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
 import GeoLoader from '../../GeoLoader';
@@ -47,7 +47,9 @@ import { MEVSummary } from '../../data-presentation/MEVSummary';
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class SingleMapController extends React.Component {
   static propTypes = {
-    variable_id: PropTypes.string.isRequired,    
+    model_id: PropTypes.string.isRequired,
+    experiment: PropTypes.string.isRequired,
+    variable_id: PropTypes.string.isRequired,
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
@@ -69,7 +71,7 @@ export default class SingleMapController extends React.Component {
         palette: 'x-Occam',
         logscale: 'false',
         range: {},
-      }
+      },
     };
   }
 
@@ -210,7 +212,12 @@ export default class SingleMapController extends React.Component {
   }
 
   render() {
-    console.log('SingleMapController.props.meta', this.props.meta)
+    const mapLegend = (<MapLegend
+      {...this.props}
+      {...this.state}
+      hasValidComparand={false}
+    />);
+
     return (
       <Panel>
         <Panel.Heading>
@@ -220,13 +227,7 @@ export default class SingleMapController extends React.Component {
                 {mapPanelLabel}
               </Col>
               <Col lg={10}>
-                <MEVSummary
-                  className={styles.mevSummary} {...this.props}
-                />
-                {': '}
-                { this.state.run }
-                {' '}
-                { this.state.start_date }-{ this.state.end_date }
+                {mapLegend}
               </Col>
             </Row>
         </Panel.Title>
@@ -264,7 +265,7 @@ export default class SingleMapController extends React.Component {
                     title='Map Settings'
                     meta={this.props.meta}
 
-                    dataSpec={currentDataSpec.bind(this)()}
+                    dataSpec={currentDataSpec(this.state)}
                     onDataSpecChange={this.updateDataSpec}
 
                     raster={{
@@ -280,10 +281,7 @@ export default class SingleMapController extends React.Component {
                 </StaticControl>
 
                 <StaticControl position='bottomleft'>
-                  <MapFooter
-                    {...this.state}
-                    hasValidComparand={false}
-                  />
+                  {mapLegend}
                 </StaticControl>
 
               </DataMap>
