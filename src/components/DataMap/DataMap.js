@@ -294,6 +294,14 @@ class DataMap extends React.Component {
               marker: false,
               circle: false,
               polyline: false,
+              polygon: {
+                showArea: false,
+                showLength: false,
+              },
+              rectangle: {
+                showArea: false,
+                showLength: false,
+              },
             }}
             onCreated={this.handleAreaCreated}
             onEdited={this.handleAreaEdited}
