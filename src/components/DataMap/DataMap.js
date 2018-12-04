@@ -218,7 +218,7 @@ class DataMap extends React.Component {
   };
 
   deleteGeometryLayers = layers => {
-    this.setState(prevState => ({
+    this.setState(prevState => ({{}
       geometryLayers: _.without(prevState.geometryLayers, ...layers),
     }), this.onSetArea);
   };
@@ -317,7 +317,9 @@ class DataMap extends React.Component {
         </StaticControl>
 
         <StaticControl position='topleft'>
-          {/* See comments above regarding current GeoExporter arrangement. */}
+          { // See comments at module head regarding current GeoExporter
+            // arrangement.
+          }
           <GeoExporter
             area={this.layersToArea(this.state.geometryLayers)}
             title='Export polygon'
