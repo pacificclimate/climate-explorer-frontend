@@ -301,22 +301,15 @@ class DataMap extends React.Component {
           {...this.props.isoline}  // update when any isoline prop changes
         />
 
-        <StaticControl position='topleft'>
-          {
-            allowGeometryDraw &&
-            <GeoLoader
-              onLoadArea={this.handleUploadArea}
-              title='Import polygon'
-            />
-          }
-          { // See comments at module head regarding current GeoExporter
-            // arrangement.
-          }
-          <GeoExporter
-            area={this.layersToArea(this.state.geometryLayers)}
-            title='Export polygon'
-          />
-        </StaticControl>
+        {
+          allowGeometryDraw &&
+          <StaticControl position='topleft'>
+              <GeoLoader
+                onLoadArea={this.handleUploadArea}
+                title='Import polygon'
+              />
+          </StaticControl>
+        }
 
         <LayerControlledFeatureGroup
           layers={this.state.geometryLayers}
@@ -342,6 +335,18 @@ class DataMap extends React.Component {
             onDeleted={this.handleAreaDeleted}
           />
         </LayerControlledFeatureGroup>
+
+        {
+          // See comments at module head regarding current GeoExporter
+          // arrangement.
+          !allowGeometryDraw &&
+          <StaticControl position='topleft'>
+              <GeoExporter
+                area={this.layersToArea(this.state.geometryLayers)}
+                title='Export polygon'
+              />
+          </StaticControl>
+        }
 
         { this.props.children }
 
