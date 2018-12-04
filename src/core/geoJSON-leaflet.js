@@ -20,8 +20,6 @@ export function geoJSONToLeafletLayers(geoJSON) {
   // and in any case ought to be handled OK by Leaflet (since `FeatureGroup` is
   // a subclass of `Layer`).
 
-  console.log('geoJSONToLeafletLayers geoJSON =', geoJSON);
-
   const geoJSONType = geoJSON && geoJSON.type;
   switch (geoJSONType) {
     case undefined:
