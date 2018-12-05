@@ -3,9 +3,12 @@ import React from 'react';
 import _ from 'underscore';
 
 import {timeseriesToAnnualCycleGraph} from '../../core/chart-generators';
-import {assignColoursByGroup, fadeSeriesByRank} from '../../core/chart-formatters';
+import {assignColoursByGroup,
+        fadeSeriesByRank,
+        padYAxis} from '../../core/chart-formatters';
 import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
+import { getVariableOptions } from '../../core/util';
 
 
 export default function DualAnnualCycleGraph(props) {
@@ -104,6 +107,50 @@ export default function DualAnnualCycleGraph(props) {
 
     graph = fadeSeriesByRank(graph, rankByTimeResolution);
 
+    // In a few cases, different variables move in lockstep over the course of
+    // the year, e.g tasmin and tasmax: tasmin is almost always about 10
+    // degrees lower than tasmax. These pairs of variables will be hard to
+    // understand in a comparison graph, because c3's normally excellent
+    // smart formatting will automatically scale each data set vertically
+    // to take advantage of the entire graph space, making the two sets of
+    // graph lines nearly identical.
+    //
+    // The variable configuration file indicates which pairs of variables are
+    // expected to have this issue. If either of the two currently displayed
+    // variables lists the other as a visual conflict (using the "shiftAnnualCycle"
+    // attribute), they will be detangled by padding the graph y-scales to
+    // shift the graph lines apart vertically.
+    if(!_.isUndefined(graph.axis.y2)
+        && props.comparand_id !== props.variable_id) {
+      // see if either variable is listed as conflicting with the other
+      let overlap = false;
+      const variableOverlaps = getVariableOptions(props.variable_id, "shiftAnnualCycle");
+      if(variableOverlaps && variableOverlaps.includes(props.comparand_id)) {
+        overlap = true;
+      }
+      const comparandOverlaps = getVariableOptions(props.comparand_id, "shiftAnnualCycle");
+      if(comparandOverlaps && comparandOverlaps.includes(props.variable_id)) {
+        overlap = true;
+      }
+      if(overlap) {
+        // find which set of data series has larger values;
+        // the larger-valued will be shifted upward
+        let maximum = -Infinity;
+        let maxName = "";
+        for(let i = 0; i < graph.data.columns.length; i++) {
+          const series = graph.data.columns[i];
+          const seriesMax = _.max(series);
+          if(seriesMax > maximum) {
+            maximum = seriesMax;
+            maxName = series[0];
+          }
+        }
+        const upAxis = graph.data.axes[maxName];
+        const downAxis = upAxis === 'y' ? 'y2' : 'y';
+        graph = padYAxis(graph, upAxis, "bottom", .2);
+        graph = padYAxis(graph, downAxis, "top", .2);
+      }
+    }
     return graph;
   }
 

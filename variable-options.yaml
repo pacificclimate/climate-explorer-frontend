@@ -26,14 +26,26 @@
 #        be expressed as percentages, not nominal values, in
 #        graphs and tables that display anomalies
 #        (default: false)
+#   - shiftAnnualCycle
+#        LIST OF VARIABLE NAMES
+#        if this variable is displayed for comparison with one
+#        of the variables in the list in an Annual Cycle Graph,
+#        their lines will be shifted apart vertically. This helps
+#        clarify variables whose values move in parallel over the
+#        course of a year, such as tasmax and tasmin.
+#        (default: none)
 ################################################################
 
 #GCM output variables
 tasmin:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - tasmax
   
 tasmax:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - tasmin
 
 pr:
   overrideLogarithmicScale: true
