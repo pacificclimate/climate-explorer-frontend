@@ -56,7 +56,7 @@ var ModalMixin = {
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
-      var viewerMessageDisplays = [this.setStatsTableNoDataMessage];
+      var viewerMessageDisplays = [this.displayNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);
