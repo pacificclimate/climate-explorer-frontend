@@ -104,12 +104,6 @@ export default class LongTermAveragesGraph extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    if (this.dataRequest) {
-      this.dataRequest.cancel();
-    }
-  }
-
   // Data fetching
 
   getAndValidateData(metadata) {
@@ -126,12 +120,10 @@ export default class LongTermAveragesGraph extends React.Component {
     .filter(metadata => !!metadata)
 
   fetchData() {
-    const dataPromises = 
-      this.timeOfYearMetadatas().map(metadata =>
-        this.getAndValidateData(metadata)
-      );
-
-    this.dataRequest = Promise.all(dataPromises)
+    Promise.all(
+      this.timeOfYearMetadatas()
+      .map(metadata => this.getAndValidateData(metadata))
+    )
     .then(data => {
       this.setState({
         data,
