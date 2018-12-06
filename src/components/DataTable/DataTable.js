@@ -5,12 +5,18 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 class DataTable extends React.Component {
   static propTypes = {
     data: PropTypes.array,
+    options: PropTypes.object,
   };
 
   render() {
     return (
       <div id={'table'}>
-        <BootstrapTable data={this.props.data} options={this.props.options} striped hover >
+        <BootstrapTable
+          data={this.props.data}
+          options={this.props.options}
+          striped
+          hover
+        >
           <TableHeaderColumn
             dataField='run'
             dataAlign='center'
