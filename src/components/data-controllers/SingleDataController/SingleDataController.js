@@ -99,6 +99,7 @@ export default class SingleDataController extends React.Component {
   render() {
     return (
       <div>
+        // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
         <Panel>
           <Panel.Heading>
             <Panel.Title>

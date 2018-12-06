@@ -57,7 +57,7 @@ import GraphTabs from '../GraphTabs';
 
 export default class DualDataController extends React.Component {
   static propTypes = {
-    ensemble_name: PropTypes.string,
+    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     comparand_id: PropTypes.string,
@@ -96,6 +96,7 @@ export default class DualDataController extends React.Component {
 
   render() {
     return (
+      // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
       <Panel>
           <Panel.Heading>
             <Panel.Title>
