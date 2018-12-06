@@ -22,8 +22,8 @@ import ExportButtons from '../ExportButtons';
 
 import {
   loadingDataGraphSpec,
-  displayError,
   noDataMessageGraphSpec,
+  errorMessage,
 } from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
@@ -70,7 +70,7 @@ export default class LongTermAveragesGraph extends React.Component {
       timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
 
       data: null,
-      graphSpec: loadingDataGraphSpec,  // TODO: Remove from state
+      dataError: null,
     };
   }
 
@@ -84,7 +84,7 @@ export default class LongTermAveragesGraph extends React.Component {
         prevMeta: props.meta,
         prevArea: props.area,
         data: null,  // Signal that data fetch is required
-        graphSpec: loadingDataGraphSpec,  // TODO: Remove from state
+        dataError: null,
       };
     }
 
@@ -115,13 +115,6 @@ export default class LongTermAveragesGraph extends React.Component {
 
   // Data fetching
 
-  displayNoDataMessage = (message) => {
-    //Removes all data from the graph and displays a message
-    this.setState({
-      graphSpec: noDataMessageGraphSpec(message),
-    });
-  };
-
   getAndValidateData(metadata) {
     return (
       getData(metadata)
@@ -130,21 +123,28 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  fetchData() {
-    const timeOfYearMetadatas =
-      this.props.getMetadata(this.state.timeOfYear)
-      .filter(metadata => !!metadata);
-    const dataPromises = timeOfYearMetadatas.map(metadata =>
-      this.getAndValidateData(metadata)
-    );
+  timeOfYearMetadatas = () =>
+    // This thing is called twice, so memoize it if inefficient
+    this.props.getMetadata(this.state.timeOfYear)
+    .filter(metadata => !!metadata)
 
-    this.dataRequest = Promise.all(dataPromises).then(data => {
+  fetchData() {
+    const dataPromises = 
+      this.timeOfYearMetadatas().map(metadata =>
+        this.getAndValidateData(metadata)
+      );
+
+    this.dataRequest = Promise.all(dataPromises)
+    .then(data => {
       this.setState({
         data,
-        graphSpec: this.props.dataToGraphSpec(data, timeOfYearMetadatas), // TODO: Remove from state
+        dataError: null,
       });
-    }).catch(error => {
-      displayError(error, this.displayNoDataMessage);
+    }).catch(dataError => {
+      this.setState({
+        // Do we have to set data non-null here to prevent infinite update loop?
+        dataError,
+      });
     });
   }
 
@@ -168,6 +168,26 @@ export default class LongTermAveragesGraph extends React.Component {
 
   handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
+  
+  // render helpers
+
+  graphSpec() {
+    // Return a graphSpec appropriate to the given state
+
+    // An error occurred
+    if (this.state.dataError) {
+      return noDataMessageGraphSpec(errorMessage(this.state.dataError));
+    }
+
+    // Waiting for data
+    if (this.state.data === null) {
+      return loadingDataGraphSpec;
+    }
+
+    // We can haz data
+    return this.props.dataToGraphSpec(
+      this.state.data, this.timeOfYearMetadatas());
+  }
 
   render() {
     return (
@@ -190,7 +210,7 @@ export default class LongTermAveragesGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph {...this.state.graphSpec}/>
+            <DataGraph {...this.graphSpec()}/>
           </Col>
         </Row>
       </React.Fragment>
