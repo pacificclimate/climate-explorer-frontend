@@ -236,6 +236,10 @@ export function timeResolutionIndexToTimeOfYear(res, idx) {
 }
 
 export function timeResolutions(meta) {
+  // Given an array of (standard) metadata,
+  // return an object containing flags indicating whether each of the
+  // 3 standard timescales are present in the datasets described by
+  // the metadata.
   const timescales = _.pluck(meta, 'timescale');
   return {
     monthly: _.contains(timescales, 'monthly'),
@@ -245,6 +249,10 @@ export function timeResolutions(meta) {
 }
 
 export function defaultTimeOfYear({ monthly, seasonal, yearly }) {
+  // Given a set of flags indicating the timescales present,
+  // return an object giving the default timescale and time index.
+  // The default timescale is the highest-resolution one present;
+  // the default time index is the first item in the default timescale.
   if (monthly) {
     return 0;  // January
   }
