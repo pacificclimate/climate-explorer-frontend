@@ -38,7 +38,6 @@ export default class StatisticalSummaryTable extends React.Component {
     area: PropTypes.string,
     meta: PropTypes.array,
     contextMeta: PropTypes.array,
-    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
   };
 
   // Lifecycle hooks
