@@ -80,28 +80,36 @@ function findMatchingMetadata(example, difference, meta) {
   return _.findWhere(meta, template);
 }
 
-function displayError(error, displayMethod) {
-  // Used to display any error (via `displayMethod`) generated in the
-  // process of showing a graph or table, so it handles networking
+export function errorMessage(error) {
+  // Create an error message for any error generated in the
+  // process of showing a graph or table. Handles networking
   // errors thrown by axios calls and errors thrown by validators
   // and parsers, which have different formats.
   if (error.response) {
     // axios error: data server sent a non-200 response
-    displayMethod('Error: ' + error.response.status + ' received from data server.');
-  } else if (error.request) {
-    // axios error: data server didn't respond
-    displayMethod('Error: no response received from data server.');
-  } else {
-    // either an error thrown by a data validation function,
-    // an error thrown by the DataGraph or DataTable parsers,
-    // or the generic and somewhat unhelpful 'Network Error' from axios
-    // Testing turned up 'Network Error' in two cases:
-    // the server is down, or the server has a 500 error.
-    // Other http error statuses tested were reflected in
-    // error.response.status as expected
-    // (see https://github.com/mzabriskie/axios/issues/383)
-    displayMethod(error.message);
+    return 'Error: ' + error.response.status + ' received from data server.';
   }
+
+  if (error.request) {
+    // axios error: data server didn't respond
+    return 'Error: no response received from data server.';
+  }
+
+  // either an error thrown by a data validation function,
+  // an error thrown by the DataGraph or DataTable parsers,
+  // or the generic and somewhat unhelpful 'Network Error' from axios
+  // Testing turned up 'Network Error' in two cases:
+  // the server is down, or the server has a 500 error.
+  // Other http error statuses tested were reflected in
+  // error.response.status as expected
+  // (see https://github.com/mzabriskie/axios/issues/383)
+  return error.message;
+}
+
+
+function displayError(error, displayMethod) {
+  // Used to display any error (via `displayMethod`)
+  displayMethod(errorMessage(error));
 }
 
 
