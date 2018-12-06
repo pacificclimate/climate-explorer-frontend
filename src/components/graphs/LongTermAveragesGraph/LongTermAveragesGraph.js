@@ -54,21 +54,18 @@ export default class LongTermAveragesGraph extends React.Component {
   };
 
   // Lifecycle hooks
-  // Follows React 16+ new lifecycle API and recommendations.
+  // Follows React 16+ lifecycle API and recommendations.
   // See https://reactjs.org/blog/2018/03/29/react-v-16-3.html
   // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
   // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
-
-  // TODO: Don't store graphSpec on state, store data and derive graphSpec?
 
   constructor(props) {
     super(props);
 
     this.state = {
-      // prevMeta: null,
-      // prevArea: null,
+      prevMeta: null,
+      prevArea: null,
       timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
-
       data: null,
       dataError: null,
     };
