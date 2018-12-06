@@ -1,3 +1,15 @@
+// This component renders a complete long-term average graph, including a
+// selector for the averaged period of interest (e.g., January, Fall, Year).
+// A long-term average graph presents spatially averaged values of
+// climatological average data for the selected model, variable,
+// experiment, and the locally-selected period of interest,
+// for each available climatological averaging period (forming the time
+// axis, which typically extends from 1950 to 2100).
+//
+// The component is generalized by two function props, `getMetadata`
+// and `dataToGraphSpec`, which respectively return metadata describing the
+// the datasets to display, and return a graph spec for the graph proper.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
@@ -12,7 +24,6 @@ import {
   loadingDataGraphSpec,
   displayError,
   noDataMessageGraphSpec,
-  shouldLoadData,
 } from '../graph-helpers';
 import {
   timeKeyToResolutionIndex,
@@ -22,18 +33,6 @@ import {
 } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
 import { exportDataToWorksheet } from '../../../core/export';
-
-// This component renders a complete long-term average graph, including a
-// selector for the averaged period of interest (e.g., January, Fall, Year).
-// A long-term average graph presents spatially averaged values of
-// climatological average data for the selected model, variable,
-// experiment, and the locally-selected period of interest,
-// for each available climatological averaging period (forming the time
-// axis, which typically extends from 1950 to 2100).
-//
-// The component is generalized by two function props, `getMetadata`
-// and `dataToGraphSpec`, which respectively return metadata describing the
-// the datasets to display, and return a graph spec for the graph proper.
 
 export default class LongTermAveragesGraph extends React.Component {
   static propTypes = {
@@ -66,9 +65,9 @@ export default class LongTermAveragesGraph extends React.Component {
     super(props);
 
     this.state = {
-      // prevMeta: null,  // unnecessary
-      // prevArea: null,  // unnecessary
-      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),  // necessary?
+      // prevMeta: null,
+      // prevArea: null,
+      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
 
       data: null,
       graphSpec: loadingDataGraphSpec,  // TODO: Remove from state
