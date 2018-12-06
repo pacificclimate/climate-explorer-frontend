@@ -9,7 +9,7 @@ import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 
 import {
-  blankGraphSpec,
+  loadingDataGraphSpec,
   displayError,
   noDataMessageGraphSpec,
   shouldLoadData,
@@ -71,7 +71,7 @@ export default class LongTermAveragesGraph extends React.Component {
       timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),  // necessary?
 
       data: null,
-      graphSpec: blankGraphSpec,  // TODO: Remove from state
+      graphSpec: loadingDataGraphSpec,  // TODO: Remove from state
     };
   }
 
@@ -85,7 +85,7 @@ export default class LongTermAveragesGraph extends React.Component {
         prevMeta: props.meta,
         prevArea: props.area,
         data: null,  // Signal that data fetch is required
-        graphSpec: blankGraphSpec,  // TODO: Remove from state
+        graphSpec: loadingDataGraphSpec,  // TODO: Remove from state
       };
     }
 

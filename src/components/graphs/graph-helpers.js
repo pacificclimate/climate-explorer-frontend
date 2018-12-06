@@ -127,6 +127,8 @@ const blankGraphSpec = {
   axis: {},
 };
 
+export const loadingDataGraphSpec = noDataMessageGraphSpec('Loading data...');
+
 
 function shouldLoadData(props, displayMessage) {
   // Return true iff the current state, evaluated based on `props`, indicates
