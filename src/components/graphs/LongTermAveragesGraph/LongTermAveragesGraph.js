@@ -54,17 +54,67 @@ export default class LongTermAveragesGraph extends React.Component {
     // this general component to particular cases (single vs. dual controller).
   };
 
+  // Lifecycle hooks
+  // Follows React 16+ new lifecycle API and recommendations.
+  // See https://reactjs.org/blog/2018/03/29/react-v-16-3.html
+  // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
+  // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
+
+  // TODO: Don't store graphSpec on state, store data and derive graphSpec?
+
   constructor(props) {
     super(props);
 
     this.state = {
-      graphSpec: blankGraphSpec,
+      // prevMeta: null,  // unnecessary
+      // prevArea: null,  // unnecessary
+      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),  // necessary?
+
+      data: null,
+      graphSpec: blankGraphSpec,  // TODO: Remove from state
     };
   }
 
-  handleChangeTimeOfYear = (timeOfYear) => {
-    this.setState({ timeOfYear });
-  };
+  static getDerivedStateFromProps(props, state) {
+    if (
+      props.meta !== state.prevMeta ||
+      props.area !== state.prevArea
+    ) {
+      return {
+        timeOfYear: defaultTimeOfYear(timeResolutions(props.meta)),
+        prevMeta: props.meta,
+        prevArea: props.area,
+        data: null,  // Signal that data fetch is required
+        graphSpec: blankGraphSpec,  // TODO: Remove from state
+      };
+    }
+
+    // No state update necessary.
+    return null;
+  }
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      // props changed => data invalid
+      this.state.data === null ||
+      // user selected new time of year
+      this.state.timeOfYear !== prevState.timeOfYear
+    ) {
+      this.fetchData();
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.dataRequest) {
+      this.dataRequest.cancel();
+    }
+  }
+
+  // Data fetching
 
   displayNoDataMessage = (message) => {
     //Removes all data from the graph and displays a message
@@ -76,39 +126,34 @@ export default class LongTermAveragesGraph extends React.Component {
   getAndValidateData(metadata) {
     return (
       getData(metadata)
-        .then(validateLongTermAverageData)
-        .then(response => response.data)
+      .then(validateLongTermAverageData)
+      .then(response => response.data)
     );
   }
 
-  loadGraph() {
-    // Fetch data for graph, then convert it to a graph spec and set state
-    // accordingly. Set default time of year appropriately for the data
-    // available.
-
-    if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
-      return;
-    }
-
-    this.setState({
-      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
-    });
-
+  fetchData() {
     const timeOfYearMetadatas =
       this.props.getMetadata(this.state.timeOfYear)
-        .filter(metadata => !!metadata);
+      .filter(metadata => !!metadata);
     const dataPromises = timeOfYearMetadatas.map(metadata =>
       this.getAndValidateData(metadata)
     );
 
-    Promise.all(dataPromises).then(data => {
+    this.dataRequest = Promise.all(dataPromises).then(data => {
       this.setState({
-        graphSpec: this.props.dataToGraphSpec(data, timeOfYearMetadatas),
+        data,
+        graphSpec: this.props.dataToGraphSpec(data, timeOfYearMetadatas), // TODO: Remove from state
       });
     }).catch(error => {
       displayError(error, this.displayNoDataMessage);
     });
   }
+
+  // User event handlers
+
+  handleChangeTimeOfYear = (timeOfYear) => {
+    this.setState({ timeOfYear });
+  };
 
   exportData(format) {
     const { timescale: timeres, timeidx } =
@@ -124,22 +169,6 @@ export default class LongTermAveragesGraph extends React.Component {
 
   handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
-
-  // Lifecycle hooks
-
-  componentDidMount() {
-    this.loadGraph();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps.meta !== this.props.meta ||
-      prevProps.area !== this.props.area ||
-      prevState.timeOfYear !== this.state.timeOfYear
-    ) {
-      this.loadGraph();
-    }
-  }
 
   render() {
     return (
