@@ -59,8 +59,9 @@ function getData(
   });
 }
 
+// TODO: getTimeseries, getData and getStats are almost identical. Factor.
 function getStats (
-    { ensemble_name, model_id, variable_id, experiment, area }, timeidx, timeres
+    { ensemble_name, model_id, variable_id, experiment, timescale, timeidx, area }
 ) {
   // Query the "multistats" API endpoint.
   // Gets an object from each qualifying dataset file with the following
@@ -78,18 +79,18 @@ function getStats (
   //      modtime (last time dataset was modified)
   //    }
   //  }
-  const emissionString = guessExperimentFormatFromVariable(variable_id, experiment);
+  const emission = guessExperimentFormatFromVariable(variable_id, experiment);
   return axios({
     baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
     params: {
       ensemble_name: ensemble_name,
       model: model_id,
       variable: variable_id,
-      emission: emissionString,
-      area: area || null,
+      emission,
       time: timeidx,
-      timescale: timeres
-    }
+      timescale,
+      area: area || null,
+    },
   });
 }
 
