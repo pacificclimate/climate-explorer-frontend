@@ -16,10 +16,17 @@ import { MEVSummary } from '../data-presentation/MEVSummary';
 import styles from './StatisticalSummaryTable.css';
 import { getStats } from '../../data-services/ce-backend';
 import {
-  parseBootstrapTableData, resolutionIndexToTimeKey, timeKeyToResolutionIndex,
+  defaultTimeOfYear,
+  parseBootstrapTableData,
+  timeKeyToResolutionIndex,
+  timeResolutions,
   validateStatsData,
 } from '../../core/util';
-import { displayError, multiYearMeanSelected } from '../graphs/graph-helpers';
+
+// TODO: Replace stub with import when new code integrated from LTA graph fix
+// import { errorMessage } from '../graphs/graph-helpers';
+const errorMessage = () => 'Error fetching data.';  // Temporary stub.
+
 import { exportDataToWorksheet } from '../../core/export';
 
 
@@ -34,121 +41,75 @@ export default class StatisticalSummaryTable extends React.Component {
     ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
   };
 
+  // Lifecycle hooks
+  // Follows React 16+ lifecycle API and recommendations.
+  // See https://reactjs.org/blog/2018/03/29/react-v-16-3.html
+  // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
+  // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
+
   constructor(props) {
     super(props);
 
     this.state = {
-      dataTableTimeOfYear: 0,
-      dataTableTimeScale: 'monthly',
-      statsData: undefined,
+      prevMeta: null,
+      prevArea: null,
+      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
+      data: null,
+      dataError: null,
     };
   }
-  
-  /*
-   * Called when SingleDataController is first loaded. Selects and fetches
-   * arbitrary initial data to display in the graphs and stats table.
-   * Monthly time resolution, January, on the first run returned by the API.
-   */
-  getData(props) {
-    //if the selected dataset is a multi-year mean, load annual cycle
-    //and long term average graphs, otherwise load a timeseries graph
-    if (multiYearMeanSelected(props)) {
-      this.loadDataTable(props);
-    } else {
-      this.loadDataTable(props, { timeidx: 0, timescale: 'yearly' });
+
+  static getDerivedStateFromProps(props, state) {
+    if (
+      props.meta !== state.prevMeta ||
+      props.area !== state.prevArea
+    ) {
+      return {
+        prevMeta: props.meta,
+        prevArea: props.area,
+        timeOfYear: defaultTimeOfYear(timeResolutions(props.meta)),
+        data: null,  // Signal that data fetch is required
+        dataError: null,
+      };
     }
-  }
 
-  //Removes all data from the Stats Table and displays a message
-  setStatsTableNoDataMessage(message) {
-    this.setState({
-      statsTableOptions: { noDataText: message },
-      statsData: [],
-    });
-  }
-
-  /*
-   * Called when the user selects a time of year to display on the stats
-   * table. Fetches new data, records the new time index and resolution
-   * in state, and updates the table.
-   */
-  updateDataTableTimeOfYear = (timeidx) => {
-    this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
-  }
-
-  /*
-   * This function fetches and loads data for the Stats Table.
-   * If passed a time of year(resolution and index), it will load
-   * data for that time of year. Otherwise, it defaults to January
-   * (resolution: "monthly", index 0).
-   */
-  loadDataTable(props, time) {
-    const timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
-    const timeres = time ? time.timescale : this.state.dataTableTimeScale;
-
-    //load stats table
-    this.setStatsTableNoDataMessage('Loading Data');
-    const myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
-
-    myStatsPromise.then(response => {
-      if (_.allKeys(response.data).length > 0) {
-        this.setState({
-          dataTableTimeOfYear: timeidx,
-          dataTableTimeScale: timeres,
-          statsData: parseBootstrapTableData(
-            this.injectRunIntoStats(response.data), props.meta),
-        });
-      } else {
-        this.setState({
-          dataTableTimeOfYear: timeidx,
-          dataTableTimeScale: timeres,
-        });
-        this.setStatsTableNoDataMessage('Statistics unavailable for this time period.');
-      }
-    }).catch(error => {
-      displayError(error, this.setStatsTableNoDataMessage);
-    });
-  }
-
-  verifyParams(props) {
-    const stringPropList = _.values(_.pick(props, 'ensemble_name', 'meta', 'model_id', 'variable_id', 'experiment'));
-    return (stringPropList.length > 0) && stringPropList.every(Boolean);
+    // No state update necessary.
+    return null;
   }
 
   componentDidMount() {
-    if (this.verifyParams(this.props)) {
-      this.getData(this.props);
+    this.fetchData();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      // props changed => data invalid
+      this.state.data === null ||
+      // user selected new time of year
+      this.state.timeOfYear !== prevState.timeOfYear
+    ) {
+      this.fetchData();
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.verifyParams(nextProps) && nextProps.meta.length > 0) {
-      this.getData(nextProps);
-    } else { //Didn't receive any valid data.
-      //Most likely cause in production would be the user selecting
-      //parameters (rcp, model, constiable) for which no datasets have been
-      //added to the database yet.
-      //In development, could be API or ensemble misconfiguration, database down.
-      //Display an error message on each viewer in use by this datacontroller.
-      const text = 'No data matching selected parameters available';
-      const viewerMessageDisplays = [this.setStatsTableNoDataMessage];
-      _.each(viewerMessageDisplays, function (display) {
-        if (typeof display === 'function') {
-          display(text);
-        }
-      });
+  componentWillUnmount() {
+    if (this.dataRequest) {
+      this.dataRequest.cancel();
     }
   }
 
-  exportDataTable(format) {
-    exportDataToWorksheet(
-      'stats', this.props, this.state.statsData, format,
-      { timeidx: this.state.dataTableTimeOfYear,
-        timeres: this.state.dataTableTimeScale }
+  // Data fetching
+
+  getAndValidateData(metadata) {
+    return (
+      getStats(metadata)
+      .then(validateStatsData)
+      .then(response => response.data)
     );
   }
 
   injectRunIntoStats(data) {
+    // TODO: Make this into a pure function
     // Injects model run information into object returned by stats call
     _.map(data, function (val, key) {
       const selected = this.props.meta.filter(el => el.unique_id === key);
@@ -157,33 +118,61 @@ export default class StatisticalSummaryTable extends React.Component {
     return data;
   }
 
-  //Returns the metadata object that corresponds to a unique_id
-  getMetadata(id, meta = this.props.meta) {
-    return _.find(meta, { unique_id: id });
+  fetchData() {
+    const metadata = {
+      ..._.pick(this.props,
+        'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'),
+      ...timeKeyToResolutionIndex(this.state.timeOfYear),
+    };
+    this.getAndValidateData(metadata)
+    .then(data => {
+      this.setState({
+        data: parseBootstrapTableData(
+          this.injectRunIntoStats(data), this.props.meta),
+        dataError: null,
+      });
+    }).catch(dataError => {
+      this.setState({
+        // Do we have to set data non-null here to prevent infinite update loop?
+        dataError,
+      });
+    });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    // This guards against re-rendering before calls to the data sever alter the
-    // state
-    // TODO: Consider making shallow comparisons. Deep ones are expensive.
-    // If immutable data objects are used (or functionally equivalently,
-    // new data objects each time), then shallow comparison works.
-    return !(
-      _.isEqual(nextState.statsData, this.state.statsData) &&
-      _.isEqual(nextProps.meta, this.props.meta) &&
-      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions) &&
-      _.isEqual(nextProps.area, this.props.area)
+  // User event handlers
+
+  handleChangeTimeOfYear = (timeOfYear) => {
+    this.setState({ timeOfYear });
+  };
+
+  exportDataTable(format) {
+    exportDataToWorksheet(
+      'stats', this.props, this.state.data, format,
+      { timeidx: this.state.timeOfYear,
+        timeres: this.state.dataTableTimeScale }
     );
+  }
+
+  // render helpers
+
+  dataTableOptions() {
+    // Return a data table options object appropriate to the current state.
+
+    // An error occurred
+    if (this.state.dataError) {
+      return { noDataText: errorMessage(this.state.dataError) };
+    }
+
+    // Waiting for data
+    if (this.state.data === null) {
+      return { noDataText: 'Loading data...' };
+    }
+
+    // We can haz data
+    return { noDataText: 'We have data and this message should not show' };
   }
 
   render() {
-    const statsData = this.state.statsData ? this.state.statsData : [];
-
-    const dataTableSelected = resolutionIndexToTimeKey(
-      this.state.dataTableTimeScale,
-      this.state.dataTableTimeOfYear
-    );
-
     return (
       <Panel>
         <Panel.Heading>
@@ -202,8 +191,9 @@ export default class StatisticalSummaryTable extends React.Component {
           <Row>
             <Col lg={6} md={6} sm={6}>
               <TimeOfYearSelector
-                onChange={this.updateDataTableTimeOfYear}
-                value={dataTableSelected}
+                value={this.state.timeOfYear}
+                onChange={this.handleChangeTimeOfYear}
+                {...timeResolutions(this.props.meta)}
                 inlineLabel
               />
             </Col>
@@ -214,7 +204,10 @@ export default class StatisticalSummaryTable extends React.Component {
               />
             </Col>
           </Row>
-          <DataTable data={statsData} options={this.state.statsTableOptions}/>
+          <DataTable
+            data={this.state.data || []}
+            options={this.dataTableOptions()}
+          />
         </Panel.Body>
       </Panel>
     );
