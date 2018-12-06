@@ -91,12 +91,6 @@ export default class StatisticalSummaryTable extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    if (this.dataRequest) {
-      this.dataRequest.cancel();
-    }
-  }
-
   // Data fetching
 
   getAndValidateData(metadata) {
