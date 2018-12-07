@@ -28,7 +28,7 @@ export default class LayerOpacityControl extends PureComponent {
 
   handleMouseEnter = () => this.setState({ showControls: true });
   handleMouseLeave = () => this.setState({ showControls: false });
-  
+
   toggleLayerVisibility = layerType => {
     // If current layer is visible, save its current opacity, then hide it by
     // setting its opacity to 0.
@@ -53,11 +53,59 @@ export default class LayerOpacityControl extends PureComponent {
         },
       },
     }));
-  }
+  };
 
   formatLabel = value => `${(value*100).toFixed(0)}%`;
 
   render() {
+    // One Row per layer containing controls for managing that layer's vis.
+    const layerVisibilityControls = Object.entries(this.props.layerOpacity).map(
+      ([layerType, opacity]) => {
+        const showLayer = this.state.layerState[layerType].visible;
+        return (
+          <Row key={layerType} className='layer-controls'>
+            <Row>
+              <Col lg={1} className='visibility-toggle'>
+                <Button
+                  bsSize={'xsmall'}
+                  onClick={
+                    this.toggleLayerVisibility.bind(this, layerType)
+                  }
+                >
+                  <Glyphicon
+                    glyph={showLayer ? 'eye-open' : 'eye-close'}
+                  />
+                </Button>
+              </Col>
+              <Col lg={10} className='layer-identifier'>
+                {`Climate ${layerType} layer`}
+              </Col>
+            </Row>
+            {
+              showLayer &&
+              <Row className='opacity'>
+                <Col lg={1} className='opacity-icon'>
+                  <Glyphicon glyph={'adjust'}/>
+                </Col>
+                <Col lg={10} className='opacity-control'>
+                  <InputRange
+                    // step=0.0499 ensures can go up to 100%
+                    // presumed rounding error means 0.05 won't work
+                    minValue={0} maxValue={1} step={0.0499}
+                    formatLabel={this.formatLabel}
+                    value={opacity}
+                    onChange={
+                      this.props.onChange.bind(this, layerType)
+                    }
+                  />
+                </Col>
+              </Row>
+            }
+          </Row>
+        );
+      }
+    );
+
     return (
       <StaticControl position={'topright'}>
         <div
@@ -69,54 +117,7 @@ export default class LayerOpacityControl extends PureComponent {
             this.state.showControls ?
             (
               <Grid fluid className='layer-controls-container'>
-                {
-                  Object.entries(this.props.layerOpacity).map(
-                    ([layerType, opacity]) => {
-                      const showLayer = this.state.layerState[layerType].visible;
-                      return (
-                        <Row key={layerType} className='layer-controls'>
-                          <Row>
-                            <Col lg={1} className='visibility-toggle'>
-                              <Button
-                                bsSize={'xsmall'}
-                                onClick={
-                                  this.toggleLayerVisibility.bind(this, layerType)
-                                }
-                              >
-                                <Glyphicon
-                                  glyph={showLayer ? 'eye-open' : 'eye-close'}
-                                />
-                              </Button>
-                            </Col>
-                            <Col lg={10} className='layer-identifier'>
-                              {`Climate ${layerType} layer`}
-                            </Col>
-                          </Row>
-                          {
-                            showLayer &&
-                            <Row className='opacity'>
-                              <Col lg={1} className='opacity-icon'>
-                                <Glyphicon glyph={'adjust'}/>
-                              </Col>
-                              <Col lg={10} className='opacity-control'>
-                                <InputRange
-                                  // step=0.0499 ensures can go up to 100%
-                                  // presumed rounding error means 0.05 won't work
-                                  minValue={0} maxValue={1} step={0.0499}
-                                  formatLabel={this.formatLabel}
-                                  value={opacity}
-                                  onChange={
-                                    this.props.onChange.bind(this, layerType)
-                                  }
-                                />
-                              </Col>
-                            </Row>
-                          }
-                        </Row>
-                      );
-                    }
-                  )
-                }
+                {layerVisibilityControls}
               </Grid>
             ) : (
               <Button bsSize='small'>
