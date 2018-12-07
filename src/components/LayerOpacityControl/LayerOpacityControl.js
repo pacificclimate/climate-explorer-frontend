@@ -24,6 +24,8 @@ export default class LayerOpacityControl extends PureComponent {
   handleMouseEnter = () => this.setState({ showControls: true });
   handleMouseLeave = () => this.setState({ showControls: false });
 
+  formatLabel = value => `${(value*100).toFixed(0)}%`;
+
   render() {
     return (
       <StaticControl position={'topright'}>
@@ -51,9 +53,7 @@ export default class LayerOpacityControl extends PureComponent {
                             // step=0.0499 ensures can go up to 100%
                             // presumed rounding error means 0.05 won't work
                             minValue={0} maxValue={1} step={0.0499}
-                            formatLabel={
-                              value => `${(value*100).toFixed(0)}%`
-                            }
+                            formatLabel={this.formatLabel}
                             value={opacity}
                             onChange={
                               this.props.onChange.bind(this, layerType)
