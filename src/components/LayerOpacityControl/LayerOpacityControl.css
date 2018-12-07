@@ -1,10 +1,23 @@
-/*:global(.LayerOpacityControl) {*/
-    /*width: 200px;*/
-/*}*/
+:global(.LayerOpacityControl .layer-controls-container) {
+    margin: 0 1em;
+}
 
-:global(.LayerOpacityControl .row) {
-    line-height: 1.0em;
-    padding: 0.8em 0em;
+:global(.LayerOpacityControl .layer-controls) {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+}
+
+:global(.LayerOpacityControl .layer-identifier) {
+    font-weight: bold;
+    text-align: center;
+}
+
+:global(.LayerOpacityControl .opacity) {
+    margin-top: 0.6em;
+}
+
+:global(.LayerOpacityControl .opacity-icon) {
+    top: 0.2em;
 }
 
 :global(.LayerOpacityControl .input-range) {
