@@ -22,67 +22,93 @@ export default class LayerOpacityControl extends PureComponent {
       showControls: false,
       layerState: _.mapObject(props.layerOpacity, () => ({
         visible: true,
+        prevOpacity: 0,
       })),
+      allLayersVisible: true,
     };
   }
 
   handleMouseEnter = () => this.setState({ showControls: true });
   handleMouseLeave = () => this.setState({ showControls: false });
 
-  toggleLayerVisibility = layerType => {
-    // If current layer is visible, save its current opacity, then hide it by
-    // setting its opacity to 0.
-    // If current layer is invisible, restore its saved opacity.
+  changeLayerVisibility = (layerType, visible) => {
+    // Change specified layer's visibility.
+    //
+    // If `visible` has a Boolean value, change visibility accordingly.
+    // Otherwise, toggle visibility.
+    //
+    // If no visibility change, do nothing.
+    // If hiding layer, save its current opacity, then set its opacity to 0.
+    // If showing layer, restore its saved opacity.
 
-    const currLayerVisible = this.state.layerState[layerType].visible;
+    const nextVisible = _.isBoolean(visible) ?
+      visible : !this.state.layerState[layerType].visible;
+    const change = nextVisible !== this.state.layerState[layerType].visible;
 
-    // Update layer opacity according to visibility.
+    if (!change) {
+      return;
+    }
+
+    const currentOpacity = this.props.layerOpacity[layerType];
+
+    // Update layer opacity according to next visibility.
     this.props.onChange(
       layerType,
-      currLayerVisible ? 0 : this.state.layerState[layerType].prevOpacity
+      nextVisible ? this.state.layerState[layerType].prevOpacity : 0
     );
 
-    // Update layer's visibility state: Toggle visibility flag,
+    // Update layer's visibility state: Set visibility flag to next visibility,
     // store current opacity.
     this.setState(prevState => ({
       layerState: {
         ...prevState.layerState,
         [layerType]: {
-          visible: !currLayerVisible,
-          prevOpacity: this.props.layerOpacity[layerType],
+          visible: nextVisible,
+          prevOpacity: currentOpacity,
         },
       },
     }));
   };
 
+  toggleAllLayersVisiblility = () => {
+    const nextVisible = !this.state.allLayersVisible;
+    for (const layerType in this.props.layerOpacity) {
+      this.changeLayerVisibility(layerType, nextVisible);
+    }
+    this.setState({
+      allLayersVisible: nextVisible,
+    });
+  };
+
   formatLabel = value => `${(value*100).toFixed(0)}%`;
 
   render() {
+    // TODO: Extract this to a separate component
+    const LayerVisibilityButton = ({ layerVisibility, onClick }) => (
+      <Button bsSize={'xsmall'} onClick={onClick}>
+        <Glyphicon glyph={layerVisibility ? 'eye-open' : 'eye-close'} />
+      </Button>
+    );
+
     // One Row per layer containing controls for managing that layer's vis.
     const layerVisibilityControls = Object.entries(this.props.layerOpacity).map(
       ([layerType, opacity]) => {
-        const showLayer = this.state.layerState[layerType].visible;
+        const visible = this.state.layerState[layerType].visible;
         return (
           <Row key={layerType} className='layer-controls'>
             <Row>
               <Col lg={1} className='visibility-toggle'>
-                <Button
-                  bsSize={'xsmall'}
-                  onClick={
-                    this.toggleLayerVisibility.bind(this, layerType)
-                  }
-                >
-                  <Glyphicon
-                    glyph={showLayer ? 'eye-open' : 'eye-close'}
-                  />
-                </Button>
+                <LayerVisibilityButton
+                  layerVisibility={!visible}
+                  onClick={this.changeLayerVisibility.bind(this, layerType, undefined)}
+                />
               </Col>
               <Col lg={10} className='layer-identifier'>
                 {`Climate ${layerType} layer`}
               </Col>
             </Row>
             {
-              showLayer &&
+              visible &&
               <Row className='opacity'>
                 <Col lg={1} className='opacity-icon'>
                   <Glyphicon glyph={'adjust'}/>
@@ -114,9 +140,20 @@ export default class LayerOpacityControl extends PureComponent {
           onMouseLeave={this.handleMouseLeave}
         >
           {
-            this.state.showControls ?
+            true || this.state.showControls ?
             (
               <Grid fluid className='layer-controls-container'>
+                <Row className='layer-controls'>
+                  <Col lg={1} className='visibility-toggle'>
+                    <LayerVisibilityButton
+                      layerVisibility={!this.state.allLayersVisible}
+                      onClick={this.toggleAllLayersVisiblility}
+                    />
+                  </Col>
+                  <Col lg={10} className='layer-identifier'>
+                    All climate layers
+                  </Col>
+                </Row>
                 {layerVisibilityControls}
               </Grid>
             ) : (
