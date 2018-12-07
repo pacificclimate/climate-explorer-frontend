@@ -143,17 +143,20 @@ export default class LayerOpacityControl extends PureComponent {
             true || this.state.showControls ?
             (
               <Grid fluid className='layer-controls-container'>
-                <Row className='layer-controls'>
-                  <Col lg={1} className='visibility-toggle'>
-                    <LayerVisibilityButton
-                      layerVisibility={!this.state.allLayersVisible}
-                      onClick={this.toggleAllLayersVisiblility}
-                    />
-                  </Col>
-                  <Col lg={10} className='layer-identifier'>
-                    All climate layers
-                  </Col>
-                </Row>
+                {
+                  _.keys(this.props.layerOpacity).length > 1 &&
+                  <Row className='layer-controls'>
+                    <Col lg={1} className='visibility-toggle'>
+                      <LayerVisibilityButton
+                        layerVisibility={!this.state.allLayersVisible}
+                        onClick={this.toggleAllLayersVisiblility}
+                      />
+                    </Col>
+                    <Col lg={10} className='layer-identifier'>
+                      All climate layers
+                    </Col>
+                  </Row>
+                }
                 {layerVisibilityControls}
               </Grid>
             ) : (
