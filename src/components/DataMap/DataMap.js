@@ -74,14 +74,12 @@ import _ from 'underscore';
 
 import 'proj4';
 import 'proj4leaflet';
-import { LayersControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
 import './DataMap.css';
-
 import { getLayerMinMax } from '../../data-services/ncwms';
 import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
@@ -293,19 +291,14 @@ class DataMap extends React.Component {
 
     const dataLayers = DataMap.layerTypes.map(layerType => (
       this.props[layerType] && (
-        <LayersControl.Overlay
-          name={`Climate ${layerType} layer`}
-          checked={true}
-        >
-          <DataLayer
-            layerType={layerType}
-            layerParams={{
-              ...this.props[layerType],
-              opacity: this.state.layerOpacity[layerType],
-            }}
-            onLayerRef={this.handleLayerRef.bind(this, layerType)}
-          />
-        </LayersControl.Overlay>
+        <DataLayer
+          layerType={layerType}
+          layerParams={{
+            ...this.props[layerType],
+            opacity: this.state.layerOpacity[layerType],
+          }}
+          onLayerRef={this.handleLayerRef.bind(this, layerType)}
+        />
       )
     ));
 
@@ -315,9 +308,7 @@ class DataMap extends React.Component {
       <CanadaBaseMap
         mapRef={this.handleMapRef}
       >
-        <LayersControl>
-          {dataLayers}
-        </LayersControl>
+        {dataLayers}
 
         <LayerOpacityControl
           layerOpacity={this.state.layerOpacity}
