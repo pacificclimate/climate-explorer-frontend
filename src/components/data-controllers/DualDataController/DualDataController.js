@@ -37,12 +37,8 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { Panel, Row, Col } from 'react-bootstrap';
 import _ from 'underscore';
-
-
-import DataControllerMixin from '../../DataControllerMixin';
 
 import DualAnnualCycleGraph from '../../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';
@@ -59,11 +55,9 @@ import { MEVSummary } from '../../data-presentation/MEVSummary';
 import GraphTabs from '../GraphTabs';
 
 
-export default createReactClass({
-  displayName: 'DualDataController',
-
-  propTypes: {
-    ensemble_name: PropTypes.string,
+export default class DualDataController extends React.Component {
+  static propTypes = {
+    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     comparand_id: PropTypes.string,
@@ -71,20 +65,9 @@ export default createReactClass({
     area: PropTypes.string,
     meta: PropTypes.array,
     comparandMeta: PropTypes.array,
-  },
+  };
 
-  mixins: [DataControllerMixin],
-
-  getInitialState: function () {
-    return {
-      statsData: undefined,
-    };
-  },
-
-  // TODO: Remove when DataControllerMixin is removed
-  getData: function (props) {/* Legacy: NOOP*/},
-
-  shouldComponentUpdate: function (nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
     // TODO: Consider making shallow comparisons. Deep ones are expensive.
@@ -94,9 +77,12 @@ export default createReactClass({
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.comparandMeta, this.props.comparandMeta) &&
       _.isEqual(nextProps.area, this.props.area));
-  },
+  }
 
-  graphTabsSpecs: {
+  // Spec for generating tabs containing various graphs.
+  // Property names indicate whether the dataset is a multi-year mean or not.
+  // TODO: Pull this out into new component CompareVariablesGraphs
+  static graphTabsSpecs = {
     mym: [
       { title: dualAnnualCycleTabLabel, graph: DualAnnualCycleGraph },
       { title: singleLtaTabLabel, graph: DualLongTermAveragesGraph },
@@ -106,10 +92,11 @@ export default createReactClass({
       { title: timeSeriesTabLabel, graph: DualTimeSeriesGraph },
       { title: variableResponseTabLabel, graph: DualVariableResponseGraph },
     ],
-  },
+  };
 
-  render: function () {
+  render() {
     return (
+      // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
       <Panel>
           <Panel.Heading>
             <Panel.Title>
@@ -128,10 +115,10 @@ export default createReactClass({
           <Panel.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
-              specs={this.graphTabsSpecs}
+              specs={DualDataController.graphTabsSpecs}
             />
           </Panel.Body>
         </Panel>
     );
-  },
-});
+  }
+}

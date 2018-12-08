@@ -1,3 +1,12 @@
+// DEPRECATED: DO NOT MAINTAIN THIS MODULE. REMOVE WHEN SOLE REMAINING
+// DEPENDENCY IS REMOVED.
+//
+// We are moving away from mixins.
+// (see [Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+// This mixin is no longer relevant, since it is only used in the deprecated
+// component MotiDataController. Dependence on it has been removed from all other
+// data controllers.
+
 /*********************************************************************
  * DataControllerMixin.js - shared functionality for data controllers
  * 
@@ -47,7 +56,7 @@ var ModalMixin = {
       //In development, could be API or ensemble misconfiguration, database down.
       //Display an error message on each viewer in use by this datacontroller.
       var text = "No data matching selected parameters available";
-      var viewerMessageDisplays = [this.setStatsTableNoDataMessage];
+      var viewerMessageDisplays = [this.displayNoDataMessage];
       _.each(viewerMessageDisplays, function(display) {
         if(typeof display == 'function') {
           display(text);

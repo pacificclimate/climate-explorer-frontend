@@ -33,147 +33,57 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { Row, Col, Panel } from 'react-bootstrap';
 import _ from 'underscore';
 
-import { parseBootstrapTableData,
-         timeKeyToResolutionIndex,
-         resolutionIndexToTimeKey,
-         validateStatsData } from '../../../core/util';
-import DataTable from '../../DataTable/DataTable';
-import TimeOfYearSelector from '../../Selector/TimeOfYearSelector';
-import DataControllerMixin from '../../DataControllerMixin';
-import { displayError, multiYearMeanSelected } from '../../graphs/graph-helpers';
 import SingleAnnualCycleGraph from '../../graphs/SingleAnnualCycleGraph';
 import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
 import SingleContextGraph from '../../graphs/SingleContextGraph';
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
-import { getStats } from '../../../data-services/ce-backend';
 import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
 import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
 import {
   singleAnnualCycleTabLabel, changeFromBaselineTabLabel,
   singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
-  timeSeriesTabLabel, statsTableLabel,
+  timeSeriesTabLabel,
   graphsPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
-import ExportButtons from '../../graphs/ExportButtons';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import GraphTabs from '../GraphTabs';
+import StatisticalSummaryTable from '../../StatisticalSummaryTable';
 
 
-// TODO: Remove DataControllerMixin and convert to class extension style when 
-// no more dependencies on DataControllerMixin remain
-export default createReactClass({
-  displayName: 'SingleDataController',
-
-  propTypes: {
+export default class SingleDataController extends React.Component {
+  static propTypes = {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
     area: PropTypes.string,
     meta: PropTypes.array,
     contextMeta: PropTypes.array,
-    ensemble_name: PropTypes.string,
-  },
+    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
+  };
 
-  mixins: [DataControllerMixin],
-
-  getInitialState: function () {
-    return {
-      dataTableTimeOfYear: 0,
-      dataTableTimeScale: 'monthly',
-      statsData: undefined,
-    };
-  },
-
-  /*
-   * Called when SingleDataController is first loaded. Selects and fetches 
-   * arbitrary initial data to display in the graphs and stats table. 
-   * Monthly time resolution, January, on the first run returned by the API.
-   */
-  getData: function (props) {
-    //if the selected dataset is a multi-year mean, load annual cycle
-    //and long term average graphs, otherwise load a timeseries graph
-    if (multiYearMeanSelected(props)) {
-      this.loadDataTable(props);
-    }
-    else {
-      this.loadDataTable(props, { timeidx: 0, timescale: "yearly" });
-    }
-  },
-
-  //Removes all data from the Stats Table and displays a message
-  setStatsTableNoDataMessage: function (message) {
-    this.setState({
-      statsTableOptions: { noDataText: message },
-      statsData: [],
-    });
-  },
-
-  shouldComponentUpdate: function (nextProps, nextState) {
+  // TODO: Is this necessary?
+  shouldComponentUpdate(nextProps, nextState) {
     // This guards against re-rendering before calls to the data sever alter the
     // state
     // TODO: Consider making shallow comparisons. Deep ones are expensive.
     // If immutable data objects are used (or functionally equivalently,
     // new data objects each time), then shallow comparison works.
     return !(
-      _.isEqual(nextState.statsData, this.state.statsData) &&
       _.isEqual(nextProps.meta, this.props.meta) &&
-      _.isEqual(nextState.statsTableOptions, this.state.statsTableOptions) &&
       _.isEqual(nextProps.area, this.props.area)
      );
-  },
+  }
 
-  /*
-   * Called when the user selects a time of year to display on the stats
-   * table. Fetches new data, records the new time index and resolution
-   * in state, and updates the table.
-   */
-  updateDataTableTimeOfYear: function (timeidx) {
-    this.loadDataTable(this.props, timeKeyToResolutionIndex(timeidx));
-  },
-
-  /*
-   * This function fetches and loads data for the Stats Table. 
-   * If passed a time of year(resolution and index), it will load
-   * data for that time of year. Otherwise, it defaults to January 
-   * (resolution: "monthly", index 0). 
-   */
-  loadDataTable: function (props, time) {
-    
-    var timeidx = time ? time.timeidx : this.state.dataTableTimeOfYear;
-    var timeres = time ? time.timescale : this.state.dataTableTimeScale;
-
-    //load stats table
-    this.setStatsTableNoDataMessage('Loading Data');
-    var myStatsPromise = getStats(props, timeidx, timeres).then(validateStatsData);
-
-    myStatsPromise.then(response => {
-      if (_.allKeys(response.data).length > 0) {
-        this.setState({
-          dataTableTimeOfYear: timeidx,
-          dataTableTimeScale: timeres,
-          statsData: parseBootstrapTableData(this.injectRunIntoStats(response.data), props.meta),
-        });
-      }
-      else {
-        this.setState({
-          dataTableTimeOfYear: timeidx,
-          dataTableTimeScale: timeres,
-        });
-        this.setStatsTableNoDataMessage('Statistics unavailable for this time period.');
-      }
-    }).catch(error => {
-      displayError(error, this.setStatsTableNoDataMessage);
-    });
-  },
-
-  graphTabsSpecs: {
+  // Spec for generating tabs containing various graphs.
+  // Property names indicate whether the dataset is a multi-year mean or not.
+  // TODO: Pull this out into new component SingleVariableGraphs
+  static graphTabsSpecs = {
     mym: [
       { title: singleAnnualCycleTabLabel, graph: SingleAnnualCycleGraph },
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
@@ -184,19 +94,11 @@ export default createReactClass({
     notMym: [
       { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
     ],
-  },
+  };
 
-  render: function () {
-    const statsData = this.state.statsData ? this.state.statsData : this.blankStatsData;
-
-    const dataTableSelected = resolutionIndexToTimeKey(
-      this.state.dataTableTimeScale,
-      this.state.dataTableTimeOfYear
-    );
-
-    // Spec for generating tabs containing various graphs.
-    // Property names indicate whether the dataset is a multi-year mean or not.
+  render() {
     return (
+      // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
       <div>
         <Panel>
           <Panel.Heading>
@@ -216,48 +118,16 @@ export default createReactClass({
           <Panel.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
-              specs={this.graphTabsSpecs}
+              specs={SingleDataController.graphTabsSpecs}
             />
           </Panel.Body>
         </Panel>
 
         <FlowArrow>filtered datasets</FlowArrow>
 
-        <Panel>
-          <Panel.Heading>
-            <Panel.Title>
-              <Row>
-                <Col lg={4}>
-                  {statsTableLabel}
-                </Col>
-                <Col lg={8}>
-                  <MEVSummary
-                    className={styles.mevSummary} {...this.props}
-                  />
-                </Col>
-              </Row>
-            </Panel.Title>
-          </Panel.Heading>
-          <Panel.Body className={styles.data_panel}>
-            <Row>
-              <Col lg={6} md={6} sm={6}>
-                <TimeOfYearSelector
-                  onChange={this.updateDataTableTimeOfYear}
-                  value={dataTableSelected}
-                  inlineLabel
-                />
-              </Col>
-              <Col lg={6} md={6} sm={6}>
-                <ExportButtons
-                  onExportXlsx={this.exportDataTable.bind(this, 'xlsx')}
-                  onExportCsv={this.exportDataTable.bind(this, 'csv')}
-                />
-              </Col>
-            </Row>
-            <DataTable data={statsData} options={this.state.statsTableOptions}/>
-          </Panel.Body>
-        </Panel>
+        <StatisticalSummaryTable {...this.props} />
+
       </div>
     );
-  },
-});
+  }
+}
