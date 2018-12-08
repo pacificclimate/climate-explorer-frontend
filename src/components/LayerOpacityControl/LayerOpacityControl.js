@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Row, Col, Button, Glyphicon } from 'react-bootstrap';
 
+import layersIcon from 'leaflet/dist/images/layers.png';
+
 import _ from 'underscore';
 
 import InputRange from 'react-input-range';
@@ -177,8 +179,8 @@ export default class LayerOpacityControl extends PureComponent {
                 {layerVisibilityControls}
               </Grid>
             ) : (
-              <Button bsSize='small'>
-                <Glyphicon glyph='adjust' />
+              <Button>
+                <img src={layersIcon}/>
               </Button>
             )
           }
