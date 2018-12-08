@@ -22,11 +22,7 @@ import {
   timeResolutions,
   validateStatsData,
 } from '../../core/util';
-
-// TODO: Replace stub with import when new code integrated from LTA graph fix
-// import { errorMessage } from '../graphs/graph-helpers';
-const errorMessage = () => 'Error fetching data.';  // Temporary stub.
-
+import { errorMessage } from '../graphs/graph-helpers';
 import { exportDataToWorksheet } from '../../core/export';
 
 
