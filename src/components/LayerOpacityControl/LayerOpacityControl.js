@@ -157,7 +157,7 @@ export default class LayerOpacityControl extends PureComponent {
           onMouseLeave={this.handleMouseLeave}
         >
           {
-            true || this.state.showControls ?
+            this.state.showControls ?
             (
               <Grid fluid className='layer-controls-container'>
                 {
