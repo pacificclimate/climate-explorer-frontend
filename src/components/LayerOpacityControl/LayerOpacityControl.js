@@ -40,6 +40,9 @@ export default class LayerOpacityControl extends PureComponent {
     // If no visibility change, do nothing.
     // If hiding layer, save its current opacity, then set its opacity to 0.
     // If showing layer, restore its saved opacity.
+    //
+    // Update the all-layers toggling state if we go to all hidden
+    // or all visible.
 
     const nextVisible = _.isBoolean(visible) ?
       visible : !this.state.layerState[layerType].visible;
@@ -58,16 +61,30 @@ export default class LayerOpacityControl extends PureComponent {
     );
 
     // Update layer's visibility state: Set visibility flag to next visibility,
-    // store current opacity.
-    this.setState(prevState => ({
-      layerState: {
+    // store current opacity for restoration later.
+
+    this.setState(prevState => {
+      const layerState = {
         ...prevState.layerState,
         [layerType]: {
           visible: nextVisible,
           prevOpacity: currentOpacity,
         },
-      },
-    }));
+      };
+
+      // If we're now showing all layers, change all-layers toggling accordingly
+      if (_.every(layerState, 'visible')) {
+        return { layerState, allLayersVisible: true };
+      }
+
+      // If we're now hiding all layers, change all-layers toggling accordingly
+      if (!_.some(layerState, 'visible')) {
+        return { layerState, allLayersVisible: false };
+      }
+
+      // Otherwise don't mess with the all-layers toggling state
+      return { layerState };
+    });
   };
 
   toggleAllLayersVisiblility = () => {
