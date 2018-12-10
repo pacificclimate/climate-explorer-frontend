@@ -100,8 +100,8 @@ class DataMap extends React.Component {
     annotated: layerParamsPropTypes,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
-    activeGeometryStyle: PropTypes.string.isRequired,
-    inactiveGeometryStyle: PropTypes.string.isRequired,
+    activeGeometryStyle: PropTypes.object.isRequired,
+    inactiveGeometryStyle: PropTypes.object.isRequired,
     children: PropTypes.node,
   };
 
