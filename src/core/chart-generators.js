@@ -152,6 +152,7 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   let y2Units = '';
 
   // if a y axis already exists, add new data to it.
+  // TODO: this code is undertested, as at present we aren't using it
   if (nestedAttributeIsDefined(graph, 'axis', 'y')) {
     if (nestedAttributeIsDefined(graph, 'axis', 'y', 'groupBy')
         && nestedAttributeIsDefined(graph, 'axis', 'y', 'units')) {
@@ -165,6 +166,9 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
     }
   }
   // if a second y axis already exists, use it.
+  // TODO: This code is included for completeness, but not currently
+  // reachable - new data are never added to an existing graph -
+  // nor well tested.
   if (nestedAttributeIsDefined(graph, 'axis', 'y2')) {
     if (nestedAttributeIsDefined(graph, 'axis', 'y2', 'groupBy')
         && nestedAttributeIsDefined(graph, 'axis', 'y2', 'units')) {
@@ -227,8 +231,8 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   if (y2Group) {
     const y2Label = groupByUnits ? y2Units : `${y2Group} ${y2Units}`;
     graph.axis.y2 = formatYAxis(y2Label);
-    graph.axis.y.units = y2Units;
-    graph.axis.y.groupBy = {
+    graph.axis.y2.units = y2Units;
+    graph.axis.y2.groupBy = {
       type: groupBy,
       value: y2Group,
     };

@@ -289,6 +289,39 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
 }
 
 /*
+ * Post-processing graph function that accepts a graph with two y axes and
+ * sets the axes to have the same range.
+ * 
+ * Most of the time, if two y-axes have the same range, a single shared y-axis
+ * should obviously be used instead. However, for graphs that are *normally*
+ * displayed with 2 y-axes, having two identical y-axes may be a better option
+ * than either: 1) having an axis that appears and disappears depending on
+ * the data range, or 2) having two misleadingly *almost* identical axes.
+ * 
+ * This graph transform function is for those limited circumstances.
+ */
+function matchYAxisRange(graph) {
+  const y = graph.axis.y;
+  const y2 = graph.axis.y2;
+  
+  if(!(y && y2)) {
+    throw new Error("Error: cannot match single axis range");
+  }
+
+  const ymin = y.min ? y.min : _.min(_.map(getDataSeriesByAxis(graph, "y"), series => _.min(series)));
+  const ymax = y.max ? y.max : _.max(_.map(getDataSeriesByAxis(graph, "y"), series => _.max(series)));
+  const y2min = y2.min ? y2.min : _.min(_.map(getDataSeriesByAxis(graph, "y2"), series => _.min(series)));
+  const y2max = y2.max ? y2.max : _.max(_.map(getDataSeriesByAxis(graph, "y2"), series => _.max(series)));
+
+  graph.axis.y.min = Math.min(ymin, y2min);
+  graph.axis.y2.min = Math.min(ymin, y2min);
+  graph.axis.y.max = Math.max(ymax, y2max);
+  graph.axis.y2.max = Math.max(ymax, y2max);
+  return graph;
+}
+
+
+/*
  * Post-processing graph function that alters the graph to only display
  * numerical values for axis ticks inside a certain range. This is 
  * intended to help make it clearer which data series are
@@ -329,7 +362,7 @@ function hideTicksByRange(graph, axis = "y", min, max) {
 
 module.exports = { assignColoursByGroup, fadeSeriesByRank,
     hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
-    padYAxis, hideTicksByRange,
+    padYAxis, matchYAxisRange, hideTicksByRange,
     //helper functions exported only for testing:
     getDataSeriesByAxis
     };

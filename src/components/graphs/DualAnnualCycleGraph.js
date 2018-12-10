@@ -5,11 +5,14 @@ import _ from 'underscore';
 import {timeseriesToAnnualCycleGraph} from '../../core/chart-generators';
 import {assignColoursByGroup,
         fadeSeriesByRank,
-        padYAxis} from '../../core/chart-formatters';
+        padYAxis,
+        matchYAxisRange} from '../../core/chart-formatters';
+import {hasTwoYAxes,
+        yAxisUnits,
+        yAxisRange, } from '../../core/chart-accessors';
 import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 import { getVariableOptions } from '../../core/util';
-
 
 export default function DualAnnualCycleGraph(props) {
   function getMetadata(dataSpec) {
@@ -108,7 +111,7 @@ export default function DualAnnualCycleGraph(props) {
     graph = fadeSeriesByRank(graph, rankByTimeResolution);
 
     // In a few cases, different variables move in lockstep over the course of
-    // the year, e.g tasmin and tasmax: tasmin is almost always about 10
+    // the year, e.g tasmin and tasmax: tasmin is almost always about 9
     // degrees lower than tasmax. These pairs of variables will be hard to
     // understand in a comparison graph, because c3's normally excellent
     // smart formatting will automatically scale each data set vertically
@@ -119,8 +122,8 @@ export default function DualAnnualCycleGraph(props) {
     // expected to have this issue. If either of the two currently displayed
     // variables lists the other as a visual conflict (using the "shiftAnnualCycle"
     // attribute), they will be detangled by padding the graph y-scales to
-    // shift the graph lines apart vertically.
-    if(!_.isUndefined(graph.axis.y2)
+    // shift their respective graph lines apart vertically.
+    if(hasTwoYAxes(graph)
         && props.comparand_id !== props.variable_id) {
       // see if either variable is listed as conflicting with the other
       let overlap = false;
@@ -133,22 +136,29 @@ export default function DualAnnualCycleGraph(props) {
         overlap = true;
       }
       if(overlap) {
-        // find which set of data series has larger values;
-        // the larger-valued will be shifted upward
-        let maximum = -Infinity;
-        let maxName = "";
-        for(let i = 0; i < graph.data.columns.length; i++) {
-          const series = graph.data.columns[i];
-          const seriesMax = _.max(series);
-          if(seriesMax > maximum) {
-            maximum = seriesMax;
-            maxName = series[0];
-          }
+        // if the two data series have overlapping ranges and the same units,
+        // set their y axes to the same range to avoid 
+        // the misleading visuals of *slightly* different y axes.
+        //
+        // otherwise, just pad each axis by a flat 20% to move the
+        // data sets apart visually.
+
+        // determine whether the data ranges overlap:
+        const yRange = yAxisRange(graph, 'y');
+        const y2Range = yAxisRange(graph, 'y2');
+        if (yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
+            (((yRange.min < y2Range.min) && (yRange.max > y2Range.min)) ||
+             ((yRange.min < y2Range.max) && (yRange.max > y2Range.max)))) {
+          // y axes will have the same range
+          graph = matchYAxisRange(graph);
         }
-        const upAxis = graph.data.axes[maxName];
-        const downAxis = upAxis === 'y' ? 'y2' : 'y';
-        graph = padYAxis(graph, upAxis, "bottom", .2);
-        graph = padYAxis(graph, downAxis, "top", .2);
+        else {
+          // y axes padded by 20%
+          const shiftUpAxis = yRange.max > y2Range.max ? "y" : "y2";
+          const shiftDownAxis = yRange.max < y2Range.max ? "y" : "y2";
+          graph = padYAxis(graph, shiftUpAxis, "bottom", .2);
+          graph = padYAxis(graph, shiftDownAxis, "top", .2);
+        }
       }
     }
     return graph;
