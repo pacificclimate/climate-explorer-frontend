@@ -34,6 +34,9 @@
       "CE_ENSEMBLE_NAME": "ce",
       "CE_CURRENT_VERSION": "Climate Explorer test version"
     },
+    "moduleNameMapper": {
+      "\\.(png|jpg|gif|ttf|eot|svg)$": "<rootDir>/test_support/jest/__mocks__/fileMock.js"
+    },
     "unmockedModulePathPatterns": [
       "fbjs",
       "react",
