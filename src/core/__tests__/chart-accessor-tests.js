@@ -17,13 +17,13 @@ const mockAPI = require('../__test_data__/sample-API-results');
 
 describe('hasTwoYAxes', function () {
   const metadata = mockAPI.metadataToArray();
-  it('detects graphs that have only 1 y-axis', function (){
+  it('detects graphs that have only 1 y-axis', function () {
     const graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
         mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
     expect(ca.hasTwoYAxes(graph)).toBe(false);
   });
   it('detects graphs that have 2 y-axes', function () {
-    const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+    const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
         mockAPI.monthlyTasmaxTimeseries,
         mockAPI.monthlyPrTimeseries);
     expect(ca.hasTwoYAxes(graph)).toBe(true);
@@ -31,8 +31,7 @@ describe('hasTwoYAxes', function () {
 });
 
 describe('checkYAxisValidity', function () {
-  const metadata = mockAPI.metadataToArray();
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
       mockAPI.monthlyTasmaxTimeseries,
       mockAPI.monthlyPrTimeseries);
   it('does nothing for valid axes', function () {
@@ -48,8 +47,7 @@ describe('checkYAxisValidity', function () {
 });
 
 describe('yAxisUnits', function () {
-  const metadata = mockAPI.metadataToArray();
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
       mockAPI.monthlyTasmaxTimeseries,
       mockAPI.monthlyPrTimeseries);
   it('returns the units associated with the y axis', function () {
@@ -59,8 +57,7 @@ describe('yAxisUnits', function () {
 });
 
 describe('yAxisRange', function () {
-  const metadata = mockAPI.metadataToArray();
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
       mockAPI.monthlyTasmaxTimeseries,
       mockAPI.monthlyPrTimeseries);
   it('calculates the min and max of data associated with a y-axis', function () {
@@ -69,6 +66,4 @@ describe('yAxisRange', function () {
     expect(ca.yAxisRange(graph, 'y2').min).toBe(0.7965349522694691);
     expect(ca.yAxisRange(graph, 'y2').max).toBe(1.7647179206314954);
   });
-  
 });
-
