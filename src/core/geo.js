@@ -118,7 +118,6 @@ var g = {
   },
 
   save: function (format) {
-    console.log(`geo.save('${format}'):`, this.feature)
     switch (format) {
       case 'wkt':
         saveAs(
