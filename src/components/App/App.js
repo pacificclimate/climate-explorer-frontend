@@ -21,6 +21,7 @@ import About from '../guidance-content/about/About';
 import logo from '../../assets/logo.png';
 import marmot from '../../assets/marmot.png';
 import styles from './App.css';
+import '!style!css!react-input-range/lib/css/index.css';
 
 
 export default class App extends React.Component {

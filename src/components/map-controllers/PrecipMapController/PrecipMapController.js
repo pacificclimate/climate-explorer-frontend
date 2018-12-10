@@ -35,8 +35,6 @@ import DataMap from '../../DataMap';
 import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
-import GeoLoader from '../../GeoLoader';
-import GeoExporter from '../../GeoExporter';
 
 import { hasValidData, currentDataSpec,
          updateLayerSimpleState, updateLayerTime,
@@ -257,6 +255,7 @@ export default class PrecipMapController extends React.Component {
                   dataset: getDatasetId.bind(
                     this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
                   ...this.state.raster,
+                  defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
                 }}
 
@@ -264,6 +263,7 @@ export default class PrecipMapController extends React.Component {
                   dataset: getDatasetId.bind(
                     this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
                   ...this.state.annotated,
+                  defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeAnnotatedRange,
                 }}
 
@@ -271,7 +271,7 @@ export default class PrecipMapController extends React.Component {
                 area={this.props.area}
               >
 
-                <StaticControl position='topright' style={{ marginRight: '70px' }}>
+                <StaticControl position='topright'>
                   <MapSettings
                     title='Map Settings'
                     meta={this.props.meta}

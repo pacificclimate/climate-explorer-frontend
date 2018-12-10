@@ -4,6 +4,7 @@
   "description": "PCIC Climate Explorer front end application",
   "main": "index.js",
   "scripts": {
+    "reinstall": "rm -rf ./node_modules && npm install",
     "prestart": "if [ ! -f ./variable-options.yaml ]; then touch ./variable-options.yaml; fi",
     "start": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback",
     "build": "webpack --progress --colors",
@@ -33,6 +34,9 @@
       "CE_ENSEMBLE_NAME": "ce",
       "CE_CURRENT_VERSION": "Climate Explorer test version"
     },
+    "moduleNameMapper": {
+      "\\.(png|jpg|gif|ttf|eot|svg)$": "<rootDir>/test_support/jest/__mocks__/fileMock.js"
+    },
     "unmockedModulePathPatterns": [
       "fbjs",
       "react",
@@ -59,6 +63,7 @@
     "react-bootstrap": "^0.32.0",
     "react-bootstrap-table": "^4.3.1",
     "react-dom": "^16.6.3",
+    "react-input-range": "^1.3.0",
     "react-leaflet": "^2.0.0",
     "react-leaflet-draw": "^0.19.0",
     "react-router-bootstrap": "^0.24.4",
