@@ -150,6 +150,27 @@ export function getVariableOptions(variable, option) {
 }
 
 /************************************************************
+ * Data spec helper functions
+ */
+
+/*
+ * Determine a valid default data spec given a set of metadata
+ * and model, variable, and experiment values.
+ *
+ * Prefers the highest-resolution data available
+ */
+export function defaultDataSpec({ meta, model_id, variable_id, experiment }) {
+  for (const timescale of ['monthly', 'seasonal', 'yearly']) {
+    const matchingMetadata =
+      _.findWhere(meta, { model_id, variable_id, experiment, timescale });
+    if (matchingMetadata) {
+      return _.pick(matchingMetadata,
+        'start_date', 'end_date', 'ensemble_member');
+    }
+  }
+}
+
+/************************************************************
  * Date and calendar helper functions
  *
  * Several different representations of time are needed to
