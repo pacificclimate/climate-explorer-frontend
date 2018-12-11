@@ -10,15 +10,15 @@ import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
 import { getTimeseries } from '../../../data-services/ce-backend';
 import {
+  defaultDataSpec,
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData,
 } from '../../../core/util';
 import {
-  displayError,
   noDataMessageGraphSpec,
-  blankGraphSpec,
   multiYearMeanSelected,
-  shouldLoadData,
+  errorMessage,
+  loadingDataGraphSpec,
 } from '../graph-helpers';
 
 // This component renders an annual cycle graph, including a selector
@@ -54,71 +54,98 @@ export default class AnnualCycleGraph extends React.Component {
     // this general component to particular cases (single vs. dual controller).
   };
 
+  ///////////////////////////////////////////////////////////////////////////
+  // NEW
+
+  // Lifecycle hooks
+  // Follows React 16+ lifecycle API and recommendations.
+  // See https://reactjs.org/blog/2018/03/29/react-v-16-3.html
+  // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
+  // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
+
   constructor(props) {
     super(props);
 
-    const { start_date, end_date, ensemble_member } =
-      this.initialDataSpec(this.props);
     this.state = {
-      dataSpec: { start_date, end_date, ensemble_member },
-      graphSpec: blankGraphSpec,
+      prevMeta: null,
+      prevArea: null,
+      dataSpec: defaultDataSpec(this.props),
+      data: null,
+      dataError: null,
     };
   }
 
-  initialDataSpec({ meta, model_id, variable_id, experiment }) {
-    //selects a starting dataspec, preferring one with the highest-resolution data available.
-    return (
-      _.findWhere(meta,
-          { model_id, variable_id, experiment, timescale: 'monthly' }) ||
-      _.findWhere(meta,
-          { model_id, variable_id, experiment, timescale: 'seasonal' }) ||
-      _.findWhere(meta,
-          { model_id, variable_id, experiment, timescale: 'yearly' })
-    );
+  static getDerivedStateFromProps(props, state) {
+    if (
+      // Assumes that metadata changes when model, variable, or experiment does.
+      props.meta !== state.prevMeta ||
+      props.area !== state.prevArea
+    ) {
+      return {
+        prevMeta: props.meta,
+        prevArea: props.area,
+        dataSpec: defaultDataSpec(props),
+        data: null,  // Signal that data fetch is required
+        dataError: null,
+      };
+    }
+
+    // No state update necessary.
+    return null;
   }
 
-  displayNoDataMessage = (message) => {
-    //Removes all data from the graph and displays a message
-    this.setState({
-      graphSpec: noDataMessageGraphSpec(message),
-    });
-  };
+  componentDidMount() {
+    this.fetchData();
+  }
 
-  getAndValidateTimeseries(metadata, area) {
-    const validate = multiYearMeanSelected(this.props) ?
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      // props changed => data invalid
+      this.state.data === null ||
+      // user selected new dataset
+      this.state.dataSpec !== prevState.dataSpec  // TODO: Deep comparison??
+    ) {
+      this.fetchData();
+    }
+  }
+
+  // Data fetching
+
+  getAndValidateData(metadata, area) {
+    const validateData = multiYearMeanSelected(this.props) ?
       validateAnnualCycleData :
       validateUnstructuredTimeseriesData;
     return (
-      getTimeseries(metadata, area)
-        .then(validate)
-        .then(response => response.data)
+      getTimeseries(metadata, this.props.area)
+      .then(validateData)
+      .then(response => response.data)
     );
   }
 
-  loadGraph() {
-    // Fetch monthly, seasonal, and yearly resolution annual cycle data,
-    // then convert it to a graph spec and set state accordingly.
+  getMetadatas = () =>
+    // This fn is called multiple times, so memoize it if inefficient
+    this.props.getMetadata(this.state.dataSpec)
+    .filter(metadata => !!metadata);
 
-    if (!shouldLoadData(this.props, this.displayNoDataMessage)) {
-      return;
-    }
-
-    const dataSpecMetadata =
-      this.props.getMetadata(this.state.dataSpec)
-        .filter(metadata => !!metadata);
-    const timeseriesPromises =
-      dataSpecMetadata.map(metadata =>
-        this.getAndValidateTimeseries(metadata, this.props.area)
-      );
-
-    Promise.all(timeseriesPromises).then(data => {
+  fetchData() {
+    Promise.all(
+      this.getMetadatas()
+      .map(metadata => this.getAndValidateData(metadata))
+    )
+    .then(data => {
       this.setState({
-        graphSpec: this.props.dataToGraphSpec(dataSpecMetadata, data),
+        data,
+        dataError: null,
       });
-    }).catch(error => {
-      displayError(error, this.displayNoDataMessage);
+    }).catch(dataError => {
+      this.setState({
+        // Do we have to set data non-null here to prevent infinite update loop?
+        dataError,
+      });
     });
   }
+
+  // User event handlers
 
   // TODO: Refactor to eliminate encoding of dataSpec
   handleChangeDataSpec = (dataSpec) => {
@@ -129,29 +156,32 @@ export default class AnnualCycleGraph extends React.Component {
     exportDataToWorksheet(
       'timeseries',
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
-      this.state.graphSpec,
+      this.graphSpec(),
       format,
       this.state.dataSpec
     );
   }
-  
+
   handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
-  
-  // Lifecycle hooks
 
-  componentDidMount() {
-    this.loadGraph();
-  }
+  // render helpers
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps.meta !== this.props.meta ||
-      prevProps.area !== this.props.area ||
-      !_.isEqual(prevState.dataSpec, this.state.dataSpec)
-    ) {
-      this.loadGraph();
+  graphSpec() {
+    // Return a graphSpec appropriate to the given state
+
+    // An error occurred
+    if (this.state.dataError) {
+      return noDataMessageGraphSpec(errorMessage(this.state.dataError));
     }
+
+    // Waiting for data
+    if (this.state.data === null) {
+      return loadingDataGraphSpec;
+    }
+
+    // We can haz data
+    return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
   }
 
   render() {
@@ -176,7 +206,7 @@ export default class AnnualCycleGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph {...this.state.graphSpec}/>
+            <DataGraph {...this.graphSpec()}/>
           </Col>
         </Row>
       </React.Fragment>
