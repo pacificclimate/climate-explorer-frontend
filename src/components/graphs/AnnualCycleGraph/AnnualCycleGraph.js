@@ -119,7 +119,6 @@ export default class AnnualCycleGraph extends React.Component {
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
-      console.log('ACG.getDerivedStateFromProps: props change')
       const dataSpec = defaultDataSpec(props);
       return {
         prevMeta: props.meta,
@@ -138,7 +137,6 @@ export default class AnnualCycleGraph extends React.Component {
     if (
       state.prevDataSpec !== state.dataSpec
     ) {
-      console.log('ACG.getDerivedStateFromProps: state change')
       return {
         prevDataSpec: state.dataSpec,
         fetchingData: false,  // not quite yet
@@ -180,28 +178,22 @@ export default class AnnualCycleGraph extends React.Component {
     .filter(metadata => !!metadata);
 
   fetchData() {
-    console.log('ACG.fetchData')
     this.setState({ fetchingData: true });
     Promise.all(
       this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
-      console.log('ACG.fetchData: data received')
       this.setState({
         fetchingData: false,
         data,
         dataError: null,
       });
     }).catch(dataError => {
-      console.log('ACG.fetchData: error', dataError)
       this.setState({
         // Do we have to set data non-null here to prevent infinite update loop?
         fetchingData: false,
         dataError,
-      }).finally(() => {
-        console.log('ACG.fetchData: finally')
-        this.setState({ fetchingData: false });
       });
     });
   }
