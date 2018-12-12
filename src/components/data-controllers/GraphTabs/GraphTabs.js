@@ -49,7 +49,7 @@ export default class GraphTabs extends React.Component {
       );
 
     return (
-      <Tabs id='Graphs'>
+      <Tabs id='Graphs' mountOnEnter>
         {graphTabs}
       </Tabs>
     );
