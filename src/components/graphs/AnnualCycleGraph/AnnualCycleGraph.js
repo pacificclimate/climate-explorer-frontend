@@ -76,11 +76,14 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
+    console.log('ACG.getDerivedStateFromProps, props =', props)
+    console.log('ACG.getDerivedStateFromProps, state =', state)
     if (
       // Assumes that metadata changes when model, variable, or experiment does.
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
+      console.log('ACG.getDerivedStateFromProps: meta or area changed')
       return {
         prevMeta: props.meta,
         prevArea: props.area,
@@ -98,12 +101,23 @@ export default class AnnualCycleGraph extends React.Component {
     this.fetchData();
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+    if (!_.isEqual(this.state.dataSpec, nextState.dataSpec)
+      && this.state.data === nextState.data
+    ) {
+      return false;
+    }
+    return true;
+  }
+
   componentDidUpdate(prevProps, prevState) {
+    console.log('ACG.componentDidUpdate')
     if (
       // props changed => data invalid
       this.state.data === null ||
       // user selected new dataset
-      this.state.dataSpec !== prevState.dataSpec  // TODO: Deep comparison??
+      !_.isEqual(this.state.dataSpec, prevState.dataSpec)  // TODO: Deep comparison??
     ) {
       this.fetchData();
     }
@@ -111,7 +125,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   // Data fetching
 
-  getAndValidateData(metadata, area) {
+  getAndValidateData(metadata) {
     const validateData = multiYearMeanSelected(this.props) ?
       validateAnnualCycleData :
       validateUnstructuredTimeseriesData;
@@ -128,11 +142,13 @@ export default class AnnualCycleGraph extends React.Component {
     .filter(metadata => !!metadata);
 
   fetchData() {
+    console.log('ACG.fetchData: start data fetches')
     Promise.all(
       this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
+      console.log('ACG.fetchData: data received')
       this.setState({
         data,
         dataError: null,
@@ -181,7 +197,15 @@ export default class AnnualCycleGraph extends React.Component {
     }
 
     // We can haz data
-    return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
+    console.log('ACG.graphSpec(), metadatas =', this.getMetadatas())
+    console.log('ACG.graphSpec(), data =', this.state.data)
+    try {
+      console.log('ACG.graphSpec(): invoking dataToGraphSpec')
+      return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
+    } catch (error) {
+      console.log('ACG.graphSpec(): error thrown in dataToGraphSpec')
+      return noDataMessageGraphSpec(errorMessage(error));
+    }
   }
 
   render() {
