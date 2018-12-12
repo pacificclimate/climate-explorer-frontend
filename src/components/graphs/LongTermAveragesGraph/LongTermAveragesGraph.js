@@ -108,7 +108,6 @@ export default class LongTermAveragesGraph extends React.Component {
   // Data fetching
 
   getAndValidateData(metadata) {
-    // TODO: Should this be submitting this.props.area????
     return (
       getData(metadata)
       .then(validateLongTermAverageData)
