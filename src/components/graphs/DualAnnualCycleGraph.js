@@ -126,15 +126,12 @@ export default function DualAnnualCycleGraph(props) {
     if(hasTwoYAxes(graph)
         && props.comparand_id !== props.variable_id) {
       // see if either variable is listed as conflicting with the other
-      let overlap = false;
       const variableOverlaps = getVariableOptions(props.variable_id, "shiftAnnualCycle");
-      if(variableOverlaps && variableOverlaps.includes(props.comparand_id)) {
-        overlap = true;
-      }
       const comparandOverlaps = getVariableOptions(props.comparand_id, "shiftAnnualCycle");
-      if(comparandOverlaps && comparandOverlaps.includes(props.variable_id)) {
-        overlap = true;
-      }
+      
+      const overlap = (comparandOverlaps && comparandOverlaps.includes(props.variable_id))
+        || (variableOverlaps && variableOverlaps.includes(props.comparand_id));      
+      
       if(overlap) {
         // if the two data series have overlapping ranges and the same units,
         // set their y axes to the same range to avoid 
@@ -146,9 +143,7 @@ export default function DualAnnualCycleGraph(props) {
         // determine whether the data ranges overlap:
         const yRange = yAxisRange(graph, 'y');
         const y2Range = yAxisRange(graph, 'y2');
-        if (yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
-            (((yRange.min < y2Range.min) && (yRange.max > y2Range.min)) ||
-             ((yRange.min < y2Range.max) && (yRange.max > y2Range.max)))) {
+        if(!(yRange.max < y2Range.min || y2Range.max < yRange.min)) {
           // y axes will have the same range
           graph = matchYAxisRange(graph);
         }

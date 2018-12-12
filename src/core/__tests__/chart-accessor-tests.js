@@ -11,59 +11,67 @@
 jest.dontMock('../chart-accessors');
 jest.dontMock('underscore');
 
-const ca = require('../chart-accessors');
-const cg = require('../chart-generators');
-const mockAPI = require('../__test_data__/sample-API-results');
+import {hasTwoYAxes,
+        checkYAxisValidity,
+        yAxisUnits,
+        yAxisRange} from '../chart-accessors';
+import {timeseriesToAnnualCycleGraph} from '../chart-generators';
+import {monthlyTasmaxTimeseries,
+        seasonalTasmaxTimeseries,
+        annualTasmaxTimeseries,
+        monthlyPrTimeseries,
+        metadataToArray} from '../__test_data__/sample-API-results';
+import _ from 'underscore';
 
 describe('hasTwoYAxes', function () {
-  const metadata = mockAPI.metadataToArray();
+  const metadata = metadataToArray();
   it('detects graphs that have only 1 y-axis', function () {
-    const graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
-        mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
-    expect(ca.hasTwoYAxes(graph)).toBe(false);
+    const graph = timeseriesToAnnualCycleGraph(metadata, monthlyTasmaxTimeseries,
+        seasonalTasmaxTimeseries, annualTasmaxTimeseries);
+    expect(hasTwoYAxes(graph)).toBeFalsy();
   });
   it('detects graphs that have 2 y-axes', function () {
-    const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
-        mockAPI.monthlyTasmaxTimeseries,
-        mockAPI.monthlyPrTimeseries);
-    expect(ca.hasTwoYAxes(graph)).toBe(true);
+    const graph = timeseriesToAnnualCycleGraph(metadataToArray(),
+        monthlyTasmaxTimeseries,
+        monthlyPrTimeseries);
+    expect(hasTwoYAxes(graph)).toBeTruthy();
   });
 });
 
 describe('checkYAxisValidity', function () {
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
-      mockAPI.monthlyTasmaxTimeseries,
-      mockAPI.monthlyPrTimeseries);
+  const graph = timeseriesToAnnualCycleGraph(metadataToArray(),
+      monthlyTasmaxTimeseries,
+      monthlyPrTimeseries);
   it('does nothing for valid axes', function () {
-    let func = function () {ca.checkYAxisValidity(graph, 'y');};
+    let func = function () {checkYAxisValidity(graph, 'y');};
     expect(func).not.toThrow();
-    func = function () {ca.checkYAxisValidity(graph, 'y2');};
+    func = function () {checkYAxisValidity(graph, 'y2');};
     expect(func).not.toThrow();
   });
   it('throws an eror for invalid axes', function () {
-    let func = function () {ca.checkYAxisValidity(graph, 'banana');};
+    let func = function () {checkYAxisValidity(graph, 'banana');};
     expect(func).toThrow();
   });
 });
 
 describe('yAxisUnits', function () {
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
-      mockAPI.monthlyTasmaxTimeseries,
-      mockAPI.monthlyPrTimeseries);
+  const graph = timeseriesToAnnualCycleGraph(metadataToArray(),
+      monthlyTasmaxTimeseries,
+      monthlyPrTimeseries);
   it('returns the units associated with the y axis', function () {
-    expect(ca.yAxisUnits(graph, 'y')).toBe('degC');
-    expect(ca.yAxisUnits(graph, 'y2')).toBe('kg m-2 d-1');
+    expect(yAxisUnits(graph, 'y')).toBe('degC');
+    expect(yAxisUnits(graph, 'y2')).toBe('kg m-2 d-1');
   });
 });
 
 describe('yAxisRange', function () {
-  const graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(),
-      mockAPI.monthlyTasmaxTimeseries,
-      mockAPI.monthlyPrTimeseries);
+  const graph = timeseriesToAnnualCycleGraph(metadataToArray(),
+      monthlyTasmaxTimeseries,
+      monthlyPrTimeseries);
   it('calculates the min and max of data associated with a y-axis', function () {
-    expect(ca.yAxisRange(graph, 'y').min).toBe(-20.599000150601793);
-    expect(ca.yAxisRange(graph, 'y').max).toBe(15.835593959678455);
-    expect(ca.yAxisRange(graph, 'y2').min).toBe(0.7965349522694691);
-    expect(ca.yAxisRange(graph, 'y2').max).toBe(1.7647179206314954);
+    expect(yAxisRange(graph, 'y').min).toBe(_.min(monthlyTasmaxTimeseries.data));
+    expect(yAxisRange(graph, 'y').max).toBe(_.max(monthlyTasmaxTimeseries.data));
+    expect(yAxisRange(graph, 'y2').min).toBe(_.min(monthlyPrTimeseries.data));
+    expect(yAxisRange(graph, 'y2').max).toBe(_.max(monthlyPrTimeseries.data));
   });
 });

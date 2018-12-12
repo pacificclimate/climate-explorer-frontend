@@ -4,19 +4,19 @@
  *   make decisions about how to format and display charts, without needing
  *   to understand or access the internals of charts.
  *
- * Reference on the C3 chart format can be found at https://c3js.org
+ * Reference on the C3 chart spec format can be found at https://c3js.org
  ***************************************************************************/
 import _ from 'underscore';
 
 export function hasTwoYAxes(graph) {
-  // returns true if this graph has a both a y and y2 axis defined
-  return !_.isUndefined(graph.axis.y2) && !_.isUndefined(graph.axis.y2);
+  // returns a truthy object if this graph has a both a y and y2 axis defined
+  return !!(graph.axis.y && graph.axis.y2);
 }
 
 export function checkYAxisValidity(graph, axis) {
-  // helper function that throws an error if the given y axis is
-  // not present in the graph spec.
-  if (_.isUndefined(graph.axis[axis])) {
+  // helper function that throws an error if the named (typically "y" or "y2")
+  // y axis is not present in the graph spec.
+  if (!graph.axis[axis]) {
     throw new Error('Error: invalid axis ' + axis);
   }
 }
@@ -33,19 +33,16 @@ export function yAxisUnits(graph, axis) {
 
 export function yAxisRange(graph, axis) {
   // returns an object containing the maximum and minimum of all
-  // data series associated with a particular y-axis,
-  // like {max: 10, min: 0}
+  // data series in this graph spec associated with a particular 
+  // y-axis. The axis argument is typically either "y" or "y2".
+  // Return value has the format {max: 10, min: 0}
   checkYAxisValidity(graph, axis);
-  let min = Infinity;
-  let max = -Infinity;
-  for (let i = 0; i < graph.data.columns.length; i++) {
-    if (axis === graph.data.axes[graph.data.columns[i][0]]) {
-      min = Math.min(min, _.min(graph.data.columns[i]));
-      max = Math.max(max, _.max(graph.data.columns[i]));
-    }
-  }
+  
+  //filter to just the data points associated with this y axis
+  const axisData = _.flatten(graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]]));
+  
   return {
-    min: min,
-    max: max,
-  };
+    min: _.min(axisData),
+    max: _.max(axisData),
+  };  
 }
