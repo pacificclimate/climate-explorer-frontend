@@ -73,6 +73,7 @@ export default class LongTermAveragesGraph extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     if (
+      // Assumes that metadata changes when model, variable, or experiment does.
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
@@ -114,14 +115,14 @@ export default class LongTermAveragesGraph extends React.Component {
     );
   }
 
-  timeOfYearMetadatas = () =>
-    // This thing is called twice, so memoize it if inefficient
+  getMetadatas = () =>
+    // This fn is called multiple times, so memoize it if inefficient
     this.props.getMetadata(this.state.timeOfYear)
     .filter(metadata => !!metadata)
 
   fetchData() {
     Promise.all(
-      this.timeOfYearMetadatas()
+      this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
@@ -149,7 +150,7 @@ export default class LongTermAveragesGraph extends React.Component {
     exportDataToWorksheet(
       'climoseries',
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
-      this.state.graphSpec,
+      this.graphSpec(),
       format,
       { timeres, timeidx }
     );
@@ -175,7 +176,7 @@ export default class LongTermAveragesGraph extends React.Component {
 
     // We can haz data
     return this.props.dataToGraphSpec(
-      this.state.data, this.timeOfYearMetadatas());
+      this.state.data, this.getMetadatas());
   }
 
   render() {
