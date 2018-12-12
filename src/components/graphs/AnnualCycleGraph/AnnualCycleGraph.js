@@ -63,16 +63,44 @@ export default class AnnualCycleGraph extends React.Component {
   // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
   // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
 
-  static instance = 0;
+  // Multiple of this component are created by SingleDataController.
+  // The instance and state variables `instance` are used to identify the
+  // instance in debug logging, etc. I'm keeping this because there is still
+  // some sleuthing to do that can use it. (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
+  static instance = 0;  // for debugging
   constructor(props) {
+    console.log('ACG.constructor')
     super(props);
-    this.instance = AnnualCycleGraph.instance++;
+    this.instance = AnnualCycleGraph.instance++;  // for debugging
+
+    // The content of `state.data` is determined by two qualitatively
+    // different kinds of values:
+    //
+    //    props (specifically, `meta` and `area`)
+    //    state (specifically, `dataSpec`)
+    //
+    // A change to any of these values triggers a data fetch.
+    // The need for a data fetch is signalled by setting `data = null`.
+    // The fact of a fetch in progress is signalled by `fetchingData`.
+    // Signal, fetch initiation, and fetch completion occur separately.
+    //
+    // Between the time `dataSpec` changes and the time that the
+    // data fetch completes, `dataSpec` and `data` are inconsistent, and any
+    // computation based on them will be invalid (e.g., `this.graphSpec()`).
+    // We must therefore treat dataSpec (and its changes) like props.
+    // This requires putting the previous value of dataSpec on state as well,
+    // so that it can, like props, be compared in `getDerivedStateFromProps`.
+    // (Note: `getDerivedStateFromProps` does only has access to the current
+    // state and props ... hence the need for prev values stored on state.
+    // This comes directly from the design of and recommended practice
+    // in React.)
 
     this.state = {
-      instance: this.instance,
+      instance: this.instance,  // for debugging
       prevMeta: null,
       prevArea: null,
-      dataSpec: defaultDataSpec(this.props),
+      prevDataSpec: null,
+      dataSpec: null,
       fetchingData: false,
       data: null,
       dataError: null,
@@ -80,16 +108,41 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
+    // This function is called whenever a component may be udpated, either
+    // due to props change or *state change*.
+
+    // Props change.
+    // Assumes that metadata changes when model, variable, or experiment does.
+    // Set up dataSpec to default based on new props, signal need for
+    // data fetch.
     if (
-      // Assumes that metadata changes when model, variable, or experiment does.
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
+      console.log('ACG.getDerivedStateFromProps: props change')
+      const dataSpec = defaultDataSpec(props);
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        dataSpec: defaultDataSpec(props),
-        data: null,  // Signal that data fetch is required
+        // Avoid triggering an unnecessary second second data fetch due to
+        // change in dataSpec.
+        prevDataSpec: dataSpec,
+        dataSpec,
+        fetchingData: false,  // not quite yet
+        data: null,  // Signal that data fetch is required due to props change
+        dataError: null,
+      };
+    }
+
+    // State change (dataSpec). Signal need for data fetch.
+    if (
+      state.prevDataSpec !== state.dataSpec
+    ) {
+      console.log('ACG.getDerivedStateFromProps: state change')
+      return {
+        prevDataSpec: state.dataSpec,
+        fetchingData: false,  // not quite yet
+        data: null,  // Signal that data fetch is required due to state change
         dataError: null,
       };
     }
@@ -102,20 +155,8 @@ export default class AnnualCycleGraph extends React.Component {
     this.fetchData();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.fetchingData) {
-      return false;
-    }
-    return true;
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    if (
-      // props changed => data invalid
-      this.state.data === null ||
-      // user selected new dataset
-      !_.isEqual(this.state.dataSpec, prevState.dataSpec)
-    ) {
+    if (!this.state.fetchingData && this.state.data === null) {
       this.fetchData();
     }
   }
@@ -139,23 +180,27 @@ export default class AnnualCycleGraph extends React.Component {
     .filter(metadata => !!metadata);
 
   fetchData() {
+    console.log('ACG.fetchData')
     this.setState({ fetchingData: true });
     Promise.all(
       this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
+      console.log('ACG.fetchData: data received')
       this.setState({
         fetchingData: false,
         data,
         dataError: null,
       });
     }).catch(dataError => {
+      console.log('ACG.fetchData: error', dataError)
       this.setState({
         // Do we have to set data non-null here to prevent infinite update loop?
         fetchingData: false,
         dataError,
       }).finally(() => {
+        console.log('ACG.fetchData: finally')
         this.setState({ fetchingData: false });
       });
     });
@@ -192,12 +237,7 @@ export default class AnnualCycleGraph extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.fetchingData) {
-      return loadingDataGraphSpec;
-    }
-
-    // Waiting for data
-    if (this.state.data === null) {
+    if (this.state.fetchingData || this.state.data === null) {
       return loadingDataGraphSpec;
     }
 
@@ -205,6 +245,9 @@ export default class AnnualCycleGraph extends React.Component {
     try {
       return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
     } catch (error) {
+      // dataToGraphSpec may blow a raspberry if the data it is passed is
+      // invalid. This won't happen due to mismatched dataSpec and data,
+      // because we don't allow that mismatch to occur.
       return noDataMessageGraphSpec(errorMessage(error));
     }
   }
