@@ -65,7 +65,6 @@ export default class AnnualCycleGraph extends React.Component {
 
   static instance = 0;
   constructor(props) {
-    console.log(`ACG.constructor (${AnnualCycleGraph.instance}) `)
     super(props);
     this.instance = AnnualCycleGraph.instance++;
 
@@ -81,13 +80,11 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    console.log(`ACG.getDerivedStateFromProps (${state.instance}) , props =`, props, 'state =', state)
     if (
       // Assumes that metadata changes when model, variable, or experiment does.
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
-      console.log(`ACG.getDerivedStateFromProps (${state.instance}) : meta or area changed`)
       return {
         prevMeta: props.meta,
         prevArea: props.area,
@@ -98,12 +95,10 @@ export default class AnnualCycleGraph extends React.Component {
     }
 
     // No state update necessary.
-    console.log(`ACG.getDerivedStateFromProps (${state.instance}) : no change`)
     return null;
   }
 
   componentDidMount() {
-    console.log(`ACG.componentDidMount (${this.instance}) : fetch`)
     this.fetchData();
   }
 
@@ -115,23 +110,14 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(`ACG.componentDidUpdate (${this.instance}) , prevProps =`, prevProps, 'prevState =', prevState)
-    console.log(`ACG.componentDidUpdate (${this.instance}) , props =`, this.props, 'state =', this.state)
     if (
       // props changed => data invalid
       this.state.data === null ||
       // user selected new dataset
       !_.isEqual(this.state.dataSpec, prevState.dataSpec)
     ) {
-      console.log(`ACG.componentDidUpdate (${this.instance}) : change/fetch`)
       this.fetchData();
-    } else {
-      console.log(`ACG.componentDidUpdate (${this.instance}) : no change/fetch`)
     }
-  }
-
-  componentWillUnmount() {
-    console.log(`ACG.componentWillUnmount (${this.instance}) `)
   }
 
   // Data fetching
@@ -153,27 +139,23 @@ export default class AnnualCycleGraph extends React.Component {
     .filter(metadata => !!metadata);
 
   fetchData() {
-    console.log(`ACG.fetchData (${this.instance}) : start data fetches`)
     this.setState({ fetchingData: true });
     Promise.all(
       this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
-      console.log(`ACG.fetchData (${this.instance}) : data received`)
       this.setState({
         fetchingData: false,
         data,
         dataError: null,
       });
     }).catch(dataError => {
-      console.log(`ACG.fetchData (${this.instance}) : error`, dataError)
       this.setState({
         // Do we have to set data non-null here to prevent infinite update loop?
         fetchingData: false,
         dataError,
       }).finally(() => {
-        console.log(`ACG.fetchData (${this.instance}) : finally`)
         this.setState({ fetchingData: false });
       });
     });
@@ -203,40 +185,31 @@ export default class AnnualCycleGraph extends React.Component {
 
   graphSpec() {
     // Return a graphSpec appropriate to the given state
-    console.log(`ACG.graphSpec (${this.instance}) `)
 
     // An error occurred
     if (this.state.dataError) {
-      console.log(`ACG.graphSpec (${this.instance}) : data error`)
       return noDataMessageGraphSpec(errorMessage(this.state.dataError));
     }
 
     // Waiting for data
     if (this.state.fetchingData) {
-      console.log(`ACG.graphSpec (${this.instance}) : no data (fetchingData)`)
       return loadingDataGraphSpec;
     }
 
     // Waiting for data
     if (this.state.data === null) {
-      console.log(`ACG.graphSpec (${this.instance}) : no data (data === null)`)
       return loadingDataGraphSpec;
     }
 
     // We can haz data
-    console.log(`ACG.graphSpec (${this.instance}) : data`, this.state.data)
-    // console.log(`ACG.graphSpec (${this.instance}) , metadatas =`, this.getMetadatas())
-    // console.log(`ACG.graphSpec (${this.instance}) , data =`, this.state.data)
     try {
       return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
     } catch (error) {
-      console.log(`ACG.graphSpec (${this.instance}) : error thrown in dataToGraphSpec`)
       return noDataMessageGraphSpec(errorMessage(error));
     }
   }
 
   render() {
-    console.log(`ACG.render (${this.instance}) , data =`, this.state.data)
     return (
       <React.Fragment>
         <Row>
