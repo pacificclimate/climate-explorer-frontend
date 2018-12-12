@@ -54,22 +54,18 @@ export default class AnnualCycleGraph extends React.Component {
     // this general component to particular cases (single vs. dual controller).
   };
 
-  ///////////////////////////////////////////////////////////////////////////
-  // NEW
-
   // Lifecycle hooks
   // Follows React 16+ lifecycle API and recommendations.
   // See https://reactjs.org/blog/2018/03/29/react-v-16-3.html
   // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
   // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
 
-  // Multiple of this component are created by SingleDataController.
-  // The instance and state variables `instance` are used to identify the
-  // instance in debug logging, etc. I'm keeping this because there is still
-  // some sleuthing to do that can use it. (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
   static instance = 0;  // for debugging
   constructor(props) {
-    console.log('ACG.constructor')
+    // Multiple instances of this component are created by SingleDataController.
+    // The instance and state variables `instance` are used to identify the
+    // instance in debug logging, etc. I'm keeping this because there is still
+    // some sleuthing to do that can use it. (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
     super(props);
     this.instance = AnnualCycleGraph.instance++;  // for debugging
 
