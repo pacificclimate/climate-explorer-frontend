@@ -12,11 +12,9 @@ import { getTimeseries } from '../../../data-services/ce-backend';
 import {
   defaultDataSpec,
   validateAnnualCycleData,
-  validateUnstructuredTimeseriesData,
 } from '../../../core/util';
 import {
   noDataMessageGraphSpec,
-  multiYearMeanSelected,
   errorMessage,
   loadingDataGraphSpec,
 } from '../graph-helpers';
@@ -157,16 +155,11 @@ export default class AnnualCycleGraph extends React.Component {
 
   // Data fetching
 
-  getAndValidateData(metadata) {
-    const validateData = multiYearMeanSelected(this.props) ?
-      validateAnnualCycleData :
-      validateUnstructuredTimeseriesData;
-    return (
-      getTimeseries(metadata, this.props.area)
-      .then(validateData)
-      .then(response => response.data)
-    );
-  }
+  getAndValidateData = (metadata) => (
+    getTimeseries(metadata, this.props.area)
+    .then(validateAnnualCycleData)
+    .then(response => response.data)
+  );
 
   getMetadatas = () =>
     // This fn is called multiple times, so memoize it if inefficient
