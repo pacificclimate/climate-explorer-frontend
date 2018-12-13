@@ -67,27 +67,9 @@ export default class AnnualCycleGraph extends React.Component {
     super(props);
     this.instance = AnnualCycleGraph.instance++;  // for debugging
 
-    // The content of `state.data` is determined by two qualitatively
-    // different kinds of values:
-    //
-    //    props (specifically, `meta` and `area`)
-    //    state (specifically, `dataSpec`)
-    //
-    // A change to any of these values triggers a data fetch.
-    // The need for a data fetch is signalled by setting `data = null`.
-    // The fact of a fetch in progress is signalled by `fetchingData`.
-    // Signal, fetch initiation, and fetch completion occur separately.
-    //
-    // Between the time `dataSpec` changes and the time that the
-    // data fetch completes, `dataSpec` and `data` are inconsistent, and any
-    // computation based on them will be invalid (e.g., `this.graphSpec()`).
-    // We must therefore treat dataSpec (and its changes) like props.
-    // This requires putting the previous value of dataSpec on state as well,
-    // so that it can, like props, be compared in `getDerivedStateFromProps`.
-    // (Note: `getDerivedStateFromProps` does only has access to the current
-    // state and props ... hence the need for prev values stored on state.
-    // This comes directly from the design of and recommended practice
-    // in React.)
+    // See ../README for an explanation of the content and usage
+    // of state values. This is important for understanding how this
+    // component works.
 
     this.state = {
       instance: this.instance,  // for debugging
