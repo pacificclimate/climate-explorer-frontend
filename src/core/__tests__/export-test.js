@@ -92,7 +92,7 @@ describe('generateDataCellsFromC3Graph', function () {
     expect(validate.isRectangularArray(cells, 2, 14)).toBe(true);
     expect(cells[1][0]).toBe("Monthly Mean");
     //spot check representative values
-    expect(cells[1][13]).toBe("degC");
+    expect(cells[1][13]).toBe("tasmax degC");
     expect(cells[1][1]).toBe('-20.60');
     expect(cells[1][12]).toBe('-16.96');
     //make sure nothing is undefined

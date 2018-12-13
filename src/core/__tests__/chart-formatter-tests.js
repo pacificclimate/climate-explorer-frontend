@@ -183,6 +183,19 @@ describe('padYAxis', function () {
   });
 });
 
+describe('matchYAxisRange', function () {
+  it('sets both y-axis of the graph to have the same range', function () {
+    const metadata = mockAPI.metadataToArray();
+    let graph = cg.timeseriesToAnnualCycleGraph(mockAPI.metadataToArray(), 
+        mockAPI.monthlyTasmaxTimeseries,
+        mockAPI.monthlyPrTimeseries);
+    
+    graph = cf.matchYAxisRange(graph);
+    expect(graph.axis.y.min).toEqual(graph.axis.y2.min);
+    expect(graph.axis.y.max).toEqual(graph.axis.y2.max);
+  });  
+});
+
 describe('hideTicksByRange', function () {
   const metadata = mockAPI.metadataToArray();
   let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
