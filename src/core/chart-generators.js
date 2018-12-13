@@ -104,11 +104,11 @@ function makeTooltipDisplayNumbersWithUnits(axes, axis, precisionFunction) {
 
 /*
  * Helper function for assignDataToYAxis.
- * 
+ *
  * Accepts a c3 chart spec and the name of a y axis (typically "y" or "y2").
- * 
+ *
  * It determines whether the y axis is already defined in the chart spec.
- * 
+ *
  * If the axis is defined, it checks for the following parameters
  * of the axis:
  *   - units
@@ -117,35 +117,34 @@ function makeTooltipDisplayNumbersWithUnits(axes, axis, precisionFunction) {
  * These attributes are not part of the standard c3 graph spec; they are added
  * by assignDataToYAxis during chart creation to facilitate adding additional
  * datasets to a pre-existing graph.
- * 
+ *
  * If the y axis is completely unspecified, returns an object containing empty
  * strings for each sorting parameter. A new unformatted graph, ready for data
  * assignment.
- * 
- * If the y axis is defined but does not specify all the sorting attributes, 
- * throws an error. It isn't possible to add more data to this graph; not 
+ *
+ * If the y axis is defined but does not specify all the sorting attributes,
+ * throws an error. It isn't possible to add more data to this graph; not
  * enough information.
- * 
+ *
  * If the axis is defined and specifies all the sorting parameters, return an object
  * containing them, which assignDataToYAxis will use to assign new data to
- * the graph following the pattern laid out by data already present. 
+ * the graph following the pattern laid out by data already present.
  */
 function axisSortingParams(graph, yAxis) {
   let params = {
-      units: '',
-      groupBy: { type: '', value: '', }
+    units: '',
+    groupBy: { type: '', value: '' },
   };
-  if(graph.axis) {
+  if (graph.axis) {
     const axis = graph.axis[yAxis];
-    if(axis) {
-      if(nestedAttributeIsDefined(axis, 'units')
-         && nestedAttributeIsDefined(axis, 'groupBy', 'type') 
+    if (axis) {
+      if (nestedAttributeIsDefined(axis, 'units')
+         && nestedAttributeIsDefined(axis, 'groupBy', 'type')
          && nestedAttributeIsDefined(axis, 'groupBy', 'value')) {
         params.units = axis.units;
         params.groupBy.type = axis.groupBy.type;
         params.groupBy.value = axis.groupBy.value;
-      }
-      else {
+      } else {
         throw new Error('Error: unable to add data to y axis ' + yAxis);
       }
     }
@@ -197,53 +196,53 @@ function axisSortingParams(graph, yAxis) {
 function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   // get sorting algorithm, if the chart already has one.
   const sortingParams = {
-      y: axisSortingParams(graph, 'y'),
-      y2: axisSortingParams(graph, 'y2'),
+    y: axisSortingParams(graph, 'y'),
+    y2: axisSortingParams(graph, 'y2'),
   };
-  
-  if(sortingParams.y.groupBy.type !== sortingParams.y2.groupBy.type) {
+
+  if (sortingParams.y.groupBy.type !== sortingParams.y2.groupBy.type) {
     // make sure both axes agree on the data sorting.
-    throw new Error("Error: axis data grouping inconsistent.");
+    throw new Error('Error: axis data grouping inconsistent.');
   }
-  
-  let groupBy = 'variable'; //default and most common case.
-  
-  if(groupByUnits) {
+
+  let groupBy = 'variable'; // default and most common case.
+
+  if (groupByUnits) {
     // check to make sure the caller of this function didn't request grouping
     // by units when the existing graph is already grouped by variable.
-    if(sortingParams.y.groupBy.type === 'variable') {
-      throw new Error("Error: cannot regroup data series");
+    if (sortingParams.y.groupBy.type === 'variable') {
+      throw new Error('Error: cannot regroup data series');
     }
     groupBy = 'units';
-  } else if(sortingParams.y.groupBy.type === 'units') {
+  } else if (sortingParams.y.groupBy.type === 'units') {
     // caller didn't specify a grouping algorithm, but
     // this graph is already grouped by units, use that.
     groupBy = 'units';
   }
-  
+
   // collect all data series name, but exclude the data series named "x" - it is
   // a C3 convention used to format labels for the x axis (months & seasons,
   // in our case), not a real data series.
-  const seriesNames = graph.data.columns.map(col=>col[0]).filter(n => n !== 'x');
-  
+  const seriesNames = graph.data.columns.map(col => col[0]).filter(n => n !== 'x');
+
   const allotSeriesToAxis = (axis, seriesName) => {
     // attempts to sort a data series to the named y axis
-    // it checks to see if metadata about the series matches the 
+    // it checks to see if metadata about the series matches the
     // sorting parameters set for this axis.
     // if no sorting parameters for this axis are set yet, they
     // will be initialized to match this data series.
     // it returns false if the data series cannot be assigned to the axis.
     const seriesMeta = seriesMetadata[seriesName];
-    if(!sortingParams[axis].groupBy.value) {
+    if (!sortingParams[axis].groupBy.value) {
       // this axis has not been initialized. initialize it before assigning.
       sortingParams[axis].groupBy.type = groupBy;
       sortingParams[axis].groupBy.value = seriesMeta[groupBy];
       sortingParams[axis].units = seriesMeta.units;
-    } 
+    }
     // check to see if this data series matches this axis' parameters
-    if(seriesMeta[groupBy] === sortingParams[axis].groupBy.value) {
+    if (seriesMeta[groupBy] === sortingParams[axis].groupBy.value) {
       // it does!
-      if(seriesMeta.units != sortingParams[axis].units) {
+      if (seriesMeta.units !== sortingParams[axis].units) {
         // ... but the units are wrong. Error.
         throw new Error('Error: mismatched units for graph axis ' + axis);
       }
@@ -253,10 +252,10 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
     }
     // not a match
     return false;
-  }
-  
+  };
+
   for (const seriesName of seriesNames) {
-    if(!(allotSeriesToAxis('y', seriesName) || allotSeriesToAxis('y2', seriesName))) {
+    if (!(allotSeriesToAxis('y', seriesName) || allotSeriesToAxis('y2', seriesName))) {
       // this data series is a match for neither Y axis.
       throw new Error('Error: too many data axes required for graph');
     }
@@ -264,21 +263,20 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
 
   // all data series have been assigned. Format each axis to display accordingly.
   graph.axis = graph.axis ? graph.axis : {};
-  
+
   const formatSortedAxis = (yAxis) => {
-    if(sortingParams[yAxis].groupBy.value && !graph.axis[yAxis]) {
+    if (sortingParams[yAxis].groupBy.value && !graph.axis[yAxis]) {
       // data was assigned to this axis, and the axis is not formatted already
       const params = sortingParams[yAxis];
-      let label = "";
-      if(groupBy === 'variable' 
+      let label = '';
+      if (groupBy === 'variable'
         && params.groupBy.value !== missingVariableName) {
         label = `${params.groupBy.value} ${params.units}`;
-      }
-      else {
+      } else {
         label = params.units;
       }
-      
-      // add the parameters used in sorting the data to the axis spec - 
+
+      // add the parameters used in sorting the data to the axis spec -
       // so more data can be added later in a subsequent call to assignDataToYAxis
       graph.axis[yAxis] = formatYAxis(label);
       graph.axis[yAxis].units = params.units;
@@ -287,7 +285,7 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   };
 
   formatSortedAxis('y');
-  formatSortedAxis('y2');  
+  formatSortedAxis('y2');
   return graph;
 }
 

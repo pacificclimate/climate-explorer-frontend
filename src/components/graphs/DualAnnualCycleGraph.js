@@ -143,7 +143,8 @@ export default function DualAnnualCycleGraph(props) {
         // determine whether the data ranges overlap:
         const yRange = yAxisRange(graph, 'y');
         const y2Range = yAxisRange(graph, 'y2');
-        if(!(yRange.max < y2Range.min || y2Range.max < yRange.min)) {
+        if(yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
+           !(yRange.max < y2Range.min || y2Range.max < yRange.min)) {
           // y axes will have the same range
           graph = matchYAxisRange(graph);
         }
