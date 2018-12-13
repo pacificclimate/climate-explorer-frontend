@@ -10,63 +10,72 @@ import {assignColoursByGroup,
 import {hasTwoYAxes,
         yAxisUnits,
         yAxisRange, } from '../../core/chart-accessors';
-import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 import { getVariableOptions } from '../../core/util';
 
-export default function DualAnnualCycleGraph(props) {
-  function getMetadata(dataSpec) {
+const valuesWithin = (tolerance, a, b) => Math.abs(+a - +b) <= tolerance;
 
-    // Find and return metadata matching the data specification ("dataSpec"): 
+const findMatchingMetadata = (
+  metadata, tolerance,
+  { model_id, experiment, variable_id, timescale,
+    start_date, end_date, ensemble_member },
+) =>
+  _.find(metadata, metadatum =>
+    // Match exactly on these parameters
+    _.matcher(
+      { model_id, experiment, variable_id, timescale, ensemble_member }
+    )(metadatum) &&
+    // Match within `tolerance` on start and end date
+    valuesWithin(tolerance, start_date, metadatum.start_date) &&
+    valuesWithin(tolerance, end_date, metadatum.end_date)
+  );
+
+export default function DualAnnualCycleGraph(
+  { model_id, experiment, variable_id, meta, comparand_id, comparandMeta, area }
+) {
+  function getMetadata(dataSpec) {
+    // Find and return metadata matching the data specification (`dataSpec`):
     // model_id, experiment, variable_id, start_date, end_date, ensemble_member
     // for monthly, seasonal and annual timescales.
-    // Variable, model, and experiment are supplied by the graph's parent, but 
+    // Variable, model, and experiment are supplied by the graph's parent, but
     // start, end, and run are selected here.
     // Do the the same for comparand_id and comparandMeta.
 
-    const {
-      model_id, experiment,
-      variable_id, meta,
-      comparand_id, comparandMeta,
-    } = props;
+    // `dateTolerance` establishes the tolerance (in years) for matches to
+    // `start_date` and `end_date`. (`dataSpec` specifies the values to match.)
+    const dateTolerance = 1;
 
-    var findMetadataForDataSpec = function (variable, timeres, metadataList) {
-      return _.findWhere(metadataList, {
+    const timescales = ['monthly', 'seasonal', 'yearly'];
+
+    // Find matching metadata sets for variable (`variable_id`).
+    const variableMetadataSets = timescales.map(timescale =>
+      findMatchingMetadata(meta, dateTolerance, {
         model_id, experiment,
-        ...dataSpec,
-        timescale: timeres,
-        variable_id: variable
-        });
-    }
-  
-    // Set up metadata sets for variable
-    const monthlyVariableMetadata = findMetadataForDataSpec(variable_id, 'monthly', meta);
-    const seasonalVariableMetadata = findMetadataForDataSpec(variable_id, 'seasonal', meta);
-    const yearlyVariableMetadata = findMetadataForDataSpec(variable_id, 'yearly', meta);
+        variable_id: variable_id,
+        timescale, ...dataSpec,
+      })
+    );
 
-    let metadataSets =[
-      monthlyVariableMetadata,
-      seasonalVariableMetadata,
-      yearlyVariableMetadata,
-    ];
+    // Find matching metadata sets for comparand (comparand_id).
+    // Only use comparand metadata sets for which there is a corresponding
+    // variable metadata set with the same timescale.
+    // This is a function because we don't always compute it.
+    const comparandMetadataSets = () => timescales.map((timescale, i) =>
+      variableMetadataSets[i] &&
+      findMatchingMetadata(comparandMeta, dateTolerance, {
+        model_id, experiment,
+        variable_id: comparand_id,
+        timescale, ...dataSpec,
+      })
+    );
 
-    // Extend metadata sets with comparand, if different from variable
-    // Include only comparand time resolutions present for the variable.
-    if(variable_id !== comparand_id) {
-      if(monthlyVariableMetadata) {
-        metadataSets = metadataSets.concat(
-            findMetadataForDataSpec(comparand_id, 'monthly', comparandMeta));
-      }
-      if(seasonalVariableMetadata) {
-       metadataSets = metadataSets.concat(
-           findMetadataForDataSpec(comparand_id, 'seasonal', comparandMeta));
-      }
-      if(yearlyVariableMetadata) {
-        metadataSets = metadataSets.concat(
-            findMetadataForDataSpec(comparand_id, 'yearly', comparandMeta));
-      }
-    }    
-    return _.compact(metadataSets);
+    // Extend variable metadata sets with comparand metdata sets
+    // if the comparand is different from the variable.
+    const allMetadataSets = variableMetadataSets.concat(
+      variable_id === comparand_id ? [] : comparandMetadataSets()
+    );
+
+    return _.compact(allMetadataSets);
   }
 
   function dataToGraphSpec(meta, data) {
@@ -80,9 +89,9 @@ export default function DualAnnualCycleGraph(props) {
     // graph line colors.
     const sortByVariable = dataSeries => {
       const seriesName = dataSeries[0].toLowerCase();
-      if (seriesName.search(props.variable_id.toLowerCase()) !== -1) {
+      if (seriesName.search(variable_id.toLowerCase()) !== -1) {
         return 0;
-      } else if (seriesName.search(props.comparand_id.toLowerCase()) !== -1) {
+      } else if (seriesName.search(comparand_id.toLowerCase()) !== -1) {
         return 1;
       } else {
         // if only one variable is selected, it won't be in any series names.
@@ -123,14 +132,13 @@ export default function DualAnnualCycleGraph(props) {
     // variables lists the other as a visual conflict (using the "shiftAnnualCycle"
     // attribute), they will be detangled by padding the graph y-scales to
     // shift their respective graph lines apart vertically.
-    if(hasTwoYAxes(graph)
-        && props.comparand_id !== props.variable_id) {
+    if (hasTwoYAxes(graph) && comparand_id !== variable_id) {
       // see if either variable is listed as conflicting with the other
-      const variableOverlaps = getVariableOptions(props.variable_id, "shiftAnnualCycle");
-      const comparandOverlaps = getVariableOptions(props.comparand_id, "shiftAnnualCycle");
+      const variableOverlaps = getVariableOptions(variable_id, "shiftAnnualCycle");
+      const comparandOverlaps = getVariableOptions(comparand_id, "shiftAnnualCycle");
       
-      const overlap = (comparandOverlaps && comparandOverlaps.includes(props.variable_id))
-        || (variableOverlaps && variableOverlaps.includes(props.comparand_id));      
+      const overlap = (comparandOverlaps && comparandOverlaps.includes(variable_id))
+        || (variableOverlaps && variableOverlaps.includes(comparand_id));
       
       if(overlap) {
         // if the two data series have overlapping ranges and the same units,
@@ -160,13 +168,11 @@ export default function DualAnnualCycleGraph(props) {
     return graph;
   }
 
-  const graphProps = _.pick(props,
-    'model_id', 'variable_id', 'comparand_id', 'experiment', 'meta', 'comparandMeta', 'area'
-  );
-
   return (
     <AnnualCycleGraph
-      {...graphProps}
+      {...{ model_id, experiment, variable_id, meta,
+        comparand_id, comparandMeta, area }
+      }
       getMetadata={getMetadata}
       dataToGraphSpec={dataToGraphSpec}
     />
