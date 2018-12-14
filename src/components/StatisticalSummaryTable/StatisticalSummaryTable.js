@@ -45,25 +45,43 @@ export default class StatisticalSummaryTable extends React.Component {
   constructor(props) {
     super(props);
 
+    // See ../README for an explanation of the content and usage
+    // of state values. This is important for understanding how this
+    // component works.
+
     this.state = {
       prevMeta: null,
       prevArea: null,
-      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
+      prevTimeOfYear: null,
+      timeOfYear: null,
+      fetchingData: false,
       data: null,
       dataError: null,
     };
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (
-      props.meta !== state.prevMeta ||
-      props.area !== state.prevArea
-    ) {
+    if (props.meta !== state.prevMeta || props.area !== state.prevArea) {
+      const timeOfYear = defaultTimeOfYear(timeResolutions(props.meta))
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        timeOfYear: defaultTimeOfYear(timeResolutions(props.meta)),
+        // Avoid triggering an unnecessary second second data fetch due to
+        // change in timeOfYear.
+        prevTimeOfYear: timeOfYear,
+        timeOfYear,
+        fetchingData: false,  // not quite yet
         data: null,  // Signal that data fetch is required
+        dataError: null,
+      };
+    }
+
+    // State change (timeOfYear). Signal need for data fetch.
+    if (state.prevTimeOfYear !== state.timeOfYear) {
+      return {
+        prevTimeOfYear: state.timeOfYear,
+        fetchingData: false,  // not quite yet
+        data: null,  // Signal that data fetch is required due to state change
         dataError: null,
       };
     }
@@ -77,12 +95,7 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      // props changed => data invalid
-      this.state.data === null ||
-      // user selected new time of year
-      this.state.timeOfYear !== prevState.timeOfYear
-    ) {
+    if (!this.state.fetchingData && this.state.data === null) {
       this.fetchData();
     }
   }
@@ -108,6 +121,7 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   fetchData() {
+    this.setState({ fetchingData: true });
     const metadata = {
       ..._.pick(this.props,
         'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'),
@@ -116,6 +130,7 @@ export default class StatisticalSummaryTable extends React.Component {
     this.getAndValidateData(metadata)
     .then(data => {
       this.setState({
+        fetchingData: false,
         data: parseBootstrapTableData(
           this.injectRunIntoStats(data), this.props.meta),
         dataError: null,
@@ -123,6 +138,7 @@ export default class StatisticalSummaryTable extends React.Component {
     }).catch(dataError => {
       this.setState({
         // Do we have to set data non-null here to prevent infinite update loop?
+        fetchingData: false,
         dataError,
       });
     });
@@ -134,6 +150,7 @@ export default class StatisticalSummaryTable extends React.Component {
     this.setState({ timeOfYear });
   };
 
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/261
   exportDataTable(format) {
     exportDataToWorksheet(
       'stats', this.props, this.state.data, format,
@@ -153,7 +170,7 @@ export default class StatisticalSummaryTable extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.data === null) {
+    if (this.state.fetchingData || this.state.data === null) {
       return { noDataText: 'Loading data...' };
     }
 
