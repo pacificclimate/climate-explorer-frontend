@@ -2,33 +2,23 @@ import React from 'react';
 
 import _ from 'underscore';
 
-import {timeseriesToAnnualCycleGraph} from '../../core/chart-generators';
-import {assignColoursByGroup,
-        fadeSeriesByRank,
-        padYAxis,
-        matchYAxisRange} from '../../core/chart-formatters';
-import {hasTwoYAxes,
-        yAxisUnits,
-        yAxisRange, } from '../../core/chart-accessors';
+import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
+import {
+  assignColoursByGroup,
+  fadeSeriesByRank,
+  padYAxis,
+  matchYAxisRange,
+} from '../../core/chart-formatters';
+import {
+  hasTwoYAxes,
+  yAxisUnits,
+  yAxisRange,
+} from '../../core/chart-accessors';
 import AnnualCycleGraph from './AnnualCycleGraph';
-import { getVariableOptions } from '../../core/util';
-
-const valuesWithin = (tolerance, a, b) => Math.abs(+a - +b) <= tolerance;
-
-const findMatchingMetadata = (
-  metadata, tolerance,
-  { model_id, experiment, variable_id, timescale,
-    start_date, end_date, ensemble_member },
-) =>
-  _.find(metadata, metadatum =>
-    // Match exactly on these parameters
-    _.matcher(
-      { model_id, experiment, variable_id, timescale, ensemble_member }
-    )(metadatum) &&
-    // Match within `tolerance` on start and end date
-    valuesWithin(tolerance, start_date, metadatum.start_date) &&
-    valuesWithin(tolerance, end_date, metadatum.end_date)
-  );
+import {
+  getVariableOptions,
+  findMatchingMetadata,
+} from '../../core/util';
 
 export default function DualAnnualCycleGraph(
   { model_id, experiment, variable_id, meta, comparand_id, comparandMeta, area }
