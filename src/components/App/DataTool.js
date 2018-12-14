@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Navbar, Button } from 'react-bootstrap';
 
-import NavRoutes from './navigation/NavRoutes/NavRoutes';
-import SingleAppController from './app-controllers/SingleAppController/SingleAppController';
-import PrecipAppController from './app-controllers/PrecipAppController/PrecipAppController';
-import DualAppController from './app-controllers/DualAppController/DualAppController';
+import NavRoutes from '../navigation/NavRoutes/NavRoutes';
+import SingleAppController from '../app-controllers/SingleAppController/SingleAppController';
+import PrecipAppController from '../app-controllers/PrecipAppController/PrecipAppController';
+import DualAppController from '../app-controllers/DualAppController/DualAppController';
 
 const navSpec = {
   basePath: '/data',

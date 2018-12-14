@@ -12,7 +12,7 @@ import React from 'react';
 import { Navbar } from 'react-bootstrap';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import DataTool from '../DataTool';
+import DataTool from './DataTool';
 import NavRoutes from '../navigation/NavRoutes';
 import Help from '../guidance-content/help/Help';
 import Science from '../guidance-content/science/Science';
