@@ -124,13 +124,13 @@ export default function DualAnnualCycleGraph(
     // shift their respective graph lines apart vertically.
     if (hasTwoYAxes(graph) && comparand_id !== variable_id) {
       // see if either variable is listed as conflicting with the other
-      const variableOverlaps = getVariableOptions(variable_id, "shiftAnnualCycle");
-      const comparandOverlaps = getVariableOptions(comparand_id, "shiftAnnualCycle");
+      const variableOverlaps = getVariableOptions(variable_id, 'shiftAnnualCycle');
+      const comparandOverlaps = getVariableOptions(comparand_id, 'shiftAnnualCycle');
       
       const overlap = (comparandOverlaps && comparandOverlaps.includes(variable_id))
         || (variableOverlaps && variableOverlaps.includes(comparand_id));
       
-      if(overlap) {
+      if (overlap) {
         // if the two data series have overlapping ranges and the same units,
         // set their y axes to the same range to avoid 
         // the misleading visuals of *slightly* different y axes.
@@ -141,17 +141,17 @@ export default function DualAnnualCycleGraph(
         // determine whether the data ranges overlap:
         const yRange = yAxisRange(graph, 'y');
         const y2Range = yAxisRange(graph, 'y2');
-        if(yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
+        if (yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
            !(yRange.max < y2Range.min || y2Range.max < yRange.min)) {
           // y axes will have the same range
           graph = matchYAxisRange(graph);
         }
         else {
           // y axes padded by 20%
-          const shiftUpAxis = yRange.max > y2Range.max ? "y" : "y2";
-          const shiftDownAxis = yRange.max < y2Range.max ? "y" : "y2";
-          graph = padYAxis(graph, shiftUpAxis, "bottom", .2);
-          graph = padYAxis(graph, shiftDownAxis, "top", .2);
+          const shiftUpAxis = yRange.max > y2Range.max ? 'y' : 'y2';
+          const shiftDownAxis = yRange.max < y2Range.max ? 'y' : 'y2';
+          graph = padYAxis(graph, shiftUpAxis, 'bottom', 0.2);
+          graph = padYAxis(graph, shiftDownAxis, 'top', 0.2);
         }
       }
     }
@@ -160,11 +160,12 @@ export default function DualAnnualCycleGraph(
 
   return (
     <AnnualCycleGraph
-      {...{ model_id, experiment, variable_id, meta,
-        comparand_id, comparandMeta, area }
-      }
-      getMetadata={getMetadata}
-      dataToGraphSpec={dataToGraphSpec}
+      {...{
+        model_id, experiment, variable_id, meta,
+        comparand_id, comparandMeta, area,
+        getMetadata,
+        dataToGraphSpec,
+      }}
     />
   );
 }
