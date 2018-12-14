@@ -77,6 +77,7 @@ export default class LongTermAveragesGraph extends React.Component {
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
+      const timeOfYear = defaultTimeOfYear(timeResolutions(props.meta))
       return {
         prevMeta: props.meta,
         prevArea: props.area,
