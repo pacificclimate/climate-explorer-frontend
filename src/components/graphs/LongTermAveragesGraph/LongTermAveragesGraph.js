@@ -62,6 +62,10 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    // See ../README for an explanation of the content and usage
+    // of state values. This is important for understanding how this
+    // component works.
+
     this.state = {
       prevMeta: null,
       prevArea: null,
@@ -73,10 +77,7 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (
-      props.meta !== state.prevMeta ||
-      props.area !== state.prevArea
-    ) {
+    if (props.meta !== state.prevMeta || props.area !== state.prevArea) {
       const timeOfYear = defaultTimeOfYear(timeResolutions(props.meta))
       return {
         prevMeta: props.meta,
