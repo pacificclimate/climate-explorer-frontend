@@ -44,7 +44,6 @@ export default function SingleAnnualCycleGraph(props) {
   function dataToGraphSpec(meta, data) {
     // Convert `data` (described by `meta`) to a graph specification compatible
     // with `DataGraph`.
-
     let graph = timeseriesToAnnualCycleGraph(meta, ...data);
 
     // arrange the graph so that the highest-resolution data is most visible.
