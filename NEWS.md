@@ -1,5 +1,54 @@
 # News / Release Notes
 
+## 1.2.0
+*17-Dec-2018*
+
+Features and bug fixes
+
+* [Flexible determination of "matching" climatologies (start and end dates)](https://github.com/pacificclimate/climate-explorer-frontend/pull/263)
+* [Fix data export in LongTermAveragesGraph](https://github.com/pacificclimate/climate-explorer-frontend/pull/257)
+* [Fix invalid default climatology (Dataset) selection](https://github.com/pacificclimate/climate-explorer-frontend/pull/255)
+* [Save zipped shapefiles to root folder in zipfile](https://github.com/pacificclimate/climate-explorer-frontend/pull/251)
+* [Fix stats summary table time of year bugs](https://github.com/pacificclimate/climate-explorer-frontend/pull/247)
+* [Fix time of year selection in LTA graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/245)
+* [Allow users to change opacity on climate layers](https://github.com/pacificclimate/climate-explorer-frontend/pull/241)
+* [Limit geometry to one active polygon](https://github.com/pacificclimate/climate-explorer-frontend/pull/240)
+* [Fix imported polygon behaviours](https://github.com/pacificclimate/climate-explorer-frontend/pull/236)
+* [Always display different variables with different vertical scales](https://github.com/pacificclimate/climate-explorer-frontend/pull/235)
+* [Show dataset selection in Data Map panel label](https://github.com/pacificclimate/climate-explorer-frontend/pull/234)
+* [Disable circle marker map tool](https://github.com/pacificclimate/climate-explorer-frontend/pull/233)
+* [Set precision for *all* variables](https://github.com/pacificclimate/climate-explorer-frontend/pull/228)
+* [Fix timestampToTimeOfYear bug; clean up code](https://github.com/pacificclimate/climate-explorer-frontend/pull/214)
+* [Guidance, Part 6: Miscellaneous](https://github.com/pacificclimate/climate-explorer-frontend/pull/210)
+* [Guidance, Part 5: Dataset context 
+](https://github.com/pacificclimate/climate-explorer-frontend/pull/209)
+* [Guidance, Part 4: Panels](https://github.com/pacificclimate/climate-explorer-frontend/pull/208)
+* [Guidance, Part 3: Help](https://github.com/pacificclimate/climate-explorer-frontend/pull/205)
+* [Guidance, Part 2: Information popovers](https://github.com/pacificclimate/climate-explorer-frontend/pull/200)
+* [Guidance, Part 1: Revise navigation](https://github.com/pacificclimate/climate-explorer-frontend/pull/199)
+* [Fix dataset filter for anomaly graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/197)
+* [Display datasets with no monthly values in the Long Term Averages graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/194)
+* [Improve anomaly graph UI](https://github.com/pacificclimate/climate-explorer-frontend/pull/180)
+* [Flexible map width](https://github.com/pacificclimate/climate-explorer-frontend/pull/164)
+* [Context graph bugfixes](https://github.com/pacificclimate/climate-explorer-frontend/pull/163)
+* [UI changes and bugfixes to support multiplle timeset types in one portal](https://github.com/pacificclimate/climate-explorer-frontend/pull/156)
+* [Fix spreadsheet download format](https://github.com/pacificclimate/climate-explorer-frontend/pull/153)
+* [Make sure timeseries are correlated](https://github.com/pacificclimate/climate-explorer-frontend/pull/161)
+* [Support selecting a specific variable+description](https://github.com/pacificclimate/climate-explorer-frontend/pull/160)
+* [Default to loading CanESM2 and rcp85](https://github.com/pacificclimate/climate-explorer-frontend/pull/158)
+* [Use correct scenario string for downscaled data queries to multistat](https://github.com/pacificclimate/climate-explorer-frontend/pull/151)
+* [Add stick plot](https://github.com/pacificclimate/climate-explorer-frontend/pull/149)
+* [Add a future annual cycle graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/146)
+
+Code improvements
+
+* [Update LTAG and SST lifecycle to match AnnualCycleGraph](https://github.com/pacificclimate/climate-explorer-frontend/pull/262)
+* [Fix test suite after jsdom update ](https://github.com/pacificclimate/climate-explorer-frontend/pull/178)
+* [Pass only needed data to context graphs](https://github.com/pacificclimate/climate-explorer-frontend/pull/148)
+
+
+
+
 ## 1.1.0
 *26-March-2018*
 * [Adds Extreme Precipitation tab to list of existing data views](https://github.com/pacificclimate/climate-explorer-frontend/pull/141)
