@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Navbar, Button } from 'react-bootstrap';
 
 import NavRoutes from '../navigation/NavRoutes/NavRoutes';
 import SingleAppController from '../app-controllers/SingleAppController/SingleAppController';
 import PrecipAppController from '../app-controllers/PrecipAppController/PrecipAppController';
 import DualAppController from '../app-controllers/DualAppController/DualAppController';
+import ToggleButton from '../ToggleButton';
 
 const navSpec = {
   basePath: '/data',
@@ -34,8 +34,31 @@ const navSpec = {
   ],
 };
 
-export default function DataTool(props) {
-  return <NavRoutes pullUp { ...{ navSpec, ...props } } />;
+export default class DataTool extends React.Component {
+
+  state = {
+    showDatasetsContext: false,
+  };
+
+  handleToggleSDC =
+      showDatasetsContext => this.setState({ showDatasetsContext });
+
+  render() {
+    return (
+      <NavRoutes
+        pullUp
+        { ...{ navSpec, ...this.props } }
+      >
+        <ToggleButton
+          active={this.state.showDatasetsContext}
+          onToggle={this.handleToggleSDC}
+          activeMessage={'Hide datasets context'}
+          inactiveMessage={'Show datasets context'}
+          bsSize={'small'}
+        />
+      </NavRoutes>
+    );
+  }
 }
 
 DataTool.propTypes = {
