@@ -151,7 +151,7 @@ export function getVariableOptions(variable, option) {
 
 /************************************************************
  * Data spec helper functions
- */
+ ************************************************************/
 
 /*
  * Determine a valid default data spec given a set of metadata
@@ -169,6 +169,28 @@ export function defaultDataSpec({ meta, model_id, variable_id, experiment }) {
     }
   }
 }
+
+/************************************************************
+ * Metadata helper functions
+************************************************************/
+
+export const valuesWithin = (tolerance, a, b) => Math.abs(+a - +b) <= tolerance;
+
+export const findMatchingMetadata = (
+  metadata, tolerance,
+  { model_id, experiment, variable_id, timescale,
+    start_date, end_date, ensemble_member },
+) =>
+  _.find(metadata, metadatum =>
+    // Match exactly on these parameters
+    _.matcher(
+      { model_id, experiment, variable_id, timescale, ensemble_member }
+    )(metadatum) &&
+    // Match within `tolerance` on start and end date
+    valuesWithin(tolerance, start_date, metadatum.start_date) &&
+    valuesWithin(tolerance, end_date, metadatum.end_date)
+  );
+
 
 /************************************************************
  * Date and calendar helper functions
