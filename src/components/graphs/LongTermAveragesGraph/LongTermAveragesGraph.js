@@ -62,26 +62,42 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    // See ../README for an explanation of the content and usage
+    // of state values. This is important for understanding how this
+    // component works.
+
     this.state = {
       prevMeta: null,
       prevArea: null,
-      timeOfYear: defaultTimeOfYear(timeResolutions(this.props.meta)),
+      prevTimeOfYear: null,
+      timeOfYear: null,
       data: null,
       dataError: null,
     };
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (
-      // Assumes that metadata changes when model, variable, or experiment does.
-      props.meta !== state.prevMeta ||
-      props.area !== state.prevArea
-    ) {
+    if (props.meta !== state.prevMeta || props.area !== state.prevArea) {
+      const timeOfYear = defaultTimeOfYear(timeResolutions(props.meta))
       return {
-        timeOfYear: defaultTimeOfYear(timeResolutions(props.meta)),
         prevMeta: props.meta,
         prevArea: props.area,
+        // Avoid triggering an unnecessary second second data fetch due to
+        // change in timeOfYear.
+        prevTimeOfYear: timeOfYear,
+        timeOfYear,
+        fetchingData: false,  // not quite yet
         data: null,  // Signal that data fetch is required
+        dataError: null,
+      };
+    }
+
+    // State change (timeOfYear). Signal need for data fetch.
+    if (state.prevTimeOfYear !== state.timeOfYear) {
+      return {
+        prevTimeOfYear: state.timeOfYear,
+        fetchingData: false,  // not quite yet
+        data: null,  // Signal that data fetch is required due to state change
         dataError: null,
       };
     }
@@ -95,12 +111,7 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      // props changed => data invalid
-      this.state.data === null ||
-      // user selected new time of year
-      this.state.timeOfYear !== prevState.timeOfYear
-    ) {
+    if (!this.state.fetchingData && this.state.data === null) {
       this.fetchData();
     }
   }
@@ -121,18 +132,21 @@ export default class LongTermAveragesGraph extends React.Component {
     .filter(metadata => !!metadata)
 
   fetchData() {
+    this.setState({ fetchingData: true });
     Promise.all(
       this.getMetadatas()
       .map(metadata => this.getAndValidateData(metadata))
     )
     .then(data => {
       this.setState({
+        fetchingData: false,
         data,
         dataError: null,
       });
     }).catch(dataError => {
       this.setState({
         // Do we have to set data non-null here to prevent infinite update loop?
+        fetchingData: false,
         dataError,
       });
     });
@@ -170,13 +184,19 @@ export default class LongTermAveragesGraph extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.data === null) {
+    if (this.state.fetchingData || this.state.data === null) {
       return loadingDataGraphSpec;
     }
 
     // We can haz data
-    return this.props.dataToGraphSpec(
-      this.state.data, this.getMetadatas());
+    try {
+      return this.props.dataToGraphSpec(this.state.data, this.getMetadatas());
+    } catch (error) {
+      // dataToGraphSpec may blow a raspberry if the data it is passed is
+      // invalid. This won't happen due to mismatched timeOfYear and data,
+      // because we don't allow that mismatch to occur.
+      return noDataMessageGraphSpec(errorMessage(error));
+    }
   }
 
   render() {
