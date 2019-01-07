@@ -16,6 +16,7 @@ jest.dontMock('underscore');
 import {formatYAxis,
         fixedPrecision,
         makePrecisionBySeries,
+        tooltipAddTimeOfYear,
         makeTooltipDisplayNumbersWithUnits,
         timeseriesToAnnualCycleGraph,
         getMonthlyData,
@@ -72,6 +73,19 @@ describe('makePrecisionBySeries', function () {
   it('uses a default precision for unspecified variables', function () {
     const precision = makePrecisionBySeries({ testseries: 'tasmin' });
     expect(precision(4.777, 'testseries')).toEqual(4.78);
+  });
+});
+
+describe('tooltipAddTimeOfYear', function() {
+  it('substitutes in the name of a month', function () {
+    expect(tooltipAddTimeOfYear("Monthly Bills", undefined, 100, 6)).toBe("July Bills");
+    expect(tooltipAddTimeOfYear("Income Monthly", undefined, 600, 3)).toBe("Income April");
+  });
+  it('substitutes in the name of a season', function () {
+    expect(tooltipAddTimeOfYear("Seasonal Harvest", undefined, 600, 1)).toBe("Winter-DJF Harvest");
+  });
+  it('does nothing when not needed', function () {
+    expect(tooltipAddTimeOfYear("Eggs per Chicken", undefined, 10, 10)).toBe("Eggs per Chicken");
   });
 });
 
