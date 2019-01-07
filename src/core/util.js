@@ -37,15 +37,18 @@ export function parseBootstrapTableData(data, metadata) {
   return _.map(data, function (stats, model) {
     const modelMetadata = _.find(metadata, m => m.unique_id === model);
     const period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
+    const variable_id = modelMetadata.variable_id;
+    const configuredPrecision = getVariableOptions(variable_id, "decimalPrecision");
+    const precision = configuredPrecision ? configuredPrecision : PRECISION;
     const modelInfo = {
       model_period: period,
       run: stats.run,
-      min: +stats.min.toFixed(PRECISION),
-      max: +stats.max.toFixed(PRECISION),
-      mean: +stats.mean.toFixed(PRECISION),
-      median: +stats.median.toFixed(PRECISION),
-      stdev: +stats.stdev.toFixed(PRECISION),
-      units: stats.units,
+      min: +stats.min.toFixed(precision),
+      max: +stats.max.toFixed(precision),
+      mean: +stats.mean.toFixed(precision),
+      median: +stats.median.toFixed(precision),
+      stdev: +stats.stdev.toFixed(precision),
+      units: getDataUnits(stats, modelMetadata.variable_id),
     };
     return modelInfo;
   });
@@ -126,7 +129,6 @@ export function validateUnstructuredTimeseriesData(response) {
   return response;
 }
 
-
 /*
  * Get an option defined in the variable-options.yaml config file.
  * This file is used to set formatting options (default map colours,
@@ -147,6 +149,29 @@ export function getVariableOptions(variable, option) {
     return vOptions[variable][option];
   }
   return undefined;
+}
+
+/*
+ * Get the units string associated with a data object and associated
+ * variable. This is usually just the "units" attribute of the
+ * data object.
+ *
+ * However, if the variable configuration file provides a user-friendly
+ * substitute unit string (such as "mm/day" instead of "kg m-2 day-1")
+ * for this variable+unit pair, the user friendly unit will be
+ * returned instead.
+ */
+export function getDataUnits(data, variable_id) {
+  const units = data.units;
+  const userFriendlyUnits = getVariableOptions(variable_id, "userFriendlyUnits");
+  if(userFriendlyUnits) {
+    for(let i = 0; i < userFriendlyUnits.length; i++) {
+      if(units in userFriendlyUnits[i]) {
+        return userFriendlyUnits[i][units];
+      }
+    }
+  }
+  return units;
 }
 
 /************************************************************

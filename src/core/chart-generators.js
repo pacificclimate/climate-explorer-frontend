@@ -28,7 +28,8 @@ import { PRECISION,
         nestedAttributeIsDefined,
         caseInsensitiveStringSearch,
         timeResolutionIndexToTimeOfYear,
-        timestampToTimeOfYear} from './util';
+        timestampToTimeOfYear,
+        getDataUnits} from './util';
 
 /* **************************************************
  * 0. Helper functions used by all graph generators *
@@ -491,7 +492,7 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
     c3Data.types[timeseriesName] = timeseriesMetadata.timescale === 'monthly' ? 'line' : 'step';
 
     seriesMetadata[timeseriesName] = {
-      units: timeseries.units,
+      units: getDataUnits(timeseries, timeseriesMetadata.variable_id),
       variable: timeseriesMetadata.variable_id,
     };
     seriesVariables[timeseriesName] = timeseriesMetadata.variable_id;
@@ -706,7 +707,7 @@ function dataToLongTermAverageGraph(data, contexts = []) {
       seriesVariables[runName] = seriesVariable;
       seriesMetadata[runName] = {
         variable: seriesVariable || '', // single-run has no var metadata
-        units: call[run].units,
+        units: getDataUnits(call[run], seriesVariable),
       };
       const series = [runName];
 
@@ -819,7 +820,7 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
     const seriesVariable = timeseriesMetadata.variable_id;
     seriesVariables[timeseriesName] = seriesVariable;
     seriesMetadata[timeseriesName] = {
-      units: timeseries.units,
+      units: getDataUnits(timeseries, seriesVariable),
       variable: seriesVariable,
     };
 
