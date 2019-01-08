@@ -156,45 +156,222 @@ wsdiETCCDI:
   decimalPrecision: 0
 
 #degree-day variables
+# these are annual-only multi year mean datasets, so they have a
+# graphable annual cycle, but it's a flat line.
+# apply shiftAnnualCycle to the other annual-only flat graph MYM
+# datasets.
 cdd:
   decimalPrecision: 0
+  shiftAnnualCycle:
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 fdd:
   decimalPrecision: 0
+  shiftAnnualCycle:
+    - cdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 gdd:
   decimalPrecision: 0
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 hdd:
   decimalPrecision: 0
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 #return period variables
+# these are annual-only multi year mean datasets, so they have a
+# graphable annual cycle, but it's a flat line.
+# apply shiftAnnualCycle to the other annual-only flat graph MYM
+# datasets.
 rp20pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp20tasmax:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp20tasmin:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp50tasmin
 
 rp50pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp50tasmax:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp50tasmin:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
 
 rp5pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp5tasmax:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp20tasmax
+    - rp50tasmax
+    - rp5tasmin
+    - rp20tasmin
+    - rp50tasmin
 
 rp5tasmin:
   decimalPrecision: 1
+  shiftAnnualCycle:
+    - cdd
+    - fdd
+    - gdd
+    - hdd
+    - rp5pr
+    - rp20pr
+    - rp50pr
+    - rp5tasmax
+    - rp20tasmax
+    - rp50tasmax
+    - rp20tasmin
+    - rp50tasmin
