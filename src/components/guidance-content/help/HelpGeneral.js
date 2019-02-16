@@ -439,13 +439,15 @@ export default function HelpGeneral() {
               <p>
                 Counts of how many days fall below or above a given temperature
                 threshold multiplied by how much the threshold is exceeded,
-                calculated from model output, over a period of one year.
-                The data is averaged over four thirty year periods between
-                1970 to 2100, namely
+                calculated from model output, over a period of a season or year.
+                The data is averaged over six thirty year periods between
+                1960 to 2100, namely
+                1961-1990,
                 1971-2000,
-                2011-2040,
-                2041-2070, and
-                2071-2100.
+                1981-2010,
+                2010-2039,
+                2040-2069, and
+                2070-2099.
                 This data is available for all of British Columbia.
               </p>
               <p>
