@@ -25,7 +25,10 @@ import { PRECISION,
         extendedDateToBasicDate,
         capitalizeWords,
         getVariableOptions,
-        nestedAttributeIsDefined } from './util';
+        nestedAttributeIsDefined,
+        caseInsensitiveStringSearch,
+        timeResolutionIndexToTimeOfYear,
+        timestampToTimeOfYear} from './util';
 
 /* **************************************************
  * 0. Helper functions used by all graph generators *
@@ -67,6 +70,37 @@ function makePrecisionBySeries(series) {
   }
 
   return function (n, name) {return +n.toFixed(dictionary[name]);};
+}
+
+/*
+ * This formatting function is used in chart tooltips to label the
+ * names of data points. It searches the name of the displayed time
+ * series for the keywords "Seasonal" or "Monthly". If it finds them,
+ * it replaces the keyword with the name of the individual month or
+ * season this data point represents ("June", "Winter", etc)
+ *
+ * If it finds neither keyword, it returns the name of the series
+ * unchanged.
+ *
+ * C3 passes tooltip text formatting functions four arguments:
+ *   - the name of the data series (index)
+ *   - ratio of this data point to total - pie charts only (ratio)
+ *   - nominal value of this data point (value)
+ *   - n where this data point is the nth in its series (index)
+ * This function only uses the name and index arguments.
+ */
+function tooltipAddTimeOfYear(name, ratio, value, index) {
+  if(caseInsensitiveStringSearch(name, "monthly")) {
+    return name.replace(/monthly/gi,
+        timeResolutionIndexToTimeOfYear("monthly", index));
+  } else if(caseInsensitiveStringSearch(name, "seasonal")) {
+    // timestamp representing this month - only the month is relevant
+    const timestamp = new Date(0, index);
+    return name.replace(/seasonal/gi,
+        timestampToTimeOfYear(timestamp.toISOString(), "seasonal", false)); 
+  } else {
+    return name;
+  }
 }
 
 /*
@@ -478,6 +512,7 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
   c3Tooltip.grouped = 'true';
   c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
       graph.axis, precision);
+  c3Tooltip.format.name = tooltipAddTimeOfYear;
 
   graph.tooltip = c3Tooltip;
   return graph;
@@ -836,6 +871,7 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
 module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeseriesGraph,
     // exported only for testing purposes:
-    formatYAxis, fixedPrecision, makePrecisionBySeries, makeTooltipDisplayNumbersWithUnits,
+    formatYAxis, fixedPrecision, makePrecisionBySeries,
+    makeTooltipDisplayNumbersWithUnits, tooltipAddTimeOfYear,
     getMonthlyData, shortestUniqueTimeseriesNamingFunction,
     getAllTimestamps, nameAPICallParametersFunction };
