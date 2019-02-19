@@ -18,10 +18,10 @@ export default function SingleLongTermAveragesGraph(props) {
     ];
   }
 
-  function dataToGraphSpec(data) {
+  function dataToGraphSpec(data, meta) {
     // Convert `data` (described by `meta`) to a graph specification compatible
     // with `DataGraph`.
-    return dataToLongTermAverageGraph(data);
+    return dataToLongTermAverageGraph(data, meta);
   }
 
   const graphProps = _.pick(props,

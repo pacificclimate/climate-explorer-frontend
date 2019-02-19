@@ -34,6 +34,12 @@
 #        clarify variables whose values move in parallel over the
 #        course of a year, such as tasmax and tasmin.
 #        (default: none)
+#   - userFriendlyUnits
+#        LIST OF UNIT1: UNIT2 PAIRS
+#        UNIT2, an equivalent but more user-friendly version of
+#        UNIT1, will be substituted for UNIT1 in user-visible
+#        displays like graphs and tables.
+#        (default: no substitutions)
 ################################################################
 
 #GCM output variables
@@ -52,8 +58,9 @@ pr:
   defaultRasterPalette: seq-Greens
   percentageAnomalies: true
   #decimalPrecision: 0
-  #Note: in an ideal universe, pr would be measured in millimeters with 0
-  #decimal places, but our pr data is in kg m-2 d-1 instead.
+  userFriendlyUnits:
+    - kg m-2 d-1: mm/day
+    - kg d-1 m-2: mm/day
 
 #CLIMDEX variables
 altcddETCCDI:
