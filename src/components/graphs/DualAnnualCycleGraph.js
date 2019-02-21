@@ -129,9 +129,7 @@ export default function DualAnnualCycleGraph(
       
       // see if both variables are annual-only, in which case they visually
       // overlap as well, because both will be graphed as horizontal lines.
-      //const annualOnly = !_.contains(_.pluck(meta, "timescale"), "seasonal")
-      //&& !_.contains(_.pluck(meta, "timescale"), "monthly");
-      const annualOnly = (_.reject(meta, m => {return m.timescale === 'yearly';})).length === 0;
+      const annualOnly = (_.reject(meta, m => m.timescale === 'yearly')).length === 0;
       
       const overlap = (comparandOverlaps && comparandOverlaps.includes(variable_id))
         || (variableOverlaps && variableOverlaps.includes(comparand_id));
