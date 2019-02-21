@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 1.2.1
+*21-Feb-2019*
+
+* [Fix a bug that caused the time of year on exported data to show as "undefined"](https://github.com/pacificclimate/climate-explorer-frontend/pull/268)
+* [Support configuring user-friendly unit strings in UI](https://github.com/pacificclimate/climate-explorer-frontend/pull/270)
+* [Graph popups display specific month or season corresponding to each value](https://github.com/pacificclimate/climate-explorer-frontend/pull/271)
+* [Datasets with only annual values are visually separated on annual cycle comparison graphs](https://github.com/pacificclimate/climate-explorer-frontend/pull/273)
+
 ## 1.2.0
 *17-Dec-2018*
 
