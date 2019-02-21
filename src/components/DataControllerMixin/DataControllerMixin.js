@@ -67,7 +67,7 @@ var ModalMixin = {
 
   exportDataTable: function (format) {
     exportDataToWorksheet("stats", this.props, this.state.statsData, format, 
-        {timeidx: this.state.dataTableTimeOfYear, timeres:this.state.dataTableTimeScale});
+        {timeidx: this.state.dataTableTimeOfYear, timescale:this.state.dataTableTimeScale});
   },
 
   injectRunIntoStats: function (data) {

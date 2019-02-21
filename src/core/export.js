@@ -59,13 +59,13 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       outputFilename = `${filenamePrefix}Timeseries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
-      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timescale, selection.timeidx);
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromDataTable(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "climoseries":
-      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timeres, selection.timeidx);
+      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timescale, selection.timeidx);
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
       outputFilename = `${filenamePrefix}LongTermAverage${filenameInfix}_${timeOfYear}${filenameSuffix}`;

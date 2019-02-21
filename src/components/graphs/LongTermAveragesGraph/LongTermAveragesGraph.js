@@ -159,14 +159,12 @@ export default class LongTermAveragesGraph extends React.Component {
   };
 
   exportData(format) {
-    const { timescale: timeres, timeidx } =
-      timeKeyToResolutionIndex(this.state.timeOfYear);
     exportDataToWorksheet(
       'climoseries',
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
       this.graphSpec(),
       format,
-      { timeres, timeidx }
+      timeKeyToResolutionIndex(this.state.timeOfYear)
     );
   }
 

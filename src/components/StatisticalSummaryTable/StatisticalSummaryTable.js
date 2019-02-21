@@ -154,8 +154,7 @@ export default class StatisticalSummaryTable extends React.Component {
   exportDataTable(format) {
     exportDataToWorksheet(
       'stats', this.props, this.state.data, format,
-      { timeidx: this.state.timeOfYear,
-        timeres: this.state.dataTableTimeScale }
+      timeKeyToResolutionIndex(this.state.timeOfYear)
     );
   }
 
