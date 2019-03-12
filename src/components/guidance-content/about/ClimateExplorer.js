@@ -7,7 +7,7 @@ export default function ClimateExplorer() {
     <Grid fluid>
       <Row>
         <FullWidthCol>
-          <h1>Climate Explorer</h1>
+          <h1>PCIC Climate Explorer (PCEX)</h1>
         </FullWidthCol>
       </Row>
 
@@ -17,11 +17,11 @@ export default function ClimateExplorer() {
             <ListGroupItem header='Description'>
               <p>
                 A tool for visualizing and downloading
-                climate model data and data derived from climate outputs
-                for the B.C. - Yukon region.
+                climate model outputs and data derived from those outputs.
               </p>
               <p>
-                Climate Explorer is also fondly known as 'the Marmot,'
+                The PCIC Climate Explorer (PCEX) is also fondly known as
+                the 'marmot,'
                 since it is an improvement (we sincerely hope) on its predecessor,
                 the Regional Analysis Tool, or 'RAT.' Hence our mascot in the
                 header.
@@ -72,7 +72,7 @@ export default function ClimateExplorer() {
                 contained here is your sole responsibility and strictly at
                 your own risk.
                 In no event will the Pacific Climate Impacts Consortium be
-                liable for any loss or damage whatsoever, including without
+                liable for any loss or damage whatsoever, including, without
                 limitation, indirect or consequential loss or damage, arising
                 from reliance upon the data or derived information.
               </p>
