@@ -19,7 +19,7 @@ export default function Credits() {
               header='Ministry of Transportation and Infrastructure (MoTI)'
               href='https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure'
             >
-              Primary sponsor of the Climate Explorer project.
+              Primary sponsor of the PCIC Climate Explorer project.
             </ListGroupItem>
           </ListGroup>
 
@@ -39,17 +39,18 @@ export default function Credits() {
           <ListGroup>
 
             <ListGroupItem
-              header='Environment Canada'
+              header='Environment and Climate Change Canada'
               href='http://www.ec.gc.ca/'
             >
               <p>
                 We thank the Landscape Analysis and Applications section of the
-                Canadian Forest Service, Natural Resources Canada for developing
+                Canadian Forest Service, Natural Resources Canada, for developing
                 and making available the Canada-wide historical daily gridded
                 climate dataset used as the downscaling target.
               </p>
               <p>
-                PCIC gratefully acknowledges support from Environment Canada
+                PCIC gratefully acknowledges support from
+                Environment and Climate Change Canada
                 for the development of the statistically downscaled GCM
                 scenarios on which much of the data presented here is based.
               </p>
@@ -57,6 +58,7 @@ export default function Credits() {
 
             <ListGroupItem
               header='World Climate Research Programme'
+              href='https://www.wcrp-climate.org/'
             >
               We acknowledge the World Climate Research Programme’s
               Working Group on Coupled Modelling, which is responsible for
@@ -66,9 +68,9 @@ export default function Credits() {
 
             <ListGroupItem
               header='U.S. Department of Energy'
-              href=''
+              href='https://www.energy.gov/'
             >
-              For CMIP the U.S. Department of Energy’s Program for
+              For CMIP, the U.S. Department of Energy’s Program for
               Climate Model Diagnosis and Intercomparison provides coordinating
               support and led development of software infrastructure in
               partnership with the Global Organization for
