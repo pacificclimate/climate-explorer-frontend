@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 1.2.2
+*12-Mar-2019*
+
+* [Tweak naming and credits](https://github.com/pacificclimate/climate-explorer-frontend/pull/281)
+
 ## 1.2.1
 *21-Feb-2019*
 
