@@ -21,7 +21,7 @@ export default function ClimateExplorer() {
               </p>
               <p>
                 The PCIC Climate Explorer (PCEX) is also fondly known as
-                the 'marmot,'
+                'the marmot,'
                 since it is an improvement (we sincerely hope) on its predecessor,
                 the Regional Analysis Tool, or 'RAT.' Hence our mascot in the
                 header.
