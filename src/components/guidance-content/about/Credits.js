@@ -19,7 +19,7 @@ export default function Credits() {
               header='Ministry of Transportation and Infrastructure (MoTI)'
               href='https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure'
             >
-              Primary sponsor of the PCIC Climate Explorer project.
+              Primary sponsor of the PCIC Climate Explorer (PCEX) project.
             </ListGroupItem>
           </ListGroup>
 

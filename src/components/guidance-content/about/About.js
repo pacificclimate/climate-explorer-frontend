@@ -9,7 +9,7 @@ const navSpec = {
   basePath: '/about',
   items: [
     {
-      label: 'Climate Explorer',
+      label: 'PCIC Climate Explorer',
       subpath: 'climate-explorer',
       component: ClimateExplorer,
     },
