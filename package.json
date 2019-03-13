@@ -6,11 +6,12 @@
   "scripts": {
     "reinstall": "rm -rf ./node_modules && npm install",
     "prestart": "if [ ! -f ./variable-options.yaml ]; then touch ./variable-options.yaml; fi",
-    "start": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback",
+    "start": "CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback",
     "build": "webpack --progress --colors",
     "test": "jest --verbose --runInBand",
     "lint": "eslint .",
-    "lint:glob": "eslint"
+    "lint:glob": "eslint",
+    "rg-start": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback"
   },
   "author": "Basil Veerman <bveerman@uvic.ca>",
   "license": "GPL-3.0",
