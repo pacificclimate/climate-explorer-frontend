@@ -143,7 +143,7 @@ export default class App extends React.Component {
                 />
               </Navbar.Brand>
               <Navbar.Brand>
-                Climate Explorer
+                PCIC Climate Explorer
               </Navbar.Brand>
             </Navbar.Header>
           </NavRoutes>

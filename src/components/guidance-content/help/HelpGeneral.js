@@ -17,7 +17,7 @@ const cddCaution = (<span>
 </span>);
 
 const monthlyAnnualVarNameAmbiguityCaution = (<span>
-  Unlike most Climdex variable names used in Climate Explorer,
+  Unlike most Climdex variable names used in PCEX,
   this variable name can refer to either an annual version
   (calculation spanning a calendar year) or to the standard
   Climdex monthly version. The distinction is shown in the
@@ -51,11 +51,11 @@ export default function HelpGeneral() {
 
           <h2>Overview</h2>
           <h3>What it is</h3>
-          <p>Climate Explorer is an interactive web application that runs in
+          <p>PCIC Climate Explorer (PCEX) is an interactive web application that runs in
             your browser. It displays data derived from climate models in a
             variety of ways, including maps, graphs and data tables.</p>
           <h3>Purpose</h3>
-          <p>Climate Explorer’s purpose is to help you do the following
+          <p>PCEX’s purpose is to help you do the following
             things:</p>
           <ul>
             <li>
@@ -91,14 +91,14 @@ export default function HelpGeneral() {
           </ul>
           <h3>Application elements</h3>
           <p>It helps to have a little terminology for the various parts of the
-            Climate Explorer application.</p>
+            PCEX application.</p>
           <p>
             <img src={overviewImg} alt='Overview of app'/>
           </p>
 
-          <h2>Data available in Climate Explorer</h2>
+          <h2>Data available in PCEX</h2>
           <p>
-            There are four types of data available in Climate Explorer.
+            There are four types of data available in PCEX.
             (Click on a heading to expand the full explanation of each type.)
           </p>
 
@@ -547,7 +547,7 @@ export default function HelpGeneral() {
           <h2>Models (GCMs)</h2>
           <p>{gcmDefn}</p>
           <p>
-            In Climate Explorer, models are indentified by short codes.
+            In PCEX, models are indentified by short codes.
             The following table gives the full name and provenance of these
             models.
           </p>
@@ -741,7 +741,7 @@ export default function HelpGeneral() {
           </ListGroup>
 
           <h2>Datasets and data filtering</h2>
-          <p>Climate Explorer has a huge base of data available—far too much
+          <p>PCEX has a huge base of data available—far too much
             to present usefully in any single view. A selection (filtering)
             process must come between data and presentation.</p>
           <h3>Datasets</h3>
@@ -767,7 +767,7 @@ export default function HelpGeneral() {
           <ListGroup>
             <ListGroupItem header='Model'>
               Which GCM produced the base data for the dataset.
-              (Almost all data available in Climate Explorer is further
+              (Almost all data available in PCEX is further
               processed
               from this base data. Specifically, most of the data available
               has
@@ -830,7 +830,7 @@ export default function HelpGeneral() {
           </ListGroup>
 
           <h2>Data presentations</h2>
-          <p>Climate Explorer presents data in several different ways. The
+          <p>PCEX presents data in several different ways. The
             following is a summary of the different presentations available.</p>
           <ListGroup>
             <ListGroupItem header='Data Map'>
