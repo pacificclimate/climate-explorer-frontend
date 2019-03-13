@@ -64,19 +64,55 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 ### Setup using Docker
 
 
-#### Build docker image
+#### Build docker image manually
 
-Clone repo:
+Until recently (roughly, Jan 2019), we were using Dockerhub automated builds
+to build our images. Dockerhub recently changed their UI and in doing so broke
+all the automated builds. For the moment we need to do manual builds.
 
-```bash
-git clone https://github.com/pacificclimate/climate-explorer-frontend
-cd climate-explorer-frontend
-```
+Dockerhub images all had the name `pcic/climate-explorer-frontend`.
+
+To distinguish our manually built images, we are omitting the `pcic/` portion
+of the name and just using `climate-explorer-frontend`.
 
 Build a docker image:
 
 ```bash
-docker build -t pcic/climate-explorer-frontend-image .
+docker build -t climate-explorer-frontend .
+```
+
+#### Tag docker image
+
+Dockerhub automatically assigned the tag `latest` to the latest build.
+That was convenient, but ...
+
+For manual build procedures, 
+[tagging with `latest` is not considered a good idea](https://medium.com/@mccode/the-misunderstood-docker-tag-latest-af3babfd6375).
+It is better (and easy and immediately obvious) to tag with version/release
+numbers. In this example, we will tag with version 1.2.3.
+
+1. Determine the recently built image's ID:
+
+   ```bash
+   $ docker images
+   REPOSITORY                                                         TAG                 IMAGE ID            CREATED             SIZE
+   climate-explorer-frontend                                          latest              14cb66d3d145        22 seconds ago      867MB
+
+   ```
+   
+1. Tag the image:
+
+   ```bash
+   Tag the image
+   $ docker tag 1040e7f07e5d docker-registry01.pcic.uvic.ca:5000/climate-explorer-frontend:1.2.3
+   ```
+   
+#### Push docker image to PCIC docker registry
+
+[PCIC maintains its own docker registry](https://pcic.uvic.ca/confluence/pages/viewpage.action?pageId=3506599). We place manual builds in this registry:
+
+```bash
+docker push docker-registry01.pcic.uvic.ca:5000/climate-explorer-frontend:1.2.3
 ```
 
 #### Run docker image
@@ -110,7 +146,7 @@ docker run --restart=unless-stopped -d
   -e TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py 
   -e CE_BASE_PATH=/marmot/app 
   --name climate-explorer-frontend
-  pcic/climate-explorer-frontend:latest
+  climate-explorer-frontend:<tag>
 ```
 
 ## Releasing
