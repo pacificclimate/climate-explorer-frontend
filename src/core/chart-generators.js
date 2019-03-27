@@ -385,7 +385,9 @@ function getMonthlyData(data, timescale = 'monthly') {
  * the graph legend will need to display variable names as well.
  *
  * Timeseries names include any descriptive  metadata that vary between
- * timeseries and leave out any metadata that doesn't. They end with "mean".
+ * timeseries and leave out any metadata that doesn't. They end with a
+ * basename specific to the variable and set in the variable config file 
+ * (or "mean" if the config file doesn't specify).
  */
 // TODO: special case climatological period to display as (XXXX-XXXX)
 // TODO: possibly cue descriptors to appear in a specific order?
@@ -425,13 +427,23 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   if (variation.length === 0) {
     throw new Error('Error: cannot graph identical timeseries');
   }
+  
+  // Build a dictionary with the base name for each variable (typically
+  // either "Mean" or "Mean Count") from the variable config file. 
+  // Defaults to "Mean" since all data displayed by this graph is MYMs.
+  const variables = _.uniq(_.pluck(metadata, "variable_id"));
+  function getVarBasename(v) {
+    const fromConfig = getVariableOptions(v, 'seriesLegendString');
+    return _.isUndefined(fromConfig) ? "Mean" : fromConfig;
+  }
+  const basenameByVariable = _.object(variables, _.map(variables, getVarBasename));
 
   return function (m) {
     let name = '';
     for (let v of variation) {
       name = name.concat(`${m[v]} `);
     }
-    name = name.concat('mean');
+    name = name.concat(basenameByVariable[m.variable_id]);
     return capitalizeWords(name);
   };
 }
