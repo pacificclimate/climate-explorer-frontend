@@ -62,6 +62,10 @@ pr:
     - kg m-2 d-1: mm/day
     - kg d-1 m-2: mm/day
 
+prsn:
+  overrideLogarithmicScale: true
+  percentageAnomalies: true
+
 #CLIMDEX variables
 altcddETCCDI:
   decimalPrecision: 0

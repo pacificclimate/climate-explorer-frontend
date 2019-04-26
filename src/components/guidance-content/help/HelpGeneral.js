@@ -126,6 +126,9 @@ export default function HelpGeneral() {
                 <ListGroupItem header='tasmin'>
                   Daily minimum near-surface air temperature.
                 </ListGroupItem>
+                <ListGroupItem header='prsn'>
+                  Precipitation at ground level while mean daily temperature is below freezing.
+                </ListGroupItem>
               </ListGroup>
             </Accordion.Item>
 
