@@ -1,113 +1,31 @@
 {
-  "name": "Climate-explorer",
-  "version": "1.2.3",
-  "description": "PCIC Climate Explorer front end application",
-  "main": "index.js",
-  "scripts": {
-    "reinstall": "rm -rf ./node_modules && npm install",
-    "prestart": "if [ ! -f ./variable-options.yaml ]; then touch ./variable-options.yaml; fi",
-    "start": "CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback",
-    "build": "webpack --progress --colors",
-    "test": "jest --verbose --runInBand",
-    "lint": "eslint .",
-    "lint:glob": "eslint",
-    "rg-start": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) webpack-dev-server --host 0.0.0.0 --history-api-fallback"
-  },
-  "author": "Basil Veerman <bveerman@uvic.ca>",
-  "license": "GPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/pacificclimate/climate-explorer-frontend"
-  },
-  "bugs": "https://github.com/pacificclimate/climate-explorer-frontend/issues",
-  "//": [
-    "fbjs mocked due to https://github.com/facebook/jest/issues/554",
-    "config file variable-options.yaml created by prestart if not present"
-  ],
-  "jest": {
-    "testURL": "http://localhost",
-    "rootDir": "./src",
-    "scriptPreprocessor": "../preprocessor.js",
-    "globals": {
-      "CE_BACKEND_URL": "http://tools.pacificclimate.org/climate-data",
-      "TILECACHE_URL": "http://tiles.pacificclimate.org/tilecache/tilecache.py",
-      "NCWMS_URL": "http://tools.pacificclimate.org/ncWMS-PCIC/wms",
-      "CE_ENSEMBLE_NAME": "ce",
-      "CE_CURRENT_VERSION": "Climate Explorer test version"
-    },
-    "moduleNameMapper": {
-      "\\.(png|jpg|gif|ttf|eot|svg)$": "<rootDir>/test_support/jest/__mocks__/fileMock.js"
-    },
-    "unmockedModulePathPatterns": [
-      "fbjs",
-      "react",
-      "react-dom"
-    ]
-  },
+  "name": "climate-explorer-frontend-cra",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "axios": "^0.16.1",
-    "bootstrap": "^3.3.5",
-    "bootstrap-slider": "^5.1.0",
-    "c3": "~0.4.11-rc4",
-    "chroma-js": "^1.3.4",
-    "create-react-class": "^15.6.2",
-    "enzyme": "^3.6.0",
-    "enzyme-adapter-react-16": "^1.5.0",
-    "filesaver.js": "^0.2.0",
-    "leaflet": "^1.3.4",
-    "leaflet-draw": "^1.0.4",
-    "moment": "^2.10.6",
-    "proj4": "^2.4.4",
-    "proj4leaflet": "^1.0.2",
-    "prop-types": "^15.6.0",
-    "react": "^16.6.3",
-    "react-bootstrap": "^0.32.0",
-    "react-bootstrap-table": "^4.3.1",
-    "react-dom": "^16.6.3",
-    "react-input-range": "^1.3.0",
-    "react-leaflet": "^2.0.0",
-    "react-leaflet-draw": "^0.19.0",
-    "react-router-bootstrap": "^0.24.4",
-    "react-router-dom": "^4.3.1",
-    "react-test-renderer": "^16.5.2",
-    "xlsx": "^0.8.0"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1"
   },
-  "devDependencies": {
-    "autoprefixer": "^6.0.3",
-    "babel-core": "^5.8.25",
-    "babel-eslint": "^4.1.8",
-    "babel-jest": "^5.3.0",
-    "babel-loader": "^5.3.2",
-    "classnames": "^2.2.0",
-    "css-loader": "^0.20.2",
-    "eslint": "^1.10.3",
-    "eslint-config-airbnb": "^5.0.0",
-    "eslint-plugin-react": "^3.16.1",
-    "extract-text-webpack-plugin": "^0.8.2",
-    "file-loader": "^0.8.4",
-    "filesaver.js": "^0.2.0",
-    "jest-cli": "^22.0.6",
-    "json-stable-stringify": "^1.0.0",
-    "leaflet-image": "^0.1.0",
-    "normalize.css": "^3.0.3",
-    "perfect-scrollbar": "^0.6.7",
-    "postcss-cssnext": "^2.2.0",
-    "postcss-import": "^7.1.0",
-    "postcss-loader": "^0.7.0",
-    "react-hot-loader": "^1.3.0",
-    "react-loader": "^2.2.0",
-    "shp-write": "^0.2.5",
-    "shpjs": "^3.3.1",
-    "style-loader": "^0.13.0",
-    "togeojson": "^0.13.0",
-    "togpx": "^0.4.0",
-    "tokml": "^0.4.0",
-    "underscore": "^1.8.3",
-    "url-join": "0.0.1",
-    "url-loader": "^0.5.6",
-    "webpack": "^1.12.2",
-    "webpack-dev-server": "^1.12.1",
-    "wellknown": "^0.4.1",
-    "yml-loader": ">=2.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
