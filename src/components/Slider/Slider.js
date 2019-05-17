@@ -67,4 +67,4 @@ class Slider extends React.Component {
   }
 }
 
-module.exports = Slider;
+export Slider;

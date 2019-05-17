@@ -316,7 +316,7 @@ var addRunToStats = function () {
 };
 
 
-module.exports = {monthlyTasmaxTimeseries, seasonalTasmaxTimeseries, annualTasmaxTimeseries,
+export {monthlyTasmaxTimeseries, seasonalTasmaxTimeseries, annualTasmaxTimeseries,
     monthlyTasminTimeseries, monthlyPrTimeseries,
     tasmaxStats, addRunToStats,
     tasmaxData, tasminData, prData,

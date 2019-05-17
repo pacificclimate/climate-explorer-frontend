@@ -1,0 +1,211 @@
+################################################################
+# variable-options.yaml - variable-specific configuration file
+#
+# This file supplies default display options about climate
+# variables. Each variable is referred to using the name that 
+# appears in the netcdf variables listing.
+#
+# Available options are:
+#   - decimalPrecision
+#        INTEGER
+#        number of digits after the decimal point to display on
+#        graphs and map legends (default: 2)
+#   - overrideLogarithmicScale 
+#        BOOLEAN
+#        if true, allows clipping this variable to a positive 
+#        range and displaying with a logarithmic scale on map 
+#        views, even when the range of the variable contains 
+#        negative values (default: false)
+#   - defaultRasterPalette
+#        NCWMS PALETTE (see options here: http://goo.gl/J4Q5PD )
+#        the default colour scheme used to show this variable
+#        on a map. (default: seq-Greys)
+#   - percentageAnomalies
+#        BOOLEAN
+#        if true, projected anomalies for this variables will
+#        be expressed as percentages, not nominal values, in
+#        graphs and tables that display anomalies
+#        (default: false)
+#   - shiftAnnualCycle
+#        LIST OF VARIABLE NAMES
+#        if this variable is displayed for comparison with one
+#        of the variables in the list in an Annual Cycle Graph,
+#        their lines will be shifted apart vertically. This helps
+#        clarify variables whose values move in parallel over the
+#        course of a year, such as tasmax and tasmin.
+#        (default: none)
+#   - userFriendlyUnits
+#        LIST OF UNIT1: UNIT2 PAIRS
+#        UNIT2, an equivalent but more user-friendly version of
+#        UNIT1, will be substituted for UNIT1 in user-visible
+#        displays like graphs and tables.
+#        (default: no substitutions)
+################################################################
+
+#GCM output variables
+tasmin:
+  decimalPrecision: 1
+  shiftAnnualCycle:
+    - tasmax
+  
+tasmax:
+  decimalPrecision: 1
+  shiftAnnualCycle:
+    - tasmin
+
+pr:
+  overrideLogarithmicScale: true
+  defaultRasterPalette: seq-Greens
+  percentageAnomalies: true
+  #decimalPrecision: 0
+  userFriendlyUnits:
+    - kg m-2 d-1: mm/day
+    - kg d-1 m-2: mm/day
+
+prsn:
+  overrideLogarithmicScale: true
+  percentageAnomalies: true
+
+#CLIMDEX variables
+altcddETCCDI:
+  decimalPrecision: 0
+
+altcsdiETCCDI:
+  decimalPrecision: 0
+
+altcwdETCCDI:
+  decimalPrecision: 0
+
+altwsdiETCCDI:
+  decimalPrecision: 0
+
+cddETCCDI:
+  decimalPrecision: 0
+
+csdiETCCDI:
+  decimalPrecision: 0
+
+cwdETCCDI:
+  decimalPrecision: 0
+
+dtrETCCDI:
+  decimalPrecision: 1
+
+fdETCCDI:
+  decimalPrecision: 0
+
+gslETCCDI:
+  decimalPrecision: 0
+
+idETCCDI:
+  decimalPrecision: 0
+
+prcptotETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+rx1dayETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+rx5dayETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+r1mmETCCDI:
+  decimalPrecision: 0
+
+r10mmETCCDI:
+  decimalPrecision: 0
+
+r20mmETCCDI:
+  decimalPrecision: 0
+  
+r95pETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+r99pETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+sdiiETCCDI:
+  percentageAnomalies: true
+  decimalPrecision: 0
+
+suETCCDI:
+  decimalPrecision: 0
+
+tn10pETCCDI:
+  decimalPrecision: 0
+
+tn90pETCCDI:
+  decimalPrecision: 0
+
+tnnETCCDI:
+  decimalPrecision: 1
+
+tnxETCCDI:
+  decimalPrecision: 1
+
+trETCCDI:
+  decimalPrecision: 1
+
+tx10pETCCDI:
+  decimalPrecision: 0
+
+tx90pETCCDI:
+  decimalPrecision: 0
+
+txnETCCDI:
+  decimalPrecision: 1
+
+txxETCCDI:
+  decimalPrecision: 1
+
+wsdiETCCDI:
+  decimalPrecision: 0
+
+#degree-day variables
+cdd:
+  decimalPrecision: 0
+
+fdd:
+  decimalPrecision: 0
+
+gdd:
+  decimalPrecision: 0
+
+hdd:
+  decimalPrecision: 0
+
+#return period variables
+rp20pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp20tasmax:
+  decimalPrecision: 1
+
+rp20tasmin:
+  decimalPrecision: 1
+
+rp50pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp50tasmax:
+  decimalPrecision: 1
+
+rp50tasmin:
+  decimalPrecision: 1
+
+rp5pr:
+  decimalPrecision: 0
+  percentageAnomalies: true
+
+rp5tasmax:
+  decimalPrecision: 1
+
+rp5tasmin:
+  decimalPrecision: 1

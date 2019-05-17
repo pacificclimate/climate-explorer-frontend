@@ -70,4 +70,4 @@ var allDefinedObject = function (obj) {
   return true;
 };
 
-module.exports = {isRectangularArray, allDefinedArray, allDefinedObject};
+export {isRectangularArray, allDefinedArray, allDefinedObject};

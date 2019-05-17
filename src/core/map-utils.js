@@ -6,6 +6,6 @@ var generateResolutions = function (maxRes, count) {
   return result;
 };
 
-module.exports = {
-  generateResolutions: generateResolutions,
+export {
+  generateResolutions,
 };

@@ -86,7 +86,7 @@ export function getLayerMinMax(layer, props, bounds) {
   const { layers, version, srs, time } = getWMSParams(layer, props[layer]);
 
   return axios(
-    NCWMS_URL,
+    process.env.REACT_APP_NCWMS_URL,
     {
       params: {
         styles: 'default-scalar',

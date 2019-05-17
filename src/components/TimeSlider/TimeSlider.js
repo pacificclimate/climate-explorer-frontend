@@ -17,4 +17,4 @@ class TimeSlider extends React.Component {
   }
 }
 
-module.exports = TimeSlider;
+export TimeSlider;

@@ -17,4 +17,4 @@ const layerParamsPropTypes = PropTypes.shape({
   onChangeRange: PropTypes.func.isRequired,
 });
 
-module.exports = {layerParamsPropTypes};
+export {layerParamsPropTypes};

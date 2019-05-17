@@ -21,7 +21,7 @@ import About from '../guidance-content/about/About';
 import logo from '../../assets/logo.png';
 import marmot from '../../assets/marmot.png';
 import styles from './App.css';
-import '!style!css!react-input-range/lib/css/index.css';
+import '../../../node_modules/react-input-range/lib/css/index.css';
 
 
 export default class App extends React.Component {
@@ -121,7 +121,7 @@ export default class App extends React.Component {
     // We choose option 2, hence the hash (#) following the base path in the
     // `Router.basename` value below.
     return (
-      <Router basename={`${CE_BASE_PATH}/#`}>
+      <Router basename={`${process.env.REACT_APP_CE_BASE_PATH}/#`}>
         <div>
           <NavRoutes navSpec={this.navSpec} navClassName={styles.mainNav}>
             <Navbar.Header>

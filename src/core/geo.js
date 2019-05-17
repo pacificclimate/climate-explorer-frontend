@@ -6,9 +6,11 @@ import _tokml from 'tokml';
 import _togpx from 'togpx';
 import shp from 'shpjs';
 import { write } from 'shp-write';
+import JSZip from 'jszip';  // Installed by `shp-write`; apparently not
+
+// TODO: Convert to import syntax?
 const geojson = require('shp-write/src/geojson');
 const prj = require('shp-write/src/prj');
-import JSZip from 'jszip';  // Installed by `shp-write`
 
 function createZippedShapefile(gj, options) {
   // Alternate to function `zip` in `shp-write/src/zip`, but with option to
@@ -64,7 +66,7 @@ function saveZippedShapefile(gj, options) {
   // Alternate to function `download` in `shp-write`, but with option to
   // store files in root of zipped shapefile. See `createZippedShapefile`.
   const content = createZippedShapefile(gj, options);
-  location.href = 'data:application/zip;base64,' + content;
+  window.location.href = 'data:application/zip;base64,' + content;
 }
 
 var g = {
@@ -196,4 +198,4 @@ var g = {
 };
 
 
-module.exports = g;
+export default g;

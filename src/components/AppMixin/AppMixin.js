@@ -20,7 +20,7 @@ var findEnsemble = function(props) {
   return (
     (props.match && props.match.params && props.match.params.ensemble_name) ||
     props.ensemble_name ||
-    CE_ENSEMBLE_NAME
+    process.env.REACT_APP_CE_ENSEMBLE_NAME
   );
 };
 
@@ -54,7 +54,7 @@ var AppMixin = {
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
     axios({
-      baseURL: urljoin(CE_BACKEND_URL, 'multimeta'),
+      baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: this.state.ensemble_name },
       }).then(response => {
         for (var key in response.data) {

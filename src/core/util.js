@@ -144,7 +144,7 @@ export function validateUnstructuredTimeseriesData(response) {
  * and "undefined" when acting on its results.
  */
 export function getVariableOptions(variable, option) {
-  const vOptions = require('../../variable-options.yaml');
+  const vOptions = require('../assets/variable-options.yaml');
   if (nestedAttributeIsDefined(vOptions, variable, option)) {
     return vOptions[variable][option];
   }

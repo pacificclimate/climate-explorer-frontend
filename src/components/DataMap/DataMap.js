@@ -72,6 +72,7 @@ import React from 'react';
 
 import _ from 'underscore';
 
+import L from 'leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import { EditControl } from 'react-leaflet-draw';
