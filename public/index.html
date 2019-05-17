@@ -19,11 +19,26 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
+          crossorigin="anonymous">
+    <style type="text/css">
+      .leaflet-container {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <title>PCIC Climate Explorer (CRA)</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!--[if lt IE 8]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
     <div id="root"></div>
+    <!--  leaflet canvas required for leaflet.image  -->
+    <script>L_PREFER_CANVAS = true;</script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
