@@ -6,7 +6,7 @@
     padding: 0px 15px;
 }
 
-.mainNav :global(.navbar-nav>li>a) {
+.mainNav :global(.navbar-nav > li >a ) {
     padding-top: 20px;
     padding-bottom: 20px;
 }

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { Button, Glyphicon, Table } from 'react-bootstrap';
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 import Information from '../../guidance-tools/Information';
-import css from './InformationItems.css';
+import css from './InformationItems.module.css';
 
 ///////////////////////////////
 // Parts for building items

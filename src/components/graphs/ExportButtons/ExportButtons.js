@@ -7,7 +7,7 @@ import {
   downloadGraphDataLabel, xslxButtonLabel,
 } from '../../guidance-content/info/InformationItems';
 
-import styles from './ExportButtons.css';
+import styles from './ExportButtons.module.css';
 
 
 export default class ExportButtons extends React.Component {

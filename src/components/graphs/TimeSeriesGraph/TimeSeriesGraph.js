@@ -3,7 +3,7 @@ import React from 'react';
 import { Row, Col, ControlLabel } from 'react-bootstrap';
 
 import DataGraph from '../DataGraph/DataGraph';
-import styles from './TimeSeriesGraph.css';
+import styles from './TimeSeriesGraph.module.css';
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData,

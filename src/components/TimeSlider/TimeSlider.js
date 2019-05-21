@@ -2,7 +2,7 @@ var React = require('react');
 
 var Slider = require('../Slider');
 
-import styles from './TimeSlider.css';
+import styles from './TimeSlider.module.css';
 
 class TimeSlider extends React.Component {
   render() {

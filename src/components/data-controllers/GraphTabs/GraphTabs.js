@@ -3,7 +3,7 @@ import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
 import { multiYearMeanSelected } from '../../graphs/graph-helpers';
-import styles from '../DataController.css';
+import styles from '../DataController.module.css';
 
 const graphTabSpecPropType = PropTypes.shape({
   title: PropTypes.node,

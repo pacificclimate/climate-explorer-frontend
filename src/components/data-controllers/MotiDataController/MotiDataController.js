@@ -56,7 +56,7 @@ import {
   statsTableLabel,
 } from '../../guidance-content/info/LabelWithInfoItems';
 
-import styles from '../DataController.css';
+import styles from '../DataController.module.css';
 
 
 export default createReactClass({

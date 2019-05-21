@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ControlLabel, MenuItem, Dropdown } from 'react-bootstrap';
 import _ from 'underscore';
-import styles from './Selector.css';
+import styles from './Selector.module.css';
 
 class Selector extends React.Component {
   static propTypes = {
