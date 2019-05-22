@@ -1,10 +1,10 @@
-var React = require('react');
+import React from 'react';
 
-var Slider = require('../Slider');
+import Slider from '../Slider';
 
 import styles from './TimeSlider.module.css';
 
-class TimeSlider extends React.Component {
+export default class TimeSlider extends React.Component {
   render() {
     return (
       <div className={styles.timeslider}>
@@ -16,5 +16,3 @@ class TimeSlider extends React.Component {
     );
   }
 }
-
-export TimeSlider;

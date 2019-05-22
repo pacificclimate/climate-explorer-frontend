@@ -7,10 +7,8 @@ import _togpx from 'togpx';
 import shp from 'shpjs';
 import { write } from 'shp-write';
 import JSZip from 'jszip';  // Installed by `shp-write`; apparently not
-
-// TODO: Convert to import syntax?
-const geojson = require('shp-write/src/geojson');
-const prj = require('shp-write/src/prj');
+import geojson from 'shp-write/src/geojson';
+import prj from 'shp-write/src/prj';
 
 function createZippedShapefile(gj, options) {
   // Alternate to function `zip` in `shp-write/src/zip`, but with option to

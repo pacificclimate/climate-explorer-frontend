@@ -9,19 +9,20 @@
  * validation functions from ./test-validators.js
  ******************************************************************/
 
+import _ from 'underscore';
+import xlsx from 'xlsx';
+import * as exportdata from '../export';
+import * as validate from '../__test_data__/test-validators';
+import * as mockAPI from '../__test_data__/sample-API-results';
+import * as util from '../util';
+import * as chart from '../chart-generators';
+
+
 jest.dontMock('../util');
 jest.dontMock('../chart-generators');
 jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
-
-var _ = require('underscore');
-var xlsx = require('xlsx');
-var exportdata = require('../export');
-var validate = require('../__test_data__/test-validators');
-var mockAPI = require('../__test_data__/sample-API-results');
-var util = require('../util');
-var chart = require('../chart-generators');
 
 /*
  * It's not clear how to test exportDataToWorksheet, which would require
@@ -68,7 +69,7 @@ describe('createTimeseriesWorksheetSummaryCells', function () {
 
 describe('generateDataCellsFromDataTable', function () {
   it('generates data cells from a data table', function () {
-    var toExport = util.parseBootstrapTableData(mockAPI.addRunToStats(), 
+    var toExport = util.parseBootstrapTableData(mockAPI.addRunToStats(),
         mockAPI.metadataToArray());
     var cells = exportdata.generateDataCellsFromDataTable(toExport);
     //make sure each series is present
@@ -133,7 +134,7 @@ describe('assembleWorksheet', function () {
     headerOptions.meta = mockAPI.metadataToArray();
     var headers = exportdata.createWorksheetSummaryCells(headerOptions, "January");
     //build data cells
-    var dataTable = util.parseBootstrapTableData(mockAPI.addRunToStats(), 
+    var dataTable = util.parseBootstrapTableData(mockAPI.addRunToStats(),
         mockAPI.metadataToArray());
     var data = exportdata.generateDataCellsFromDataTable(dataTable);
     //test assembly

@@ -10,17 +10,17 @@
  ********************************************************/
 
 
+import _ from 'underscore';
+import xlsx from 'xlsx';
+import * as util from '../util';
+import * as mockAPI from '../__test_data__/sample-API-results';
+
 jest.dontMock('../util');
 jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
 
-var _ = require('underscore');
-var xlsx = require('xlsx');
-var util = require('../util');
-var mockAPI = require('../__test_data__/sample-API-results');
-
-  //expected results for the parseBootstrapTableData test - the
+//expected results for the parseBootstrapTableData test - the
   // ./sample-API-Results.tasmaxStats data rendered into a table.
   const bootstrapTableTestExpected = [ 
     {
@@ -47,7 +47,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
 
   describe('parseBootstrapTableData', function () {
     it('correctly flattens a stats object for passing to the DataTable component', function () {
-      var result = util.parseBootstrapTableData(mockAPI.addRunToStats(), 
+      var result = util.parseBootstrapTableData(mockAPI.addRunToStats(),
           mockAPI.metadataToArray());
       expect(result).toEqual(bootstrapTableTestExpected);
     });
@@ -59,7 +59,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateLongTermAverageData( { data: 
+      var func = function () {util.validateLongTermAverageData( { data:
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -85,7 +85,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateStatsData({data: 
+      var func = function () {util.validateStatsData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -120,7 +120,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateAnnualCycleData({data: 
+      var func = function () {util.validateAnnualCycleData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -157,7 +157,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data: 
+      var func = function () {util.validateUnstructuredTimeseriesData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -284,7 +284,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(util.caseInsensitiveStringSearch("CATEGORY", "OR")).toBeTruthy();
       expect(util.caseInsensitiveStringSearch("category", "OR")).toBeTruthy();
       expect(util.caseInsensitiveStringSearch("CATEGORY", "or")).toBeTruthy();
-      expect(util.caseInsensitiveStringSearch("cAtEgOrY", "oR")).toBeTruthy();     
+      expect(util.caseInsensitiveStringSearch("cAtEgOrY", "oR")).toBeTruthy();
     });
     it('does not find nonexistant substrings', function () {
       expect(util.caseInsensitiveStringSearch("category", "and")).not.toBeTruthy();

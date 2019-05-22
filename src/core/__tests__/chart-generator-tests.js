@@ -9,10 +9,6 @@
  * validation functions from ./test-validators.js
  *****************************************************************/
 
-jest.dontMock('../chart-generators');
-jest.dontMock('../util');
-jest.dontMock('underscore');
-
 import {formatYAxis,
         fixedPrecision,
         makePrecisionBySeries,
@@ -36,7 +32,11 @@ import {monthlyTasmaxTimeseries,
         tasminData,
         tasmaxData,
         metadataToArray} from '../__test_data__/sample-API-results';
-        
+
+jest.dontMock('../chart-generators');
+jest.dontMock('../util');
+jest.dontMock('underscore');
+
 describe('formatYAxis', function () {
   it('formats a c3 y axis with units label', function () {
     const axis = formatYAxis('meters');

@@ -4,6 +4,7 @@
 
 import moment from 'moment/moment';
 import _ from 'underscore';
+import vOptions from '../assets/variable-options.yaml';
 
 /*****************************************************************
  * Functions for working with data from the Climate Explorer API
@@ -144,7 +145,6 @@ export function validateUnstructuredTimeseriesData(response) {
  * and "undefined" when acting on its results.
  */
 export function getVariableOptions(variable, option) {
-  const vOptions = require('../assets/variable-options.yaml');
   if (nestedAttributeIsDefined(vOptions, variable, option)) {
     return vOptions[variable][option];
   }
