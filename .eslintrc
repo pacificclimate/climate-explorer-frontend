@@ -11,13 +11,6 @@
   "plugins": [
     "react"
   ],
-  "globals": {
-    "CE_BACKEND_URL": false,
-    "CE_ENSEMBLE_NAME": false,
-    "TILECACHE_URL": false,
-    "NCWMS_URL": false,
-    "L"
-  },
   "rules": {
     "no-var": 0,
     "vars-on-top": 1,
