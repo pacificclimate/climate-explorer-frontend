@@ -1,10 +1,84 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import _ from 'underscore';
 
 import NavRoutes from './navigation/NavRoutes/NavRoutes';
 import SingleAppController from './app-controllers/SingleAppController/SingleAppController';
 import PrecipAppController from './app-controllers/PrecipAppController/PrecipAppController';
 import DualAppController from './app-controllers/DualAppController/DualAppController';
+import { loadVariableOptions } from '../core/util';
+
+
+function loadFakeSuccess() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('loaded');
+    }, 3000);
+  });
+}
+
+function loadFakeFail() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error('Dang!'));
+    }, 3000);
+  });
+}
+
+const promiseType = PropTypes.instanceOf(Promise);
+
+class Await extends React.Component {
+  static propTypes = {
+    promises: PropTypes.oneOfType([
+      promiseType,
+      PropTypes.arrayOf(promiseType),
+    ]),
+    fallback: PropTypes.node,
+    error: PropTypes.element,
+  };
+
+  static defaultProps = {
+    fallback: <div>Waiting...</div>,
+    error:  ({ error }) => {
+      console.log(error)
+      return <div>{error.name}: {error.message}</div>;
+    },
+  };
+
+  state = {
+    waiting: true,
+  };
+
+  componentWillMount() {
+    const promise = _.isArray(this.props.promises) ?
+      Promise.all(this.props.promises) :
+      this.props.promises;
+    promise.then(() => {
+      this.setState({ waiting: false });
+    }).catch(error => {
+      this.setState({
+        waiting: false,
+        error
+      });
+    });
+  }
+
+  render() {
+    if (this.state.waiting) {
+      return this.props.fallback;
+    }
+    if (this.state.error) {
+      const Error = this.props.error;
+      return (
+        <Error error={this.state.error} />
+      );
+    }
+    return (
+      <div>{this.props.children}</div>
+    );
+  }
+}
+
 
 const navSpec = {
   basePath: '/data',
@@ -33,8 +107,24 @@ const navSpec = {
   ],
 };
 
+
+function Patience() {
+  return <div>Patience...</div>;
+}
+
 export default function DataTool(props) {
-  return <NavRoutes pullUp { ...{ navSpec, ...props } } />;
+  return (
+    <Await
+      promises={[
+        loadVariableOptions(),
+        // loadFakeSuccess(),
+        // loadFakeFail(),
+      ]}
+      fallback={<Patience/>}
+    >
+      <NavRoutes pullUp { ...{ navSpec, ...props } } />
+    </Await>
+  );
 }
 
 DataTool.propTypes = {
