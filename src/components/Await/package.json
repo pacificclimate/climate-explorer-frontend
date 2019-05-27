@@ -1,0 +1,6 @@
+{
+  "name": "Await",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Await.js"
+}
