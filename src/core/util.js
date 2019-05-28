@@ -4,8 +4,8 @@
 
 import moment from 'moment/moment';
 import _ from 'underscore';
-import axios from 'axios';
 import yaml from 'js-yaml';
+import { getVariableOptions as httpGetVariableOptions } from '../data-services/public'
 
 /*****************************************************************
  * Functions for working with data from the Climate Explorer API
@@ -177,19 +177,13 @@ let variableOptions = {};
 let variableOptionsPromise;
 export function loadVariableOptions() {
   if (!variableOptionsPromise) {
-    const url = `${process.env.PUBLIC_URL}/${process.env.REACT_APP_VARIABLE_OPTIONS}`;
-    variableOptionsPromise = axios.get(url, { responseType: 'text' })
-    .then(response => response.data)
-    .then(yaml.safeLoad)
-    .then(result => {
-      variableOptions = result;
-      return result;
-    })
-    .catch(error => {
-      throw new Error(
-        `Could not load ${url}: ${error.name}: ${error.message}`
-      );
-    })
+    variableOptionsPromise = httpGetVariableOptions()
+      .then(response => response.data)
+      .then(yaml.safeLoad)
+      .then(result => {
+        variableOptions = result;
+        return result;
+      });
   }
   return variableOptionsPromise;
 }
