@@ -9,7 +9,9 @@ Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babe
 
 Node.js >= 4.0
 
-We reccomend using [nvm](https://github.com/creationix/nvm) to manage your node/npm install.
+All other package requirements are specified in `package.json`.
+
+We recommend using [nvm](https://github.com/creationix/nvm) to manage your node/npm install.
 
 ## Deployment
 
@@ -17,33 +19,70 @@ In progress
 
 ## Development
 
-Uses webpack-dev-server with hot module replacement.
+This project is now based on [Create React App](https://github.com/facebook/create-react-app). 
+Originally it was a manually managed Webpack/Babel project, 
+but, for a variety of reasons you can read about in [issue 297](https://github.com/pacificclimate/climate-explorer-frontend/issues/297), 
+we "rebased" it on CRA.
+
+### Install
+
+Assuming you have `npm` installed on your system:
+
+```bash
+npm install
+```
+
+If you need to start fresh after much messing about, the `reinstall` script 
+deletes `./node_modules/` and then installs:
+
+```bash
+npm run reinstall
+```
 
 ### Config
 
 Front end configuration uses environment variables.
 
+In a Create React App app, [environment variables are managed carefully](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
+Therefore, most of the environment variables below begin with `REACT_APP_`, as required.
+
+The environment variables for configuring the app are:
+
 * NODE_ENV
-  * set to "production" to enable production build optimization
-  * default: "development"
-* CE_BACKEND_URL
+  * [automatically set; cannot be overridden manually](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
+* REACT_APP_CE_CURRENT_VERSION
+  * Current version of the app.
+  * Usually set externally (not via `.env` file) as: `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)`
+  * Unfortunately, cannot be set to a dynamic value via `.env` file.
+* REACT_APP_CE_BACKEND_URL
   * Publicly accessible URL for backend climate data
-  * Development default: http://localhost:8000/api
-  * Production default: http://tools.pacificclimate.org/climate-data
-* TILECACHE_URL
+* REACT_APP_TILECACHE_URL
   * Tilecache URL for basemap layers
-  * default: http://tiles.pacificclimate.org/tilecache/tilecache.py
-* NCWMS_URL
+* REACT_APP_NCWMS_URL
   * ncWMS URL for climate layers
-  * default: http://tools.pacificclimate.org/ncWMS-PCIC/wms
-* CE_ENSEMBLE_NAME
+* REACT_APP_CE_ENSEMBLE_NAME
   * ensemble name to use for backend requests
-  * default: ce
+* REACT_APP_CE_BASE_PATH
+  * Base **path** of the URL for the CE frontend app; 
+    set this to the path component of the URL for CE configured in 
+    our proxy server
+* REACT_APP_VARIABLE_OPTIONS
+  * Path within the `public` folder of the variable options file.
+
+Default values for these variables are set in the following files (as described in the 
+[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)):
+ 
+* `[.env`](./.env): Default
+* `.env.development`: Development-specific settings (`npm start`)
+* `.env.production`: Production-specific settings (`npm run build`)
+
+### Running (dev environment)
 
 ```bash
-npm install
 npm start
 ```
+
+For building a production app, see below.
 
 ### Testing
 
@@ -60,6 +99,8 @@ You can lint all files `npm run lint`, or a specific file `npm run lint:glob <fi
 Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks directory) to abort a commit if any staged `*.js` files fail linting (warnings OK).
 
 If you *really* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
+
+## Production
 
 ### Setup using Docker
 
@@ -117,37 +158,54 @@ docker push docker-registry01.pcic.uvic.ca:5000/climate-explorer-frontend:1.2.3
 
 #### Run docker image
 
-The following environment variables must be set:
+As described above, environment variables configure the app.
+All are given standard development and production values in the files
+`.env`, `.env.development`, and `.env.production`.
 
-- `NODE_ENV` 
-  (set to `'production'` for production environment; 
-  anything other value, including undefined, defaults to dev)
-- `CE_BACKEND_URL` (base URL of backend API)
-- `CE_ENSEMBLE_NAME` 
-   (final last-ditch fallback in case invalid ensemble name is used in URLs; 
-   in all normal use cases is ignored; could reasonably omit)
-- `NCWMS_URL` (base URL of ncWMS server)
-- `TILECACHE_URL` (base URL of TileCache server)
-- `CE_BASE_PATH` 
-  (base **path** of the URL for the Marmot frontend app; 
-  set this to the path component of the URL for Marmot configured in 
-  our proxy server;
-  e.g., `/marmot/app`)
+The only environment variable that must be set outside of the `.env` files is:
+
+* `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)` 
+  * (If no value is set for this variable, the app still works, but the version
+    cannot be displayed in the Help.)
+
 
 Typical production run:
 
 ```bash
 docker run --restart=unless-stopped -d 
+  -e REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)
   -p <external port>:8080 
-  -e NODE_ENV=production 
-  -e CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api 
-  -e CE_ENSEMBLE_NAME=ce 
-  -e NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms 
-  -e TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py 
-  -e CE_BASE_PATH=/marmot/app 
   --name climate-explorer-frontend
   climate-explorer-frontend:<tag>
 ```
+
+## Updating the variable options file
+
+The variable options file is stored in [the `public` folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder).
+(Path to file inside this folder specified by env variable `REACT_APP_VARIABLE_OPTIONS`; 
+default value `variable-options.yaml`.)
+
+Files in the public folder are copied directly, and without bundling,
+to the `static` folder within the build directory (normally, `build`)
+during a build (`npm run build`).
+Files in the `static` folder can be updated on the fly, so that changes to them can be made without creating
+a new release of Climate Explorer.
+
+To change the variable options file without creating a new release of the app, 
+do one of the following things:
+
+* Replace the file pointed to by `REACT_APP_VARIABLE_OPTIONS` in `build/static/` 
+  (e.g., `build/static/variable-options.yaml`).
+  This results in an immediate update in any new or refreshed browser sessions of 
+  the app. Nothing need be done on the server side.
+* Restart the app with a different value for `REACT_APP_VARIABLE_OPTIONS`.
+  (which should of course point at a valid variable options file in `build/static/`).
+* Place a new variable options file in `build/static/` and restart the app with the
+  appropriate value for `REACT_APP_VARIABLE_OPTIONS`.
+
+To prevent tears, hair loss, and the cursing of your name, 
+we strongly recommend **also updating** the default file `public/variable-options.yaml` in the repo
+with any changes made, so that they are in fact propagated to later versions.
 
 ## Releasing
 
