@@ -19,6 +19,7 @@ jest.dontMock('../util');
 jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
+jest.mock('../../data-services/public.js');
 
 //expected results for the parseBootstrapTableData test - the
   // ./sample-API-Results.tasmaxStats data rendered into a table.
@@ -189,9 +190,15 @@ jest.dontMock('xlsx');
   //Info about configuring jest to test webpack-dependent functionality:
   //https://facebook.github.io/jest/docs/en/webpack.html
   describe('getVariableOptions', function() {
-    xit('returns undefined for nonexistant variables', function () {});
-    xit('returns undefined for nonexistent options', function () {});
-    xit('returns the requested option', function () {});
+    it('returns undefined for nonexistent variables', function () {
+      expect(util.getVariableOptions('foo', 'bar')).toBeUndefined();
+    });
+    it('returns undefined for nonexistent options', function () {
+      expect(util.getVariableOptions('tasmin', 'fuggle')).toBeUndefined();
+    });
+    it('returns the requested option', function () {
+      expect(util.getVariableOptions('tasmin', 'decimalPrecision')).toBe(1);
+    });
   });
 
   describe('timeKeyToTimeOfYear', function() {
