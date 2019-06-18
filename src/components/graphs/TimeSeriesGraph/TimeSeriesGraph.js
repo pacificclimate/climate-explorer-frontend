@@ -2,7 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, ControlLabel } from 'react-bootstrap';
 
+import _ from 'underscore';
+
 import DataGraph from '../DataGraph/DataGraph';
+import ExportButtons from '../ExportButtons';
+import { exportDataToWorksheet } from '../../../core/export';
 import styles from './TimeSeriesGraph.module.css';
 import {
   validateAnnualCycleData,
@@ -103,16 +107,40 @@ export default class TimeSeriesGraph extends React.Component {
     }
   }
 
+  // User event handlers
+  exportData(format) {
+    exportDataToWorksheet(
+      'raw_timeseries',
+      _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
+      this.state.graphSpec,
+      format,
+      null
+    );
+  }
+
+  handleExportXlsx = this.exportData.bind(this, 'xlsx');
+  handleExportCsv = this.exportData.bind(this, 'csv');
+
   render() {
     return (
-      <Row>
-        <Col>
-          <DataGraph {...this.state.graphSpec}/>
-          <ControlLabel className={styles.graphlabel}>
-            Highlight a time span on lower graph to see more detail
-          </ControlLabel>
-        </Col>
-      </Row>
+      <React.Fragment>
+        <Row>
+          <Col lg={6} md={6} sm={6}>
+            <ExportButtons
+              onExportXlsx={this.handleExportXlsx}
+              onExportCsv={this.handleExportCsv}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <DataGraph {...this.state.graphSpec}/>
+            <ControlLabel className={styles.graphlabel}>
+              Highlight a time span on lower graph to see more detail
+            </ControlLabel>
+          </Col>
+        </Row>
+      </React.Fragment>
     );
   }
 }

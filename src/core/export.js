@@ -70,6 +70,12 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
       dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
       outputFilename = `${filenamePrefix}LongTermAverage${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
+    case "raw_timeseries":
+      timeOfYear = 'Annual';
+      summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
+      dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
+      outputFilename = `${filenamePrefix}RawTimeseries${filenameInfix}_${timeOfYear}${filenameSuffix}`;
+      break;
   }
 
   // assemble the worksheet and add it to the workbook.
