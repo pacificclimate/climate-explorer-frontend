@@ -48,26 +48,34 @@ Therefore, most of the environment variables below begin with `REACT_APP_`, as r
 
 The environment variables for configuring the app are:
 
-* NODE_ENV
-  * [automatically set; cannot be overridden manually](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
-* REACT_APP_CE_CURRENT_VERSION
-  * Current version of the app.
-  * Usually set externally (not via `.env` file) as: `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)`
-  * Unfortunately, cannot be set to a dynamic value via `.env` file.
-* REACT_APP_CE_BACKEND_URL
-  * Publicly accessible URL for backend climate data
-* REACT_APP_TILECACHE_URL
-  * Tilecache URL for basemap layers
-* REACT_APP_NCWMS_URL
-  * ncWMS URL for climate layers
-* REACT_APP_CE_ENSEMBLE_NAME
-  * ensemble name to use for backend requests
-* REACT_APP_CE_BASE_PATH
-  * Base **path** of the URL for the CE frontend app; 
+
+`NODE_ENV`
+* [automatically set; cannot be overridden manually](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
+
+`REACT_APP_CE_CURRENT_VERSION`
+* Current version of the app.
+* Usually set externally (not via `.env` file) as: `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)`
+* Unfortunately, cannot be set to a dynamic value via `.env` file.
+
+`REACT_APP_CE_BACKEND_URL`
+* Publicly accessible URL for backend climate data
+
+`REACT_APP_TILECACHE_URL`
+* Tilecache URL for basemap layers
+
+`REACT_APP_NCWMS_URL`
+* ncWMS URL for climate layers
+
+`REACT_APP_CE_ENSEMBLE_NAME`
+* ensemble name to use for backend requests
+
+`REACT_APP_CE_BASE_PATH`
+* Base **path** of the URL for the CE frontend app; 
     set this to the path component of the URL for CE configured in 
     our proxy server
-* REACT_APP_VARIABLE_OPTIONS
-  * Path within the `public` folder of the variable options file.
+
+`REACT_APP_VARIABLE_OPTIONS`
+* Path within the `public` folder of the variable options file.
 
 Default values for these variables are set in the following files (as described in the 
 [CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)):
