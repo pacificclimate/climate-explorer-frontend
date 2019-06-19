@@ -10,24 +10,6 @@ import { loadVariableOptions } from '../core/util';
 import Await from './Await';
 
 
-function loadFakeSuccess() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('loaded');
-    }, 3000);
-  });
-}
-
-function loadFakeFail() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error('Dang!'));
-    }, 3000);
-  });
-}
-
-
-
 const navSpec = {
   basePath: '/data',
   items: [
@@ -59,11 +41,7 @@ const navSpec = {
 export default function DataTool(props) {
   return (
     <Await
-      promises={[
-        loadVariableOptions(),
-        // loadFakeSuccess(),
-        // loadFakeFail(),
-      ]}
+      promises={[ loadVariableOptions() ]}
       awaiting={<div>Loading external data...</div>}
     >
       <NavRoutes pullUp { ...{ navSpec, ...props } } />
