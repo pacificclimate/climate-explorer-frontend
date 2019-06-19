@@ -183,12 +183,6 @@ jest.mock('../../data-services/public.js');
     });
   });
 
-  //Depends on an external .yml file, variable-options.yaml. 
-  //Under normal circumstances, webpack transforms the file and makes it
-  //accessible. It is theoretically possible to have jest run similar 
-  //transforms for testing, but I haven't gotten that working yet.
-  //Info about configuring jest to test webpack-dependent functionality:
-  //https://facebook.github.io/jest/docs/en/webpack.html
   describe('getVariableOptions', function() {
     it('returns undefined for nonexistent variables', function () {
       expect(util.getVariableOptions('foo', 'bar')).toBeUndefined();
