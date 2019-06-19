@@ -231,7 +231,6 @@ export default class SingleMapController extends React.Component {
         </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
-          {/*Foo*/}
           {
             this.state.raster.times ? (
               <DataMap
