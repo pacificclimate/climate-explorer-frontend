@@ -7,46 +7,38 @@ Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babe
 
 ## Requirements
 
-Node.js >= 4.0
+Node.js >= 9.2.0 (**important**)
 
 All other package requirements are specified in `package.json`.
 
-We recommend using [nvm](https://github.com/creationix/nvm) to manage your node/npm install.
+We **strongly** recommend using [`nvm`](https://github.com/creationix/nvm) to manage your `node`/`npm` install.
+In particular, you will have trouble finding later versions of Node.js in standard Linux installs;
+`nvm` however is up to date with all recent releases.
 
-## Deployment
+Note: Avoid `snap` packages. Experience to date suggests it does not result in stable, reliable installations.
 
-In progress
+## Configuration
 
-## Development
+### Environment variables
 
-This project is now based on [Create React App](https://github.com/facebook/create-react-app). 
-Originally it was a manually managed Webpack/Babel project, 
-but, for a variety of reasons you can read about in [issue 297](https://github.com/pacificclimate/climate-explorer-frontend/issues/297), 
-we "rebased" it on CRA.
-
-### Install
-
-Assuming you have `npm` installed on your system:
-
-```bash
-npm install
-```
-
-If you need to start fresh after much messing about, the `reinstall` script 
-deletes `./node_modules/` and then installs:
-
-```bash
-npm run reinstall
-```
-
-### Config
-
-Front end configuration uses environment variables.
+Main configuration of the Climate Explorer frontend is done via environment variables.
 
 In a Create React App app, [environment variables are managed carefully](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
-Therefore, most of the environment variables below begin with `REACT_APP_`, as required.
+Therefore, most of the environment variables below begin with `REACT_APP_`, as required by CRA.
 
-The environment variables for configuring the app are:
+CRA also provides a convenient system for setting default values of environment variables
+in various contexts (development, production, etc.). 
+
+Brief summary:
+ 
+* `.env`: Global default settings
+* `.env.development`: Development-specific settings (`npm start`)
+* `.env.production`: Production-specific settings (`npm run build`)
+
+For more details, see the 
+[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)).
+
+Environment variables for configuring the app are:
 
 
 `NODE_ENV`
@@ -77,12 +69,44 @@ The environment variables for configuring the app are:
 `REACT_APP_VARIABLE_OPTIONS`
 * Path within the `public` folder of the variable options file.
 
-Default values for these variables are set in the following files (as described in the 
-[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)):
- 
-* `[.env`](./.env): Default
-* `.env.development`: Development-specific settings (`npm start`)
-* `.env.production`: Production-specific settings (`npm run build`)
+### Variable options
+
+A certain amount of configuration of the app is accomplished through the variable options file,
+which is a YAML file stored at a location specified by the environment variable `REACT_APP_VARIABLE_OPTIONS`.
+The source for the default version of this file is at `./public/variable-options.yaml`.
+
+For documentation on the contents of this file, see the comments at the head
+of the file.
+
+See Production section below for information on "live updating" this file.
+
+## Development
+
+This project is now based on [Create React App](https://github.com/facebook/create-react-app). 
+Originally it was a manually managed Webpack/Babel project, 
+but, for a variety of reasons you can read about in [issue 297](https://github.com/pacificclimate/climate-explorer-frontend/issues/297), 
+we "rebased" it on CRA.
+
+### Installation
+
+You **must** use a version of `npm` >= 5.5.1. This version of `npm` comes with `node` 9.2.0.
+If you are using nvm, then run `nvm use 9.2.0` (or higher; ver 11.13 works fine too).
+
+(`npm` 5.5.1 / `node` 9.2.0 is known to work; `npm` 3.5.2 / `node` 8.10.0 is known to fail to install certain required dependencies. 
+Intermediate versions may or may not work.)
+
+With the appropriate versions of `node`/`npm` in use:
+
+```bash
+npm install
+```
+
+If you need to start fresh after much messing about, the `reinstall` script 
+deletes `./node_modules/` and then installs:
+
+```bash
+npm run reinstall
+```
 
 ### Running (dev environment)
 
@@ -108,10 +132,14 @@ Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks director
 
 If you *really* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
 
+
 ## Production
 
 ### Setup using Docker
 
+We use Docker for production deployment.
+ 
+It can also be useful in development; for example, to test a proposed volume mounting for the container.
 
 #### Build docker image manually
 
@@ -176,6 +204,9 @@ The only environment variable that must be set outside of the `.env` files is:
   * (If no value is set for this variable, the app still works, but the version
     cannot be displayed in the Help.)
 
+In addition, we mount the variable options file as a volume in the container.
+This enables us to update this file by just restarting the container. See the section below
+for details.
 
 Typical production run:
 
@@ -184,6 +215,7 @@ docker run --restart=unless-stopped -d
   -e REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)
   -p <external port>:8080 
   --name climate-explorer-frontend
+  - v /path/to/external/variable-options.yaml:/app/build/variable
   climate-explorer-frontend:<tag>
 ```
 
@@ -193,26 +225,29 @@ The variable options file is stored in [the `public` folder](https://facebook.gi
 (Path to file inside this folder specified by env variable `REACT_APP_VARIABLE_OPTIONS`; 
 default value `variable-options.yaml`.)
 
-Files in the public folder are copied directly, and without bundling,
-to the `static` folder within the build directory (normally, `build`)
-during a build (`npm run build`).
-Files in the `static` folder can be updated on the fly, so that changes to them can be made without creating
+During a build (`npm run build`), 
+files in the `public` folder are copied directly, without bundling, to the build directory (normally, `./build`).
+Files in the `public` folder can be updated on the fly, so that changes to them can be made without creating
 a new release of Climate Explorer.
 
-To change the variable options file without creating a new release of the app, 
-do one of the following things:
+When running the app in a production environment, we mount an external variable options file as a volume 
+in the docker container. (See section above.) 
+This external file can be modified, and the container restarted, to provide an updated version of the
+variable options file without needing to modify source code, create a new release, or rebuild the image.
 
-* Replace the file pointed to by `REACT_APP_VARIABLE_OPTIONS` in `build/static/` 
-  (e.g., `build/static/variable-options.yaml`).
-  This results in an immediate update in any new or refreshed browser sessions of 
-  the app. Nothing need be done on the server side.
-* Restart the app with a different value for `REACT_APP_VARIABLE_OPTIONS`.
-  (which should of course point at a valid variable options file in `build/static/`).
-* Place a new variable options file in `build/static/` and restart the app with the
-  appropriate value for `REACT_APP_VARIABLE_OPTIONS`.
+To change the variable options file without creating a new release of the app:
 
-To prevent tears, hair loss, and the cursing of your name, 
-we strongly recommend **also updating** the default file `public/variable-options.yaml` in the repo
+* Update the variable options file in the external file system.
+* Restart the container (`docker restart climate-explorer-frontend`)
+
+Alternatives:
+
+* Stop the app and start it again with a different value for `REACT_APP_VARIABLE_OPTIONS`.
+  and a corresponding volume mount for this new file. 
+
+
+To prevent tears, hair loss, and the cursing of your name by future developers (or even yourself), 
+we **strongly recommend also updating** the source file `public/variable-options.yaml` in the repo
 with any changes made, so that they are in fact propagated to later versions.
 
 ## Releasing
