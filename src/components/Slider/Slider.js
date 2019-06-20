@@ -1,9 +1,9 @@
-var PropTypes = require('prop-types');
-var React = require('react');
-var ReactDOM = require('react-dom');
-var BootstrapSlider = require('bootstrap-slider');
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import BootstrapSlider from 'bootstrap-slider';
 
-class Slider extends React.Component {
+export default class Slider extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     min: PropTypes.number,
@@ -66,5 +66,3 @@ class Slider extends React.Component {
     );
   }
 }
-
-module.exports = Slider;

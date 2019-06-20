@@ -4,6 +4,8 @@ import StatisticalSummaryTable from '../StatisticalSummaryTable';
 import { noop } from 'underscore';
 import { meta } from '../../../test_support/data';
 
+jest.mock('../../../data-services/ce-backend');
+
 it('renders without crashing', () => {
   const div = document.createElement('div');
   ReactDOM.render(

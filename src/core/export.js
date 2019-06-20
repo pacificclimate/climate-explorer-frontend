@@ -8,7 +8,7 @@
  * Built around the js-xlsx library
  *******************************************************************/
 
-var _ = require('underscore');
+import _ from 'underscore';
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
@@ -332,5 +332,5 @@ var assembleWorksheet = function (cells) {
   return ws;
 };
 
-module.exports = {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
+export {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
     createTimeseriesWorksheetSummaryCells, generateDataCellsFromC3Graph};

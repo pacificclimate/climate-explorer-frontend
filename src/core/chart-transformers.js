@@ -396,7 +396,7 @@ function makeTimeSliceGraph (timestamp, graph) {
   return graph;
 }
 
-module.exports = { makeVariableResponseGraph, makeAnomalyGraph,
+export { makeVariableResponseGraph, makeAnomalyGraph,
     makeTimeSliceGraph,
     //exported only for testing purposes:
     getAxisTextForVariable, percentageChange};

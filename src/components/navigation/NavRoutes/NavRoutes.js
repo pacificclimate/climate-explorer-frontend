@@ -31,7 +31,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
 
-import styles from './NavRoutes.css';
+import styles from './NavRoutes.module.css';
 import classnames from 'classnames';
 
 export default function NavRoutes(

@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import _ from 'underscore';
 
 import NavRoutes from './navigation/NavRoutes/NavRoutes';
 import SingleAppController from './app-controllers/SingleAppController/SingleAppController';
 import PrecipAppController from './app-controllers/PrecipAppController/PrecipAppController';
 import DualAppController from './app-controllers/DualAppController/DualAppController';
+import { loadVariableOptions } from '../core/util';
+import Await from './Await';
+
 
 const navSpec = {
   basePath: '/data',
@@ -33,8 +37,16 @@ const navSpec = {
   ],
 };
 
+
 export default function DataTool(props) {
-  return <NavRoutes pullUp { ...{ navSpec, ...props } } />;
+  return (
+    <Await
+      promises={[ loadVariableOptions() ]}
+      awaiting={<div>Loading external data...</div>}
+    >
+      <NavRoutes pullUp { ...{ navSpec, ...props } } />
+    </Await>
+  );
 }
 
 DataTool.propTypes = {

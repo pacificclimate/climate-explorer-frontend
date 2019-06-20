@@ -869,7 +869,7 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
   return graph;
 }
 
-module.exports = { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
+export { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
     timeseriesToTimeseriesGraph,
     // exported only for testing purposes:
     formatYAxis, fixedPrecision, makePrecisionBySeries,

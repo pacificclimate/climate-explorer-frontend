@@ -4,6 +4,8 @@
 
 import moment from 'moment/moment';
 import _ from 'underscore';
+import yaml from 'js-yaml';
+import { getVariableOptions as httpGetVariableOptions } from '../data-services/public'
 
 /*****************************************************************
  * Functions for working with data from the Climate Explorer API
@@ -130,23 +132,70 @@ export function validateUnstructuredTimeseriesData(response) {
 }
 
 /*
- * Get an option defined in the variable-options.yaml config file.
+ * Get an option defined in the variable options yaml config file.
+ *
  * This file is used to set formatting options (default map colours,
  * decimal precision, logarithmic scales, etc) at an individual
- * variable level. 
- * variable-options.yaml is guarenteed to exist as a file; webpack 
- * is configured to creates it during pre-startip if it doesn't 
- * already exist, but if webpack creates it, it will be blank.
+ * variable level.
+ *
  * Returns the option value, or "undefined" if the variable or option
- * is not listed. 
+ * is not listed.
+ *
  * NOTE: A variable option can legitimately have a value of "false", 
- * so callers of this function need to distinguish between "false" 
+ * so callers of this function may need to distinguish between "false"
  * and "undefined" when acting on its results.
+ *
+ * The variable options config file is located in the `public` directory so
+ * that it can be updated without making a new release of the entire app.
+ * The filepath within the `public` directory is specified by the environment
+ * variable `REACT_APP_VARIABLE_OPTIONS`.
+ *
+ * The benefit of placing the variable options file in the public directory
+ * however comes with the complication that it must be loaded _asynchronously_.
+ * Function `loadVariableOptions()` below performs this action.
+ *
+ * Complication: Until the file successfully loads,
+ * the object `variableOptions`, from which this information is retrieved,
+ * is empty, and `getVariableOptions()` will return `undefined` for all calls.
+ *
+ * Complication: Any code that depends on valid values for variable options
+ * must wait for the asynchronous load to complete. To enable this,
+ * `loadVariableOptions()` returns a Promise that resolves (or rejects,
+ * on failure) when the loading completes. A convenient way to avoid
+ * complicating a component which depends on variable options is to wrap it
+ * in an `Await` component, which was built for this very purpose.
+ *
+ * As is evident from the above explanation, we decided to take a "global"
+ * approach to signalling the loading of the variable options config file.
+ * An alternative would be to have `getVariableOptions()` return a promise
+ * for the value, but that would weave asynchronousness into all the client
+ * code, which would be complicated and expensive to introduce into a
+ * substantial amount of existing code. Global signalling is less
+ * obvious to the reader, but makes for much simpler client code.
  */
+let variableOptions = {};
+let variableOptionsPromise;
+export function loadVariableOptions() {
+  if (!variableOptionsPromise) {
+    variableOptionsPromise = httpGetVariableOptions()
+      .then(response => response.data)
+      .then(yaml.safeLoad)
+      .then(result => {
+        variableOptions = result;
+        return result;
+      });
+  }
+  return variableOptionsPromise;
+}
+
+// Pre-load the variable options
+loadVariableOptions();
+
+// TODO: Make this function safer by having it throw an error when it is
+// called when variable options have not been loaded.
 export function getVariableOptions(variable, option) {
-  const vOptions = require('../../variable-options.yaml');
-  if (nestedAttributeIsDefined(vOptions, variable, option)) {
-    return vOptions[variable][option];
+  if (nestedAttributeIsDefined(variableOptions, variable, option)) {
+    return variableOptions[variable][option];
   }
   return undefined;
 }

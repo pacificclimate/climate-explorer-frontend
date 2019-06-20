@@ -4,7 +4,7 @@ jest.dontMock('../../../core/util');
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 
-const DataGraph = require('../DataGraph');
+import DataGraph from '../DataGraph';
 
 const timeseriesTestData = {
   id: 'tasmin_Amon_CanESM2_historical_r1i1p1_19710101-20001231',

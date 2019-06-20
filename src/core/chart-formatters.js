@@ -360,9 +360,9 @@ function hideTicksByRange(graph, axis = "y", min, max) {
   return graph;
 }
 
-module.exports = { assignColoursByGroup, fadeSeriesByRank,
+export { assignColoursByGroup, fadeSeriesByRank,
     hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
     padYAxis, matchYAxisRange, hideTicksByRange,
     //helper functions exported only for testing:
     getDataSeriesByAxis
-    };
+};

@@ -4,6 +4,7 @@
  * `GetMetadata` requests.
 */
 import axios from 'axios';
+import L from 'leaflet';
 
 var ncWMSAutoscaleControl = L.Control.extend({
   options: {

@@ -4,7 +4,7 @@ import urljoin from 'url-join';
 import _ from 'underscore';
 import axios from 'axios';
 
-import styles from './ExperimentSelector.css';
+import styles from './ExperimentSelector.module.css';
 
 class ExperimentSelector extends React.Component {
   static propTypes = {

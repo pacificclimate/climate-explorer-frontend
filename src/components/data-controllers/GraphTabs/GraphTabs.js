@@ -3,12 +3,12 @@ import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
 import { multiYearMeanSelected } from '../../graphs/graph-helpers';
+import styles from '../DataController.module.css';
 
 const graphTabSpecPropType = PropTypes.shape({
   title: PropTypes.node,
   graph: PropTypes.element,
 });
-import styles from '../DataController.css';
 
 
 export default class GraphTabs extends React.Component {

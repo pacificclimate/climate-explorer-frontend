@@ -6,7 +6,7 @@ import axios from 'axios/index';
 
 function getTimeMetadata(uniqueId) {
   return axios({
-    baseURL: urljoin(CE_BACKEND_URL, 'metadata'),
+    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'metadata'),
     params: {
       model_id: uniqueId,
     },
@@ -19,7 +19,7 @@ function getTimeseries({ variable_id, unique_id }, area) {
   // `area`. (`variable_id` and `unique_id` are typically components of a
   // metadata object, hence their grouping like this.)
   return axios({
-    baseURL: urljoin(CE_BACKEND_URL, 'timeseries'),
+    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'timeseries'),
     params: {
       id_: unique_id || null,
       variable: variable_id,
@@ -46,7 +46,7 @@ function getData(
 
   let queryExpString = guessExperimentFormatFromVariable(variable_id, experiment);
   return axios({
-    baseURL: urljoin(CE_BACKEND_URL, 'data'),
+    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'data'),
     params: {
       ensemble_name: ensemble_name,
       model: model_id,
@@ -81,7 +81,7 @@ function getStats (
   //  }
   const emission = guessExperimentFormatFromVariable(variable_id, experiment);
   return axios({
-    baseURL: urljoin(CE_BACKEND_URL, 'multistats'),
+    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multistats'),
     params: {
       ensemble_name: ensemble_name,
       model: model_id,

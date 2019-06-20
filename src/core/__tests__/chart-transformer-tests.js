@@ -11,15 +11,15 @@
  * chart generation uses chart-generators.js
  ********************************************************************/
 
+import * as cg from '../chart-generators';
+import * as ct from '../chart-transformers';
+import * as validate from '../__test_data__/test-validators';
+import * as mockAPI from '../__test_data__/sample-API-results';
+
 jest.dontMock('../chart-generators');
 jest.dontMock('../chart-transformers');
 jest.dontMock('../util');
 jest.dontMock('underscore');
-
-const cg = require('../chart-generators');
-const ct = require('../chart-transformers'); 
-const validate = require('../__test_data__/test-validators');
-const mockAPI = require('../__test_data__/sample-API-results');
 
 
 describe('makeVariableResponseGraph', function () {

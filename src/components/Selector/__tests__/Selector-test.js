@@ -1,10 +1,9 @@
-jest.dontMock('../Selector');
-jest.dontMock('react-bootstrap');
-
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
+import Selector from '../Selector';
 
-const Selector = require('../Selector');
+jest.dontMock('../Selector');
+jest.dontMock('react-bootstrap');
 
 describe('Selector', function () {
   it('sets the label', function () {
@@ -56,9 +55,9 @@ describe('Selector', function () {
   });
 
   it('calls the callback', function () {
-    var dummyCallback = jest.genMockFunction();
+    var callback = jest.fn();
     var selector = TestUtils.renderIntoDocument(
-      <Selector onChange={dummyCallback} items={[["one", "first"], ["two", "second"]]}/>
+      <Selector onChange={callback} items={[["one", "first"], ["two", "second"]]}/>
     );
 
     var dropdownButton = TestUtils.findRenderedDOMComponentWithTag(selector, 'button');
@@ -66,6 +65,6 @@ describe('Selector', function () {
     var option = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'a')[1];
     TestUtils.Simulate.click(option);
 
-    expect(dummyCallback).toBeCalledWith("two");
+    expect(callback).toBeCalledWith("two");
   });
 });

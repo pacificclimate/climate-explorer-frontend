@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Glyphicon, Popover, OverlayTrigger } from 'react-bootstrap';
 
-import styles from './Information.css';
+import styles from './Information.module.css';
 
 let idNum = 0;
 

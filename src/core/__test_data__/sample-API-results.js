@@ -18,6 +18,7 @@
  *  - addRunToStats() copies the "run" attribute to stats data objects
  *  from the associated metadata.
  *********************************************************************/
+import _ from 'underscore';
 
 /**************************************************************
  * Sample results from the timeseries API call.
@@ -285,8 +286,7 @@ var metadata = {
 var metadataToArray = function () {
   var models = [];
   var vars;
-  var _ = require('underscore');
-  
+
   for (var key in metadata) {
     vars = Object.keys(metadata[key].variables);
 
@@ -316,7 +316,7 @@ var addRunToStats = function () {
 };
 
 
-module.exports = {monthlyTasmaxTimeseries, seasonalTasmaxTimeseries, annualTasmaxTimeseries,
+export {monthlyTasmaxTimeseries, seasonalTasmaxTimeseries, annualTasmaxTimeseries,
     monthlyTasminTimeseries, monthlyPrTimeseries,
     tasmaxStats, addRunToStats,
     tasmaxData, tasminData, prData,

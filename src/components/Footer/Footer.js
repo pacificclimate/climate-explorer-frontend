@@ -3,7 +3,7 @@ import createReactClass from 'create-react-class';
 import { Grid, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import styles from './Footer.css';
+import styles from './Footer.module.css';
 
 var Footer = createReactClass({
 

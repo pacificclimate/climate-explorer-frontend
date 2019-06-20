@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import _ from 'underscore';
+import L from 'leaflet';
 
 import { Map, TileLayer, WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
 import 'proj4';
@@ -11,7 +12,7 @@ import { EditControl } from 'react-leaflet-draw';
 
 import StaticControl from '../StaticControl';
 import './CanadaBaseMap.css';
-import utils from '../../core/map-utils';
+import { generateResolutions } from '../../core/map-utils';
 import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
 import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
@@ -35,7 +36,7 @@ class CanadaBaseMap extends React.Component {
       'EPSG:4326',
       '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
       {
-        resolutions: utils.generateResolutions(0.09765625, 10),
+        resolutions: generateResolutions(0.09765625, 10),
         // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
         // coordinates incorrectly. You have to know the magic origin value.
         //
@@ -67,7 +68,7 @@ class CanadaBaseMap extends React.Component {
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url={TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
+            url={process.env.REACT_APP_TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
             subdomains={'abc'}
             noWrap
             maxZoom={12}

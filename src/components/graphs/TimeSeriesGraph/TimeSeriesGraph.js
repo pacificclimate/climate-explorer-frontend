@@ -7,7 +7,7 @@ import _ from 'underscore';
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
-import styles from './TimeSeriesGraph.css';
+import styles from './TimeSeriesGraph.module.css';
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData,
@@ -120,7 +120,7 @@ export default class TimeSeriesGraph extends React.Component {
 
   handleExportXlsx = this.exportData.bind(this, 'xlsx');
   handleExportCsv = this.exportData.bind(this, 'csv');
- 
+
   render() {
     return (
       <React.Fragment>

@@ -10,17 +10,18 @@
  ********************************************************/
 
 
+import _ from 'underscore';
+import xlsx from 'xlsx';
+import * as util from '../util';
+import * as mockAPI from '../__test_data__/sample-API-results';
+
 jest.dontMock('../util');
 jest.dontMock('../export');
 jest.dontMock('underscore');
 jest.dontMock('xlsx');
+jest.mock('../../data-services/public.js');
 
-var _ = require('underscore');
-var xlsx = require('xlsx');
-var util = require('../util');
-var mockAPI = require('../__test_data__/sample-API-results');
-
-  //expected results for the parseBootstrapTableData test - the
+//expected results for the parseBootstrapTableData test - the
   // ./sample-API-Results.tasmaxStats data rendered into a table.
   const bootstrapTableTestExpected = [ 
     {
@@ -47,7 +48,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
 
   describe('parseBootstrapTableData', function () {
     it('correctly flattens a stats object for passing to the DataTable component', function () {
-      var result = util.parseBootstrapTableData(mockAPI.addRunToStats(), 
+      var result = util.parseBootstrapTableData(mockAPI.addRunToStats(),
           mockAPI.metadataToArray());
       expect(result).toEqual(bootstrapTableTestExpected);
     });
@@ -59,7 +60,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateLongTermAverageData( { data: 
+      var func = function () {util.validateLongTermAverageData( { data:
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -85,7 +86,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateStatsData({data: 
+      var func = function () {util.validateStatsData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -120,7 +121,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateAnnualCycleData({data: 
+      var func = function () {util.validateAnnualCycleData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -157,7 +158,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data: 
+      var func = function () {util.validateUnstructuredTimeseriesData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -182,16 +183,16 @@ var mockAPI = require('../__test_data__/sample-API-results');
     });
   });
 
-  //Depends on an external .yml file, variable-options.yaml. 
-  //Under normal circumstances, webpack transforms the file and makes it
-  //accessible. It is theoretically possible to have jest run similar 
-  //transforms for testing, but I haven't gotten that working yet.
-  //Info about configuring jest to test webpack-dependent functionality:
-  //https://facebook.github.io/jest/docs/en/webpack.html
   describe('getVariableOptions', function() {
-    xit('returns undefined for nonexistant variables', function () {});
-    xit('returns undefined for nonexistent options', function () {});
-    xit('returns the requested option', function () {});
+    it('returns undefined for nonexistent variables', function () {
+      expect(util.getVariableOptions('foo', 'bar')).toBeUndefined();
+    });
+    it('returns undefined for nonexistent options', function () {
+      expect(util.getVariableOptions('tasmin', 'fuggle')).toBeUndefined();
+    });
+    it('returns the requested option', function () {
+      expect(util.getVariableOptions('tasmin', 'decimalPrecision')).toBe(1);
+    });
   });
 
   describe('timeKeyToTimeOfYear', function() {
@@ -284,7 +285,7 @@ var mockAPI = require('../__test_data__/sample-API-results');
       expect(util.caseInsensitiveStringSearch("CATEGORY", "OR")).toBeTruthy();
       expect(util.caseInsensitiveStringSearch("category", "OR")).toBeTruthy();
       expect(util.caseInsensitiveStringSearch("CATEGORY", "or")).toBeTruthy();
-      expect(util.caseInsensitiveStringSearch("cAtEgOrY", "oR")).toBeTruthy();     
+      expect(util.caseInsensitiveStringSearch("cAtEgOrY", "oR")).toBeTruthy();
     });
     it('does not find nonexistant substrings', function () {
       expect(util.caseInsensitiveStringSearch("category", "and")).not.toBeTruthy();

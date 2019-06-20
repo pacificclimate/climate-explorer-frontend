@@ -50,7 +50,7 @@ import {
   graphsPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
-import styles from '../DataController.css';
+import styles from '../DataController.module.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 import GraphTabs from '../GraphTabs';
 

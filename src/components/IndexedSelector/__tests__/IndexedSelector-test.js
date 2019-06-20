@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-dom/test-utils';
 
-const IndexedSelector = require('../IndexedSelector');
+import IndexedSelector from '../IndexedSelector';
 
 describe('IndexedSelector', function () {
   it('renders without crashing', () => {

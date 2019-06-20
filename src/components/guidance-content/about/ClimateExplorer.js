@@ -29,7 +29,7 @@ export default function ClimateExplorer() {
             </ListGroupItem>
 
             <ListGroupItem header='Version'>
-              {CE_CURRENT_VERSION}
+              {process.env.REACT_APP_CE_CURRENT_VERSION || 'Current version not specified'}
             </ListGroupItem>
 
             <ListGroupItem header='Author'>

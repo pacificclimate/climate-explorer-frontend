@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import classnames from 'classnames';
 
-import css from './FlowArrow.css';
+import css from './FlowArrow.module.css';
 
 
 const FlowArrow = ({ pullUp, children }) => (

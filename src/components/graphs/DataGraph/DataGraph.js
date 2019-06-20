@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-var C3 = require('c3/c3');
 import _ from 'underscore';
-import styles from './DataGraph.css';
+import styles from './DataGraph.module.css';
+var C3 = require('c3/c3');
 
 class DataGraph extends React.Component {
   static propTypes = {

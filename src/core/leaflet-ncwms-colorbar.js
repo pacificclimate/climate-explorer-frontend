@@ -5,6 +5,7 @@
 */
 import axios from 'axios';
 import {getVariableOptions, PRECISION} from './util';
+import L from 'leaflet';
 
 var round = function (number, places) {
   return Math.round(number * Math.pow(10, places)) / Math.pow(10, places);

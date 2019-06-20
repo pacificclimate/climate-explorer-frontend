@@ -5,7 +5,7 @@ import React from 'react';
 
 import Selector from '../Selector';
 import {
-  paletteSelectorLabel,
+  PaletteSelectorLabel,
 } from '../guidance-content/info/InformationItems';
 
 
@@ -34,7 +34,7 @@ export default class PaletteSelector extends React.Component {
   render() {
     return (
       <Selector
-        label={paletteSelectorLabel}
+        label={<PaletteSelectorLabel name={this.props.name} />}
         items={PaletteSelector.palettes}
         value={this.props.value}
         onChange={this.props.onChange}

@@ -8,9 +8,6 @@
  * test data from ../_test_data__/sample-API-results.js
  *****************************************************************/
 
-jest.dontMock('../chart-accessors');
-jest.dontMock('underscore');
-
 import {hasTwoYAxes,
         checkYAxisValidity,
         yAxisUnits,
@@ -22,6 +19,9 @@ import {monthlyTasmaxTimeseries,
         monthlyPrTimeseries,
         metadataToArray} from '../__test_data__/sample-API-results';
 import _ from 'underscore';
+
+jest.dontMock('../chart-accessors');
+jest.dontMock('underscore');
 
 describe('hasTwoYAxes', function () {
   const metadata = metadataToArray();

@@ -38,7 +38,7 @@ export default class DataLayer extends React.Component {
     if (layerParams && layerParams.dataset) {
       return (
         <WMSTileLayer
-          url={NCWMS_URL}
+          url={process.env.REACT_APP_NCWMS_URL}
           {...wmsParams}
           ref={onLayerRef}
         />

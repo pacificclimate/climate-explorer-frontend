@@ -28,7 +28,7 @@ import { Panel, Row, Col } from 'react-bootstrap';
 
 import _ from 'underscore';
 
-import '../MapController.css';
+import '../MapController.module.css';
 import DataMap from '../../DataMap';
 import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
@@ -40,7 +40,7 @@ import { hasValidData, currentDataSpec,
   updateLayerSimpleState, updateLayerTime,
   getDatasetId} from '../map-helpers.js';
 
-import styles from '../MapController.css';
+import styles from '../MapController.module.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 

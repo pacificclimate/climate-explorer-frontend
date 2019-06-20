@@ -13,7 +13,7 @@ import ExportButtons from '../graphs/ExportButtons';
 import { statsTableLabel } from '../guidance-content/info/InformationItems';
 import { MEVSummary } from '../data-presentation/MEVSummary';
 
-import styles from './StatisticalSummaryTable.css';
+import styles from './StatisticalSummaryTable.module.css';
 import { getStats } from '../../data-services/ce-backend';
 import {
   defaultTimeOfYear,

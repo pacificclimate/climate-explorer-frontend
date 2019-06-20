@@ -7,17 +7,9 @@
     "jest": true,
     "jquery": true,
   },
-  "extends": "airbnb",
   "plugins": [
     "react"
   ],
-  "globals": {
-    "CE_BACKEND_URL": false,
-    "CE_ENSEMBLE_NAME": false,
-    "TILECACHE_URL": false,
-    "NCWMS_URL": false,
-    "L"
-  },
   "rules": {
     "no-var": 0,
     "vars-on-top": 1,
@@ -33,6 +25,6 @@
     "react/sort-comp": 1,
     "prefer-template": 0,
     "jsx-quotes": [2, "prefer-single"],
-    "no-param-reassign": [2, { "props": false }]
-  }
+    "no-param-reassign": [2, { "props": false }],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]  }
 }
