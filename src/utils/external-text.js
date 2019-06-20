@@ -5,10 +5,10 @@ import _ from 'underscore';
 // TODO: We should just be using lodash. RIP underscore.
 import get from 'underscore.get';
 import axios from 'axios';
-import ReactDOM from 'react-dom';
 import yaml from 'js-yaml';
 
 _.mixin(get);
+
 
 export const ExternalTextContext = React.createContext(
   null
@@ -62,7 +62,8 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 class ExternalText extends React.Component {
   static propTypes = {
     item: PropTypes.string,
-    context: PropTypes.object,  // Context in which to evaluate item's text.
+    evalContext: PropTypes.object,
+      // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markup']).isRequired,
   };
 
@@ -70,17 +71,22 @@ class ExternalText extends React.Component {
     as: 'markup',
   };
 
-  render() {
-    const texts = this.context;
-    const { as, item, context } = this.props;
 
+  static getString(texts, item, evalContext = {}, as = 'string') {
     const text = (texts && _.get(texts, item)) || `{{${item}}}`;
     if (as === 'raw') {
       return text;
     }
+    return evaluateAsTemplateLiteral(text, { $$: texts, ...evalContext });
+  }
 
-    const source = evaluateAsTemplateLiteral(text, { $$: texts, ...context });
-    if (as === 'string') {
+  render() {
+    const texts = this.context;
+    const { as, item, evalContext } = this.props;
+
+    const source = ExternalText.getString(texts, item, evalContext, as);
+
+    if (as === 'raw' || as === 'string') {
       return source;
     }
 
