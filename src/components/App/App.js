@@ -144,7 +144,7 @@ export default class App extends React.Component {
                 />
               </Navbar.Brand>
               <Navbar.Brand>
-                <T item='title' as='string'/> {' '}
+                <T item='app.title' as='string'/> {' '}
               </Navbar.Brand>
             </Navbar.Header>
           </NavRoutes>
