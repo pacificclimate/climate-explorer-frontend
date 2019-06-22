@@ -71,28 +71,36 @@ class ExternalText extends React.Component {
     as: 'markup',
   };
 
+  static Markdown = ReactMarkdown;
 
-  static getString(texts, item, evalContext = {}, as = 'string') {
-    const text = (texts && _.get(texts, item)) || `{{${item}}}`;
-    if (as === 'raw') {
-      return text;
+  static get(rootFrom, item, evalContext = {}, as = 'string') {
+
+    function helper(from, item) {
+      const result = (from && _.get(from, item)) || `{{${item}}}`;
+      if (_.isString(result)) {
+        if (as === 'raw') {
+          return result;
+        }
+        const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...evalContext });
+        if (as === 'string') {
+          return source;
+        }
+        return (<ReactMarkdown source={source}/>);
+      }
+      // TODO: Tighten this up. Don't re-get the item from result, already have it.
+      if (_.isArray(result)) {
+        return _.map(result, (value, index) => helper(result, index.toString()));
+      }
+      return _.mapObject(result, (value, key) => helper(result, key));
     }
-    return evaluateAsTemplateLiteral(text, { $$: texts, ...evalContext });
+
+    return helper(rootFrom, item);
   }
 
   render() {
     const texts = this.context;
-    const { as, item, evalContext } = this.props;
-
-    const source = ExternalText.getString(texts, item, evalContext, as);
-
-    if (as === 'raw' || as === 'string') {
-      return source;
-    }
-
-    return (
-      <ReactMarkdown source={source}/>
-    );
+    const { item, evalContext, as } = this.props;
+    return ExternalText.get(texts, item, evalContext, as);
   }
 }
 
@@ -102,9 +110,14 @@ ExternalText.Provider = Provider;
 
 export function makeYamlLoader(url) {
   return function (setTexts) {
+    console.log('YAML loader: loading...')
     axios.get(url, { responseType: 'text' })
     .then(response => response.data)
     .then(yaml.safeLoad)
+    .then(data => {
+      console.log('YAML loader: loaded', data);
+      return data;
+    })
     .then(setTexts)
     .catch(error => {
       console.error(error);

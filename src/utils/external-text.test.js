@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-// import each from 'jest-each';
 
 import ExternalText, { evaluateAsTemplateLiteral } from './external-text';
+
 
 describe('evaluateAsTemplateLiteral', () => {
   it('works without interpolation', () => {
@@ -38,6 +38,50 @@ describe('evaluateAsTemplateLiteral', () => {
     ).toBe('Hello, world');
   });
 });
+
+
+describe('ExternalText.get', function () {
+  const from = {
+    simple: 'SIMPLE',
+    obj: {
+      a: 'A',
+      b: 'B'
+    },
+    arr: ['X', 'Y'],
+    deepObj: {
+      a: {
+        a1: 'A1',
+        a2: 'A2'
+      },
+      b: {
+        b1: 'B1',
+        b2: 'B2'
+      },
+      c: ['C0', 'C1']
+    },
+    deepArr: [
+      { 'a': 'A' },
+      { 'b': 'B' },
+    ]
+  };
+
+  it.each([
+    ['simple', 'SIMPLE'],
+    ['obj', { 'a': 'A', 'b': 'B' }],
+    ['obj.a', 'A'],
+    ['arr', ['X', 'Y']],
+    ['arr.0', 'X'],
+    ['arr.1', 'Y'],
+    ['deepObj', { a: { a1: 'A1', a2: 'A2' }, b: { b1: 'B1', b2: 'B2' }, c: ['C0', 'C1'] }],
+    ['deepObj.a', { a1: 'A1', a2: 'A2' }],
+    ['deepObj.c', ['C0', 'C1']],
+    ['deepArr', [{ 'a': 'A' }, { 'b': 'B' }]],
+    ['deepArr.1', { 'b': 'B' }],
+  ])('works for path %s', function (path, value) {
+    expect(ExternalText.get(from, path, {})).toEqual(value);
+  });
+});
+
 
 class C {
   constructor(value, loadValue) {
@@ -80,6 +124,7 @@ describe('async loading test helper', () => {
   });
 });
 
+
 describe('ExternalText', () => {
   const texts = {
     greeting: 'Hello, ${name}',
@@ -99,7 +144,13 @@ First content.
 
 Second content.
     `,
-    internalRef: '${$$.greeting}, how are you?'
+    internalRef: '${$$.greeting}, how are you?',
+    arr: ['X', 'Y', 'Z'],
+    obj: {
+      a: 'A',
+      b: 'B',
+      c: ['C0', 'C1'],
+    }
   };
 
   const externalText = (item, evalContext = undefined) => (
@@ -169,6 +220,30 @@ Array [
   Hello, world, how are you?
 </p>
 `);
+  });
+
+  it('renders an array', function () {
+    const stuff = (
+      <ExternalText.Provider texts={texts}>
+        <div>
+          <ExternalText item='arr' />
+        </div>
+      </ExternalText.Provider>
+    );
+    const tree = renderer.create(stuff).toJSON();
+    expect(tree).toMatchInlineSnapshot(`
+<div>
+  <p>
+    X
+  </p>
+  <p>
+    Y
+  </p>
+  <p>
+    Z
+  </p>
+</div>
+`)
   });
 
   it('re-renders when texts are changed', () => {
