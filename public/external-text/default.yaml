@@ -131,28 +131,34 @@ science:
 about:
   pcex:
     title: '# PCIC Climate Explorer (PCEX)'
-    description: |
-      A tool for visualizing and downloading climate model outputs and data derived from those outputs.
+    items:
+      - header: Description
+        body: |
+          A tool for visualizing and downloading climate model outputs and data derived from those outputs.
 
-      The PCIC Climate Explorer (PCEX) is also fondly known as 'the marmot,' since it is an improvement
-      (we sincerely hope) on its predecessor, the Regional Analysis Tool, or 'RAT.' Hence our mascot in the header.
-    author: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
-    terms: |
-      In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
-      data set is subject to the terms of use of each source organization.
-      For further details please refer to:
+          The PCIC Climate Explorer (PCEX) is also fondly known as 'the marmot,' since it is an improvement
+          (we sincerely hope) on its predecessor, the Regional Analysis Tool, or 'RAT.' Hence our mascot in the header.
+      - header: Version
+        body: ${version}
+      - header: Author
+        body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+      - header: Terms of Use
+        body: |
+          In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
+          data set is subject to the terms of use of each source organization.
+          For further details please refer to:
 
-      * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
-      * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
+          * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
+          * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
 
-      #### No Warranty
+          #### No Warranty
 
-      The data in this tool are provided by the Pacific Climate Impacts Consortium with an open licence on an
-      “AS IS” basis without any warranty or representation, express or implied, as to its accuracy or completeness.
-      Any reliance you place upon the information contained here is your sole responsibility and strictly at
-      your own risk. In no event will the Pacific Climate Impacts Consortium be liable for any loss or damage
-      whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
-      upon the data or derived information.
+          The data in this tool are provided by the Pacific Climate Impacts Consortium with an open licence on an
+          “AS IS” basis without any warranty or representation, express or implied, as to its accuracy or completeness.
+          Any reliance you place upon the information contained here is your sole responsibility and strictly at
+          your own risk. In no event will the Pacific Climate Impacts Consortium be liable for any loss or damage
+          whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
+          upon the data or derived information.
 
   credits:
     title: '# Credits and Acknowledgements'
@@ -203,40 +209,36 @@ about:
 
   contact:
     title: '# Contact'
-    feedback:
-      header: Feedback on Application
-      body: |
-        Please address questions and suggestions on the functioning of this
-        tool (the application proper) to
-        [climate@uvic.ca](mailto:climate@uvic.ca).
-    science:
-      header: Scientific Questions
-      body: |
-        Please address questions about science and interpretation of the
-        data presented in this tool to [TBD](#).
-    pcic:
-      header: Pacific Climate Impacts Consortium
-      body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+    items:
+      - header: Feedback on Application
+        body: |
+          Please address questions and suggestions on the functioning of this
+          tool (the application proper) to
+          [climate@uvic.ca](mailto:climate@uvic.ca).
+      - header: Scientific Questions
+        body: |
+          Please address questions about science and interpretation of the
+          data presented in this tool to [TBD](#).
+      - header: Pacific Climate Impacts Consortium
+        body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
   team:
     title: '# Team'
-    james:
-      header: James Hiebert
+    items:
+    - header: James Hiebert
       href: https://pacificclimate.org/about-pcic/people/james-hiebert
       body: |
         Fearless leader.
         Ur-Architect of PCIC information systems.
         Keeper of the clan's lore and history.
-    lee:
-      header: Lee Zeman
+    - header: Lee Zeman
       href: https://pacificclimate.org/about-pcic/people/lee-zeman
       body: |
         Front-end engineer.
         Valiant contender with GIS legacy backend rebellions.
         Implementor of wondrous data graphs.
         Champion of the practical and effective.
-    rod:
-      header: Rod Glover
+    - header: Rod Glover
       href: https://pacificclimate.org/about-pcic/people/rod-glover
       body: |
         Full-stack engineer.
@@ -244,8 +246,7 @@ about:
         Wrangler of metadata.
         React refactorer and perfectionist.
         Migrator of databases and devotee of the alchemical arts.
-    matthew:
-      header: Matthew Benstead
+    - header: Matthew Benstead
       href: https://pacificclimate.org/about-pcic/people/matthew-benstead
       body: |
         System administrator and master of all things IT.
