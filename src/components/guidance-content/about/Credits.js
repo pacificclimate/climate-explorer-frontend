@@ -1,12 +1,42 @@
 import React from 'react';
 import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
+import _ from 'underscore';
 import T from '../../../utils/external-text';
+
+
+function Item({ header, href, body }) {
+  return (
+    <ListGroupItem
+      header={header}
+      href={href}
+    >
+      <T.Markdown source={body}/>
+    </ListGroupItem>
+  );
+}
+
+function List({ items }) {
+  if (!_.isArray(items)) {
+    return null;
+  }
+  return (
+    <ListGroup>
+      { items.map(item => <Item {...item}/>) }
+    </ListGroup>
+  );
+}
+
+
 
 export default class Credits extends React.Component {
   static contextType = T.contextType;
 
   render() {
+    const sponsors = T.get(this.context, 'about.credits.sponsors.items');
+    const others = T.get(this.context, 'about.credits.others.items');
+    const data = T.get(this.context, 'about.credits.data.items');
+
     return (
       <Grid fluid>
         <Row>
@@ -18,48 +48,15 @@ export default class Credits extends React.Component {
         <Row>
           <HalfWidthCol>
             <T item='about.credits.sponsors.title'/>
-            <ListGroup>
-              <ListGroupItem
-                header={T.getString(this.context, 'about.credits.sponsors.moti.header')}
-                href={T.getString(this.context, 'about.credits.sponsors.moti.href')}
-              >
-                <T item='about.credits.sponsors.moti.body'/>
-              </ListGroupItem>
-            </ListGroup>
+            <List items={sponsors}/>
 
             <T item='about.credits.others.title'/>
-            <ListGroup>
-              <ListGroupItem
-                header={T.getString(this.context, 'about.credits.others.vimrf.header')}
-                href={T.getString(this.context, 'about.credits.others.vimrf.href')}
-              >
-                <T item='about.credits.others.vimrf.body'/>
-              </ListGroupItem>
-            </ListGroup>
+            <List items={others}/>
           </HalfWidthCol>
 
           <HalfWidthCol>
             <T item='about.credits.data.title'/>
-            <ListGroup>
-              <ListGroupItem
-                header={T.getString(this.context, 'about.credits.data.eccc.header')}
-                href={T.getString(this.context, 'about.credits.data.eccc.href')}
-              >
-                <T item='about.credits.data.eccc.body'/>
-              </ListGroupItem>
-              <ListGroupItem
-                header={T.getString(this.context, 'about.credits.data.wcrp.header')}
-                href={T.getString(this.context, 'about.credits.data.wcrp.href')}
-              >
-                <T item='about.credits.data.wcrp.body'/>
-              </ListGroupItem>
-              <ListGroupItem
-                header={T.getString(this.context, 'about.credits.data.usdoe.header')}
-                href={T.getString(this.context, 'about.credits.data.usdoe.href')}
-              >
-                <T item='about.credits.data.usdoe.body'/>
-              </ListGroupItem>
-            </ListGroup>
+            <List items={data}/>
           </HalfWidthCol>
         </Row>
 

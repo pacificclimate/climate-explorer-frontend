@@ -114,48 +114,48 @@ about:
     title: '# Credits and Acknowledgements'
     sponsors:
       title: '## Sponsors'
-      moti:
-        header: Ministry of Transportation and Infrastructure (MoTI)
-        href: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure
-        body: Primary sponsor of the PCIC Climate Explorer (PCEX) project.
+      items:
+        - header: Ministry of Transportation and Infrastructure (MoTI)
+          href: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure
+          body: Primary sponsor of the PCIC Climate Explorer (PCEX) project.
     others:
       title: '## Others'
-      vimrf:
-        header: Vancouver Island Marmot Recovery Foundation
-        href: https://marmots.org/
-        body: Use of MRF marmot graphic by kind permission.
+      items:
+        - header: Vancouver Island Marmot Recovery Foundation
+          href: https://marmots.org/
+          body: Use of MRF marmot graphic by kind permission.
     data:
       title: '## Data'
-      eccc:
-        header: Environment and Climate Change Canada
-        href: http://www.ec.gc.ca/
-        body: |
-          We thank the Landscape Analysis and Applications section of the
-          Canadian Forest Service, Natural Resources Canada, for developing
-          and making available the Canada-wide historical daily gridded
-          climate dataset used as the downscaling target.
+      items:
+        - header: Environment and Climate Change Canada
+          href: http://www.ec.gc.ca/
+          body: |
+            We thank the Landscape Analysis and Applications section of the
+            Canadian Forest Service, Natural Resources Canada, for developing
+            and making available the Canada-wide historical daily gridded
+            climate dataset used as the downscaling target.
 
-          PCIC gratefully acknowledges support from
-          Environment and Climate Change Canada
-          for the development of the statistically downscaled GCM
-          scenarios on which much of the data presented here is based.
-      wcrp:
-        header: World Climate Research Programme
-        href: https://www.wcrp-climate.org/
-        body: |
-          We acknowledge the World Climate Research Programme’s
-          Working Group on Coupled Modelling, which is responsible for
-          CMIP5, and we thank the climate modeling groups for producing
-          and making available their GCM output.
-      usdoe:
-        header: U.S. Department of Energy
-        href: https://www.energy.gov/
-        body: |
-          For CMIP, the U.S. Department of Energy’s Program for
-          Climate Model Diagnosis and Intercomparison provides coordinating
-          support and led development of software infrastructure in
-          partnership with the Global Organization for
-          Earth System Science Portals.
+            PCIC gratefully acknowledges support from
+            Environment and Climate Change Canada
+            for the development of the statistically downscaled GCM
+            scenarios on which much of the data presented here is based.
+
+        - header: World Climate Research Programme
+          href: https://www.wcrp-climate.org/
+          body: |
+            We acknowledge the World Climate Research Programme’s
+            Working Group on Coupled Modelling, which is responsible for
+            CMIP5, and we thank the climate modeling groups for producing
+            and making available their GCM output.
+
+        - header: U.S. Department of Energy
+          href: https://www.energy.gov/
+          body: |
+            For CMIP, the U.S. Department of Energy’s Program for
+            Climate Model Diagnosis and Intercomparison provides coordinating
+            support and led development of software infrastructure in
+            partnership with the Global Organization for
+            Earth System Science Portals.
 
   contact:
     title: '# Contact'
