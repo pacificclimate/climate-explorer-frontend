@@ -1,33 +1,8 @@
 import React from 'react';
 import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import _ from 'underscore';
 import T from '../../../utils/external-text';
-
-
-function Item({ header, href, body }) {
-  return (
-    <ListGroupItem
-      header={header}
-      href={href}
-    >
-      <T.Markdown source={body}/>
-    </ListGroupItem>
-  );
-}
-
-function List({ items }) {
-  if (!_.isArray(items)) {
-    return null;
-  }
-  return (
-    <ListGroup>
-      { items.map(item => <Item {...item}/>) }
-    </ListGroup>
-  );
-}
-
-
+import List from '../../guidance-tools/List';
 
 export default class Credits extends React.Component {
   static contextType = T.contextType;
