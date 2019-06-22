@@ -2,6 +2,50 @@ app:
   title: PCIC Climate Explorer
 
 help:
+  faq:
+    title: Frequently Asked Questions
+    intro: |
+      The content of our FAQ is driven by our users' needs and questions.
+
+      At present, we have few questions or answers here, because we don't yet
+      know what you, our user, needs to know.
+      Please [email us](mailto:climate@uvic.ca) with questions you would like
+      to see in the FAQ.
+    items:
+      - question: Which model should I select?
+        answer: |
+          Canada's own General Circulation Model, CanESM2, is the most representative
+          model for Canada. It is a good default choice if you do not have
+          specialized needs that would be better represented by a different model.
+
+      - question: What emissions scenario should I select?
+        answer: |
+          The worst-case emissions scenario, RCP 8.5
+          (presented in the selectors as <code>historical, rcp85</code>),
+          is a good choice for making decisions that adapt to climate change.
+
+      - question: How do I zoom in on the map?
+        answer: |
+          Click the **+** button to zoom in.
+
+          Click the **-** button to zoom out.
+
+          Alternatively, use the scroll wheel on your mouse, or, with a touch
+          screen, pinch to zoom in and spread to zoom out.
+
+      - question: |
+          What are the small triangles in the column labels of tables
+          like the Statistical Summary for?
+        answer: |
+          They are used to sort the table by that column.
+
+          Click on a column header to sort by that column.
+
+          Click again to change the direction of sorting.
+
+
+  # TODO: Break Help > General up into several pages
+  general:
 
 science:
   title: '# Scientific References'
