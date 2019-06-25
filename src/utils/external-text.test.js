@@ -37,6 +37,12 @@ describe('evaluateAsTemplateLiteral', () => {
       })
     ).toBe('Hello, world');
   });
+
+  it('works with backticks in the content', () => {
+    expect(
+      evaluateAsTemplateLiteral('Some `code`')
+    ).toBe('Some `code`');
+  });
 });
 
 
