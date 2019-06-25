@@ -1,5 +1,30 @@
 app:
   title: PCIC Climate Explorer
+  
+# Bits and chunks used repeatedly in other parts of this document.
+# (Referred to in other elements via `${$$.components}`.)
+# For sanity, let's keep these in alphabetical order.
+components:
+  cddCaution: |
+    Please note the distinction between the variable we label `cdd`,
+    meaning cooling degree-days, and the Climdex variable `CDD`,
+    meaning maximum length of dry spell, which we label `cddETCCDI`.
+  climdexUrl: https://www.climdex.org/learn/indices/
+  gcmDefn: |
+    A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
+    a numerical model representing
+    physical processes in the atmosphere, ocean, cryosphere and land surface
+    of the Earth.
+    GCMs are the most advanced tools currently available for simulating the
+    response of the global climate system to increasing greenhouse gas
+    concentrations.
+  monthlyAnnualVarNameAmbiguityCaution:
+    Unlike most Climdex variable names used in PCEX,
+    this variable name can refer to either an annual version
+    (calculation spanning a calendar year) or to the standard
+    Climdex monthly version. The distinction is shown in the
+    English description part of labels in selectors, so that the
+    meaning in each specific context is unambiguous.
 
 help:
   faq:
@@ -21,7 +46,7 @@ help:
       - question: What emissions scenario should I select?
         answer: |
           The worst-case emissions scenario, RCP 8.5
-          (presented in the selectors as <code>historical, rcp85</code>),
+          (presented in the selectors as `historical, rcp85`),
           is a good choice for making decisions that adapt to climate change.
 
       - question: How do I zoom in on the map?
@@ -43,9 +68,1152 @@ help:
 
           Click again to change the direction of sorting.
 
-
-  # TODO: Break Help > General up into several pages
   general:
+    # This chunk is partway to being ready for presenting the sections as
+    # separate pages. The real organization of the whole Help data block should
+    # be approximately as follows:
+    #
+    # help:
+    #   components:
+    #     ...
+    #   pages:
+    #     - label: <Page label>
+    #       subpath: <Page subpath>
+    #       title: '# <Section title>'
+    #       content: |
+    #         <Section content>
+    #
+    # Currently, help.general.sections contains just the content component
+    # of the above structure. But it's a start.
+    title: '# Help: General'
+    sections:
+      - |
+        ## Overview
+
+        ### What it is
+
+        PCIC Climate Explorer (PCEX) is an interactive web application that
+        runs in your browser. It displays data derived from climate models in a
+        variety of ways, including maps, graphs and data tables.
+
+        ### Purpose
+
+        PCEX’s purpose is to help you do the following things:
+
+        * Discover what data derived from climate models is available through the
+        tool.
+
+        * Select datasets based on the model that produced the data, the
+        emissions scenario that drove the model, and the variable of interest.
+
+          * Visualize a selected dataset in a variety of ways, including:
+
+          * geospatially (on an interactive map)
+
+          * as one or more graphs, typically presenting change over time
+
+          * as a statistical summary table
+
+        * Download the data shown in a visualization as an Excel compatible
+        table or a CSV file.
+
+        ### Application elements
+
+        It helps to have a little terminology for the various parts of the
+        PCEX user interface.
+
+        ![Application UI parts](${IMAGES}/app_ui_parts.png)
+
+      - |
+        ## Data available in PCEX
+
+        There are four types of data available in PCEX.
+        (Click on a heading to expand the full explanation of each type.)
+
+        ### Model output
+
+        Daily temperature and precipitation data output
+        by global or regional climate models based on a
+        combination of historical data and possible future greenhouse
+        gas projections. The data is averaged by month over thirty year
+        periods; there are six such periods from 1960 to 2100.
+        This data is available for all of Canada.
+
+        * **`pr`**
+
+          Precipitation at ground level
+
+        * **`tasmax`**
+
+          Daily maximum near-surface air temperature
+
+        * **`tasmin`**
+
+          Daily minimum near-surface air temperature
+
+        * **`prsn`**
+
+          Precipitation at ground level while mean daily temperature is below freezing
+        
+        ### Climdex (climate extremes indices)
+
+        Measures of weather extremes calculated from model output.
+        Climdex defines 27 [climate extremes indices](${$$.components.climdexUrl}),
+        encompassing extreme precipitation, extremes of temperature,
+        or lack thereof in different ways.
+        This is a heterogeneous dataset; a given extreme may be calculated
+        either as a monthly index averaged over thirty year periods
+        from 1960 to 2100, or an annual index calculated individually
+        for each year from 1950 to 2100.
+        This data is available for all of Canada.
+
+        * **`altcddETCCDI`**
+          
+          Dry spell duration index spanning years:
+          Maximum number of consecutive days in one year with less
+          than 1 mm of precipitation.
+
+          This is an alternative version of the Climdex variable
+          [`CDD`](${$$.components.climdexUrl}/#index-CDD).
+          It represents the full length of continuous dry spells
+          that extend across the (artifical) December-January boundary
+          of a calendar year.
+
+          ${$$.components.cddCaution}
+
+        * **`altcsdiETCCDI`** 
+          
+          Cold spell duration index spanning years:
+          Count of days with at least 6 consecutive days when
+          daiy minimum temperature &lt; 10th percentile.
+
+          This is an alternative version of the Climdex variable
+          [`CSDI`](${$$.components.climdexUrl}/#index-CSDI).
+          It represents the full length of continuous cold spells
+          that extend across the (artifical) December-January boundary
+          of a calendar year.
+          
+
+        * **`altcwdETCCDI`** 
+          
+          Maximum length of wet spell spanning years:
+          Maximum number of consecutive days with at
+          least 1 mm of precipitation.
+
+          This is an alternative version of the Climdex variable
+          [`CWD`](${$$.components.climdexUrl}/#index-CWD).
+          It represents the full length of continuous wet spells
+          that extend across the (artifical) December-January boundary
+          of a calendar year.
+          
+
+        * **`altwsdiETCCDI`** 
+          
+          Warm spell duration index spanning years:
+          Count of days with at least 6 consecutive days when
+          daily maximum temperature &gt; 90th percentile.
+           
+          This is an alternative version of the Climdex variable
+          [`WSDI`](${$$.components.climdexUrl}/#index-WSDI).
+          It represents the full length of continuous warm spells
+          that extend across the (artifical) December-January boundary
+          of a calendar year.
+          
+
+        * **`cddETCCDI`** 
+          
+          Maximum length of dry spell:
+          Maximum number of consecutive days with less than 1 mm of
+          precipitation.
+        
+          For details, see [`CDD`](${$$.components.climdexUrl}}). 
+           
+          ${$$.components.cddCaution}
+
+        * **`csdiETCCDI`** 
+          
+          Cold spell duration index:
+          Annual count of days with at least 6 consecutive days when
+          daiy minimum temperature &lt; 10th percentile.
+
+          For details, see [`CSDI`](${$$.components.climdexUrl}}).
+
+        * **`cwdETCCDI`** 
+          
+          Maximum length of wet spell:
+          Maximum number of consecutive days with at least 1 mm of
+          precipitation.
+
+          For details, see [`CWD`](${$$.components.climdexUrl}}).
+
+        * **`dtrETCCDI`** 
+          
+          Mean diurnal temperature range:
+          Monthly mean difference between daily maximum temperature
+          and daily minimum temperature.
+
+          For details, see [`DTR`](${$$.components.climdexUrl}}).
+
+        * **`fdETCCDI`** 
+          
+          Number of frost days:
+          Annual count of days when daily minimum temperature.
+          &lt; 0&deg;C.
+
+          For details, see [`FD`](${$$.components.climdexUrl}}).
+
+        * **`gslETCCDI`** 
+          
+          Growing season length.
+
+          For details, see [`GSL`](${$$.components.climdexUrl}}).
+
+        * **`idETCCDI`** 
+          
+          Number of icing days:
+          Annual count of days when daily maximum temperature.
+          &lt; 0&deg;C.
+
+          For details, see [`ID`](${$$.components.climdexUrl}}).
+
+        * **`prcptotETCCDI`** 
+          
+          Annual total precipitation in wet days.
+
+          For details, see [`PRCPTOT`](${$$.components.climdexUrl}}).
+
+        * **`r10mmETCCDI`** 
+          
+          Annual count of days with at least 10 mm of precipitation.
+
+          For details, see [`R10MM`](${$$.components.climdexUrl}}).
+
+        * **`r1mmETCCDI`** 
+          
+          Annual count of days with at least 1 mm of precipitation.
+
+          For details, see [`R1MM`](${$$.components.climdexUrl}}).
+
+        * **`r20mmETCCDI`** 
+          
+          Annual count of days with at least 20 mm of precipitation.
+
+          For details, see [`R20MM`](${$$.components.climdexUrl}}).
+
+        * **`r95pETCCDI`** 
+          
+          Annual total precipitation when daily precipitation exceeds the
+          95th percentile of wet day precipitation
+
+          For details, see [`R95pTOT`](${$$.components.climdexUrl}}).
+
+        * **`r99pETCCDI`** 
+          
+          Annual total precipitation when daily precipitation exceeds the
+          99th percentile of wet day precipitation
+
+          For details, see [`R99pTOT`](${$$.components.climdexUrl}}).
+
+        * **`rx1dayETCCDI`** 
+          
+          Annual Maximum 1-day Precipitation
+
+          For details, see [`RX1DAY`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`rx1dayETCCDI`** 
+          
+          Monthly Maximum 1-day Precipitation
+
+          For details, see [`RX1DAY`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`rx5dayETCCDI`** 
+          
+          Annual Maximum Consecutive 5-day Precipitation
+
+          For details, see [`RX5DAY`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`rx5dayETCCDI`** 
+          
+          Monthly Maximum Consecutive 5-day Precipitation
+
+          For details, see [`RX5DAY`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`sdiiETCCDI`** 
+          
+          Simple precipitation intensity index.
+
+          For details, see [`SDII`](${$$.components.climdexUrl}}).
+
+        * **`suETCCDI`** 
+          
+          Number of summer days:
+          Annual count of days when daily maximum temperature &gt; 25&deg;C.
+
+          For details, see [`SU`](${$$.components.climdexUrl}}).
+
+        * **`tn10pETCCDI`** 
+          
+          Percentage of days when daily minimum temperature is below the
+          10th percentile.
+
+          For details, see [`TN10P`](${$$.components.climdexUrl}}).
+
+        * **`tn90pETCCDI`** 
+          
+          Percentage of days when daily minimum temperature is above the
+          90th percentile
+
+          For details, see [`TN90P`](${$$.components.climdexUrl}}).
+
+        * **`tnnETCCDI`** 
+          
+          Annual minimum of daily minimum temperature
+
+          For details, see [`TNN`](${$$.components.climdexUrl}}).
+
+        * **`tnnETCCDI`** 
+          
+          Monthly minimum of daily minimum temperature
+
+          For details, see [`TNN`](${$$.components.climdexUrl}}).
+
+        * **`tnxETCCDI`** 
+          
+          Annual maximum of daily minimum temperature
+
+          For details, see [`TNX`](${$$.components.climdexUrl}}).
+
+        * **`tnxETCCDI`** 
+          
+          Monthly maximum of daily minimum temperature
+
+          For details, see [`TNX`](${$$.components.climdexUrl}}).
+
+        * **`trETCCDI`** 
+          
+          Number of tropical nights:
+          Annual count of days when daily minimum temperature) exceeds 20&deg;C.
+
+          For details, see [`TR`](${$$.components.climdexUrl}}).
+
+        * **`tx10pETCCDI`** 
+          
+          Percentage of days when daily maximum temperature is below the
+          10th percentile
+
+          For details, see [`TX10P`](${$$.components.climdexUrl}}).
+
+        * **`tx90pETCCDI`** 
+          
+          Percentage of days when daily maximum temperature is above the
+          90th percentile
+
+          For details, see [`TX90P`](${$$.components.climdexUrl}}).
+
+        * **`txnETCCDI`** 
+          
+          Annual minimum of daily maximum temperature
+
+          For details, see [`TXN`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`txnETCCDI`** 
+          
+          Monthly minimum of daily maximum temperature
+
+          For details, see [`TXN`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`txxETCCDI`** 
+          
+          Annual maximum of daily maximum temperature
+
+          For details, see [`TXX`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`txxETCCDI`** 
+          
+          Monthly maximum of daily maximum temperature
+
+          For details, see [`TXX`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        * **`wsdiETCCDI`** 
+          
+          Warm spell duration index:
+          Count of days with at least 6 consecutive days when
+          daily maximum temperature &gt; 90th percentile.
+
+          For details, see [`WSDI`](${$$.components.climdexUrl}}).
+
+          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
+
+        ### Degree-day variables
+
+        Calculated from model output, a degree-day variable
+        counts how many days fall below or above a given temperature
+        threshold multiplied by how many degrees the threshold is exceeded,
+        over a period of a season or year.
+        The data is averaged over six thirty year periods between
+        1960 to 2100, namely
+        1961-1990,
+        1971-2000,
+        1981-2010,
+        2010-2039,
+        2040-2069, and
+        2070-2099.
+        This data is available for all of British Columbia.
+
+        A degree-day is a measure of how much
+        the actual temperature (usually the mean average temperature)
+        falls either above or below a threshold temperature that
+        represents a temperature of
+        interest (e.g., freezing, temperature at which cooling is
+        required).
+        For a given degree-day measure,
+        the difference is only counted when the actual
+        temperature is either above or below the threshold,
+        the condition (above, below) being given as part of the
+        measure's definition.
+        One degree day is one day with a temperature
+        difference from threshold of 1 degree (in Canada, &deg;C).
+        A day with a temperature difference of 3 degrees represents
+        3 degree-days. The total degree-days over a given period
+        (e.g., a month, a year) is the total degree-days for each day
+        in that period, always respecting both the threshold and the
+        condition (above, below) in counting each day.
+
+        * **`cdd`**
+
+          Cooling Degree Days: Degree-days in one year above 18&deg;C.
+
+        * **`hdd`**
+        
+          Heating Degree Days: Degree-days in one year below 18&deg;C.
+
+        * **`gdd`**
+        
+          Growing Degree Days: Degree-days in one year above 5&deg;C.
+
+        * **`fdd`**
+        
+          Frost Degree Days: Degree-days in one year below 0&deg;C.
+        
+        ### Return period variables
+
+        A return period variable describes extreme temperature or
+        precipitation events that would be expected to occur once
+        during a specified "return period," for example once every
+        20 years.
+        These datasets are calculated from model output using a
+        generalized extreme value distribution.
+        This data is available for four thirty year climatological
+        periods from 1970 to 2100, namely
+        1971-2000,
+        2011-2040,
+        2041-2070, and
+        2071-2100.
+        This data is available for all of British Columbia.
+
+        * **`rp5pr`**
+
+          5-year annual maximum one day precipitation amount
+          
+        * **`rp20pr`**
+
+          20-year annual maximum one day precipitation amount
+          
+        * **`rp50pr`**
+
+          50-year annual maximum one day precipitation amount
+          
+        * **`rp5tasmax`**
+
+          5-year annual maximum daily maximum temperature
+          
+        * **`rp20tasmax`**
+
+          20-year annual maximum daily maximum temperature
+          
+        * **`rp50tasmax`**
+
+          50-year annual maximum daily maximum temperature
+          
+        * **`rp5tasmin`**
+
+          5-year annual minimum daily minimum temperature
+          
+        * **`rp20tasmin`**
+
+          20-year annual minimum daily minimum temperature
+          
+        * **`rp50tasmin`**
+
+          50-year annual minimum daily minimum temperature
+          
+
+      - |
+        ## Models (GCMs)
+
+        ${$$.components.gcmDefn}
+
+        In PCEX, models are indentified by short codes.
+        The following table gives the full name and provenance of these models.
+
+        * **`GFDL-CM3`**
+
+          [U.S. Geophysical Fluid Dynamics Laboratory
+            Coupled Physical Model CM3](https://www.gfdl.noaa.gov/coupled-physical-model-cm3/)
+        
+        * **`GFDL-ESM2G`**
+
+          [U.S. Geophysical Fluid Dynamics Laboratory
+            ESM2G model](https://www.gfdl.noaa.gov/earth-system-model/)
+        
+        * **`GFDL-ESM2M`**
+
+          [U.S. Geophysical Fluid Dynamics Laboratory
+            ESM2M model](https://www.gfdl.noaa.gov/earth-system-model/)
+        
+        * **`HadGEM2-AO`**
+
+          [U.K. Met Office
+            HadGEM2 AO
+            (Troposphere, Land Surface &amp; Hydrology,
+            Aerosols, Ocean &amp; Sea-ice) model](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+        
+        * **`HadGEM2-ES`**
+
+          [U.K. Met Office
+            HadGEM2 ES
+            (Troposphere, Land Surface & Hydrology,
+            Aerosols, Ocean & Sea-ice, Terrestrial
+            Carbon Cycle, Ocean Biogeochemistry,
+            Chemistry)
+            model](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+        
+        * **`HadGEM2-CC`**
+
+          [U.K. Met Office
+            HadGEM2 CC
+            (Troposphere, Land Surface &amp; Hydrology,
+            Aerosols, Ocean &amp; Sea-ice, Terrestrial
+            Carbon Cycle, Ocean Biogeochemistry)](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+        
+        * **`MRI-CGCM3`**
+
+          [Japan Meteorological Research Institute
+            CCGM3 model](https://www.jstage.jst.go.jp/article/jmsj/90A/0/90A_2012-A02/_pdf)
+        
+        * **`CNRM-CM5`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-CM5 model](http://www.umr-cnrm.fr/spip.php?article126&lang=en)
+        
+        * **`CCSM4`**
+
+          [U.S. National Center for Atmospheric Research
+            CCSM4 4.0 model](http://www.cesm.ucar.edu/models/ccsm4.0/)
+        
+        * **`CSIRO-Mk3-6-0`**
+
+          [Australia Commonwealth Scientific and Industrial Research Organisation
+            CSIRO-Mk3.6.0 model](https://confluence.csiro.au/public/CSIROMk360)
+        
+        * **`inmcm4`**
+
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 4](http://www.glisaclimate.org/node/2220)
+          We are unable to find a more authoritative reference in English
+          for this model.
+
+        * **`bcc-csm1-1-m`**
+          [China Beijing Climate Center
+            Climate System Model version 1.1 (m)](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
+        
+        * **`FGOALS-g2`**
+
+          [China LASG
+            (Laboratory of Numerical Modeling for Atmospheric Sciences
+            and Geophysical Fluid Dynamics)
+            FGOALS-g2 model](http://www.lasg.ac.cn/fgoals/index2.asp)
+        
+        * **`CanESM2`**
+
+          [Canadian Centre for Climate Modelling and Analysis
+            ESM2 (Earth System Model ver. 2)](https://www.ec.gc.ca/ccmac-cccma/default.asp?lang=En&n=1A3B7DF1-1&wbdisable=true)
+        
+        * **`MIROC5`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC5
+            (Model for Interdisciplinary Research on Climate, ver. 5)](https://journals.ametsoc.org/doi/10.1175/2010JCLI3679.1)
+        
+        * **`MIROC-ESM-CHEM`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC-ESM-CHEM
+            (Model for Interdisciplinary Research on Climate
+            Earth System Model with Atmospheric Chemistry)](https://www.researchgate.net/publication/253418457_MIROC-ESM_model_description_and_basic_results_of_CMIP5-20c3m_experiments)
+        
+        * **`MPI-ESM-LR`**
+
+          [Germany Max Planck Institute
+            ESM (Earth System Model)](https://www.mpimet.mpg.de/en/science/models/mpi-esm/)
+        
+        * **`ACCESS1-0`**
+
+          [Australian Community Climate and Earth System Simulator
+            coupled model](http://climate-cms.unsw.wikispaces.net/file/view/Bi_AMOJ_ACCESS-CM_revision.pdf)
+        
+
+      - |
+        ## Datasets and data filtering
+
+        PCEX has a huge base of data available—far too much
+          to present usefully in any single view. A selection (filtering)
+          process must come between data and presentation.
+
+        ### Datasets
+
+        A _dataset_ is a collection of data for a specific model,
+          emissions scenario, variable, model run, and time period. It
+          comprises values of the variable for specific points in space and
+          time, usually over a regular spatial grid and sequence of time
+          points.
+        
+
+        Specifically, a dataset is a collection of geospatial
+          (longitude-latitude) grids. Each geospatial grid holds the data for
+          a particular
+          time. (Conversely, you could think of a dataset as a geospatial grid
+          of time series, but the data is in fact stored as a grid per time
+          value.)
+
+        ### Dataset filtering
+
+        The first step of any effort to examine all the available data is
+          to select a smaller, more digestible subset of it to be examined.
+          This selection goes by the name of _dataset filtering_ or
+          just _filtering_.
+        
+
+        The criteria by which datasets are filtered  are:
+
+        * **Model**
+
+          Which GCM produced the base data for the dataset.
+          (Almost all data available in PCEX is further
+          processed
+          from this base data. Specifically, most of the data available
+          has
+          been downscaled from the relatively coarse global grid of the
+          GCM to
+          a finer grid suited to regional analysis. Other post-processing
+          includes forming long-term averages and forming derived
+          variables
+          such as climate indices.)
+
+        * **Emissions Scenario**
+
+          Which scenario of climate-changing emissions (greenhouse gases,
+          etc.) was used as an input to the model runs.
+
+        * **Variable(s)**
+
+          Which output variable(s) from the model runs
+          you are interested in. (For example: maximum temperature,
+          precipitation, number of frost-free days.)
+          
+        The result of data filtering is a collection of one or
+          more _datasets_.
+        
+
+        #### Distinguishing datasets within a filtered collection
+
+        Filtering (by model, emissions scenario, variable) in general
+        results in more than one dataset.
+        
+        Individual datasets within a filtered collection are characterized by:
+
+        * **Model Run**
+
+          The following explanation is taken
+          from [ENES](https://portal.enes.org/data/enes-model-data/cmip5/datastructure):
+
+          > Many CMIP5 experiments, the so-called ensemble calculations,
+            were calculated using several initial states, initialisation
+            methods or physics details. Ensemble calculations facilitate
+            quantifying the variability of simulation data concerning a
+            single model. For example, climate model simulations are
+            dependent on the initial state. The variability we know from
+            weather is also existent in climate simulations. The ensemble
+            members with different initial states are usually called
+            realizations. Initialisation method and physics details may also
+            have an influence. Physics details may be parameterisation
+            constants, for example. In the CMIP5 project, ensemble members
+            are named in the rip-nomenclature, r for realization, i for
+            initialisation and p for physics, followed by an integer, e.g.
+            r1i1p1.
+
+          You will find all datasets in CE labelled by a rip code as above.
+
+        * **Time Period**
+
+          The time period the dataset spans.
+
+      - |
+        ## Data presentations
+
+        PCEX presents data in several different ways. The
+        following is a summary of the different presentations available.
+
+        * **Data Map**
+
+          The Data Map is an interactive web map that presents one or two
+          datasets selected from the filtered collection. It shows a
+          spatial slice of the data for a specific point in time.
+
+          A single variable (or the primary variable in a comparison view)
+          is represented as a raster (a grid of coloured blocks)
+          overlaid on the base map.
+          Colours encode the variable’s value.
+
+          The secondary variable (in a comparison view) is represented as
+          a set of isolines (contours of constant value) overlaid on the
+          base map. Isolines are colour-coded by value.
+
+          The data map is the most complex data presentation tool, and
+            has a
+            substantial collection of generic web mapping features and data
+            presentation features. See below for details of these
+            features.
+
+
+        * **Data Graphs**
+
+          A data graph typically presents a non-spatial view of one or
+          more datasets. Typically this view is temporal, that is, it is a
+          graph with time as the horizontal axis.
+
+          Depending on the specific graph, more than one dataset may be
+          represented. This is useful for comparing datasets and/or giving
+          context to the dataset(s) displayed in the data map.
+
+          IMPORTANT: Spatial averaging: Data shown in all graphs is averaged
+          over either the entire spatial extent of the dataset or over the
+          spatial extent you select by drawing a polygon on the map.
+
+
+        * **Statistical Summary**
+
+          The Statistical Summary table presents a statistical summary of
+          a single dataset. The summary includes the usual statistics such
+          as mean, minimum, maximum, standard deviation, etc.
+
+          IMPORTANT: Spatial averaging: Data summarized in this table is
+          averaged over either the entire spatial extent of the dataset or
+          over the spatial extent you select by drawing a polygon on the
+          map.
+
+          
+      - |
+        ## Data Map features
+
+        ### Map tools
+
+        On the left-hand side of the map you will find a standard
+          selection of web map tools.
+
+        **Note on terminology**: “Layer”: Technically a
+          polygon is a “map layer.” You only need to know this because it
+          is the terminology used in the the tooltips for the various
+          polygon-drawing tools. Read “layer” as “polygon.”
+
+        #### Zoom In / Zoom Out
+
+        #### Draw Polygon
+
+        To draw a general polygon on the map:
+
+        1. Click the **Draw Polygon** button on the map toolbar.
+        
+        1. Click to place a corner of the polygon.
+
+        1. Click on the first point placed to complete the polygon.
+
+        #### Draw Rectangle
+
+        To draw a rectangular area on the map. (It is a rectangle in pixel
+          coordinates, not in projection coordinates.)
+
+        1. Click the **Draw Rectangle** button on the map toolbar.
+
+        1. On the map, click on one corner of the desired rectangle,
+        drag to the opposite corner and release.
+
+        #### Edit Polygon
+
+        To edit an existing polygon on the map:
+
+        1. Click the **Edit Polygon** button on the map toolbar.
+
+        1. The mouse cursor becomes a pointer.
+        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
+
+        1. Editing handles (square boxes) appear at each polygon vertex and
+        at the midpoint of each polygon side. Vertex handles are opaque white;
+        midpoint handles are semitransparent white.
+
+        1. To move a vertex, click on its handle and drag.
+        Release at the desired new position.
+
+        1. To create a new vertex, click on a midpoint handle and drag.
+        Release at the desired new position.
+
+        1. When you have made all desired changes to the polygon, click
+        the **Save** button next to the **Edit Polygon** button.
+        To discard all changes, click the **Cancel** button.
+
+        1. The modified polygon is saved and the editing handles disappear.
+
+        #### Delete Polygons (Layers)
+
+        To delete a single polygon:
+
+        1. Click the **Delete Polygons** button on the map toolbar.
+
+        1. The mouse cursor becomes a pointer.
+        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
+
+        1. Click on the polygon to delete.
+
+        1. The selected polygon disappears.
+
+        1. Click the **Save** button beside the **Delete Polygons** button.
+
+        1. To cancel (individual) deletions and close the tool, click **Cancel**.
+
+        To delete all polygons:
+
+        1. Click the **Delete Polygons** button on the map toolbar.
+
+        1. The mouse cursor becomes a pointer.
+        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
+
+        1. Click the **Clear All** button.
+        All polygons are immediately deleted without confirmation.
+
+        #### Import Polygon
+
+        Imports a polygon defined in an external file. Accepts a zipped
+          Shapefile or a GeoJSON file containing a single Feature (not a
+          FeatureCollection).
+
+        To import a polygon:
+
+        1. Click the **Import Polygon** button on the map toolbar.
+
+        1. Click **Choose File**.
+
+        1. Navigate to and select the file containing the polygon definition.
+
+        1. Click **OK**.
+
+        1. The imported polygon is added to your map.
+
+        #### Export Polygon
+
+        Exports a polygon in one of the following formats: Shapefile,
+          GeoJSON, WKT, KML, GPX.
+
+        To export a polygon:
+        
+        1. Click the **Export Polygon** button.
+
+        1. Click a button for the desired export file format.
+        
+        1. Navigate to the desired location to save the file and enter
+          a name for the file.
+
+        1. Click **Save**.
+        
+        1. The polygon on your map is saved to the file in the
+          selected format.
+
+        ### Colour scales and autoscaling
+
+        On the right-hand side of the map, you will find one or two colour
+        scale references and the autoscale (AS) button.
+
+        #### Colour scales
+
+        A _colour scale_ is a mapping between values that points in
+        the dataset can take on and the colour displayed on the map to
+        represent that data point.
+
+        Mappings from data value to colour essentially treat colour as
+        one-dimensional real variable ranging from 0 (first colour) to 1
+        (last colour). For the purposes of discussion, we call this colour
+        variable the “colour index.”
+
+        In general, a colour scale maps data values lying between chosen
+        minimum and maximum values, V<sub>min</sub> and V<sub>max</sub>,
+        respectively. Those values are usually determined by the value range
+        of the dataset. Sometimes they are actually the dataset minimum and
+        maximum values; sometimes they are derived from other, comparison
+        datasets. To convey the maximum amount of information to the human
+        user, the minimum and maximum values should be close to the dataset’s
+        minimum and maximum values.
+
+        We offer two different types of colour scale, linear and
+        logarithmic. These are distinguished by how data values are mapped
+        onto the colour index:
+
+        * Linear: Maps the value of the data point linearly to colour
+          index, with V<sub>min</sub> mapping to colour index 0, and
+          V<sub>max</sub>
+          mapping to colour index 1.
+
+        * Logarithmic: Maps the logarithm of the data point linearly
+          to colour index, with log(V<sub>min</sub>) mapping to colour
+          index 0, and log(V<sub>max</sub>) mapping to colour index 1.
+
+        #### Colour scale references
+
+        A _colour scale reference_ is a map tool that shows
+        the relationship between a colour displayed on the map and the value
+        of the data (variable) represented by that colour. Three
+        representative data values are shown to the left of the colour band:
+        
+        * Top: V<sub>max</sub>
+
+        * Middle: Mean value.
+
+            * If linear colour scale, arithmetic mean = 
+            (V<sub>min</sub> + V<sub>max</sub>)/2.
+
+            * If logarithmic colour scale, geometric mean =
+            sqrt(V<sub>min</sub> * V<sub>max</sub>).
+
+        * Bottom: V<sub>min</sub>
+
+        When only one variable is displayed on the map (as a raster),
+        there is one colour scale reference.
+
+        When two colour-mapped variables are displayed on the map (raster and
+        isolines), there are two colour scale references. The upper reference
+        is for isolines and the lower reference is for raster.
+
+      - |
+        ## Exported data file formats</h2>
+
+        ### File formats: XSLX and CSV
+        
+        Both file formats convey information as table with rows and
+        columns, as typically managed by spreadsheet programs.
+
+        * **XSLX**
+        
+          This format is compatible with Microsoft Excel.
+        
+        * **CSV**
+        
+          This format is plain text in the comma-separated variables format,
+          with column separator being the comma (`,`).
+
+        ### Content formats
+
+        Each graph or data table is exported in a table layout suitable
+        to its content. The following sections detail each such layout.
+
+        #### Annual Cycle graph
+
+        <table>
+          <thead>
+            <tr>
+              <th>Row number(s)</th>
+              <th>Contents</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1&ndash;2</td>
+              <td>Information identifying the dataset(s) presented in this
+              graph.</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Names of dataset selection criteria
+                (e.g., Model, Emissions Scenario). These define the dataset
+              filter criteria and data subselections within the graph.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Values of dataset selection criteria.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>blank</td>
+            </tr>
+            <tr>
+              <td>4&ndash;</td>
+              <td>Values of data points presented in this graph.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
+                Headings for data columns.
+              </td>
+            </tr>
+            <tr>
+              <td>5&ndash;</td>
+              <td>
+                <p>Data point values.</p>
+                <p>Column <code>Time Series</code> identifies the curve on
+                the graph,
+                one of yearly, seasonal, or monthly mean values.</p>
+                <p>The next 12 columns give the monthly values for each curve.
+                Note that there is a monthly value for each curve; for curves
+                with less than monthly resolution (seasonal, yearly),
+                values are repeated for the appropriate groups of months.</p>
+                <p>The <code>units</code> column gives the units of measure
+                for the data values.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        #### Long Term Average graph
+
+        <table>
+          <thead>
+          <tr>
+            <th>Row number(s)</th>
+            <th>Contents</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>1&ndash;2</td>
+            <td>Information identifying the dataset(s) presented in this
+              graph.</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Names of dataset selection criteria
+              (e.g., Model, Emissions Scenario). These define the dataset
+              filter criteria and data subselections within the graph.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Values of dataset selection criteria.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>blank</td>
+          </tr>
+          <tr>
+            <td>4&ndash;</td>
+            <td>Values of data points presented in this graph.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>
+              Headings for data columns.
+            </td>
+          </tr>
+          <tr>
+            <td>5&ndash;</td>
+            <td>
+              <p>Data point values.</p>
+              <p>Column <code>Run</code> identifies the curve on the graph,
+              one the <em>r-i-p</em> run codes.</p>
+              <p>The next 6 columns give the values for each data point
+              on the curve, identified by the mid-point of the averaging
+              period (e.g., <code>2085-01-15</code>).</p>
+              <p>The <code>units</code> column gives the units of measure
+              for the data values.</p>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        #### Change from Baseline graph
+
+        See Annual Cycle graph
+
+
+        #### Statistical Summary table
+
+        <Table bordered condensed responsive>
+          <thead>
+          <tr>
+            <th>Row number(s)</th>
+            <th>Contents</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>1&ndash;2</td>
+            <td>Information identifying the dataset(s) presented in this
+              table.</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Names of dataset selection criteria
+              (e.g., Model, Emissions Scenario). These define the dataset
+              filter criteria and data subselections within the graph.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Values of dataset selection criteria.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>blank</td>
+          </tr>
+          <tr>
+            <td>4&ndash;</td>
+            <td>
+              Values shown in table.
+              Layout and content is the same as the table.
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>
+              Headings for data columns.
+            </td>
+          </tr>
+          <tr>
+            <td>5&ndash;</td>
+            <td>
+              Data values.
+            </td>
+          </tr>
+          </tbody>
+        </Table>
+
 
 science:
   title: '# Scientific References'
