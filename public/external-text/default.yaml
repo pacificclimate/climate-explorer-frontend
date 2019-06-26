@@ -226,7 +226,7 @@ help:
           Maximum number of consecutive days with less than 1 mm of
           precipitation.
         
-          For details, see [`CDD`](${$$.components.climdexUrl}}). 
+          For details, see [Climdex variable `CDD`](${$$.components.climdexUrl}}).
            
           ${$$.components.cddCaution}
 
@@ -236,7 +236,7 @@ help:
           Annual count of days with at least 6 consecutive days when
           daiy minimum temperature &lt; 10th percentile.
 
-          For details, see [`CSDI`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `CSDI`](${$$.components.climdexUrl}}).
 
         * **`cwdETCCDI`** 
           
@@ -244,7 +244,7 @@ help:
           Maximum number of consecutive days with at least 1 mm of
           precipitation.
 
-          For details, see [`CWD`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `CWD`](${$$.components.climdexUrl}}).
 
         * **`dtrETCCDI`** 
           
@@ -252,7 +252,7 @@ help:
           Monthly mean difference between daily maximum temperature
           and daily minimum temperature.
 
-          For details, see [`DTR`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `DTR`](${$$.components.climdexUrl}}).
 
         * **`fdETCCDI`** 
           
@@ -260,13 +260,13 @@ help:
           Annual count of days when daily minimum temperature.
           &lt; 0&deg;C.
 
-          For details, see [`FD`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `FD`](${$$.components.climdexUrl}}).
 
         * **`gslETCCDI`** 
           
           Growing season length.
 
-          For details, see [`GSL`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `GSL`](${$$.components.climdexUrl}}).
 
         * **`idETCCDI`** 
           
@@ -274,51 +274,51 @@ help:
           Annual count of days when daily maximum temperature.
           &lt; 0&deg;C.
 
-          For details, see [`ID`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `ID`](${$$.components.climdexUrl}}).
 
         * **`prcptotETCCDI`** 
           
           Annual total precipitation in wet days.
 
-          For details, see [`PRCPTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `PRCPTOT`](${$$.components.climdexUrl}}).
 
         * **`r10mmETCCDI`** 
           
           Annual count of days with at least 10 mm of precipitation.
 
-          For details, see [`R10MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R10MM`](${$$.components.climdexUrl}}).
 
         * **`r1mmETCCDI`** 
           
           Annual count of days with at least 1 mm of precipitation.
 
-          For details, see [`R1MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R1MM`](${$$.components.climdexUrl}}).
 
         * **`r20mmETCCDI`** 
           
           Annual count of days with at least 20 mm of precipitation.
 
-          For details, see [`R20MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R20MM`](${$$.components.climdexUrl}}).
 
         * **`r95pETCCDI`** 
           
           Annual total precipitation when daily precipitation exceeds the
           95th percentile of wet day precipitation
 
-          For details, see [`R95pTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R95pTOT`](${$$.components.climdexUrl}}).
 
         * **`r99pETCCDI`** 
           
           Annual total precipitation when daily precipitation exceeds the
           99th percentile of wet day precipitation
 
-          For details, see [`R99pTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R99pTOT`](${$$.components.climdexUrl}}).
 
         * **`rx1dayETCCDI`** 
           
           Annual Maximum 1-day Precipitation
 
-          For details, see [`RX1DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -326,7 +326,7 @@ help:
           
           Monthly Maximum 1-day Precipitation
 
-          For details, see [`RX1DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -334,7 +334,7 @@ help:
           
           Annual Maximum Consecutive 5-day Precipitation
 
-          For details, see [`RX5DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -342,7 +342,7 @@ help:
           
           Monthly Maximum Consecutive 5-day Precipitation
 
-          For details, see [`RX5DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -350,79 +350,79 @@ help:
           
           Simple precipitation intensity index.
 
-          For details, see [`SDII`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `SDII`](${$$.components.climdexUrl}}).
 
         * **`suETCCDI`** 
           
           Number of summer days:
           Annual count of days when daily maximum temperature &gt; 25&deg;C.
 
-          For details, see [`SU`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `SU`](${$$.components.climdexUrl}}).
 
         * **`tn10pETCCDI`** 
           
           Percentage of days when daily minimum temperature is below the
           10th percentile.
 
-          For details, see [`TN10P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TN10P`](${$$.components.climdexUrl}}).
 
         * **`tn90pETCCDI`** 
           
           Percentage of days when daily minimum temperature is above the
           90th percentile
 
-          For details, see [`TN90P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TN90P`](${$$.components.climdexUrl}}).
 
         * **`tnnETCCDI`** 
           
           Annual minimum of daily minimum temperature
 
-          For details, see [`TNN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}}).
 
         * **`tnnETCCDI`** 
           
           Monthly minimum of daily minimum temperature
 
-          For details, see [`TNN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}}).
 
         * **`tnxETCCDI`** 
           
           Annual maximum of daily minimum temperature
 
-          For details, see [`TNX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}}).
 
         * **`tnxETCCDI`** 
           
           Monthly maximum of daily minimum temperature
 
-          For details, see [`TNX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}}).
 
         * **`trETCCDI`** 
           
           Number of tropical nights:
           Annual count of days when daily minimum temperature) exceeds 20&deg;C.
 
-          For details, see [`TR`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TR`](${$$.components.climdexUrl}}).
 
         * **`tx10pETCCDI`** 
           
           Percentage of days when daily maximum temperature is below the
           10th percentile
 
-          For details, see [`TX10P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TX10P`](${$$.components.climdexUrl}}).
 
         * **`tx90pETCCDI`** 
           
           Percentage of days when daily maximum temperature is above the
           90th percentile
 
-          For details, see [`TX90P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TX90P`](${$$.components.climdexUrl}}).
 
         * **`txnETCCDI`** 
           
           Annual minimum of daily maximum temperature
 
-          For details, see [`TXN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -430,7 +430,7 @@ help:
           
           Monthly minimum of daily maximum temperature
 
-          For details, see [`TXN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -438,7 +438,7 @@ help:
           
           Annual maximum of daily maximum temperature
 
-          For details, see [`TXX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -446,7 +446,7 @@ help:
           
           Monthly maximum of daily maximum temperature
 
-          For details, see [`TXX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -456,7 +456,7 @@ help:
           Count of days with at least 6 consecutive days when
           daily maximum temperature &gt; 90th percentile.
 
-          For details, see [`WSDI`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `WSDI`](${$$.components.climdexUrl}}).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -637,7 +637,8 @@ help:
 
           [Russia Institute for Numerical Mathematics
             Climate Model Version 4](http://www.glisaclimate.org/node/2220)
-          We are unable to find a more authoritative reference in English
+
+          Note: We are unable to find a more authoritative reference in English
           for this model.
 
         * **`bcc-csm1-1-m`**
@@ -711,10 +712,10 @@ help:
 
         ### Dataset filtering
 
-        The first step of any effort to examine all the available data is
-          to select a smaller, more digestible subset of it to be examined.
-          This selection goes by the name of _dataset filtering_ or
-          just _filtering_.
+        The first step of any effort to examine the available data is
+        to select a smaller, more digestible subset of it to be examined.
+        This selection goes by the name of _dataset filtering_ or
+        just _filtering_.
         
 
         The criteria by which datasets are filtered  are:
@@ -842,14 +843,25 @@ help:
         ### Map tools
 
         On the left-hand side of the map you will find a standard
-          selection of web map tools.
+        selection of web map tools.
 
         **Note on terminology**: “Layer”: Technically a
-          polygon is a “map layer.” You only need to know this because it
-          is the terminology used in the the tooltips for the various
-          polygon-drawing tools. Read “layer” as “polygon.”
+        polygon is a “map layer.” You only need to know this because it
+        is the terminology used in the the tooltips for the various
+        polygon-drawing tools. Read “layer” as “polygon.”
 
         #### Zoom In / Zoom Out
+
+        To zoom in or out on the map:
+
+        1. Click the **+** (zoom in) or **-** (zoom out) button on the map
+        toolbar.
+
+        1. Alternatively, roll the mouse wheel forward (zoom in) or backward
+        (zoom out) with the mouse cursor over the map.
+
+        1. Alternatively, on a touch screen, spread (zoom in) or pinch
+        (zoom out) on the map.
 
         #### Draw Polygon
 
@@ -1023,6 +1035,22 @@ help:
         When two colour-mapped variables are displayed on the map (raster and
         isolines), there are two colour scale references. The upper reference
         is for isolines and the lower reference is for raster.
+
+        #### Autoscaling
+
+        _Autoscaling_ readjusts the colour scale to span only the range of
+        data values that are currently visible on the map.
+
+        For example, suppose
+        the entire map shows a range of values between 0 and 100. Then you
+        zoom in on a small area where the range of data values lies between,
+        say, 20 and 30. The colour scale for the 0 to 100 range will not show
+        much distinction, if any, between values between 20 and 30. Click the
+        autoscale (**AS**) button, and the colour scale is readjusted so that
+        its minimum value is 20 and maximum value is 30.
+
+        To reset the colour scale to the full data range, zoom out so that
+        all data is in view on the map, then click **AS**.
 
       - |
         ## Exported data file formats</h2>
