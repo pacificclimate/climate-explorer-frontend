@@ -226,7 +226,7 @@ help:
           Maximum number of consecutive days with less than 1 mm of
           precipitation.
         
-          For details, see [Climdex variable `CDD`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `CDD`](${$$.components.climdexUrl}/#index-CDD).
            
           ${$$.components.cddCaution}
 
@@ -236,7 +236,7 @@ help:
           Annual count of days with at least 6 consecutive days when
           daiy minimum temperature &lt; 10th percentile.
 
-          For details, see [Climdex variable `CSDI`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `CSDI`](${$$.components.climdexUrl}/#index-CSDI).
 
         * **`cwdETCCDI`** 
           
@@ -244,7 +244,7 @@ help:
           Maximum number of consecutive days with at least 1 mm of
           precipitation.
 
-          For details, see [Climdex variable `CWD`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `CWD`](${$$.components.climdexUrl}/#index-CWD).
 
         * **`dtrETCCDI`** 
           
@@ -252,7 +252,7 @@ help:
           Monthly mean difference between daily maximum temperature
           and daily minimum temperature.
 
-          For details, see [Climdex variable `DTR`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `DTR`](${$$.components.climdexUrl}/#index-DTR).
 
         * **`fdETCCDI`** 
           
@@ -260,13 +260,13 @@ help:
           Annual count of days when daily minimum temperature.
           &lt; 0&deg;C.
 
-          For details, see [Climdex variable `FD`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `FD`](${$$.components.climdexUrl}/#index-FD).
 
         * **`gslETCCDI`** 
           
           Growing season length.
 
-          For details, see [Climdex variable `GSL`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `GSL`](${$$.components.climdexUrl}/#index-GSL).
 
         * **`idETCCDI`** 
           
@@ -274,51 +274,51 @@ help:
           Annual count of days when daily maximum temperature.
           &lt; 0&deg;C.
 
-          For details, see [Climdex variable `ID`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `ID`](${$$.components.climdexUrl}/#index-ID).
 
         * **`prcptotETCCDI`** 
           
           Annual total precipitation in wet days.
 
-          For details, see [Climdex variable `PRCPTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `PRCPTOT`](${$$.components.climdexUrl}/#index-PRCPTOT).
 
         * **`r10mmETCCDI`** 
           
           Annual count of days with at least 10 mm of precipitation.
 
-          For details, see [Climdex variable `R10MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R10MM`](${$$.components.climdexUrl}/#index-R10MM).
 
         * **`r1mmETCCDI`** 
           
           Annual count of days with at least 1 mm of precipitation.
 
-          For details, see [Climdex variable `R1MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R1MM`](${$$.components.climdexUrl}/#index-R1MM).
 
         * **`r20mmETCCDI`** 
           
           Annual count of days with at least 20 mm of precipitation.
 
-          For details, see [Climdex variable `R20MM`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R20MM`](${$$.components.climdexUrl}/#index-R20MM).
 
         * **`r95pETCCDI`** 
           
           Annual total precipitation when daily precipitation exceeds the
           95th percentile of wet day precipitation
 
-          For details, see [Climdex variable `R95pTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R95pTOT`](${$$.components.climdexUrl}/#index-R95pTOT).
 
         * **`r99pETCCDI`** 
           
           Annual total precipitation when daily precipitation exceeds the
           99th percentile of wet day precipitation
 
-          For details, see [Climdex variable `R99pTOT`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `R99pTOT`](${$$.components.climdexUrl}/#index-R99pTOT).
 
         * **`rx1dayETCCDI`** 
           
           Annual Maximum 1-day Precipitation
 
-          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}/#index-RX1DAY).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -326,7 +326,7 @@ help:
           
           Monthly Maximum 1-day Precipitation
 
-          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX1DAY`](${$$.components.climdexUrl}/#index-RX1DAY).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -334,7 +334,7 @@ help:
           
           Annual Maximum Consecutive 5-day Precipitation
 
-          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}/#index-RX5DAY).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -342,7 +342,7 @@ help:
           
           Monthly Maximum Consecutive 5-day Precipitation
 
-          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `RX5DAY`](${$$.components.climdexUrl}/#index-RX5DAY).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -350,79 +350,79 @@ help:
           
           Simple precipitation intensity index.
 
-          For details, see [Climdex variable `SDII`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `SDII`](${$$.components.climdexUrl}/#index-SDII).
 
         * **`suETCCDI`** 
           
           Number of summer days:
           Annual count of days when daily maximum temperature &gt; 25&deg;C.
 
-          For details, see [Climdex variable `SU`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `SU`](${$$.components.climdexUrl}/#index-SU).
 
         * **`tn10pETCCDI`** 
           
           Percentage of days when daily minimum temperature is below the
           10th percentile.
 
-          For details, see [Climdex variable `TN10P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TN10P`](${$$.components.climdexUrl}/#index-TN10P).
 
         * **`tn90pETCCDI`** 
           
           Percentage of days when daily minimum temperature is above the
           90th percentile
 
-          For details, see [Climdex variable `TN90P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TN90P`](${$$.components.climdexUrl}/#index-TN90P).
 
         * **`tnnETCCDI`** 
           
           Annual minimum of daily minimum temperature
 
-          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}/#index-TNN).
 
         * **`tnnETCCDI`** 
           
           Monthly minimum of daily minimum temperature
 
-          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNN`](${$$.components.climdexUrl}/#index-TNN).
 
         * **`tnxETCCDI`** 
           
           Annual maximum of daily minimum temperature
 
-          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}/#index-TNX).
 
         * **`tnxETCCDI`** 
           
           Monthly maximum of daily minimum temperature
 
-          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TNX`](${$$.components.climdexUrl}/#index-TNX).
 
         * **`trETCCDI`** 
           
           Number of tropical nights:
           Annual count of days when daily minimum temperature) exceeds 20&deg;C.
 
-          For details, see [Climdex variable `TR`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TR`](${$$.components.climdexUrl}/#index-TR).
 
         * **`tx10pETCCDI`** 
           
           Percentage of days when daily maximum temperature is below the
           10th percentile
 
-          For details, see [Climdex variable `TX10P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TX10P`](${$$.components.climdexUrl}/#index-TX10P).
 
         * **`tx90pETCCDI`** 
           
           Percentage of days when daily maximum temperature is above the
           90th percentile
 
-          For details, see [Climdex variable `TX90P`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TX90P`](${$$.components.climdexUrl}/#index-TX90P).
 
         * **`txnETCCDI`** 
           
           Annual minimum of daily maximum temperature
 
-          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}/#index-TXN).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -430,7 +430,7 @@ help:
           
           Monthly minimum of daily maximum temperature
 
-          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXN`](${$$.components.climdexUrl}/#index-TXN).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -438,7 +438,7 @@ help:
           
           Annual maximum of daily maximum temperature
 
-          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}/#index-TXX).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -446,7 +446,7 @@ help:
           
           Monthly maximum of daily maximum temperature
 
-          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `TXX`](${$$.components.climdexUrl}/#index-TXX).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
@@ -456,7 +456,7 @@ help:
           Count of days with at least 6 consecutive days when
           daily maximum temperature &gt; 90th percentile.
 
-          For details, see [Climdex variable `WSDI`](${$$.components.climdexUrl}}).
+          For details, see [Climdex variable `WSDI`](${$$.components.climdexUrl}/#index-WSDI).
 
           ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
 
