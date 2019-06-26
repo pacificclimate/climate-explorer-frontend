@@ -10,6 +10,15 @@ components:
     meaning cooling degree-days, and the Climdex variable `CDD`,
     meaning maximum length of dry spell, which we label `cddETCCDI`.
   climdexUrl: https://www.climdex.org/learn/indices
+  contacts:
+    csg:
+      name: Computational Support Group
+      email: climate@uvic.ca
+      link: '[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})'
+    science:
+      name: Trevor Murdock
+      email: tmurdock@uvic.ca
+      link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
     a numerical model representing
@@ -28,14 +37,15 @@ components:
 
 help:
   faq:
-    title: Frequently Asked Questions
+    title: '# Frequently Asked Questions'
     intro: |
       The content of our FAQ is driven by our users' needs and questions.
 
-      At present, we have few questions or answers here, because we don't yet
-      know what you, our user, needs to know.
-      Please [email us](mailto:climate@uvic.ca) with questions you would like
-      to see in the FAQ.
+      At present, we have relatively few questions and answers here,
+      because we don't yet know what you, our user, needs to know.
+      Please [email us](mailto:${$$.components.contacts.csg.email})
+      with questions you would like to see in the FAQ.
+
     items:
       - question: Which model should I select?
         answer: |
@@ -48,6 +58,108 @@ help:
           The worst-case emissions scenario, RCP 8.5
           (presented in the selectors as `historical, rcp85`),
           is a good choice for making decisions that adapt to climate change.
+
+      - question: How can I upload a polygon successfully?
+        answer: |
+          Climate Explorer's polygon upload feature currently has some known
+          problems. These are slated to be fixed, but in the meantime, here
+          is a guide to successfully uploading a polygon
+
+          ## Summary
+
+          Below is a summary of recommendations and workarounds.
+
+          1. **File format**: It is probably best to upload
+          [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON) files
+          (file extension `.geojson` or `.json`). Why?
+
+             1. There may be additional problems with Shapefiles.
+
+             1. GeoJSON files are human readable and easy to manipulate using
+            a text editor into the form you need (e.g., Multipolygon, etc.;
+            see below).
+
+          1. **CRS**: Express coordinates in [EPSG:4326](https://epsg.io/4326)
+          (a.k.a. WGS:84; standard long-lat coordinates).
+
+          1. **Polygon length**: Limit your polygons to a maximum of 100 vertices.
+          This will not affect the accuracy of the results you get from
+          Climate Explorer. If you have much more detailed polygons, there
+          are GIS tools that can decimate them for you.
+
+          1. **GeoJSON content type**: If it is important to average over more than one polygon,
+          encode that collection as a Multipolygon.
+          Otherwise place your polygons into separate files, and upload
+          each file as needed.
+
+          ## File format
+
+          We have reports from users that they also have problems with
+          Shapefiles. We have not yet investigated these reports,
+          so our current recommandation is to use
+          [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON).
+
+          GeoJSON is a text file format, employing the widely used
+          [JSON](https://en.wikipedia.org/wiki/JSON) standard, that is easy to
+          understand and modify.
+          If your GeoJSON file (of whatever provenance)
+          needs to be changed to be compatible with Climate Explorer,
+          it should be fairly easy to change using any text editor.
+
+          There are online tools for converting shapefiles (and other formats)
+          to GeoJSON. A search with the phrase "convert shapefile to geojson"
+          will turn up several candidates.
+
+          ## CRS (Coordinate Reference System)
+
+          Coordinates in any file uploaded to Climate Explorer must be in
+          standard long-lat coordinates ([EPSG:4326](https://epsg.io/4326)).
+
+          It is simplest if you can generate your files directly in EPSG:4325
+          coordinates.
+
+          However, if your files are in a different coordinate system,
+          there are tools for converting them.
+          One such tool, useful if you are a user of Node.js, is
+          [reproject](https://github.com/perliedman/reproject).
+
+          ## Polygon length
+
+          Climate Explorer cannot handle polygons with more than about
+          400 vertices (coordinates).
+
+          (In principle there is no problem with complicated polygons, but
+          currently there is a limitation on the length of data we can send
+          from the client application (in the browser) to the Climate Explorer
+          backend.)
+
+          If you have large polygons (many vertices), we suggest that you
+          define simpler (less detailed) boundaries for these polygons,
+          using 100 or fewer coordinates per polygon.
+          This is very unlikely to make any significant difference to the
+          results you get from Climate Explorer. Our datasets are relatively
+          coarse spatially, and so the set of grid cells over which spatial
+          averaging is done is likely to be either identical or very similar --
+          so similar that there would be no significant difference.
+
+          ## GeoJSON content type
+
+          CE does handle both FeatureCollections and Multipolygons. However ...
+
+          * ​With FeatureCollections, only one (the textually first in the file)
+          of the polygons can be active at one time.
+          The others are displayed, but inactive, which is to say that they
+          do not participate in the spatial averaging.
+          There is no way at present to have all polygons in a
+          FeatureCollection contribute to the spatial averaging.
+          This is not desirable behaviour but it is currently the case.
+
+          * For technical reasons, all the polygons in a Multipolygon DO
+          contribute to the spatial averaging.
+          This may prompt you to revise how your GeoJSON files are structured.
+          With a text editor, it is a relatively simple process to convert a
+          FeatureCollection to a Multipolygon. Please refer to GeoJSON
+          documentation for more information on these two formats.
 
       - question: How do I zoom in on the map?
         answer: |
@@ -1417,12 +1529,11 @@ about:
       - header: Feedback on Application
         body: |
           Please address questions and suggestions on the functioning of this
-          tool (the application proper) to
-          [climate@uvic.ca](mailto:climate@uvic.ca).
+          tool (the application proper) to ${$$.components.contacts.csg.link}.
       - header: Scientific Questions
         body: |
           Please address questions about science and interpretation of the
-          data presented in this tool to [TBD](#).
+          data presented in this tool to ${$$.components.contacts.science.link}.
       - header: Pacific Climate Impacts Consortium
         body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
