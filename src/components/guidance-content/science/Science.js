@@ -8,13 +8,13 @@ export default function Science() {
     <Grid fluid>
       <Row>
         <FullWidthCol>
-          <T item='science.title' />
+          <T path='science.title' />
         </FullWidthCol>
       </Row>
 
       <Row>
         <HalfWidthCol>
-          <T item='science.content' />
+          <T path='science.content' />
         </HalfWidthCol>
       </Row>
     </Grid>

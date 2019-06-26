@@ -16,21 +16,21 @@ export default class Credits extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T item='about.credits.title' />
+            <T path='about.credits.title' />
           </FullWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
-            <T item='about.credits.sponsors.title'/>
+            <T path='about.credits.sponsors.title'/>
             <List items={sponsors}/>
 
-            <T item='about.credits.others.title'/>
+            <T path='about.credits.others.title'/>
             <List items={others}/>
           </HalfWidthCol>
 
           <HalfWidthCol>
-            <T item='about.credits.data.title'/>
+            <T path='about.credits.data.title'/>
             <List items={data}/>
           </HalfWidthCol>
         </Row>

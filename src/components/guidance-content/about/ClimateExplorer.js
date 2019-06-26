@@ -12,7 +12,7 @@ export default class ClimateExplorer extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T item='about.pcex.title' />
+            <T path='about.pcex.title' />
           </FullWidthCol>
         </Row>
 

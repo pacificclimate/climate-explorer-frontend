@@ -159,14 +159,14 @@ Second content.
     }
   };
 
-  const externalText = (item, evalContext = undefined) => (
+  const externalText = (item, data = undefined) => (
     <ExternalText.Provider texts={texts}>
-      <ExternalText item={item} evalContext={evalContext}/>
+      <ExternalText path={item} data={data}/>
     </ExternalText.Provider>
   );
 
-  const externalTextTree = (item, evalContext = undefined) =>
-    renderer.create(externalText(item, evalContext)).toJSON();
+  const externalTextTree = (item, data = undefined) =>
+    renderer.create(externalText(item, data)).toJSON();
 
   it('renders the key when no such item exists', () => {
     const tree = externalTextTree('foo');
@@ -232,7 +232,7 @@ Array [
     const stuff = (
       <ExternalText.Provider texts={texts}>
         <div>
-          <ExternalText item='arr' />
+          <ExternalText path='arr' />
         </div>
       </ExternalText.Provider>
     );
@@ -253,7 +253,7 @@ Array [
   });
 
   it('re-renders when texts are changed', () => {
-    const evalContext = { name: 'world' };
+    const data = { name: 'world' };
 
     const asyncLoader = new AsyncLoader();
 
@@ -262,7 +262,7 @@ Array [
         texts={{ greeting: 'Hello, ${name}' }}
         loadTexts={asyncLoader.loadValue}
       >
-        <ExternalText item={'greeting'} evalContext={evalContext}/>
+        <ExternalText path={'greeting'} data={data}/>
       </ExternalText.Provider>
     );
     const tree1 = component.toJSON();

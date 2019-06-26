@@ -13,7 +13,7 @@ export default class Team extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T item={'about.team.title'}/>
+            <T path={'about.team.title'}/>
           </FullWidthCol>
         </Row>
 

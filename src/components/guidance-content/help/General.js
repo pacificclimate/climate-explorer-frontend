@@ -15,15 +15,15 @@ export default class HelpGeneral extends React.Component {
       <Grid fluid className='markdown'>
         <Row>
           <FullWidthCol>
-            <T item='help.general.title'/>
+            <T path='help.general.title'/>
           </FullWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
             <T
-              item='help.general.sections'
-              evalContext={{ IMAGES: `${process.env.PUBLIC_URL}/images` }}
+              path='help.general.sections'
+              data={{ IMAGES: `${process.env.PUBLIC_URL}/images` }}
             />
           </HalfWidthCol>
         </Row>

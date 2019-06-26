@@ -49,7 +49,7 @@
 // `ExternalText.makeYamlLoader` that does just this.
 //
 // 2. Wrap the app (or other high-level component) in `ExternalText.Provider`.
-// This provides the external text source to all ExternalText components
+// This provides the external text source to all `ExternalText` components
 // through React's context API.
 //
 //   ```
@@ -68,8 +68,8 @@
 //    import T from 'path/to/external-text';  //   Note abbreviation
 //    ...
 //    <div>
-//      <T item='path.to.item'/>
-//      <T item-'path.to.another.item'/>
+//      <T path='path.to.item'/>
+//      <T path='path.to.another.item'/>
 //    </div>
 //   ```
 
@@ -177,10 +177,10 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
-export function get(rootFrom, item, evalContext = {}, as = 'string') {
+export function get(rootFrom, path, data = {}, as = 'string') {
   // This is the core of `ExternalText`.
   //
-  // It gets the object selected by `item` from `rootFrom` and maps
+  // It gets the object selected by `path` from `rootFrom` and maps
   // the function of (optionally) evaluation and rendering as Markdown
   // over all strings in the object's leaf (non-object) members.
   //
@@ -190,7 +190,7 @@ export function get(rootFrom, item, evalContext = {}, as = 'string') {
   // correspond to these mappings.
   //
   // Component `ExternalText` simply invokes this function on its context
-  // and props. The simplest case is when `item` selects a single string
+  // and props. The simplest case is when `path` selects a single string
   // and it returns a single rendered React element.
   //
   // This function is exposed as a static so that more complicated use can
@@ -200,7 +200,7 @@ export function get(rootFrom, item, evalContext = {}, as = 'string') {
   //
   // ```
   //  <div>
-  //    <ExternalText item='path.to.array' />
+  //    <ExternalText path='path.to.array' />
   //  </div>
   // ```
   //
@@ -212,15 +212,15 @@ export function get(rootFrom, item, evalContext = {}, as = 'string') {
   //  </div>
   // ```
 
-  function helper(from, item) {
+  function helper(from, path) {
     // Walks the object tree, mapping the content-rendering function
     // onto leaf elements (distinguished by being strings).
-    const result = (from && _.get(from, item)) || `{{${item}}}`;
+    const result = (from && _.get(from, path)) || `{{${path}}}`;
     if (_.isString(result)) {
       if (as === 'raw') {
         return result;
       }
-      const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...evalContext });
+      const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...data });
       if (as === 'string') {
         return source;
       }
@@ -233,7 +233,7 @@ export function get(rootFrom, item, evalContext = {}, as = 'string') {
     return _.mapObject(result, (value, key) => helper(result, key));
   }
 
-  return helper(rootFrom, item);
+  return helper(rootFrom, path);
 }
 
 
@@ -241,16 +241,17 @@ export default class ExternalText extends React.Component {
   // Core component of external texts module.
   //
   // This component renders an external text (source texts provided through
-  // the React context API via `ExternalText.Provider`) selected by `item`,
-  // using the data context `evalContext` and rendered according to `as`.
+  // the React context API via `ExternalText.Provider`) selected by `path`,
+  // using the data context `data` and rendered according to `as`.
   // See static function `get` for more details.
   //
   // Supporting components and functions are both exported by the module
   // and added as properties of `ExternalText`.
 
   static propTypes = {
-    item: PropTypes.string,
-    evalContext: PropTypes.object,
+    path: PropTypes.string,
+      // Path (JS standard notation) selecting text item from text source.
+    data: PropTypes.object,
       // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markup']).isRequired,
   };
@@ -261,8 +262,8 @@ export default class ExternalText extends React.Component {
 
   render() {
     const texts = this.context;
-    const { item, evalContext, as } = this.props;
-    return ExternalText.get(texts, item, evalContext, as);
+    const { path, data, as } = this.props;
+    return ExternalText.get(texts, path, data, as);
   }
 }
 

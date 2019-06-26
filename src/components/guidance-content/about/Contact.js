@@ -12,7 +12,7 @@ export default class HelpGeneral extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T item='about.contact.title'/>
+            <T path='about.contact.title'/>
           </FullWidthCol>
         </Row>
 

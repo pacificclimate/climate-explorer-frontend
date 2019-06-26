@@ -35,13 +35,13 @@ export default class FAQ extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T item='help.faq.title' />
+            <T path='help.faq.title' />
           </FullWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
-            <T item='help.faq.intro' />
+            <T path='help.faq.intro' />
           </HalfWidthCol>
         </Row>
 
