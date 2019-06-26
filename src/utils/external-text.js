@@ -79,11 +79,11 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import _ from 'underscore';
 // TODO: We should just be using lodash. RIP underscore.
-import get from 'underscore.get';
+import _get from 'underscore.get';
 import axios from 'axios';
 import yaml from 'js-yaml';
 
-_.mixin(get);
+_.mixin(_get);
 
 
 export const ExternalTextContext = React.createContext(
@@ -92,9 +92,20 @@ export const ExternalTextContext = React.createContext(
 
 
 export class Provider extends React.Component {
+  // Data provider for component `ExternalText`, which accesses this data
+  // via the React context API.
+  //
+  // This component performs two tasks:
+  // - loads the source data into this component's state
+  // - wraps its children in a React context provider whose value is set
+  //   from the source data
+
   static propTypes = {
     texts: PropTypes.object,
+      // Default, non-asynchronous data source.
+
     loadTexts: PropTypes.func,
+      // Callback for loading data asynchronously.
   };
 
   state = {
@@ -166,7 +177,77 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
-class ExternalText extends React.Component {
+export function get(rootFrom, item, evalContext = {}, as = 'string') {
+  // This is the core of `ExternalText`.
+  //
+  // It gets the object selected by `item` from `rootFrom` and maps
+  // the function of (optionally) evaluation and rendering as Markdown
+  // over all strings in the object's leaf (non-object) members.
+  //
+  // Argument `as` controls what function (identity, evaluation as a template
+  // literal, or evaluation and rendering as Markdown) is applied to each
+  // leaf member. The values 'raw', 'string', and 'markdown', respectively,
+  // correspond to these mappings.
+  //
+  // Component `ExternalText` simply invokes this function on its context
+  // and props. The simplest case is when `item` selects a single string
+  // and it returns a single rendered React element.
+  //
+  // This function is exposed as a static so that more complicated use can
+  // be made of it. This should be done only if there is no simpler way to
+  // do it using <ExternalText/> elements. For example, if `'path.to.array'`
+  // selects an array of items from `rootFrom`, then prefer this
+  //
+  // ```
+  //  <div>
+  //    <ExternalText item='path.to.array' />
+  //  </div>
+  // ```
+  //
+  // over this equivalent but unnecessarily complicated code
+  //
+  // ```
+  //  <div>
+  //    { ExternalText.get(this.context, 'path.to.array') }
+  //  </div>
+  // ```
+
+  function helper(from, item) {
+    // Walks the object tree, mapping the content-rendering function
+    // onto leaf elements (distinguished by being strings).
+    const result = (from && _.get(from, item)) || `{{${item}}}`;
+    if (_.isString(result)) {
+      if (as === 'raw') {
+        return result;
+      }
+      const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...evalContext });
+      if (as === 'string') {
+        return source;
+      }
+      return (<ReactMarkdown escapeHtml={false} source={source}/>);
+    }
+    // TODO: Tighten this up. Don't re-get the item from result, already have it.
+    if (_.isArray(result)) {
+      return _.map(result, (value, index) => helper(result, index.toString()));
+    }
+    return _.mapObject(result, (value, key) => helper(result, key));
+  }
+
+  return helper(rootFrom, item);
+}
+
+
+export default class ExternalText extends React.Component {
+  // Core component of external texts module.
+  //
+  // This component renders an external text (source texts provided through
+  // the React context API via `ExternalText.Provider`) selected by `item`,
+  // using the data context `evalContext` and rendered according to `as`.
+  // See static function `get` for more details.
+  //
+  // Supporting components and functions are both exported by the module
+  // and added as properties of `ExternalText`.
+
   static propTypes = {
     item: PropTypes.string,
     evalContext: PropTypes.object,
@@ -178,78 +259,12 @@ class ExternalText extends React.Component {
     as: 'markup',
   };
 
-  // Expose the Markdown renderer in a convenient way.
-  static Markdown = ReactMarkdown;
-
-  static get(rootFrom, item, evalContext = {}, as = 'string') {
-    // This is the core of `ExternalText`.
-    //
-    // It gets the object selected by `item` from `rootFrom` and maps
-    // the function of (optionally) evaluation and rendering as Markdown
-    // over all strings in the object's leaf (non-object) members.
-    //
-    // Argument `as` controls what function (identity, evaluation as a template
-    // literal, or evaluation and rendering as Markdown) is applied to each
-    // leaf member. The values 'raw', 'string', and 'markdown', respectively,
-    // correspond to these mappings.
-    //
-    // Component `ExternalText` simply invokes this function on its context
-    // and props. The simplest case is when `item` selects a single string
-    // and it returns a single rendered React element.
-    //
-    // This function is exposed as a static so that more complicated use can
-    // be made of it. This should be done only if there is no simpler way to
-    // do it using <ExternalText/> elements. For example, if `'path.to.array'`
-    // selects an array of items from `rootFrom`, then prefer this
-    //
-    // ```
-    //  <div>
-    //    <ExternalText item='path.to.array' />
-    //  </div>
-    // ```
-    //
-    // over this equivalent but unnecessarily complicated code
-    //
-    // ```
-    //  <div>
-    //    { ExternalText.get(this.context, 'path.to.array') }
-    //  </div>
-    // ```
-
-    function helper(from, item) {
-      // Walks the object tree, mapping the content-rendering function
-      // onto leaf elements (distinguished by being strings).
-      const result = (from && _.get(from, item)) || `{{${item}}}`;
-      if (_.isString(result)) {
-        if (as === 'raw') {
-          return result;
-        }
-        const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...evalContext });
-        if (as === 'string') {
-          return source;
-        }
-        return (<ReactMarkdown escapeHtml={false} source={source}/>);
-      }
-      // TODO: Tighten this up. Don't re-get the item from result, already have it.
-      if (_.isArray(result)) {
-        return _.map(result, (value, index) => helper(result, index.toString()));
-      }
-      return _.mapObject(result, (value, key) => helper(result, key));
-    }
-
-    return helper(rootFrom, item);
-  }
-
   render() {
     const texts = this.context;
     const { item, evalContext, as } = this.props;
     return ExternalText.get(texts, item, evalContext, as);
   }
 }
-
-ExternalText.contextType = ExternalTextContext;
-ExternalText.Provider = Provider;
-
 
 export function makeYamlLoader(url) {
   // Convenience function for initializing an ExternalText Provider.
@@ -274,7 +289,10 @@ export function makeYamlLoader(url) {
     ;
   };
 }
+
+
+ExternalText.contextType = ExternalTextContext;
+ExternalText.Provider = Provider;
+ExternalText.get = get;
+ExternalText.Markdown = ReactMarkdown;
 ExternalText.makeYamlLoader = makeYamlLoader;
-
-
-export default ExternalText;
