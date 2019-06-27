@@ -1,0 +1,22 @@
+/* This is copied from bootstrap.css.
+Copy-paste is a terrible way to get the effect, but there is apparently no other way to do it. */
+.markdown .table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+.markdown table > thead > tr > th,
+.markdown table > tbody > tr > th,
+.markdown table > tfoot > tr > th,
+.markdown table > thead > tr > td,
+.markdown table > tbody > tr > td,
+.markdown table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+.markdown table > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #ddd;
+}

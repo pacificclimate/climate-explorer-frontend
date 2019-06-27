@@ -204,9 +204,9 @@ The only environment variable that must be set outside of the `.env` files is:
   * (If no value is set for this variable, the app still works, but the version
     cannot be displayed in the Help.)
 
-In addition, we mount the variable options file as a volume in the container.
-This enables us to update this file by just restarting the container. See the section below
-for details.
+In addition, we mount the configuration files as volumes in the container.
+This enables us to update these files without rebuilding or redeploying the app. 
+See the section below for details.
 
 Typical production run:
 
@@ -215,40 +215,48 @@ docker run --restart=unless-stopped -d
   -e REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)
   -p <external port>:8080 
   --name climate-explorer-frontend
-  - v /path/to/external/variable-options.yaml:/app/build/variable
+  - v /path/to/external/variable-options.yaml:/app/build/variable-options.yaml
+  - v /path/to/external/external-texts/default.yaml:/app/build/external-texts/default.yaml
   climate-explorer-frontend:<tag>
 ```
 
-## Updating the variable options file
+## Updating configuration files
 
-The variable options file is stored in [the `public` folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder).
-(Path to file inside this folder specified by env variable `REACT_APP_VARIABLE_OPTIONS`; 
-default value `variable-options.yaml`.)
+Certain parts of Climate Explorer are configured in external configuration files.
+These configuration files are stored in [the `public` folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder).
+The path to each configuration file inside this folder specified by an environment variable.
+Specifically:
+
+| Configuration     | Env variable                  | Default value                 |
+| ----------------- | ----------------------------- | ------------------------------|
+| External texts    | `REACT_APP_EXTERNAL_TEXT`     |  external-text/default.yaml   |
+| Variable options  | `REACT_APP_VARIABLE_OPTIONS`  | variable-options.yaml         |
 
 During a build (`npm run build`), 
 files in the `public` folder are copied directly, without bundling, to the build directory (normally, `./build`).
-Files in the `public` folder can be updated on the fly, so that changes to them can be made without creating
+Files in the `build` folder can be updated on the fly, so that changes to them can be made without creating
 a new release of Climate Explorer.
 
-When running the app in a production environment, we mount an external variable options file as a volume 
+When running the app in a production environment, we mount an external configuration file as a volume 
 in the docker container. (See section above.) 
 This external file can be modified, and the container restarted, to provide an updated version of the
 variable options file without needing to modify source code, create a new release, or rebuild the image.
 
-To change the variable options file without creating a new release of the app:
+To change the configuration file without creating a new release of the app:
 
-* Update the variable options file in the external file system.
+* Update the configuration file in the external file system.
 * Restart the container (`docker restart climate-explorer-frontend`)
 
 Alternatives:
 
-* Stop the app and start it again with a different value for `REACT_APP_VARIABLE_OPTIONS`.
+* Stop the app and start it again with a different value for the associated environment variable,
   and a corresponding volume mount for this new file. 
 
 
 To prevent tears, hair loss, and the cursing of your name by future developers (or even yourself), 
-we **strongly recommend also updating** the source file `public/variable-options.yaml` in the repo
-with any changes made, so that they are in fact propagated to later versions.
+we **strongly recommend also updating** the source configuration files in the repo (in the `public` folder)
+with any changes made, so that they are in fact propagated to later versions. "Hot updates" should not be stored
+outside of the version control system.
 
 ## Releasing
 

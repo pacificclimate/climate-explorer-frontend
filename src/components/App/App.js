@@ -12,6 +12,7 @@ import React from 'react';
 import { Navbar } from 'react-bootstrap';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import T from '../../utils/external-text';
 import DataTool from '../DataTool';
 import NavRoutes from '../navigation/NavRoutes';
 import Help from '../guidance-content/help/Help';
@@ -143,7 +144,7 @@ export default class App extends React.Component {
                 />
               </Navbar.Brand>
               <Navbar.Brand>
-                PCIC Climate Explorer
+                <T path='app.title' as='string'/> {' '}
               </Navbar.Brand>
             </Navbar.Header>
           </NavRoutes>

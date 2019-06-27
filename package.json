@@ -52,6 +52,7 @@
     "togpx": "^0.5.4",
     "tokml": "^0.4.0",
     "underscore": "^1.9.1",
+    "underscore.get": "^0.2.9",
     "url-join": "^4.0.0",
     "wellknown": "^0.5.0",
     "xlsx": "^0.14.3"

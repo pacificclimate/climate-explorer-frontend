@@ -1,24 +1,30 @@
 import React from 'react';
-import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Grid, Row } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import T from '../../../utils/external-text';
 import List from '../../guidance-tools/List';
+
+import '../styles.css';
+
 
 export default class HelpGeneral extends React.Component {
   static contextType = T.contextType;
 
   render() {
     return (
-      <Grid fluid>
+      <Grid fluid className='markdown'>
         <Row>
           <FullWidthCol>
-            <T path='about.contact.title'/>
+            <T path='help.general.title'/>
           </FullWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
-            <List items={T.get(this.context, 'about.contact.items')}/>
+            <T
+              path='help.general.sections'
+              data={{ IMAGES: `${process.env.PUBLIC_URL}/images` }}
+            />
           </HalfWidthCol>
         </Row>
       </Grid>
