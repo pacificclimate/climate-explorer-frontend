@@ -1,7 +1,75 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import ExternalText, { evaluateAsTemplateLiteral } from './external-text';
+import ExternalText, { _, evaluateAsTemplateLiteral } from './external-text';
+
+
+describe('_.mapTraverse', () => {
+  const iteratee = x => 2 * x;
+
+  it('maps a simple array', () => {
+    expect(_.mapTraverse([1, 2, 3], iteratee))
+      .toEqual([2, 4, 6]);
+  });
+
+  it('maps a deep array', () => {
+    expect(_.mapTraverse([[1, 2], [3, [4]]], iteratee))
+      .toEqual([[2, 4], [6, [8]]]);
+  });
+
+  it('maps a simple object', () => {
+    expect(_.mapTraverse({ a: 1, b: 2, c: 3 }, iteratee))
+      .toEqual({ a: 2, b: 4, c: 6 });
+  });
+
+  it('maps a deep object', () => {
+    expect(_.mapTraverse({
+      a: {
+        x: 1,
+        y: 2
+      },
+      b: {
+        x: {
+          y: 3
+        }
+      }
+    }, iteratee))
+      .toEqual({
+        a: {
+          x: 2,
+          y: 4
+        },
+        b: {
+          x: {
+            y: 6
+          }
+        }
+      });
+  });
+
+  it('maps an array of objects', () => {
+    expect(_.mapTraverse([
+      { a: 1, b: 2},
+      { c: 3 }
+    ], iteratee))
+      .toEqual([
+        { a: 2, b: 4},
+        { c: 6 }
+      ]);
+  });
+
+  it('maps an object with arrays', () => {
+    expect(_.mapTraverse([
+      { a: [1], b: [2, 3]},
+      { c: [[4]] }
+    ], iteratee))
+      .toEqual([
+        { a: [2], b: [4, 6]},
+        { c: [[8]] }
+      ]);
+  });
+
+});
 
 
 describe('evaluateAsTemplateLiteral', () => {

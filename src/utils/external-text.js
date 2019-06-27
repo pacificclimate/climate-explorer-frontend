@@ -85,6 +85,34 @@ import yaml from 'js-yaml';
 
 _.mixin(_get);
 
+_.mixin({
+  isPlainObject: value => {
+    // Test whether `value` is a simple object, i.e., not also an array, fn, ...
+    // A bit ragged on the edges, but it will do until we adopt lodash.
+    return _.isObject(value) && !_.isArray(value) && !_.isFunction(value) &&
+      !_.isNumber(value);
+  },
+
+  mapTraverse: (collection, iteratee) => {
+    // Recursively traverse a collection and return a collection with the
+    // same structure (array, object) as the collection, but with the leaf
+    // (non-object) values replaced by applying function `iteratee` to them.
+    // Unlike other _ map functions, `iteratee` is only passed the value
+    // of the leaf, and not a key or index.
+    const traverseValue = value => _.mapTraverse(value, iteratee);
+    if (_.isArray(collection)) {
+      return _.map(collection, traverseValue);
+    }
+    if (_.isPlainObject(collection)) {
+      return _.mapObject(collection, traverseValue);
+    }
+    return iteratee(collection);
+  }
+});
+
+
+export { _ };
+
 
 export const ExternalTextContext = React.createContext(
   null
@@ -177,10 +205,10 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
-export function get(rootFrom, path, data = {}, as = 'string') {
+export function get(texts, path, data = {}, as = 'string') {
   // This is the core of `ExternalText`.
   //
-  // It gets the object selected by `path` from `rootFrom` and maps
+  // It gets the object selected by `path` from `texts` and maps
   // the function of (optionally) evaluation and rendering as Markdown
   // over all strings in the object's leaf (non-object) members.
   //
@@ -196,7 +224,7 @@ export function get(rootFrom, path, data = {}, as = 'string') {
   // This function is exposed as a static so that more complicated use can
   // be made of it. This should be done only if there is no simpler way to
   // do it using <ExternalText/> elements. For example, if `'path.to.array'`
-  // selects an array of items from `rootFrom`, then prefer this
+  // selects an array of items from `texts`, then prefer this
   //
   // ```
   //  <div>
@@ -212,28 +240,23 @@ export function get(rootFrom, path, data = {}, as = 'string') {
   //  </div>
   // ```
 
-  function helper(from, path) {
-    // Walks the object tree, mapping the content-rendering function
-    // onto leaf elements (distinguished by being strings).
-    const result = (from && _.get(from, path)) || `{{${path}}}`;
-    if (_.isString(result)) {
-      if (as === 'raw') {
-        return result;
-      }
-      const source = evaluateAsTemplateLiteral(result, { $$: rootFrom, ...data });
-      if (as === 'string') {
-        return source;
-      }
-      return (<ReactMarkdown escapeHtml={false} source={source}/>);
-    }
-    // TODO: Tighten this up. Don't re-get the item from result, already have it.
-    if (_.isArray(result)) {
-      return _.map(result, (value, index) => helper(result, index.toString()));
-    }
-    return _.mapObject(result, (value, key) => helper(result, key));
-  }
+  const item = (texts && _.get(texts, path)) || `{{${path}}}`;
 
-  return helper(rootFrom, path);
+  const render = value => {
+    if (!_.isString(value)) {
+      return null;
+    }
+    if (as === 'raw') {
+      return value;
+    }
+    const source = evaluateAsTemplateLiteral(value, { $$: texts, ...data });
+    if (as === 'string') {
+      return source;
+    }
+    return (<ReactMarkdown escapeHtml={false} source={source}/>);
+  };
+
+  return _.mapTraverse(item, render);
 }
 
 
@@ -250,10 +273,11 @@ export default class ExternalText extends React.Component {
 
   static propTypes = {
     path: PropTypes.string,
-      // Path (JS standard notation) selecting text item from text source.
+      // Path (JS standard notation) selecting text item from source texts.
     data: PropTypes.object,
       // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markup']).isRequired,
+      // What kind of content to render
   };
 
   static defaultProps = {
