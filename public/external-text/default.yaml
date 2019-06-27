@@ -16,8 +16,10 @@ components:
       email: climate@uvic.ca
       link: '[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})'
     science:
-      name: Trevor Murdock
-      email: tmurdock@uvic.ca
+      # For now, we are directing all inquiries to CSG, and will direct
+      # as necessary.
+      name: ${$$.components.contacts.csg.name}
+      email: ${$$.components.contacts.csg.email}
       link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
