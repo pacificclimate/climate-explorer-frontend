@@ -1,5 +1,22 @@
 # News / Release Notes
 
+## 2.0.0
+*27-Jun-2019*
+
+Major version increment: 
+* Conversion to a Create React App app.
+* Hot updatable configuration files (see README).
+* Externalization of most text (Help, etc.) as a configuration file.
+
+PRs:
+
+* [Improve docker instructions in README](https://github.com/pacificclimate/climate-explorer-frontend/pull/288)
+* [Add display options for prsn](https://github.com/pacificclimate/climate-explorer-frontend/pull/291)
+* [Export data from unstructured timeseries graphs](https://github.com/pacificclimate/climate-explorer-frontend/pull/299)
+* [**Convert to Create React App**](https://github.com/pacificclimate/climate-explorer-frontend/pull/298)
+* [Convert Help and other text-intensive items to external text](https://github.com/pacificclimate/climate-explorer-frontend/pull/303)
+* [Help > FAQ: Explain current polygon import limitations and behaviour](https://github.com/pacificclimate/climate-explorer-frontend/pull/306)
+
 ## 1.2.3
 *12-Mar-2019*
 
