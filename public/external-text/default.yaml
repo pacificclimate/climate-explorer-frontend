@@ -580,8 +580,6 @@ help:
 
           For details, see [Climdex variable `WSDI`](${$$.components.climdexUrl}/#index-WSDI).
 
-          ${$$.components.monthlyAnnualVarNameAmbiguityCaution}
-
         ### Degree-day variables
 
         Calculated from model output, a degree-day variable
@@ -1297,10 +1295,64 @@ help:
             <td>
               <p>Data point values.</p>
               <p>Column <code>Run</code> identifies the curve on the graph,
-              one the <em>r-i-p</em> run codes.</p>
+              one of the <em>r-i-p</em> run codes.</p>
               <p>The next 6 columns give the values for each data point
               on the curve, identified by the mid-point of the averaging
               period (e.g., <code>2085-01-15</code>).</p>
+              <p>The <code>units</code> column gives the units of measure
+              for the data values.</p>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        #### Timeseries graph
+
+        <table>
+          <thead>
+          <tr>
+            <th>Row number(s)</th>
+            <th>Contents</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>1&ndash;2</td>
+            <td>Information identifying the dataset(s) presented in this
+              graph.</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Names of dataset selection criteria
+              (e.g., Model, Emissions Scenario). These define the dataset
+              filter criteria and data subselections within the graph.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Values of dataset selection criteria.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>blank</td>
+          </tr>
+          <tr>
+            <td>4&ndash;</td>
+            <td>Values of data points presented in this graph.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>
+              Headings for data columns.
+            </td>
+          </tr>
+          <tr>
+            <td>5&ndash;</td>
+            <td>
+              <p>Data point values.</p>
+              <p>Column <code>Time Series</code> identifies the data series
+              associated with each curve on the graph.</p>
+              <p>Additional columns have a timestamp and the data values
+              associated with that timestamp.</p>
               <p>The <code>units</code> column gives the units of measure
               for the data values.</p>
             </td>
