@@ -73,7 +73,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
     case "raw_timeseries":
       timeOfYear = 'Annual';
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
-      dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
+      dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}RawTimeseries${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
   }
