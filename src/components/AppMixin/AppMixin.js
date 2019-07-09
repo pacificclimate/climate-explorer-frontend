@@ -91,7 +91,7 @@ var AppMixin = {
         // Merge the selection information
         // If a dataset is already selected, use that. Otherwise, use
         // defaults if available. Otherwise, first available.
-        // CanESM2 and rcp85 are most likely to be of interest to users.
+        // Default dataset: CanESM2, rcp85, pr
         function specifiedIfAvailable(attribute, value, items) {
           return _.pluck(items, attribute).includes(value) ? value : items[0][attribute];
         }
@@ -100,10 +100,12 @@ var AppMixin = {
           specifiedIfAvailable("model_id", "CanESM2", models);
         const experiment = this.state.experiment ? this.state.experiment :
           specifiedIfAvailable("experiment", "historical, rcp85", _.where(models, {model_id: model_id}));
-        const variable_id = _.where(models, {model_id: model_id, experiment: experiment})[0].variable_id;
+        const variable_id = specifiedIfAvailable("variable_id", "pr",
+          _.where(models, {model_id: model_id, experiment: experiment}));
+        // variable_name has no default, because it must match variable_id.
         const variable_name = _.where(models, {model_id: model_id, experiment: experiment, 
           variable_id: variable_id})[0].variable_name;
-        
+
         this.setState({
           meta: models,
           model_id,

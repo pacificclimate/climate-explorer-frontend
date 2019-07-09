@@ -26,6 +26,7 @@ import _ from 'underscore';
 import IndexedSelector from '../IndexedSelector';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getVariableOptions } from '../../core/util';
 
 export default class VariableDescriptionSelector extends React.Component {
   static propTypes = {
@@ -42,10 +43,21 @@ export default class VariableDescriptionSelector extends React.Component {
   
   //generate items for dropdown.
   update(meta, constraints) {
+	// variables are sorted into groups based on the "menuGroup"
+	// attribute in the variable configuration file.
+	// Within a group, they're alphabetical by variable_id
+	function sortVariables(variables) {
+	  let groups = _.groupBy(variables, v => {
+		const membership = getVariableOptions(v.variable_id, "menuGroup");
+		return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;});
+	  groups = _.map(groups, g=> {return _.sortBy(g, 'variable_id');});
+	  return _.flatten(groups);
+    }
+
     function varDesList(meta, constraints) {
-      return _.uniq(_.map(_.where(meta, constraints), m=> {
+      return sortVariables(_.uniq(_.map(_.where(meta, constraints), m=> {
         return _.pick(m, "variable_id", "variable_name");
-      }), false, JSON.stringify);
+      }), false, JSON.stringify));
     } 
     
     const allVars = varDesList(meta, {});
