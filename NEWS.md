@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 2.0.1
+*10-Jul-2019*
+* [Document export format for unstructured timeseries graphs](https://github.com/pacificclimate/climate-explorer-frontend/pull/310)
+* [Order variable selection dropdown](https://github.com/pacificclimate/climate-explorer-frontend/pull/307)
+
 ## 2.0.0
 *27-Jun-2019*
 

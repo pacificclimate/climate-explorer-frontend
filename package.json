@@ -1,6 +1,6 @@
 {
   "name": "climate-explorer-frontend",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "PCIC Climate Explorer front end application",
   "private": true,
   "license": "GPL-3.0",
