@@ -40,6 +40,18 @@
 #        UNIT1, will be substituted for UNIT1 in user-visible
 #        displays like graphs and tables.
 #        (default: no substitutions)
+#   - menuGroup
+#        INTEGER
+#        variables with the same menuGroup number will be
+#        displayed together in the variable dropdown menu
+#        to make it easier for the user to find related
+#        variables and match their descriptions to the
+#        help file.
+#        0: model output
+#        1: climdex
+#        2: degree-days
+#        3: return periods
+#        (default: MAXINT - uncategorized data is listed last)
 ################################################################
 
 #GCM output variables
@@ -47,11 +59,13 @@ tasmin:
   decimalPrecision: 1
   shiftAnnualCycle:
     - tasmax
+  menuGroup: 0
   
 tasmax:
   decimalPrecision: 1
   shiftAnnualCycle:
     - tasmin
+  menuGroup: 0
 
 pr:
   overrideLogarithmicScale: true
@@ -61,151 +75,197 @@ pr:
   userFriendlyUnits:
     - kg m-2 d-1: mm/day
     - kg d-1 m-2: mm/day
+  menuGroup: 0
 
 prsn:
   overrideLogarithmicScale: true
   percentageAnomalies: true
+  menuGroup: 0
 
 #CLIMDEX variables
 altcddETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 altcsdiETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 altcwdETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 altwsdiETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 cddETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 csdiETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 cwdETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 dtrETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 fdETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 gslETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 idETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 prcptotETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 rx1dayETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 rx5dayETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 r1mmETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 r10mmETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 r20mmETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
   
 r95pETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 r99pETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 sdiiETCCDI:
   percentageAnomalies: true
   decimalPrecision: 0
+  menuGroup: 1
 
 suETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 tn10pETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 tn90pETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 tnnETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 tnxETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 trETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 tx10pETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 tx90pETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 txnETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 txxETCCDI:
   decimalPrecision: 1
+  menuGroup: 1
 
 wsdiETCCDI:
   decimalPrecision: 0
+  menuGroup: 1
 
 #degree-day variables
 cdd:
   decimalPrecision: 0
+  menuGroup: 2
 
 fdd:
   decimalPrecision: 0
+  menuGroup: 2
 
 gdd:
   decimalPrecision: 0
+  menuGroup: 2
 
 hdd:
   decimalPrecision: 0
+  menuGroup: 2
 
 #return period variables
 rp20pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  menuGroup: 3
 
 rp20tasmax:
   decimalPrecision: 1
+  menuGroup: 3
 
 rp20tasmin:
   decimalPrecision: 1
+  menuGroup: 3
 
 rp50pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  menuGroup: 3
 
 rp50tasmax:
   decimalPrecision: 1
+  menuGroup: 3
 
 rp50tasmin:
   decimalPrecision: 1
+  menuGroup: 3
 
 rp5pr:
   decimalPrecision: 0
   percentageAnomalies: true
+  menuGroup: 3
 
 rp5tasmax:
   decimalPrecision: 1
+  menuGroup: 3
 
 rp5tasmin:
   decimalPrecision: 1
+  menuGroup: 3
