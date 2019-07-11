@@ -1,7 +1,7 @@
 # This Dockerfile adapted from https://mherman.org/blog/dockerizing-a-react-app/
-# There are a *lot* of approaches to this task. This one does work. Yay us.
 
-FROM node:latest
+# At this moment, Node.js 10.16 LTS is recommended for most users.
+FROM node:10.16
 
 ADD . /app
 WORKDIR /app
