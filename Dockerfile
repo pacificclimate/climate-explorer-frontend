@@ -12,8 +12,7 @@ COPY package.json /app/package.json
 RUN npm install --quiet
 RUN npm install -g serve
 COPY . /app
-RUN npm run build
 
 EXPOSE 8080
 
-CMD serve -s build -l 8080
+CMD ["/bin/bash", "./entrypoint.sh"]

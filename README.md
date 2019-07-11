@@ -135,6 +135,42 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 ## Production
 
+### Notes
+
+According to [CRA documentation](https://facebook.github.io/create-react-app/docs/deployment#serving-the-same-build-from-different-paths), 
+if we want to serve the same build from different paths, we should set `"homepage": "."` in `package.json`.
+But this comes with the caveat "if you are not using the HTML5 pushState history API or not using client-side 
+routing at all". We are using React Router v4 (react-router-dom). It seems we _are_ using the pushState API, based on the
+not entirely clear but suggestive documentation for the [`history`](https://github.com/ReactTraining/history) package,
+[which is a dependency of React Router](https://reacttraining.com/react-router/web/api/history).
+
+So basically, we can't set `package.json` `homepage` to `"."`. And we don't want to set it
+to a fixed relative path because we want to be able to change the path at which CE is deployed without
+rebuilding the app. 
+
+What we have done instead is to set the `<Router>` `basename` prop to the value of the environment
+variable `REACT_APP_CE_BASE_PATH`, followed by `/#`.
+
+CRA introduces the environment variable `PUBLIC_URL`. 
+It is [discussed briefly](https://facebook.github.io/create-react-app/docs/using-the-public-folder) 
+as the URL for the `public` folder, of which we make use for dynamic configuration assets such as
+external text and variable configuration files.
+
+`PUBLIC_URL` is also discussed more interestingly in [Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration):
+
+> Create React App assumes your application is hosted at the serving web server's root or a subpath as 
+specified in package.json (homepage). Normally, Create React App ignores the 
+hostname. You may use this variable to force assets to be referenced verbatim 
+to the url you provide (hostname included). This may be particularly useful 
+when using a CDN to host your application.
+
+In many ways `PUBLIC_URL` does the same thing as our custom env variable `REACT_APP_CE_BASE_PATH`.
+It will be worth reviewing whether `REACT_APP_CE_BASE_PATH` can be eliminated in favour
+of `PUBLIC_URL`. For now we will use both.
+
+
+CRA provides an environment variable 
+
 ### Setup using Docker
 
 We use Docker for production deployment.
