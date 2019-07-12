@@ -161,20 +161,29 @@ export class Provider extends React.Component {
 }
 
 
+// Backticks must be escaped during processing, then unescaped when the
+// final string is returned. This is because backtick (which incidentally
+// is also important in Markdown) delimits template strings, and template
+// strings are the core of the evaluator. Hence `escape` and `unescape`.
+// Does not escape an already escaped backtick.
+
+export const escape = s => (
+  _.map(s, (c, i, t) => (c !== '`' || (i > 0 && t[i-1] === `\\`)) ? c : '\\`')
+).join('');
+// This negative lookbehind formulation is tighter, but it lookbehind isn't
+// supported (yet) in many browsers. It does work in Node.js and Chrome.
+// export const escape = s => s.replace(/(?<!\\)`/g, '\\`');
+
+// And the inverse.
+export const unescape = s => s.replace(/\\`/g, '`');
+
+
 export function evaluateAsTemplateLiteral(s, context = {}) {
   // Convert string `s` to a template literal and evaluate it in a context
   // where all the properties of object `context` are available as identifiers
   // at the top level. (E.g., if `context = { 'a': 1, 'b': 2 }`, then
   // the template literal can refer to `context.a` and `context.b`
   // as `${a}` and `${b}`, respectively.)
-
-  // Backticks must be escaped during processing, then unescaped when the
-  // final string is returned. This is because backtick (which incidentally
-  // is also important in Markdown) delimits template strings, and template
-  // strings are the core of the evaluator. Hence `escape` and `unescape`.
-  // Does not escape an already escaped backtick.
-  const escape = s => s.replace(/(?<!\\)`/g, '\\`');
-  const unescape = s => s.replace(/\\`/g, '`');
 
   // `evaluator` constructs a function that evaluates a template string
   // constructed from the ordinary string passed in (by enclosing it in
