@@ -40,34 +40,41 @@ For more details, see the
 
 Environment variables for configuring the app are:
 
-
-`NODE_ENV`
-* [automatically set; cannot be overridden manually](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
-
-`REACT_APP_CE_CURRENT_VERSION`
-* Current version of the app.
-* Usually set externally (not via `.env` file) as: `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)`
-* Unfortunately, cannot be set to a dynamic value via `.env` file.
-
-`REACT_APP_CE_BACKEND_URL`
-* Publicly accessible URL for backend climate data
-
-`REACT_APP_TILECACHE_URL`
-* Tilecache URL for basemap layers
-
-`REACT_APP_NCWMS_URL`
-* ncWMS URL for climate layers
-
-`REACT_APP_CE_ENSEMBLE_NAME`
-* ensemble name to use for backend requests
+`PUBLIC_URL`
+* Base **URL** for CE frontend app.
+* For production, set this to the URL for CE configured in our proxy server.
+* **WARNING**: The path component of this value **MUST** match `REACT_APP_CE_BASE_PATH` (see below).
 
 `REACT_APP_CE_BASE_PATH`
 * Base **path** of the URL for the CE frontend app; 
-    set this to the path component of the URL for CE configured in 
-    our proxy server
+* For production, set this to the path component of the URL for CE configured in our proxy server.
+* **WARNING**: This **MUST** match the path component of `PUBLIC_URL` (see above).
+
+`REACT_APP_CE_CURRENT_VERSION`
+* Current version of the app.
+* In production, suggested value is release semver, e.g., 2.0.1.
+* No default value for this variable is provided in any `.env` file.
+
+`REACT_APP_CE_BACKEND_URL`
+* Publicly accessible URL for backend climate data.
+
+`REACT_APP_TILECACHE_URL`
+* Tilecache URL for basemap layers.
+
+`REACT_APP_NCWMS_URL`
+* ncWMS URL for climate layers.
+
+`REACT_APP_CE_ENSEMBLE_NAME`
+* Ensemble name to use for backend requests.
 
 `REACT_APP_VARIABLE_OPTIONS`
 * Path within the `public` folder of the variable options file.
+
+`REACT_APP_EXTERNAL_TEXT`
+* Path within the `public` folder of the external text file.
+
+`NODE_ENV`
+* [**Automatically set; cannot be overridden manually.**](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
 
 ### Variable options
 
@@ -135,6 +142,79 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 ## Production
 
+### Notes
+
+##### Configuration, environment variables, and Docker
+
+It is best practice to configure a web app externally, at run-time, typically using environment variables for any 
+simple (atomic, e.g., string) configuration values.
+
+Here we run into a problem introduced by CRA: 
+CRA injects environment variables only at _build time_, not at run time. 
+["The environment variables are embedded during the build time. Since Create React App produces a static 
+HTML/CSS/JS bundle, it can’t possibly read them at runtime."](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
+
+We containerize our apps with Docker. A natural approach to deploying apps with Docker is to build the app as
+part of the image build, and then just serve it from a container. However, because of CRA's build-time injection
+of environment variables, this means that such Docker images cannot be configured at run-time, that is, when
+a container is run. Only static, build-time environment variables are available to CRA apps inside such images.
+
+It therefore takes some extra effort to inject run-time environment variables (or configuration generally) into
+these Dockerized applications. There are two basic approaches:
+
+1. Build the app, and inject run-time environment variables, as part of the image run (i.e., the command run
+by the image includes building the app, which then has access to environment variables provided via the `docker run`
+command).
+    * This is simple but it means that containers are slow to start up and contain a lot of infrastructure 
+    (Node.js, etc.) needed to build the image. This isn't an issue for us, because we don't start many instances and
+    we don't do it often.
+
+2. Fetch the environment variables (or a configuration file) from the server. 
+    * This approach has several variants, which are outlined in this 
+    [CRA issue](https://github.com/facebook/create-react-app/issues/2353). 
+    * The way we load the external text and variable options files falls under into this category.
+
+A key requirement is to be able to configure at run time the the URL at which the app is deployed.
+CRA provides a (build-time) environment variable for this, `PUBLIC_URL`. 
+(Climate Explorer also, as a legacy from pre-CRA versions, uses an overlapping environment variable
+`REACT_APP_CE_BASE_PATH`. See Configuration > Environment variables, above.)
+
+Option 2 makes setting `PUBLIC_URL` _much_ harder to accomplish, and would require significant changes to the
+codebase. 
+ 
+Option 1 makes setting `PUBLIC_URL` simple and requires almost no change to the codebase; 
+as noted we don't care about the cost of using such containers. 
+
+Therefore we have chosen option 1.
+
+#### Routing and base path
+
+A key requirement is to be able to configure at run time the the URL at which the app is deployed.
+
+Because we are using React Router v4 (react-router-dom), and therefore the HTML5 `pushState` history API via
+its [dependency](https://reacttraining.com/react-router/web/api/history) 
+[`history`](https://github.com/ReactTraining/history), 
+we [cannot use](https://facebook.github.io/create-react-app/docs/deployment#serving-the-same-build-from-different-paths) t
+he relatively simple `package.json` `homepage` property.
+
+Instead we must use CRA-provided build-time environment variable `PUBLIC_URL`.
+
+* It is [discussed briefly](https://facebook.github.io/create-react-app/docs/using-the-public-folder) 
+as the URL for the `public` folder, of which we make use for dynamic configuration assets such as
+external text and variable configuration files.
+
+* `PUBLIC_URL` is also discussed more interestingly in 
+[Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration):
+
+    > Create React App assumes your application is hosted at the serving web server's root or a subpath as 
+specified in package.json (homepage). Normally, Create React App ignores the 
+hostname. You may use this variable to force assets to be referenced verbatim 
+to the url you provide (hostname included). This may be particularly useful 
+when using a CDN to host your application.
+
+`PUBLIC_URL` serves much the same purpose as our custom env variable `REACT_APP_CE_BASE_PATH`.
+This redundancy will be eliminated in a future verison of CE.
+
 ### Setup using Docker
 
 We use Docker for production deployment.
@@ -198,9 +278,11 @@ As described above, environment variables configure the app.
 All are given standard development and production values in the files
 `.env`, `.env.development`, and `.env.production`.
 
+These can be overridden at run time by providing them in the `docker run` command (`-e` option).
+
 The only environment variable that must be set outside of the `.env` files is:
 
-* `REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)` 
+* `REACT_APP_CE_CURRENT_VERSION` 
   * (If no value is set for this variable, the app still works, but the version
     cannot be displayed in the Help.)
 
@@ -212,7 +294,10 @@ Typical production run:
 
 ```bash
 docker run --restart=unless-stopped -d 
-  -e REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)
+  -e PUBLIC_URL=<deployment url, including base path>
+  -e REACT_APP_CE_BASE_PATH=<deployment base path>
+  -e REACT_APP_CE_CURRENT_VERSION=<semver>
+  -e <other env variable>=<value>
   -p <external port>:8080 
   --name climate-explorer-frontend
   - v /path/to/external/variable-options.yaml:/app/build/variable-options.yaml
@@ -252,8 +337,7 @@ Alternatives:
 * Stop the app and start it again with a different value for the associated environment variable,
   and a corresponding volume mount for this new file. 
 
-
-To prevent tears, hair loss, and the cursing of your name by future developers (or even yourself), 
+To prevent tears, hair loss, and the cursing of your name by future developers (including yourself), 
 we **strongly recommend also updating** the source configuration files in the repo (in the `public` folder)
 with any changes made, so that they are in fact propagated to later versions. "Hot updates" should not be stored
 outside of the version control system.
