@@ -1,7 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import ExternalText, { _, evaluateAsTemplateLiteral } from './external-text';
+import ExternalText from './external-text';
+import {
+  _, escape, unescape, evaluateAsTemplateLiteral
+} from './external-text';
 
 
 describe('_.mapTraverse', () => {
@@ -69,6 +72,55 @@ describe('_.mapTraverse', () => {
       ]);
   });
 
+});
+
+
+describe('escaping', () => {
+  describe('escape', () => {
+    it.each([
+      // Unescaped
+      ['`', '\\`'],
+      ['``', '\\`\\`'],
+      ['```', '\\`\\`\\`'],
+
+      // Escaped
+      ['\\`', '\\`'],
+      ['\\`\\`', '\\`\\`'],
+      ['\\`\\`\\`', '\\`\\`\\`'],
+
+      // Mixed
+      ['\\``', '\\`\\`'],
+      ['`\\`', '\\`\\`'],
+      ['\\``\\`', '\\`\\`\\`'],
+
+      // With surrounding text
+      ['`code`', '\\`code\\`'],
+      ['x`y', 'x\\`y'],
+    ])('works for %s', (input, expected) => {
+      expect(escape(input)).toBe(expected);
+    })
+  });
+
+
+  describe('unescape', () => {
+    it.each([
+      // Escaped
+      ['\\`', '`'],
+      ['\\`\\`', '``'],
+      ['\\`\\`\\`', '```'],
+
+      // Mixed - this won't happen in our application, but might as well check
+      ['\\``', '``'],
+      ['`\\`', '``'],
+      ['\\``\\`', '```'],
+
+      // With surrounding text
+      ['\\`code\\`','`code`'],
+      ['x\\`y', 'x`y'],
+    ])('works for %s', (input, expected) => {
+      expect(unescape(input)).toBe(expected);
+    })
+  });
 });
 
 
