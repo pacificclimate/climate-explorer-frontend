@@ -56,7 +56,7 @@ class Selector extends React.Component {
       //if associated user string cannot be found,
       //just display the original string, on the assumption
       //it's something like "Select a Choice"
-      var item = _.findWhere(items, {0: value});
+      var item = _.find(items, {0: value});
       this.displayString = item ? item[1] : value;
     }
   };

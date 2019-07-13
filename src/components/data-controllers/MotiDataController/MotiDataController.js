@@ -91,7 +91,7 @@ export default createReactClass({
     if(this.multiYearMeanSelected(props)) { //load Annual Cycle graph
       this.setAnnualCycleGraphNoDataMessage("Loading Data");
 
-      var monthlyMetadata = _.findWhere(props.meta,{
+      var monthlyMetadata = _.find(props.meta,{
         model_id: props.model_id,
         variable_id: props.variable_id,
         experiment: props.experiment,
@@ -112,7 +112,7 @@ export default createReactClass({
 
       var params = _.pick(props, 'model_id', 'variable_id', 'experiment');
 
-      var metadata = _.findWhere(props.meta, params);
+      var metadata = _.find(props.meta, params);
 
       var myTimeseriesPromise = this.getTimeseriesPromise(props, metadata.unique_id);
       myTimeseriesPromise.then(response => {

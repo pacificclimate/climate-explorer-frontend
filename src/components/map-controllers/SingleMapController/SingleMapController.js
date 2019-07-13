@@ -130,7 +130,7 @@ export default class SingleMapController extends React.Component {
     if (encodedVarTimeIdx) {
       if (hasValidData(varSymbol, this.props)) {
         const timeIndex = JSON.parse(encodedVarTimeIdx);
-        dataset = _.findWhere(varMeta, {
+        dataset = _.find(varMeta, {
           ensemble_member: this.state.run,
           start_date: this.state.start_date,
           end_date: this.state.end_date,

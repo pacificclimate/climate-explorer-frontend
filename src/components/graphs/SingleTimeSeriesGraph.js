@@ -13,7 +13,7 @@ export default function SingleTimeSeriesGraph(props) {
       variable_id, meta,
     } = props;
 
-    const primaryVariableMetadata = _.findWhere(meta, {
+    const primaryVariableMetadata = _.find(meta, {
       model_id, experiment, variable_id,
     });
     // Yes, the value of this function is an array of one element.

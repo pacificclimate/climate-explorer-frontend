@@ -236,7 +236,7 @@ export function getDataUnits(data, variable_id) {
 export function defaultDataSpec({ meta, model_id, variable_id, experiment }) {
   for (const timescale of ['monthly', 'seasonal', 'yearly']) {
     const matchingMetadata =
-      _.findWhere(meta, { model_id, variable_id, experiment, timescale });
+      _.find(meta, { model_id, variable_id, experiment, timescale });
     if (matchingMetadata) {
       return _.pick(matchingMetadata,
         'start_date', 'end_date', 'ensemble_member');

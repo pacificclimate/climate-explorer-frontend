@@ -22,7 +22,7 @@ export default function SingleAnnualCycleGraph(props) {
     } = props;
     
     var findMetadataForResolution = function (resolution) {
-      return _.findWhere(meta, {
+      return _.find(meta, {
         model_id, experiment, variable_id,
         ...dataSpec,
         timescale: resolution,

@@ -59,9 +59,9 @@ export default function AnomalyAnnualCycleGraph(props) {
     historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
 
     //pick the highest-resolution dataset available for that climatology
-    const baselineMetadata = _.findWhere(historicalMetadatas, {timescale: "monthly"})
-                             || _.findWhere(historicalMetadatas, {timescale: "seasonal"})
-                             || _.findWhere(historicalMetadatas, {timescale: "yearly"});
+    const baselineMetadata = _.find(historicalMetadatas, {timescale: "monthly"})
+                             || _.find(historicalMetadatas, {timescale: "seasonal"})
+                             || _.find(historicalMetadatas, {timescale: "yearly"});
 
     //return the baseline dataset and every same-resolution dataset that starts after it.
     if(_.isUndefined(baselineMetadata)) {
