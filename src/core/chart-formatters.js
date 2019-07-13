@@ -208,7 +208,7 @@ function sortSeriesByRank (graph, ranker) {
  */
 function hideSeriesInTooltip (graph, predicate) {
   //determine which series do not appear in the tooltip
-  const hidden = _.pluck(_.filter(graph.data.columns, predicate),0);
+  const hidden = _.map(_.filter(graph.data.columns, predicate),0);
 
   //in order to have a value not show up in the tooltip, it needs to
   //render as undefined in the tooltip value formatting function. 

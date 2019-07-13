@@ -69,7 +69,7 @@ export default createReactClass({
         comparand_name: this.state.variable_name
       });
     }
-    else if(!_.includes(_.pluck(this.state.meta, "variable_id"), this.state.comparand_id)) {
+    else if(!_.includes(_.map(this.state.meta, "variable_id"), this.state.comparand_id)) {
       //comparand leftover from previous ensemble; not present in current one
       this.setState({
         comparand_id: this.state.variable_id,

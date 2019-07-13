@@ -357,7 +357,7 @@ export function timeResolutions(meta) {
   // return an object containing flags indicating whether each of the
   // 3 standard timescales are present in the datasets described by
   // the metadata.
-  const timescales = _.pluck(meta, 'timescale');
+  const timescales = _.map(meta, 'timescale');
   return {
     monthly: _.includes(timescales, 'monthly'),
     seasonal: _.includes(timescales, 'seasonal'),

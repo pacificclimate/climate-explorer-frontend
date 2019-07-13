@@ -93,7 +93,7 @@ var AppMixin = {
         // defaults if available. Otherwise, first available.
         // Default dataset: CanESM2, rcp85, pr
         function specifiedIfAvailable(attribute, value, items) {
-          return _.pluck(items, attribute).includes(value) ? value : items[0][attribute];
+          return _.map(items, attribute).includes(value) ? value : items[0][attribute];
         }
 
         const model_id = this.state.model_id ? this.state.model_id :
@@ -210,7 +210,7 @@ var AppMixin = {
    * would return the list of all variables in datasets from the CanESM2 model.
    */
   getFilteredMetadataItems: function (name, filter) {
-    return _.unique(_.pluck(_.where(this.state.meta, filter), name));
+    return _.unique(_.map(_.where(this.state.meta, filter), name));
   },
 
   /*

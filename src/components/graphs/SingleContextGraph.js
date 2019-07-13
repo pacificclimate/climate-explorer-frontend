@@ -16,13 +16,13 @@ export default function SingleContextGraph(props) {
     } = props;
 
     // Array of unique model_id's
-    const uniqueContextModelIds = _.uniq(_.pluck(contextMeta, 'model_id'));
+    const uniqueContextModelIds = _.uniq(_.map(contextMeta, 'model_id'));
 
     //we prefer the lowest possible time resolution for this graph, since it's
     //used to provide broad context, not detailed data. But if the
     //selected dataset doesn't have yearly data, use whatever resolution it has.
     const model_metadata = _.where(contextMeta, {model_id: model_id, multi_year_mean: true});
-    const resolutions = _.unique(_.pluck(model_metadata, "timescale")).sort();
+    const resolutions = _.unique(_.map(model_metadata, "timescale")).sort();
     const timescale = resolutions[resolutions.length - 1]; 
 
     const baseMetadata = {
