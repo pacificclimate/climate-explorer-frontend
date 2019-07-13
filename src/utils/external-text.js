@@ -104,7 +104,7 @@ _.mixin({
       return _.map(collection, traverseValue);
     }
     if (_.isPlainObject(collection)) {
-      return _.mapObject(collection, traverseValue);
+      return _.mapValues(collection, traverseValue);
     }
     return iteratee(collection);
   }

@@ -22,7 +22,7 @@ export default class LayerOpacityControl extends PureComponent {
     super(props);
     this.state = {
       showControls: false,
-      layerState: _.mapObject(props.layerOpacity, () => ({
+      layerState: _.mapValues(props.layerOpacity, () => ({
         visible: true,
         prevOpacity: 0,
       })),
