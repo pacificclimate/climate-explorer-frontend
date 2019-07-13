@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import StatisticalSummaryTable from '../StatisticalSummaryTable';
-import { noop } from 'underscore';
 import { meta } from '../../../test_support/data';
 
 jest.mock('../../../data-services/ce-backend');
