@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, ControlLabel } from 'react-bootstrap';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';

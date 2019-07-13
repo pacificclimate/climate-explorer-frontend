@@ -22,7 +22,7 @@
 import PropTypes from 'prop-types';
 
 import React from 'react';
-import _ from 'underscore';
+import _ from 'lodash';
 import Selector from '../Selector/Selector';
 
 export default class IndexedSelector extends React.Component {

@@ -4,7 +4,7 @@ import { Grid, Row, Col, Button, Glyphicon } from 'react-bootstrap';
 
 import layersIcon from 'leaflet/dist/images/layers.png';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import InputRange from 'react-input-range';
 

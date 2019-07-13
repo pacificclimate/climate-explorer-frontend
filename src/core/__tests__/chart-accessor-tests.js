@@ -18,10 +18,10 @@ import {monthlyTasmaxTimeseries,
         annualTasmaxTimeseries,
         monthlyPrTimeseries,
         metadataToArray} from '../__test_data__/sample-API-results';
-import _ from 'underscore';
+import _ from 'lodash';
 
 jest.dontMock('../chart-accessors');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 
 describe('hasTwoYAxes', function () {
   const metadata = metadataToArray();

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DataMap from '../DataMap';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 
 describe('with single dataset (raster)', () => {
   it('renders without crashing', () => {

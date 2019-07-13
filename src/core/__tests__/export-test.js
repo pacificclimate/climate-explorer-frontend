@@ -9,7 +9,7 @@
  * validation functions from ./test-validators.js
  ******************************************************************/
 
-import _ from 'underscore';
+import _ from 'lodash';
 import xlsx from 'xlsx';
 import * as exportdata from '../export';
 import * as validate from '../__test_data__/test-validators';
@@ -21,7 +21,7 @@ import * as chart from '../chart-generators';
 jest.dontMock('../util');
 jest.dontMock('../chart-generators');
 jest.dontMock('../export');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 jest.dontMock('xlsx');
 
 /*

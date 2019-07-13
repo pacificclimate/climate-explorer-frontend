@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DataLayer from '../DataLayer';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 import { Map } from 'react-leaflet';
 
 it('renders without crashing', () => {

@@ -23,7 +23,7 @@ import React from 'react';
 import Loader from 'react-loader';
 import { Panel, Row, Col } from 'react-bootstrap';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import '../MapController.module.css';
 import DataMap from '../../DataMap';

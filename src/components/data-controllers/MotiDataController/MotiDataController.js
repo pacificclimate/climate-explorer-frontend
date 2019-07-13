@@ -46,7 +46,7 @@ import DataControllerMixin from '../../DataControllerMixin';
 import {timeseriesToAnnualCycleGraph,
         timeseriesToTimeseriesGraph} from '../../../core/chart-generators';
 import { getStats } from '../../../data-services/ce-backend';
-import _ from 'underscore';
+import _ from 'lodash';
 
 import AnnualCycleGraph from '../../graphs/AnnualCycleGraph';
 import TimeSeriesGraph from '../../graphs/TimeSeriesGraph';

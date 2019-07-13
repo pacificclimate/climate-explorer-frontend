@@ -22,7 +22,7 @@
  *   - disabled: true to disable entire dropdown
  *   - label: label to display beside the dropdown
  ************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 import IndexedSelector from '../IndexedSelector';
 import React from 'react';
 import PropTypes from 'prop-types';

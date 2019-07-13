@@ -5,7 +5,7 @@ import { WMSTileLayer } from 'react-leaflet';
 import {
   getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams,
 } from '../../data-services/ncwms';
-import _ from 'underscore';
+import _ from 'lodash';
 import { layerParamsPropTypes } from '../../types/types.js';
 
 export default class DataLayer extends React.Component {

@@ -12,7 +12,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col, Panel } from 'react-bootstrap';
-import _ from 'underscore';
+import _ from 'lodash';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import T from '../../utils/external-text';
-import _ from 'underscore';
+import _ from 'lodash';
 
 export function Item({ header, href, body }) {
   return (

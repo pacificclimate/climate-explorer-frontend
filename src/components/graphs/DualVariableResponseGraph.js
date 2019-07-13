@@ -21,7 +21,7 @@
  *********************************************************************/
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToTimeseriesGraph} from '../../core/chart-generators';
 import { makeVariableResponseGraph } from '../../core/chart-transformers';

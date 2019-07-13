@@ -15,7 +15,7 @@
 
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
 import { makeAnomalyGraph } from '../../core/chart-transformers';

@@ -19,7 +19,7 @@ import * as mockAPI from '../__test_data__/sample-API-results';
 jest.dontMock('../chart-generators');
 jest.dontMock('../chart-transformers');
 jest.dontMock('../util');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 
 
 describe('makeVariableResponseGraph', function () {

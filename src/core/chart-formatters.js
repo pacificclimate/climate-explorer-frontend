@@ -31,7 +31,7 @@
  *  - displayTicksByRange: only display axis ticks for specific parts of the
  *    data range
  ***************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 import {PRECISION,
         extendedDateToBasicDate,
         capitalizeWords,

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import DualMapController from '../DualMapController';
 import SingleMapController from '../SingleMapController';
 import PrecipMapController from '../PrecipMapController';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 
 
 /*********************************************************************

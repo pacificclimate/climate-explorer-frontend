@@ -6,7 +6,7 @@
  *
  * Reference on the C3 chart spec format can be found at https://c3js.org
  ***************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 
 export function hasTwoYAxes(graph) {
   // returns a truthy object if this graph has a both a y and y2 axis defined

@@ -77,9 +77,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import _ from 'underscore';
-// TODO: We should just be using lodash. RIP underscore.
-import _get from 'underscore.get';
+import _ from 'lodash';
+// TODO: We should just be using lodash. RIP lodash.
+import _get from 'lodash.get';
 import axios from 'axios';
 import yaml from 'js-yaml';
 

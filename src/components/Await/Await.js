@@ -9,7 +9,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 
 const promiseType = PropTypes.instanceOf(Promise);

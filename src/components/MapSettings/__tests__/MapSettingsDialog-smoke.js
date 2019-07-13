@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MapSettingsDialog from '../MapSettingsDialog';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 import { meta, times } from '../../../test_support/data';
 
 describe('with one variable', () => {

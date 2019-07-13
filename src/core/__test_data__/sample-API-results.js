@@ -18,7 +18,7 @@
  *  - addRunToStats() copies the "run" attribute to stats data objects
  *  from the associated metadata.
  *********************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 
 /**************************************************************
  * Sample results from the timeseries API call.

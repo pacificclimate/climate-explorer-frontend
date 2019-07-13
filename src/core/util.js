@@ -3,7 +3,7 @@
  ***********************************************************/
 
 import moment from 'moment/moment';
-import _ from 'underscore';
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import { getVariableOptions as httpGetVariableOptions } from '../data-services/public'
 

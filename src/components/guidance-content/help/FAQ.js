@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Row } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import Accordion from '../../guidance-tools/Accordion';
-import _ from 'underscore';
+import _ from 'lodash';
 import T from '../../../utils/external-text';
 
 

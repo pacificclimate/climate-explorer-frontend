@@ -20,7 +20,7 @@
  *    and a timestamp, returns a simplified narrow vertical graph showing
  *    only that timestamp. Intended for use as a sidebar.
  ***************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 import {caseInsensitiveStringSearch, getVariableOptions} from './util';
 import {fixedPrecision} from './chart-generators';
 import {assignColoursByGroup, hideSeriesInTooltip,

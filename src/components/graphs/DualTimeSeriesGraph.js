@@ -1,6 +1,6 @@
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToTimeseriesGraph } from '../../core/chart-generators';
 import TimeSeriesGraph from './TimeSeriesGraph';

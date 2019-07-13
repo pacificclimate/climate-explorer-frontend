@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import { saveAs } from 'filesaver.js';
 import togeojson from 'togeojson';
 import { parse, stringify } from 'wellknown';

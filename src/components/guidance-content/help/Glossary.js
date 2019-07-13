@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 
 // Items are sorted automatically here.

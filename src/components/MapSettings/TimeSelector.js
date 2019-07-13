@@ -5,7 +5,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { sameYear, timestampToTimeOfYear } from '../../core/util';
 import NullTimeSelector from './NullTimeSelector';

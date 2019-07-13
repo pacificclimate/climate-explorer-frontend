@@ -11,7 +11,7 @@
  * 
  ****************************************************************************/
 
-import _ from 'underscore';
+import _ from 'lodash';
 import urljoin from 'url-join';
 import axios from 'axios';
 import {timestampToYear} from '../../core/util';

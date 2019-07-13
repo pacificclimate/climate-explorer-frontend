@@ -11,7 +11,7 @@
  *      
  *   2. State and handler functions shared by multiple MapControllers
  ************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { getTimeMetadata } from '../../data-services/ce-backend';
 import { getVariableOptions } from '../../core/util';

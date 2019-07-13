@@ -34,7 +34,7 @@ import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
 
-import _ from 'underscore';
+import _ from 'lodash';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
