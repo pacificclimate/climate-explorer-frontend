@@ -39,7 +39,9 @@ export function yAxisRange(graph, axis) {
   checkYAxisValidity(graph, axis);
   
   //filter to just the data points associated with this y axis
-  const axisData = _.flatten(graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]]));
+  const axisData = _.flattenDeep(  // deep flattening may not be required here
+    graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]])
+  );
   
   return {
     min: _.min(axisData),

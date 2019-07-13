@@ -51,7 +51,7 @@ export default class VariableDescriptionSelector extends React.Component {
 		const membership = getVariableOptions(v.variable_id, "menuGroup");
 		return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;});
 	  groups = _.map(groups, g=> {return _.sortBy(g, 'variable_id');});
-	  return _.flatten(groups);
+	  return _.flattenDeep(groups);  // deep flattening may not be required here
     }
 
     function varDesList(meta, constraints) {
