@@ -184,7 +184,7 @@ var g = {
     /* All load functions must call `success` handler with a GeoJSON feature */
     var ext = file.name.split('.')[1];
 
-    if (_.contains(['geojson', 'json'], ext)) {
+    if (_.includes(['geojson', 'json'], ext)) {
       this.loadTextFormat(file, success);
     } else if (ext === 'zip') {
       this.loadShapefile(file, success);

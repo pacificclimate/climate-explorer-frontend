@@ -359,9 +359,9 @@ export function timeResolutions(meta) {
   // the metadata.
   const timescales = _.pluck(meta, 'timescale');
   return {
-    monthly: _.contains(timescales, 'monthly'),
-    seasonal: _.contains(timescales, 'seasonal'),
-    yearly: _.contains(timescales, 'yearly'),
+    monthly: _.includes(timescales, 'monthly'),
+    seasonal: _.includes(timescales, 'seasonal'),
+    yearly: _.includes(timescales, 'yearly'),
   };
 }
 
