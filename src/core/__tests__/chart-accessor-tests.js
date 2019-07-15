@@ -68,10 +68,13 @@ describe('yAxisRange', function () {
   const graph = timeseriesToAnnualCycleGraph(metadataToArray(),
       monthlyTasmaxTimeseries,
       monthlyPrTimeseries);
+  const monthlyTasmaxTimeseriesData = _.map(monthlyTasmaxTimeseries.data);
+  const monthlyPrTimeseriesData = _.map(monthlyPrTimeseries.data);
   it('calculates the min and max of data associated with a y-axis', function () {
-    expect(yAxisRange(graph, 'y').min).toBe(_.min(monthlyTasmaxTimeseries.data));
-    expect(yAxisRange(graph, 'y').max).toBe(_.max(monthlyTasmaxTimeseries.data));
-    expect(yAxisRange(graph, 'y2').min).toBe(_.min(monthlyPrTimeseries.data));
-    expect(yAxisRange(graph, 'y2').max).toBe(_.max(monthlyPrTimeseries.data));
+    console.log('### monthlyTasmaxTimeseriesData', monthlyTasmaxTimeseriesData)
+    expect(yAxisRange(graph, 'y').min).toBe(_.min(monthlyTasmaxTimeseriesData));
+    expect(yAxisRange(graph, 'y').max).toBe(_.max(monthlyTasmaxTimeseriesData));
+    expect(yAxisRange(graph, 'y2').min).toBe(_.min(monthlyPrTimeseriesData));
+    expect(yAxisRange(graph, 'y2').max).toBe(_.max(monthlyPrTimeseriesData));
   });
 });
