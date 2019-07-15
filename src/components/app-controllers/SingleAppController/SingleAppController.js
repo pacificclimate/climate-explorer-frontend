@@ -50,8 +50,13 @@ export default createReactClass({
   //Returns metadata for datasets with thethe selected variable + scenario, any model.
   //Passed as a prop for SingleDataController to generate model comparison graphs.
   getModelContextMetadata: function () {
-    return _.where(this.state.meta,
-        { variable_id: this.state.variable_id, experiment: this.state.experiment });
+    return _.filter(
+      this.state.meta,
+      {
+        variable_id: this.state.variable_id,
+        experiment: this.state.experiment
+      }
+    );
   },
 
   render: function () {

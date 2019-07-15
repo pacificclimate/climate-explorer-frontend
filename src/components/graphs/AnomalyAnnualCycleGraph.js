@@ -56,7 +56,7 @@ export default function AnomalyAnnualCycleGraph(props) {
     //(such as 1971-2000 and 1981-2000) for some reason, one will be arbitrarily selected.
     let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
     const end_date = _.max(_.map(historicalMetadatas, "end_date"));
-    historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
+    historicalMetadatas = _.filter(historicalMetadatas, {"end_date": end_date});
 
     //pick the highest-resolution dataset available for that climatology
     const baselineMetadata = _.find(historicalMetadatas, {timescale: "monthly"})
@@ -69,7 +69,7 @@ export default function AnomalyAnnualCycleGraph(props) {
     }
     else {
       let anomalyMetadatas = getDateRangeMetadatas(baselineMetadata.start_date, undefined);
-      anomalyMetadatas = _.where(anomalyMetadatas, {timescale: baselineMetadata.timescale});
+      anomalyMetadatas = _.filter(anomalyMetadatas, {timescale: baselineMetadata.timescale});
       return [baselineMetadata].concat(anomalyMetadatas);
     }
   }
