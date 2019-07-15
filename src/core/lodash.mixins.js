@@ -12,14 +12,16 @@ const assert = (cond, msg) => {
 
 
 _.mixin({
-  // Replace _.max with a version that requires numeric arguments
+  // Replace _.max with a version that requires an array of numbers
   'max': (a) => {
+    assert(_.isArrayLike(a), '_.max(): argument is not an array');
     assert(_.every(a, _.isNumber), '_.max(): argument contains non-numbers');
     return orig.max(a);
   },
 
-  // Replace _.min with a version that requires numeric arguments
+  // Replace _.min with a version that requires an array of numbers
   'min': (a) => {
+    assert(_.isArrayLike(a), '_.min(): argument is not an array');
     assert(_.every(a, _.isNumber), '_.min(): argument contains non-numbers');
     return orig.min(a);
   }
