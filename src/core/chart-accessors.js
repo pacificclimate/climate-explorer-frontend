@@ -8,6 +8,12 @@
  ***************************************************************************/
 import _ from 'lodash';
 
+
+// C3 data series are an array containing a string axis label followed by the
+// (numeric) data values for the axis. This function returns the data.
+export const seriesData = series => _.drop(series, 1);
+
+
 export function hasTwoYAxes(graph) {
   // returns a truthy object if this graph has a both a y and y2 axis defined
   return !!(graph.axis.y && graph.axis.y2);
@@ -37,12 +43,16 @@ export function yAxisRange(graph, axis) {
   // y-axis. The axis argument is typically either "y" or "y2".
   // Return value has the format {max: 10, min: 0}
   checkYAxisValidity(graph, axis);
-  
-  //filter to just the data points associated with this y axis
-  const axisData = _.flattenDeep(  // deep flattening may not be required here
-    graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]])
-  );
-  
+
+  // Filter to just the data points associated with this y axis.
+  const axisData =
+    _.flattenDeep(  // deep flattening may not be required here
+      _.map(
+        graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]]),
+        seriesData
+      )
+    );
+
   return {
     min: _.min(axisData),
     max: _.max(axisData),

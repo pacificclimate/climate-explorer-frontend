@@ -32,12 +32,15 @@
  *    data range
  ***************************************************************************/
 import _ from 'lodash';
-import {PRECISION,
-        extendedDateToBasicDate,
-        capitalizeWords,
-        caseInsensitiveStringSearch,
-        nestedAttributeIsDefined,
-        getVariableOptions} from './util';
+import {
+  PRECISION,
+  extendedDateToBasicDate,
+  capitalizeWords,
+  caseInsensitiveStringSearch,
+  nestedAttributeIsDefined,
+  getVariableOptions
+} from './util';
+import { seriesData } from './chart-accessors';
 import chroma from 'chroma-js';
 
 
@@ -271,13 +274,13 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
   let min = graph.axis[axis].min;
   let max = graph.axis[axis].max
   const axisSeries = getDataSeriesByAxis(graph, axis);
-  
+
   if(_.isUndefined(min)) {
-    min = _.min(_.map(axisSeries, series => _.min(series)));
+    min = _.min(_.map(axisSeries, series => _.min(seriesData(series))));
   }    
   
   if(_.isUndefined(max)) {
-    max = _.max(_.map(axisSeries, series => _.max(series)));
+    max = _.max(_.map(axisSeries, series => _.max(seriesData(series))));
   }
   
   if(direction === "top") {
@@ -308,10 +311,10 @@ function matchYAxisRange(graph) {
     throw new Error("Error: cannot match single axis range");
   }
 
-  const ymin = y.min ? y.min : _.min(_.map(getDataSeriesByAxis(graph, "y"), series => _.min(series)));
-  const ymax = y.max ? y.max : _.max(_.map(getDataSeriesByAxis(graph, "y"), series => _.max(series)));
-  const y2min = y2.min ? y2.min : _.min(_.map(getDataSeriesByAxis(graph, "y2"), series => _.min(series)));
-  const y2max = y2.max ? y2.max : _.max(_.map(getDataSeriesByAxis(graph, "y2"), series => _.max(series)));
+  const ymin = y.min ? y.min : _.min(_.map(getDataSeriesByAxis(graph, "y"), series => _.min(seriesData(series))));
+  const ymax = y.max ? y.max : _.max(_.map(getDataSeriesByAxis(graph, "y"), series => _.max(seriesData(series))));
+  const y2min = y2.min ? y2.min : _.min(_.map(getDataSeriesByAxis(graph, "y2"), series => _.min(seriesData(series))));
+  const y2max = y2.max ? y2.max : _.max(_.map(getDataSeriesByAxis(graph, "y2"), series => _.max(seriesData(series))));
 
   graph.axis.y.min = Math.min(ymin, y2min);
   graph.axis.y2.min = Math.min(ymin, y2min);
@@ -340,8 +343,8 @@ function hideTicksByRange(graph, axis = "y", min, max) {
   //if a range is not supplied, generate one from the data
   const genMin = _.isUndefined(min);
   const genMax = _.isUndefined(max);
-  min = genMin ? _.min(_.map(axisSeries, series => _.min(series))) : min;
-  max = genMax ? _.max(_.map(axisSeries, series => _.max(series))) : max;
+  min = genMin ? _.min(_.map(axisSeries, series => _.min(seriesData(series)))) : min;
+  max = genMax ? _.max(_.map(axisSeries, series => _.max(seriesData(series)))) : max;
   //expand generated axis range to include a ceiling or floor tick
   //(may not matter in very short or very tall graphs)
   min = genMin ? min - (max - min) / 4 : min;
