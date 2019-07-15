@@ -200,7 +200,7 @@ var AppMixin = {
    * like model or emissions scenario. Used to populate selection menus.
    */
   getMetadataItems: function (name) {
-    return _.unique(this.state.meta.map(function (el) {return el[name];}));
+    return _.uniq(this.state.meta.map(function (el) {return el[name];}));
   },
 
   /*
@@ -210,7 +210,7 @@ var AppMixin = {
    * would return the list of all variables in datasets from the CanESM2 model.
    */
   getFilteredMetadataItems: function (name, filter) {
-    return _.unique(_.map(_.where(this.state.meta, filter), name));
+    return _.uniq(_.map(_.where(this.state.meta, filter), name));
   },
 
   /*

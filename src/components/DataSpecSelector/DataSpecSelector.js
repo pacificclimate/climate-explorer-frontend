@@ -48,7 +48,7 @@ export default class DataSpecSelector extends React.Component {
         `${el.ensemble_member} ${el.start_date}-${el.end_date}`
       ]
     );
-    ids = _.uniq(ids, false, item => item[1]);
+    ids = _.sortedUniqBy(ids, false, item => item[1]);
     return ids;
   }
 

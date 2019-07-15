@@ -55,9 +55,15 @@ export default class VariableDescriptionSelector extends React.Component {
     }
 
     function varDesList(meta, constraints) {
-      return sortVariables(_.uniq(_.map(_.where(meta, constraints), m=> {
-        return _.pick(m, "variable_id", "variable_name");
-      }), false, JSON.stringify));
+      return sortVariables(
+        _.sortedUniqBy(
+          _.map(_.where(meta, constraints), m=> {
+            return _.pick(m, "variable_id", "variable_name");
+          }),
+          false,
+          JSON.stringify
+        )
+      );
     } 
     
     const allVars = varDesList(meta, {});
