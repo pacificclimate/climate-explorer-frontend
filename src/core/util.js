@@ -257,7 +257,7 @@ export const findMatchingMetadata = (
 ) =>
   _.find(metadata, metadatum =>
     // Match exactly on these parameters
-    _.matcher(
+    _.matches(
       { model_id, experiment, variable_id, timescale, ensemble_member }
     )(metadatum) &&
     // Match within `tolerance` on start and end date
