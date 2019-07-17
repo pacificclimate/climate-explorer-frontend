@@ -43,24 +43,24 @@ export default class VariableDescriptionSelector extends React.Component {
   
   //generate items for dropdown.
   update(meta, constraints) {
-	// variables are sorted into groups based on the "menuGroup"
-	// attribute in the variable configuration file.
-	// Within a group, they're alphabetical by variable_id
-	function sortVariables(variables) {
-	  let groups = _.groupBy(variables, v => {
-		const membership = getVariableOptions(v.variable_id, "menuGroup");
-		return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;});
-	  groups = _.map(groups, g=> {return _.sortBy(g, 'variable_id');});
-	  return _.flattenDeep(groups);  // deep flattening may not be required here
+    // variables are sorted into groups based on the "menuGroup"
+    // attribute in the variable configuration file.
+    // Within a group, they're alphabetical by variable_id
+    function sortVariables(variables) {
+      let groups = _.groupBy(variables, v => {
+        const membership = getVariableOptions(v.variable_id, "menuGroup");
+        return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;
+      });
+      groups = _.map(groups, g => {return _.sortBy(g, 'variable_id');});
+      return _.flattenDeep(groups);  // deep flattening may not be required here
     }
 
     function varDesList(meta, constraints) {
       return sortVariables(
-        _.sortedUniqBy(
+        _.uniqBy(
           _.map(_.filter(meta, constraints), m=> {
             return _.pick(m, "variable_id", "variable_name");
           }),
-          false,
           JSON.stringify
         )
       );
