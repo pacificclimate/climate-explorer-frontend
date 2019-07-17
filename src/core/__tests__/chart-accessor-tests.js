@@ -71,7 +71,6 @@ describe('yAxisRange', function () {
   const monthlyTasmaxTimeseriesData = _.map(monthlyTasmaxTimeseries.data);
   const monthlyPrTimeseriesData = _.map(monthlyPrTimeseries.data);
   it('calculates the min and max of data associated with a y-axis', function () {
-    console.log('### monthlyTasmaxTimeseriesData', monthlyTasmaxTimeseriesData)
     expect(yAxisRange(graph, 'y').min).toBe(_.min(monthlyTasmaxTimeseriesData));
     expect(yAxisRange(graph, 'y').max).toBe(_.max(monthlyTasmaxTimeseriesData));
     expect(yAxisRange(graph, 'y2').min).toBe(_.min(monthlyPrTimeseriesData));
