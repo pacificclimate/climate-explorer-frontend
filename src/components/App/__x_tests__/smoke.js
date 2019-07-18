@@ -8,7 +8,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import App from '../App';
-import { noop } from 'underscore';
 
 it('renders without crashing', () => {
   shallow(

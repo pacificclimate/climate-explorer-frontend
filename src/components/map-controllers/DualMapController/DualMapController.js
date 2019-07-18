@@ -26,7 +26,7 @@ import React from 'react';
 import Loader from 'react-loader';
 import { Panel, Row, Col } from 'react-bootstrap';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import '../MapController.module.css';
 import DataMap from '../../DataMap';
@@ -135,8 +135,8 @@ export default class DualMapController extends React.Component {
     
     Promise.all([rasterParamsPromise, isolineParamsPromise]).then(params => {
             
-      let rasterParams = _.findWhere(params, {variableId: props.variable_id});
-      let isolineParams = _.findWhere(params, {variableId: props.comparand_id});
+      let rasterParams = _.find(params, {variableId: props.variable_id});
+      let isolineParams = _.find(params, {variableId: props.comparand_id});
       
       if(rasterParams === isolineParams) {
         // needed when comparand and variable are the same

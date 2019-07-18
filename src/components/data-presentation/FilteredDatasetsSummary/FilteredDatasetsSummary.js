@@ -6,7 +6,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { MEVSummary } from '../MEVSummary/MEVSummary';
 import { filteredDatasetSummaryPanelLabel } from '../../guidance-content/info/InformationItems';
 
-import _ from 'underscore';
+import _ from 'lodash';
 import { HalfWidthCol } from '../../layout/rb-derived-components';
 
 

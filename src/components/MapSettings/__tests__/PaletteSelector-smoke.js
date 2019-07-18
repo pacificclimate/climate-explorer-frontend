@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PaletteSelector from '../PaletteSelector';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');

@@ -15,7 +15,7 @@
 
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
 import { makeAnomalyGraph } from '../../core/chart-transformers';
@@ -55,13 +55,13 @@ export default function AnomalyAnnualCycleGraph(props) {
     //used (usually 1981 - 2010). if there are two equally recent datasets
     //(such as 1971-2000 and 1981-2000) for some reason, one will be arbitrarily selected.
     let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
-    const end_date = _.max(_.pluck(historicalMetadatas, "end_date"));
-    historicalMetadatas = _.where(historicalMetadatas, {"end_date": end_date});
+    const end_date = _.max(_.map(historicalMetadatas, "end_date"));
+    historicalMetadatas = _.filter(historicalMetadatas, {"end_date": end_date});
 
     //pick the highest-resolution dataset available for that climatology
-    const baselineMetadata = _.findWhere(historicalMetadatas, {timescale: "monthly"})
-                             || _.findWhere(historicalMetadatas, {timescale: "seasonal"})
-                             || _.findWhere(historicalMetadatas, {timescale: "yearly"});
+    const baselineMetadata = _.find(historicalMetadatas, {timescale: "monthly"})
+                             || _.find(historicalMetadatas, {timescale: "seasonal"})
+                             || _.find(historicalMetadatas, {timescale: "yearly"});
 
     //return the baseline dataset and every same-resolution dataset that starts after it.
     if(_.isUndefined(baselineMetadata)) {
@@ -69,7 +69,7 @@ export default function AnomalyAnnualCycleGraph(props) {
     }
     else {
       let anomalyMetadatas = getDateRangeMetadatas(baselineMetadata.start_date, undefined);
-      anomalyMetadatas = _.where(anomalyMetadatas, {timescale: baselineMetadata.timescale});
+      anomalyMetadatas = _.filter(anomalyMetadatas, {timescale: baselineMetadata.timescale});
       return [baselineMetadata].concat(anomalyMetadatas);
     }
   }

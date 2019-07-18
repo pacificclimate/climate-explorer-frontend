@@ -11,7 +11,7 @@
  * 
  ****************************************************************************/
 
-import _ from 'underscore';
+import _ from 'lodash';
 import urljoin from 'url-join';
 import axios from 'axios';
 import {timestampToYear} from '../../core/util';
@@ -93,17 +93,17 @@ var AppMixin = {
         // defaults if available. Otherwise, first available.
         // Default dataset: CanESM2, rcp85, pr
         function specifiedIfAvailable(attribute, value, items) {
-          return _.pluck(items, attribute).includes(value) ? value : items[0][attribute];
+          return _.map(items, attribute).includes(value) ? value : items[0][attribute];
         }
 
         const model_id = this.state.model_id ? this.state.model_id :
           specifiedIfAvailable("model_id", "CanESM2", models);
         const experiment = this.state.experiment ? this.state.experiment :
-          specifiedIfAvailable("experiment", "historical, rcp85", _.where(models, {model_id: model_id}));
+          specifiedIfAvailable("experiment", "historical, rcp85", _.filter(models, {model_id: model_id}));
         const variable_id = specifiedIfAvailable("variable_id", "pr",
-          _.where(models, {model_id: model_id, experiment: experiment}));
+          _.filter(models, {model_id: model_id, experiment: experiment}));
         // variable_name has no default, because it must match variable_id.
-        const variable_name = _.where(models, {model_id: model_id, experiment: experiment, 
+        const variable_name = _.filter(models, {model_id: model_id, experiment: experiment,
           variable_id: variable_id})[0].variable_name;
 
         this.setState({
@@ -200,7 +200,7 @@ var AppMixin = {
    * like model or emissions scenario. Used to populate selection menus.
    */
   getMetadataItems: function (name) {
-    return _.unique(this.state.meta.map(function (el) {return el[name];}));
+    return _.uniq(this.state.meta.map(function (el) {return el[name];}));
   },
 
   /*
@@ -210,7 +210,7 @@ var AppMixin = {
    * would return the list of all variables in datasets from the CanESM2 model.
    */
   getFilteredMetadataItems: function (name, filter) {
-    return _.unique(_.pluck(_.where(this.state.meta, filter), name));
+    return _.uniq(_.map(_.filter(this.state.meta, filter), name));
   },
 
   /*

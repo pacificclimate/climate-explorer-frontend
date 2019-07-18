@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import urljoin from 'url-join';
-import _ from 'underscore';
+import _ from 'lodash';
 import axios from 'axios';
 
 import styles from './ExperimentSelector.module.css';

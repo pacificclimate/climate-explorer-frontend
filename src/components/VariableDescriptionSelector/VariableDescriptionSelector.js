@@ -22,7 +22,7 @@
  *   - disabled: true to disable entire dropdown
  *   - label: label to display beside the dropdown
  ************************************************************************/
-import _ from 'underscore';
+import _ from 'lodash';
 import IndexedSelector from '../IndexedSelector';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -43,21 +43,27 @@ export default class VariableDescriptionSelector extends React.Component {
   
   //generate items for dropdown.
   update(meta, constraints) {
-	// variables are sorted into groups based on the "menuGroup"
-	// attribute in the variable configuration file.
-	// Within a group, they're alphabetical by variable_id
-	function sortVariables(variables) {
-	  let groups = _.groupBy(variables, v => {
-		const membership = getVariableOptions(v.variable_id, "menuGroup");
-		return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;});
-	  groups = _.map(groups, g=> {return _.sortBy(g, 'variable_id');});
-	  return _.flatten(groups);
+    // variables are sorted into groups based on the "menuGroup"
+    // attribute in the variable configuration file.
+    // Within a group, they're alphabetical by variable_id
+    function sortVariables(variables) {
+      let groups = _.groupBy(variables, v => {
+        const membership = getVariableOptions(v.variable_id, "menuGroup");
+        return _.isUndefined(membership) ? Number.MAX_SAFE_INTEGER : membership;
+      });
+      groups = _.map(groups, g => {return _.sortBy(g, 'variable_id');});
+      return _.flattenDeep(groups);  // deep flattening may not be required here
     }
 
     function varDesList(meta, constraints) {
-      return sortVariables(_.uniq(_.map(_.where(meta, constraints), m=> {
-        return _.pick(m, "variable_id", "variable_name");
-      }), false, JSON.stringify));
+      return sortVariables(
+        _.uniqBy(
+          _.map(_.filter(meta, constraints), m=> {
+            return _.pick(m, "variable_id", "variable_name");
+          }),
+          JSON.stringify
+        )
+      );
     } 
     
     const allVars = varDesList(meta, {});

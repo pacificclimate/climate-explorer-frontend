@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DataDisplayControls from '../DataDisplayControls';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 import { times } from '../../../test_support/data';
 
 it('renders without crashing', () => {

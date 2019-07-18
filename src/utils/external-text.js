@@ -77,34 +77,23 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import _ from 'underscore';
-// TODO: We should just be using lodash. RIP underscore.
-import _get from 'underscore.get';
+import _ from 'lodash';
 import axios from 'axios';
 import yaml from 'js-yaml';
 
-_.mixin(_get);
-
 _.mixin({
-  isPlainObject: value => {
-    // Test whether `value` is a simple object, i.e., not also an array, fn, ...
-    // A bit ragged on the edges, but it will do until we adopt lodash.
-    return _.isObject(value) && !_.isArray(value) && !_.isFunction(value) &&
-      !_.isNumber(value);
-  },
-
   mapTraverse: (collection, iteratee) => {
     // Recursively traverse a collection and return a collection with the
     // same structure (array, object) as the collection, but with the leaf
     // (non-object) values replaced by applying function `iteratee` to them.
-    // Unlike other _ map functions, `iteratee` is only passed the value
+    // Unlike other `_` map functions, `iteratee` is only passed the value
     // of the leaf, and not a key or index.
     const traverseValue = value => _.mapTraverse(value, iteratee);
     if (_.isArray(collection)) {
       return _.map(collection, traverseValue);
     }
     if (_.isPlainObject(collection)) {
-      return _.mapObject(collection, traverseValue);
+      return _.mapValues(collection, traverseValue);
     }
     return iteratee(collection);
   }

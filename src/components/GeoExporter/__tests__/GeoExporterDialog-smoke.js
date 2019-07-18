@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import GeoExporterDialog from '../GeoExporterDialog';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 
 
 it('renders without crashing', () => {

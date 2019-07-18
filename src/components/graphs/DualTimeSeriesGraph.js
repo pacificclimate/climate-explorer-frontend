@@ -1,6 +1,6 @@
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToTimeseriesGraph } from '../../core/chart-generators';
 import TimeSeriesGraph from './TimeSeriesGraph';
@@ -15,14 +15,14 @@ export default function DualTimeSeriesGraph(props) {
     } = props;
 
     // Set up metadata sets for primary variable
-    const primaryVariableMetadata = _.findWhere(meta, {
+    const primaryVariableMetadata = _.find(meta, {
       model_id, experiment, variable_id,
     });
 
     let metadataSets = [primaryVariableMetadata];
 
     // Extend metadata sets with comparand, if present and different from variable
-    const secondaryVariableMetadata = _.findWhere(comparandMeta, {
+    const secondaryVariableMetadata = _.find(comparandMeta, {
       model_id,
       experiment,
       variable_id: comparand_id,

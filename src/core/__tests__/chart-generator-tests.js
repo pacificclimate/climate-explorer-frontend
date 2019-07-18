@@ -35,7 +35,7 @@ import {monthlyTasmaxTimeseries,
 
 jest.dontMock('../chart-generators');
 jest.dontMock('../util');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 
 describe('formatYAxis', function () {
   it('formats a c3 y axis with units label', function () {

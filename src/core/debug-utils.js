@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 
 function shallowDiff(a, b) {
   // Compute the shallow difference between two objects `a` and `b`.

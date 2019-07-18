@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
-import _ from 'underscore';
+import _ from 'lodash';
 
 import DataSpecSelector from '../DataSpecSelector/DataSpecSelector';
 import DataDisplayControls from './DataDisplayControls';

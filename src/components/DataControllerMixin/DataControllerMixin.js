@@ -22,7 +22,7 @@
  * - filter and manipulate data
  *********************************************************************/
 
-import _ from 'underscore';
+import _ from 'lodash';
 import urljoin from 'url-join';
 import {exportDataToWorksheet, 
         generateDataCellsFromC3Graph} from '../../core/export';

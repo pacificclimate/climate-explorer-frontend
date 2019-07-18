@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import './MapLegend.css';
 import { sameYear, timestampToTimeOfYear } from '../../core/util';

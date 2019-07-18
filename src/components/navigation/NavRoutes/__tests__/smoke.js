@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter } from 'react-router-dom';
 import NavRoutes from '../';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 
 const navSpec = {
   basePath: '/basePath',

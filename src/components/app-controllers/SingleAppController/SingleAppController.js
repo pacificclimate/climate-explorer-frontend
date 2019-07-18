@@ -12,7 +12,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Grid, Row, Col, Panel } from 'react-bootstrap';
-import _ from 'underscore';
+import _ from 'lodash';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
@@ -50,8 +50,13 @@ export default createReactClass({
   //Returns metadata for datasets with thethe selected variable + scenario, any model.
   //Passed as a prop for SingleDataController to generate model comparison graphs.
   getModelContextMetadata: function () {
-    return _.where(this.state.meta,
-        { variable_id: this.state.variable_id, experiment: this.state.experiment });
+    return _.filter(
+      this.state.meta,
+      {
+        variable_id: this.state.variable_id,
+        experiment: this.state.experiment
+      }
+    );
   },
 
   render: function () {

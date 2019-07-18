@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Panel } from 'react-bootstrap';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import DataTable from '../DataTable/DataTable';
 import TimeOfYearSelector from '../Selector/TimeOfYearSelector';

@@ -28,7 +28,7 @@ import React from 'react';
 import Loader from 'react-loader';
 import { Row, Col, Panel } from 'react-bootstrap';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import '../MapController.module.css';
 import DataMap from '../../DataMap';
@@ -124,8 +124,8 @@ export default class PrecipMapController extends React.Component {
     
     Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(params => {
       
-      let rasterParams = _.findWhere(params, {variableId: props.variable_id});
-      let annotatedParams = _.findWhere(params, {variableId: props.comparand_id});
+      let rasterParams = _.find(params, {variableId: props.variable_id});
+      let annotatedParams = _.find(params, {variableId: props.comparand_id});
       
       // if the variable has changed, go back to the default palette and logscale,
       // otherwise use the previous (user-selected) values in state.

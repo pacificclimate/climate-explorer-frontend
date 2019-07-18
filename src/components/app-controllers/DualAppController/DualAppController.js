@@ -34,7 +34,7 @@ import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
 
-import _ from 'underscore';
+import _ from 'lodash';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
 
@@ -69,7 +69,7 @@ export default createReactClass({
         comparand_name: this.state.variable_name
       });
     }
-    else if(!_.contains(_.pluck(this.state.meta, "variable_id"), this.state.comparand_id)) {
+    else if(!_.includes(_.map(this.state.meta, "variable_id"), this.state.comparand_id)) {
       //comparand leftover from previous ensemble; not present in current one
       this.setState({
         comparand_id: this.state.variable_id,
@@ -87,7 +87,7 @@ export default createReactClass({
     var modOptions = this.getMetadataItems('model_id');
     var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
         this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    var selectedVariable = _.findWhere(this.state.meta, { model_id: this.state.model_id,
+    var selectedVariable = _.find(this.state.meta, { model_id: this.state.model_id,
                                                           variable_id: this.state.variable_id,
                                                           experiment: this.state.experiment });
     let comparandConstraints = _.pick(this.state, 'model_id', 'experiment');

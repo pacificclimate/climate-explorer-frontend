@@ -70,7 +70,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import L from 'leaflet';
 import 'proj4';

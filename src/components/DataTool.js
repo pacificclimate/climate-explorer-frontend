@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'underscore';
 
 import NavRoutes from './navigation/NavRoutes/NavRoutes';
 import SingleAppController from './app-controllers/SingleAppController/SingleAppController';

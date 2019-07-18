@@ -276,7 +276,7 @@ to disable its tests.
     TypeError: Cannot read property 'prototype' of undefined
 
       3 | var C3 = require('c3/c3');
-      4 | import _ from 'underscore';
+      4 | import _ from 'lodash';
     > 5 | import styles from './DataGraph.css';
       6 | 
       7 | class DataGraph extends React.Component {

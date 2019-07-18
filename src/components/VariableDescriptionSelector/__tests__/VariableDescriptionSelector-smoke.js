@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import VariableDescriptionSelector from '../VariableDescriptionSelector';
-import { noop } from 'underscore';
+import { noop } from 'lodash';
 import { meta } from '../../../test_support/data';
 
 it('renders without crashing', () => {

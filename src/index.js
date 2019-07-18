@@ -12,6 +12,8 @@ import ExternalText from './utils/external-text';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
+import './core/lodash.mixins';
+
 
 const loadTexts = ExternalText.makeYamlLoader(
   `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`

@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import {
   assignColoursByGroup, fadeSeriesByRank,
   hideSeriesInLegend, sortSeriesByRank
@@ -21,7 +21,7 @@ function multiYearMeanSelected({ model_id, variable_id, experiment, meta }) {
   if (meta && meta.length === 0) {
     return undefined;
   }
-  var selectedMetadata = _.findWhere(meta, { model_id, variable_id, experiment });
+  var selectedMetadata = _.find(meta, { model_id, variable_id, experiment });
   return selectedMetadata.multi_year_mean;
 }
 
@@ -77,7 +77,7 @@ function findMatchingMetadata(example, difference, meta) {
       template[att] = difference[att] ? difference[att] : example[att];
     }
   }
-  return _.findWhere(meta, template);
+  return _.find(meta, template);
 }
 
 export function errorMessage(error) {

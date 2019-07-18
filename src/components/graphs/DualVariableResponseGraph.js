@@ -21,7 +21,7 @@
  *********************************************************************/
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import { timeseriesToTimeseriesGraph} from '../../core/chart-generators';
 import { makeVariableResponseGraph } from '../../core/chart-transformers';
@@ -37,7 +37,7 @@ export default function DualVariableResponseGraph(props) {
     } = props;
 
     //determine highest resolution data available.
-    const resolutionsAvailable = _.uniq(_.pluck(meta, 'timescale'));
+    const resolutionsAvailable = _.uniq(_.map(meta, 'timescale'));
     const resolution = _.indexOf(resolutionsAvailable, 'monthly') != -1 ? 'monthly' : 
                  _.indexOf(resolutionsAvailable, 'seasonal') != -1 ? 'seasonal' : 'yearly';
     

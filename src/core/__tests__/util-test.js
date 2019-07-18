@@ -10,14 +10,14 @@
  ********************************************************/
 
 
-import _ from 'underscore';
+import _ from 'lodash';
 import xlsx from 'xlsx';
 import * as util from '../util';
 import * as mockAPI from '../__test_data__/sample-API-results';
 
 jest.dontMock('../util');
 jest.dontMock('../export');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 jest.dontMock('xlsx');
 jest.mock('../../data-services/public.js');
 

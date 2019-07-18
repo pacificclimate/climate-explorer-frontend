@@ -5,7 +5,7 @@ import Accordion from '../../guidance-tools/Accordion';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { unfilteredDatasetSummaryPanelLabel } from '../../guidance-content/info/InformationItems';
 
-import _ from 'underscore';
+import _ from 'lodash';
 import { QuarterWidthCol } from '../../layout/rb-derived-components';
 
 

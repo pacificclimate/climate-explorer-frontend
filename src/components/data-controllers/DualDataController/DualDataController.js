@@ -38,7 +38,7 @@ import PropTypes from 'prop-types';
 
 import React from 'react';
 import { Panel, Row, Col } from 'react-bootstrap';
-import _ from 'underscore';
+import _ from 'lodash';
 
 import DualAnnualCycleGraph from '../../graphs/DualAnnualCycleGraph';
 import DualLongTermAveragesGraph from '../../graphs/DualLongTermAveragesGraph';

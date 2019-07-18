@@ -8,7 +8,7 @@
  * Built around the js-xlsx library
  *******************************************************************/
 
-import _ from 'underscore';
+import _ from 'lodash';
 import XLSX from 'xlsx';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';

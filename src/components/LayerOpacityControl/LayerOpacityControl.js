@@ -4,7 +4,7 @@ import { Grid, Row, Col, Button, Glyphicon } from 'react-bootstrap';
 
 import layersIcon from 'leaflet/dist/images/layers.png';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 import InputRange from 'react-input-range';
 
@@ -22,7 +22,7 @@ export default class LayerOpacityControl extends PureComponent {
     super(props);
     this.state = {
       showControls: false,
-      layerState: _.mapObject(props.layerOpacity, () => ({
+      layerState: _.mapValues(props.layerOpacity, () => ({
         visible: true,
         prevOpacity: 0,
       })),

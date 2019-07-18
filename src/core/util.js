@@ -3,7 +3,7 @@
  ***********************************************************/
 
 import moment from 'moment/moment';
-import _ from 'underscore';
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import { getVariableOptions as httpGetVariableOptions } from '../data-services/public'
 
@@ -236,7 +236,7 @@ export function getDataUnits(data, variable_id) {
 export function defaultDataSpec({ meta, model_id, variable_id, experiment }) {
   for (const timescale of ['monthly', 'seasonal', 'yearly']) {
     const matchingMetadata =
-      _.findWhere(meta, { model_id, variable_id, experiment, timescale });
+      _.find(meta, { model_id, variable_id, experiment, timescale });
     if (matchingMetadata) {
       return _.pick(matchingMetadata,
         'start_date', 'end_date', 'ensemble_member');
@@ -257,7 +257,7 @@ export const findMatchingMetadata = (
 ) =>
   _.find(metadata, metadatum =>
     // Match exactly on these parameters
-    _.matcher(
+    _.matches(
       { model_id, experiment, variable_id, timescale, ensemble_member }
     )(metadatum) &&
     // Match within `tolerance` on start and end date
@@ -357,11 +357,11 @@ export function timeResolutions(meta) {
   // return an object containing flags indicating whether each of the
   // 3 standard timescales are present in the datasets described by
   // the metadata.
-  const timescales = _.pluck(meta, 'timescale');
+  const timescales = _.map(meta, 'timescale');
   return {
-    monthly: _.contains(timescales, 'monthly'),
-    seasonal: _.contains(timescales, 'seasonal'),
-    yearly: _.contains(timescales, 'yearly'),
+    monthly: _.includes(timescales, 'monthly'),
+    seasonal: _.includes(timescales, 'seasonal'),
+    yearly: _.includes(timescales, 'yearly'),
   };
 }
 

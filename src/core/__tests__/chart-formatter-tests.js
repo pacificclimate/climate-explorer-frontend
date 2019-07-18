@@ -18,7 +18,7 @@ import * as mockAPI from '../__test_data__/sample-API-results';
 jest.dontMock('../chart-generators');
 jest.dontMock('../chart-formatters');
 jest.dontMock('../util');
-jest.dontMock('underscore');
+jest.dontMock('lodash');
 
 describe('assignColoursByGroup', function () {
   const metadata = mockAPI.metadataToArray();

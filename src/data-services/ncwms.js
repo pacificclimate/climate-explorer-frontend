@@ -2,7 +2,7 @@
 // Includes both HTTP request functions and supporting functions.
 
 import axios from 'axios/index';
-import _ from 'underscore';
+import _ from 'lodash';
 
 
 export function getBaseWMSParams(

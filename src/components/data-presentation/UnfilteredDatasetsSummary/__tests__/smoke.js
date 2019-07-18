@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import UnfilteredDatasetsSummary from '../';
-import { noop } from 'underscore';
 import { meta } from '../../../../test_support/data';
 
 it('renders without crashing', () => {

@@ -45,7 +45,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'underscore';
+import _ from 'lodash';
 
 
 const controlPropNames = 'show open close controls'.split(' ');
