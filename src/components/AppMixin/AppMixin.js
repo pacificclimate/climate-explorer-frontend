@@ -97,7 +97,7 @@ var AppMixin = {
         }
 
         const model_id = this.state.model_id ? this.state.model_id :
-          specifiedIfAvailable("model_id", "CanESM2", models);
+          specifiedIfAvailable("model_id", "PCIC12", models);
         const experiment = this.state.experiment ? this.state.experiment :
           specifiedIfAvailable("experiment", "historical, rcp85", _.filter(models, {model_id: model_id}));
         const variable_id = specifiedIfAvailable("variable_id", "pr",
