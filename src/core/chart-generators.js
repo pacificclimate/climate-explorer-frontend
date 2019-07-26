@@ -431,12 +431,12 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   // Build a dictionary with the base name for each variable (typically
   // either "Mean" or "Mean Count") from the variable config file. 
   // Defaults to "Mean" since all data displayed by this graph is MYMs.
-  const variables = _.uniq(_.pluck(metadata, "variable_id"));
+  const variables = _.uniq(_.map(metadata, 'variable_id'));
   function getVarBasename(v) {
     const fromConfig = getVariableOptions(v, 'seriesLegendString');
     return _.isUndefined(fromConfig) ? "Mean" : fromConfig;
   }
-  const basenameByVariable = _.object(variables, _.map(variables, getVarBasename));
+  const basenameByVariable = _.zipObject(variables, _.map(variables, getVarBasename));
 
   return function (m) {
     let name = '';
