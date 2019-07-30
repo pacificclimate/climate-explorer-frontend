@@ -613,23 +613,30 @@ help:
         3 degree-days. The total degree-days over a given period
         (e.g., a month, a year) is the total degree-days for each day
         in that period, always respecting both the threshold and the
-        condition (above, below) in counting each day.
+        condition (above, below) in counting each day. This means that
+        when both seasonal and annual degree day data are viewed in a
+        chart or table, the annual values will be larger, as they 
+        represent the sum of the seasonal values.
 
         * **`cdd`**
 
-          Cooling Degree Days: Degree-days in one year above 18&deg;C.
+          Cooling Degree Days: Degree-days during the specified time 
+          period above 18&deg;C.
 
         * **`hdd`**
         
-          Heating Degree Days: Degree-days in one year below 18&deg;C.
+          Heating Degree Days: Degree-days during the specified time 
+          period below 18&deg;C.
 
         * **`gdd`**
         
-          Growing Degree Days: Degree-days in one year above 5&deg;C.
+          Growing Degree Days: Degree-days during the specified time 
+          period above 5&deg;C.
 
         * **`fdd`**
         
-          Frost Degree Days: Degree-days in one year below 0&deg;C.
+          Frost Degree Days: Degree-days during the specified time 
+          period below 0&deg;C.
         
         ### Return period variables
 

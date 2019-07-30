@@ -52,6 +52,11 @@
 #        2: degree-days
 #        3: return periods
 #        (default: MAXINT - uncategorized data is listed last)
+#   - seriesLegendString
+#        STRING
+#        This string appears in the legends of charts and graphs
+#        asociated with this variable, such as "2010-2039 STRING".
+#        (default: "Mean")
 ################################################################
 
 #GCM output variables
@@ -118,6 +123,7 @@ dtrETCCDI:
 fdETCCDI:
   decimalPrecision: 0
   menuGroup: 1
+  seriesLegendString: Mean Count
 
 gslETCCDI:
   decimalPrecision: 0
@@ -217,18 +223,22 @@ wsdiETCCDI:
 cdd:
   decimalPrecision: 0
   menuGroup: 2
+  seriesLegendString: Mean Count
 
 fdd:
   decimalPrecision: 0
   menuGroup: 2
+  seriesLegendString: Mean Count
 
 gdd:
   decimalPrecision: 0
   menuGroup: 2
+  seriesLegendString: Mean Count
 
 hdd:
   decimalPrecision: 0
   menuGroup: 2
+  seriesLegendString: Mean Count
 
 #return period variables
 rp20pr:
