@@ -3,7 +3,7 @@ import { Grid, Row } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import Accordion from '../../guidance-tools/Accordion';
 import _ from 'lodash';
-import T from '../../../utils/external-text';
+import T from 'pcic-react-external-text';
 
 
 export default class FAQ extends React.Component {

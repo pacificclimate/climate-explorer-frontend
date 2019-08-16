@@ -12,7 +12,7 @@ import React from 'react';
 import { Navbar } from 'react-bootstrap';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import T from '../../utils/external-text';
+import T from 'pcic-react-external-text';
 import DataTool from '../DataTool';
 import NavRoutes from '../navigation/NavRoutes';
 import Help from '../guidance-content/help/Help';

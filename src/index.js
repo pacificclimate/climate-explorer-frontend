@@ -8,14 +8,15 @@ import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 import 'c3/c3.min.css';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 
-import ExternalText from './utils/external-text';
+import ExternalText from 'pcic-react-external-text';
+import { makeYamlLoader } from './utils/external-text';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
 import './core/lodash.mixins';
 
 
-const loadTexts = ExternalText.makeYamlLoader(
+const loadTexts = makeYamlLoader(
   `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`
 );
 
