@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Row } from 'react-bootstrap';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import T from '../../../utils/external-text';
+import T from 'pcic-react-external-text';
 
 export default function Science() {
   return (
