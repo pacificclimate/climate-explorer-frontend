@@ -12,6 +12,9 @@ const assert = (cond, msg) => {
 
 
 _.mixin({
+  'allDefined': (object, ...paths) =>
+    _.every(_.pick(object, _.flatten(paths)), Boolean),
+
   // Replace _.max with a version that requires an array of numbers
   'max': (a) => {
     assert(_.isArrayLike(a), '_.max(): argument is not an array');

@@ -471,6 +471,7 @@ export function caseInsensitiveStringSearch(s1, s2) {
  * Object-related helper function
  **********************************************************/
 
+// TODO: Equivalent to Lodash `has`. Replace.
 /*
  * Given an object and any number of arguments arg1, arg2, arg3,
  * et cetera, returns true if object.arg1.arg2.arg3 is defined
