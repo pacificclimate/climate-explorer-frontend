@@ -11,24 +11,44 @@
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Grid, Row, Col, Panel } from 'react-bootstrap';
+import { Col, Grid, Panel, Row } from 'react-bootstrap';
 import _ from 'lodash';
+import find from 'lodash/fp/find';
+import flatMap from 'lodash/fp/flatMap';
+import flow from 'lodash/fp/flow';
+import flatten from 'lodash/fp/flatten';
+import map from 'lodash/fp/map';
+import reduce from 'lodash/fp/reduce';
+import assign from 'lodash/fp/assign';
+import filter from 'lodash/fp/filter';
+import sortBy from 'lodash/fp/sortBy';
+import get from 'lodash/fp/get';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
-import SingleDataController from '../../data-controllers/SingleDataController/SingleDataController';
+import SingleDataController
+  from '../../data-controllers/SingleDataController/SingleDataController';
 import Selector from '../../Selector';
+import {
+  EmissionsScenarioSelector,
+  ModelSelector,
+  VariableSelector,
+} from 'pcic-react-components';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
   datasetFilterPanelLabel,
+  emissionScenarioSelectorLabel,
+  modelSelectorLabel,
+  variableSelectorLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
+import FilteredDatasetsSummary
+  from '../../data-presentation/FilteredDatasetsSummary';
 import FlowArrow from '../../data-presentation/FlowArrow';
-import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
+import UnfilteredDatasetsSummary
+  from '../../data-presentation/UnfilteredDatasetsSummary';
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -59,6 +79,56 @@ export default createReactClass({
     );
   },
 
+  handleChangeModel: function (model) {
+    this.setState({ model });
+  },
+
+  replaceInvalidModel: function (options, value) {
+    return find({ value: { representative: { model_id: 'PCIC12' }}})(options);
+  },
+
+  handleChangeScenario: function (scenario) {
+    this.setState({ scenario });
+  },
+
+  replaceInvalidScenario: function (options, value) {
+    return find(
+      opt => opt.value.representative.experiment.includes('rcp85')
+    )(options);
+  },
+
+  handleChangeVariable: function (variable) {
+    this.setState({ variable });
+  },
+
+  replaceInvalidVariable: function (options, value) {
+    const flatOptions = flatMap('options', options);
+    console.log('replaceInvalidVariable', flatOptions)
+    const option = find(opt => !opt.isDisabled)(flatOptions);
+    console.log('replaceInvalidVariable: returning', option)
+    return option;
+  },
+
+
+  representativeValue: function (optionName, valueName) {
+    return get([optionName, 'value', 'representative', valueName])(this.state);
+    // const option = this.state[optionName];
+    // return option ? option.value.representative : {};
+  },
+
+  constrainBy: function () {
+    // Returns an object containing the union of all representatives of the
+    // options named in the arguments (e.g., 'model', 'scenario').
+    // This object is suitable as a constraint for a
+    // `SimpleConstraintGroupingSelector`.
+    return flow(
+      flatten,
+      map(name => this.state[name]),
+      map(option => option && option.value.representative),
+      reduce((result, value) => assign(result, value), {})
+    )(arguments)
+  },
+
   render: function () {
     //hierarchical selection: model, then variable, then experiment
     var modOptions = this.getMetadataItems('model_id');
@@ -66,6 +136,34 @@ export default createReactClass({
         this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id }));
 
     const filteredMeta = this.getFilteredMeta();
+    const alt_filteredMeta = (() => {
+      // Initially, selectors are undefined, and go through a default selection
+      // process that eventually settles with a defined value for all of them.
+      // Returning a metadata set that is filtered by a partially settled
+      // selector set causes problems. This function returns the empty array
+      // unless a full set of constraints (derived from selectors) is available.
+      // TODO: Probably simplify to this.state.x has settled.
+      const constraint = this.constrainBy('model', 'scenario', 'variable');
+      const hasAllConstraints =
+        _.allDefined(constraint, 'model_id', 'experiment', 'variable_id');
+      console.log('constraint', constraint)
+      console.log('hasAllConstraints', hasAllConstraints)
+      if (!hasAllConstraints) {
+        return [];
+      }
+      return flow(
+        filter(constraint),
+        sortBy('unique_id')
+      )(this.state.meta);
+    })();
+    console.log('filteredMeta', filteredMeta)
+    console.log('alt_filteredMeta', alt_filteredMeta)
+    console.log('difference', _.difference(filteredMeta, alt_filteredMeta))
+    console.log('difference', _.difference(alt_filteredMeta, filteredMeta))
+
+    const model_id = this.representativeValue('model', 'model_id');
+    const experiment = this.representativeValue('scenario', 'experiment');
+    const variable_id = this.representativeValue('variable', 'variable_id');
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -93,28 +191,30 @@ export default createReactClass({
               <Panel.Body>
                 <Row>
                   <Col lg={2} md={2}>
-                    <Selector
-                      label={modelSelectorLabel}
-                      onChange={this.updateSelection.bind(this, 'model_id')}
-                      items={modOptions}
-                      value={this.state.model_id}
+                    <ModelSelector
+                      bases={this.state.meta}
+                      value={this.state.model}
+                      onChange={this.handleChangeModel.bind(this)}
+                      replaceInvalidValue={this.replaceInvalidModel.bind(this)}
                     />
                   </Col>
                   <Col lg={2} md={2}>
-                    <Selector
-                      label={emissionScenarioSelectorLabel}
-                      onChange={this.updateSelection.bind(this, 'experiment')}
-                      items={expOptions}
-                      value={this.state.experiment}
+                    <EmissionsScenarioSelector
+                      bases={this.state.meta}
+                      // constraint={this.state.model && this.state.model.value.representative}
+                      constraint={this.constrainBy('model')}
+                      value={this.state.scenario}
+                      onChange={this.handleChangeScenario.bind(this)}
+                      replaceInvalidValue={this.replaceInvalidScenario.bind(this)}
                     />
                   </Col>
                   <Col lg={4} md={4}>
-                    <VariableDescriptionSelector
-                      label={variableSelectorLabel}
-                      onChange={this.handleSetVariable.bind(this, 'variable')}
-                      meta={this.state.meta}
-                      constraints={{ model_id: this.state.model_id }}
-                      value={_.pick(this.state, 'variable_id', 'variable_name')}
+                    <VariableSelector
+                      bases={this.state.meta}
+                      constraint={this.constrainBy('model', 'scenario')}
+                      value={this.state.variable}
+                      onChange={this.handleChangeVariable.bind(this)}
+                      replaceInvalidValue={this.replaceInvalidVariable.bind(this)}
                     />
                   </Col>
                 </Row>
@@ -132,10 +232,10 @@ export default createReactClass({
         <Row>
           <FullWidthCol>
             <FilteredDatasetsSummary
-              model_id={this.state.model_id}
-              experiment={this.state.experiment}
-              variable_id={this.state.variable_id}
-              meta = {filteredMeta}
+              model_id={model_id}
+              experiment={experiment}
+              variable_id={variable_id}
+              meta = {alt_filteredMeta}
             />
           </FullWidthCol>
         </Row>
@@ -152,10 +252,10 @@ export default createReactClass({
         <Row>
           <HalfWidthCol>
             <SingleMapController
-              model_id={this.state.model_id}
-              experiment={this.state.experiment}
-              variable_id={this.state.variable_id}
-              meta = {filteredMeta}
+              model_id={model_id}
+              experiment={experiment}
+              variable_id={variable_id}
+              meta = {alt_filteredMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
             />
@@ -163,12 +263,12 @@ export default createReactClass({
           <HalfWidthCol>
             <SingleDataController
               ensemble_name={this.state.ensemble_name}
-              model_id={this.state.model_id}
-              variable_id={this.state.variable_id}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-              experiment={this.state.experiment}
+              model_id={model_id}
+              variable_id={variable_id}
+              comparand_id={this.state.comparand_id ? this.state.comparand_id : variable_id}
+              experiment={experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {filteredMeta}
+              meta = {alt_filteredMeta}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
           </HalfWidthCol>
