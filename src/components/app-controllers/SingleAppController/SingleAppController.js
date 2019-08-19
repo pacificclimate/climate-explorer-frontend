@@ -66,19 +66,6 @@ export default createReactClass({
     return !(datafile.multi_year_mean === false && datafile.timescale === 'monthly');
   },
 
-  //Returns metadata for datasets with thethe selected variable + scenario, any model.
-  //Passed as a prop for SingleDataController to generate model comparison graphs.
-  // TODO: Convert!!
-  getModelContextMetadata: function () {
-    return _.filter(
-      this.state.meta,
-      {
-        variable_id: this.state.variable_id,
-        experiment: this.state.experiment
-      }
-    );
-  },
-
   handleChangeModel: function (model) {
     this.setState({ model });
   },
@@ -124,25 +111,25 @@ export default createReactClass({
     )(arguments)
   },
 
+  filterMetaBy: function(...optionNames) {
+    // Initially, selectors are undefined, and go through a default selection
+    // process that eventually settles with a defined value for all of them.
+    // Returning a metadata set that is filtered by a partially settled
+    // selector set causes problems. This function returns the empty array
+    // unless a full set of constraints (derived from selectors) is available.
+    const settled = _.allDefined(this.state, ...optionNames);
+    if (!settled) {
+      return [];
+    }
+    return flow(
+      filter(this.constrainBy(...optionNames)),
+      sortBy('unique_id')
+    )(this.state.meta);
+  },
+
   render: function () {
-    const filteredMeta = (() => {
-      // Initially, selectors are undefined, and go through a default selection
-      // process that eventually settles with a defined value for all of them.
-      // Returning a metadata set that is filtered by a partially settled
-      // selector set causes problems. This function returns the empty array
-      // unless a full set of constraints (derived from selectors) is available.
-      // TODO: Probably simplify to this.state.x has settled.
-      const constraint = this.constrainBy('model', 'scenario', 'variable');
-      const hasAllConstraints =
-        _.allDefined(constraint, 'model_id', 'experiment', 'variable_id');
-      if (!hasAllConstraints) {
-        return [];
-      }
-      return flow(
-        filter(constraint),
-        sortBy('unique_id')
-      )(this.state.meta);
-    })();
+    const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
+    const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');
@@ -251,7 +238,7 @@ export default createReactClass({
               experiment={experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {filteredMeta}
-              contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
+              contextMeta={modelContextMetadata} //to generate Model Context graph
             />
           </HalfWidthCol>
         </Row>
