@@ -101,6 +101,14 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
      * Source new values from the ncWMS server. Possible future breakage due to
      * using layer._url and layer._map.
      */
+    // TODO: Fix problems with concurrency / async updating.
+    // I am not sure what the above comment specifically anticipated, but it's
+    // possible it bit us now. Specifically, `this.layer` is sometimes undefined
+    // and that is a problem. It's is a transient condition and can be
+    // ignored, but it indicates deeper problems with the code not managing
+    // concurrency properly. For now, this throw (and the catch for it)
+    // will suffice, but it's a hack.
+
     const reuseColorscalerange = true;
     if (reuseColorscalerange && this.layer.wmsParams.colorscalerange) {
       //  Use colorscalerange if defined on the layer
@@ -109,6 +117,10 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
       this.redraw();
     } else {
       //  Get layer bounds from `layerDetails`
+      if (!this.layer) {
+        throw new Error('Layer not defined');
+      }
+
       // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
       var getLayerInfo = axios(this.layer._url, {
         dataType: 'json',
@@ -121,6 +133,10 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
       });
 
       var getMinMax = layerInfo => {
+        if (!this.layer) {
+          throw new Error('Layer not defined');
+        }
+
         var bbox = layerInfo.data.bbox;
         if(bbox[0] == bbox[2] || bbox[1] == bbox[3]) {
           // This netcdf file does not have a valid bounding box, or ncWMS
@@ -157,7 +173,10 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
         this.min = response.data.min;
         this.max = response.data.max;
         this.redraw();
-      });
+      })
+        .catch(reason => {
+          console.log('LeafletNcWMSColorbarControl: failure, ignoring:', reason)
+        });
     }
   },
 
