@@ -13,6 +13,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Col, Grid, Panel, Row } from 'react-bootstrap';
 import _ from 'lodash';
+import fp from 'lodash/fp'
 import find from 'lodash/fp/find';
 import flatMap from 'lodash/fp/flatMap';
 import flow from 'lodash/fp/flow';
@@ -23,6 +24,8 @@ import assign from 'lodash/fp/assign';
 import filter from 'lodash/fp/filter';
 import sortBy from 'lodash/fp/sortBy';
 import get from 'lodash/fp/get';
+import pick from 'lodash/fp/pick';
+import tap from 'lodash/fp/tap';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
@@ -52,13 +55,35 @@ import axios from 'axios';
 import urljoin from 'url-join';
 import { timestampToYear } from '../../../core/util';
 
-var findEnsemble = function(props) {
+// TODO: Extract to utility module.
+function findEnsemble (props) {
   return (
     (props.match && props.match.params && props.match.params.ensemble_name) ||
     props.ensemble_name ||
     process.env.REACT_APP_CE_ENSEMBLE_NAME
   );
-};
+}
+
+// TODO: Extract to utility module.
+const transformMetadata = metadata => flow(
+  fp.mapWithKey((metadatum, unique_id) => {
+    return fp.mapWithKey((variable_name, variable_id) => {
+      return {
+        unique_id,
+        experiment: String(metadatum.experiment).replace(',r', ', r'),
+        variable_id,
+        variable_name,
+        start_date: timestampToYear(metadatum.start_date),
+        end_date: timestampToYear(metadatum.end_date),
+        ...pick([
+          'institution', 'model_id', 'model_name', 'ensemble_member',
+          'timescale', 'multi_year_mean'
+        ])(metadatum)
+      };
+    })(metadatum.variables)
+  }),
+  flatten,
+)(metadata);
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -80,11 +105,6 @@ export default createReactClass({
       scenario: undefined,
       variable: undefined,
 
-      model_id: '',
-      variable_id: '',
-      variable_name: '',
-      experiment: '',
-
       area: undefined,  // geojson object
       meta: [],
     };
@@ -105,71 +125,15 @@ export default createReactClass({
 
   updateMetadata: function () {
     console.log('### SingleAppController.updateMetadata')
-    var models = [];
-    var vars;
 
     // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
     axios({
       baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
       params: { ensemble_name: this.state.ensemble_name },
-    }).then(response => {
-      for (var key in response.data) {
-        vars = Object.keys(response.data[key].variables);
-
-        for (var v in vars) {
-          var start = timestampToYear(response.data[key].start_date);
-          var end = timestampToYear(response.data[key].end_date);
-
-          // Stopgap measure to deal with the fact that experiment string formats
-          // vary between climdex files ("historical, rcp26") and GCM outputs
-          // ("historical,rcp26"). Formats experiment strings to include a space.
-          // This formatting is undone to run queries against the database by
-          // ce-backend.guessExperimentFormatFromVariable()
-          // TODO: remove this when no longer needed.
-          var normalizedExp = String(response.data[key].experiment).replace(',r', ', r');
-
-          //If this app has a dataset filter defined, filter the data
-          if(typeof this.datasetFilter == "undefined" ||
-            this.datasetFilter(response.data[key])) {
-            models.push(_.extend({
-              unique_id: key,
-              variable_id: vars[v],
-              start_date: start,
-              end_date: end,
-              experiment: normalizedExp,
-              variable_name: response.data[key].variables[vars[v]],
-            }, _.omit(response.data[key], 'variables', 'start_date', 'end_date',
-              'modtime', 'experiment')));
-          }
-        }
-      }
-
-      // Merge the selection information
-      // If a dataset is already selected, use that. Otherwise, use
-      // defaults if available. Otherwise, first available.
-      // Default dataset: CanESM2, rcp85, pr
-      function specifiedIfAvailable(attribute, value, items) {
-        return _.map(items, attribute).includes(value) ? value : items[0][attribute];
-      }
-
-      const model_id = this.state.model_id ? this.state.model_id :
-        specifiedIfAvailable("model_id", "PCIC12", models);
-      const experiment = this.state.experiment ? this.state.experiment :
-        specifiedIfAvailable("experiment", "historical, rcp85", _.filter(models, {model_id: model_id}));
-      const variable_id = specifiedIfAvailable("variable_id", "pr",
-        _.filter(models, {model_id: model_id, experiment: experiment}));
-      // variable_name has no default, because it must match variable_id.
-      const variable_name = _.filter(models, {model_id: model_id, experiment: experiment,
-        variable_id: variable_id})[0].variable_name;
-
-      this.setState({
-        meta: models,
-        model_id,
-        variable_id,
-        variable_name,
-        experiment,
-      });
-    });
+    })
+    .then(response => response.data)
+    .then(transformMetadata)
+    .then(meta => this.setState({ meta }));
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
