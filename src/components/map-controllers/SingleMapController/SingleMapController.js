@@ -210,6 +210,10 @@ export default class SingleMapController extends React.Component {
   }
 
   render() {
+    // TODO: Improve returned item
+    if (!_.allDefined(this.props, 'model_id', 'experiment', 'variable_id')) {
+      return 'Readying...';
+    }
     const mapLegend = (<MapLegend
       {...this.props}
       {...this.state}
