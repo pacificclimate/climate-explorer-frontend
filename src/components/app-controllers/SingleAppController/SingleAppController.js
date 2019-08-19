@@ -48,6 +48,17 @@ import FilteredDatasetsSummary
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary
   from '../../data-presentation/UnfilteredDatasetsSummary';
+import axios from 'axios';
+import urljoin from 'url-join';
+import { timestampToYear } from '../../../core/util';
+
+var findEnsemble = function(props) {
+  return (
+    (props.match && props.match.params && props.match.params.ensemble_name) ||
+    props.ensemble_name ||
+    process.env.REACT_APP_CE_ENSEMBLE_NAME
+  );
+};
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -57,8 +68,133 @@ export default createReactClass({
    * Includes: - model_id - variable_id - experiment
    */
 
-  mixins: [AppMixin],
+  ////////////////////////////////////////////////////////////////////
+  // mixins: [AppMixin],
+  
+  getInitialState: function () {
+    console.log('### SingleAppController.getInitialState')
+    return {
+      ensemble_name: findEnsemble(this.props),
 
+      model: undefined,
+      scenario: undefined,
+      variable: undefined,
+
+      model_id: '',
+      variable_id: '',
+      variable_name: '',
+      experiment: '',
+
+      area: undefined,  // geojson object
+      meta: [],
+    };
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    console.log('### SingleAppController.componentWillReceiveProps')
+    this.setState({
+      ensemble_name: findEnsemble(nextProps),
+    });
+  },
+
+  //query, parse, and store metadata for all datasets
+  componentDidMount: function () {
+    console.log('### SingleAppController.componentDidMount')
+    this.updateMetadata();
+  },
+
+  updateMetadata: function () {
+    console.log('### SingleAppController.updateMetadata')
+    var models = [];
+    var vars;
+
+    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
+    axios({
+      baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
+      params: { ensemble_name: this.state.ensemble_name },
+    }).then(response => {
+      for (var key in response.data) {
+        vars = Object.keys(response.data[key].variables);
+
+        for (var v in vars) {
+          var start = timestampToYear(response.data[key].start_date);
+          var end = timestampToYear(response.data[key].end_date);
+
+          // Stopgap measure to deal with the fact that experiment string formats
+          // vary between climdex files ("historical, rcp26") and GCM outputs
+          // ("historical,rcp26"). Formats experiment strings to include a space.
+          // This formatting is undone to run queries against the database by
+          // ce-backend.guessExperimentFormatFromVariable()
+          // TODO: remove this when no longer needed.
+          var normalizedExp = String(response.data[key].experiment).replace(',r', ', r');
+
+          //If this app has a dataset filter defined, filter the data
+          if(typeof this.datasetFilter == "undefined" ||
+            this.datasetFilter(response.data[key])) {
+            models.push(_.extend({
+              unique_id: key,
+              variable_id: vars[v],
+              start_date: start,
+              end_date: end,
+              experiment: normalizedExp,
+              variable_name: response.data[key].variables[vars[v]],
+            }, _.omit(response.data[key], 'variables', 'start_date', 'end_date',
+              'modtime', 'experiment')));
+          }
+        }
+      }
+
+      // Merge the selection information
+      // If a dataset is already selected, use that. Otherwise, use
+      // defaults if available. Otherwise, first available.
+      // Default dataset: CanESM2, rcp85, pr
+      function specifiedIfAvailable(attribute, value, items) {
+        return _.map(items, attribute).includes(value) ? value : items[0][attribute];
+      }
+
+      const model_id = this.state.model_id ? this.state.model_id :
+        specifiedIfAvailable("model_id", "PCIC12", models);
+      const experiment = this.state.experiment ? this.state.experiment :
+        specifiedIfAvailable("experiment", "historical, rcp85", _.filter(models, {model_id: model_id}));
+      const variable_id = specifiedIfAvailable("variable_id", "pr",
+        _.filter(models, {model_id: model_id, experiment: experiment}));
+      // variable_name has no default, because it must match variable_id.
+      const variable_name = _.filter(models, {model_id: model_id, experiment: experiment,
+        variable_id: variable_id})[0].variable_name;
+
+      this.setState({
+        meta: models,
+        model_id,
+        variable_id,
+        variable_name,
+        experiment,
+      });
+    });
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+    console.log('### SingleAppController.shouldComponentUpdate')
+    return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
+  },
+
+  componentDidUpdate: function(nextProps, nextState) {
+    console.log('### SingleAppController.componentDidUpdate')
+    // The metadata needs to be updated if the ensemble has changed
+    if (nextState.ensemble_name !== this.state.ensemble_name) {
+      this.updateMetadata();
+    }
+  },
+
+  /*
+   * Called when user sets an area on the MapController. Propagates the area
+   * chosen to a DataController.
+   */
+  handleSetArea: function (geojson) {
+    this.setState({ area: geojson });
+  },
+
+  ////////////////////////////////////////////////////////////////////
+  
   //This filter controls which datasets are available for viewing on this portal;
   //only datasets the filter returns a truthy value for are available.
   //Filters out noisy multi-year monthly datasets.
