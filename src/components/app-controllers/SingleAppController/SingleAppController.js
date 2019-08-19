@@ -27,7 +27,6 @@ import get from 'lodash/fp/get';
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
   from '../../data-controllers/SingleDataController/SingleDataController';
-import Selector from '../../Selector';
 import {
   EmissionsScenarioSelector,
   ModelSelector,
@@ -69,6 +68,7 @@ export default createReactClass({
 
   //Returns metadata for datasets with thethe selected variable + scenario, any model.
   //Passed as a prop for SingleDataController to generate model comparison graphs.
+  // TODO: Convert!!
   getModelContextMetadata: function () {
     return _.filter(
       this.state.meta,
@@ -103,23 +103,18 @@ export default createReactClass({
 
   replaceInvalidVariable: function (options, value) {
     const flatOptions = flatMap('options', options);
-    console.log('replaceInvalidVariable', flatOptions)
     const option = find(opt => !opt.isDisabled)(flatOptions);
-    console.log('replaceInvalidVariable: returning', option)
     return option;
   },
 
-
   representativeValue: function (optionName, valueName) {
     return get([optionName, 'value', 'representative', valueName])(this.state);
-    // const option = this.state[optionName];
-    // return option ? option.value.representative : {};
   },
 
   constrainBy: function () {
     // Returns an object containing the union of all representatives of the
     // options named in the arguments (e.g., 'model', 'scenario').
-    // This object is suitable as a constraint for a
+    // Returned object is suitable as a constraint for a
     // `SimpleConstraintGroupingSelector`.
     return flow(
       flatten,
@@ -130,13 +125,7 @@ export default createReactClass({
   },
 
   render: function () {
-    //hierarchical selection: model, then variable, then experiment
-    var modOptions = this.getMetadataItems('model_id');
-    var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
-        this.getFilteredMetadataItems('experiment', { model_id: this.state.model_id }));
-
-    const filteredMeta = this.getFilteredMeta();
-    const alt_filteredMeta = (() => {
+    const filteredMeta = (() => {
       // Initially, selectors are undefined, and go through a default selection
       // process that eventually settles with a defined value for all of them.
       // Returning a metadata set that is filtered by a partially settled
@@ -146,8 +135,6 @@ export default createReactClass({
       const constraint = this.constrainBy('model', 'scenario', 'variable');
       const hasAllConstraints =
         _.allDefined(constraint, 'model_id', 'experiment', 'variable_id');
-      console.log('constraint', constraint)
-      console.log('hasAllConstraints', hasAllConstraints)
       if (!hasAllConstraints) {
         return [];
       }
@@ -156,10 +143,6 @@ export default createReactClass({
         sortBy('unique_id')
       )(this.state.meta);
     })();
-    console.log('filteredMeta', filteredMeta)
-    console.log('alt_filteredMeta', alt_filteredMeta)
-    console.log('difference', _.difference(filteredMeta, alt_filteredMeta))
-    console.log('difference', _.difference(alt_filteredMeta, filteredMeta))
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');
@@ -194,18 +177,17 @@ export default createReactClass({
                     <ModelSelector
                       bases={this.state.meta}
                       value={this.state.model}
-                      onChange={this.handleChangeModel.bind(this)}
-                      replaceInvalidValue={this.replaceInvalidModel.bind(this)}
+                      onChange={this.handleChangeModel}
+                      replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
                   <Col lg={2} md={2}>
                     <EmissionsScenarioSelector
                       bases={this.state.meta}
-                      // constraint={this.state.model && this.state.model.value.representative}
                       constraint={this.constrainBy('model')}
                       value={this.state.scenario}
-                      onChange={this.handleChangeScenario.bind(this)}
-                      replaceInvalidValue={this.replaceInvalidScenario.bind(this)}
+                      onChange={this.handleChangeScenario}
+                      replaceInvalidValue={this.replaceInvalidScenario}
                     />
                   </Col>
                   <Col lg={4} md={4}>
@@ -213,8 +195,8 @@ export default createReactClass({
                       bases={this.state.meta}
                       constraint={this.constrainBy('model', 'scenario')}
                       value={this.state.variable}
-                      onChange={this.handleChangeVariable.bind(this)}
-                      replaceInvalidValue={this.replaceInvalidVariable.bind(this)}
+                      onChange={this.handleChangeVariable}
+                      replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
                 </Row>
@@ -235,7 +217,7 @@ export default createReactClass({
               model_id={model_id}
               experiment={experiment}
               variable_id={variable_id}
-              meta = {alt_filteredMeta}
+              meta = {filteredMeta}
             />
           </FullWidthCol>
         </Row>
@@ -255,7 +237,7 @@ export default createReactClass({
               model_id={model_id}
               experiment={experiment}
               variable_id={variable_id}
-              meta = {alt_filteredMeta}
+              meta = {filteredMeta}
               area={this.state.area}
               onSetArea={this.handleSetArea}
             />
@@ -268,7 +250,7 @@ export default createReactClass({
               comparand_id={this.state.comparand_id ? this.state.comparand_id : variable_id}
               experiment={experiment}
               area={g.geojson(this.state.area).toWKT()}
-              meta = {alt_filteredMeta}
+              meta = {filteredMeta}
               contextMeta={this.getModelContextMetadata()} //to generate Model Context graph
             />
           </HalfWidthCol>
