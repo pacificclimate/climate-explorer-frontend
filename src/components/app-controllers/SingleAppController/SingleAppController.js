@@ -234,7 +234,6 @@ export default createReactClass({
               ensemble_name={this.state.ensemble_name}
               model_id={model_id}
               variable_id={variable_id}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : variable_id}
               experiment={experiment}
               area={g.geojson(this.state.area).toWKT()}
               meta = {filteredMeta}
