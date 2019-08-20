@@ -156,10 +156,11 @@ export default createReactClass({
   },
 
   representativeValue: function (optionName, valueName) {
+    // Extract a value from the representative for a named option.
     return get([optionName, 'value', 'representative', valueName])(this.state);
   },
 
-  constrainBy: function () {
+  constraintsFor: function (...optionNames) {
     // Returns an object containing the union of all representatives of the
     // options named in the arguments (e.g., 'model', 'scenario').
     // Returned object is suitable as a constraint for a
@@ -169,7 +170,7 @@ export default createReactClass({
       map(name => this.state[name]),
       map(option => option && option.value.representative),
       reduce((result, value) => assign(result, value), {})
-    )(arguments)
+    )(optionNames)
   },
 
   filterMetaBy: function(...optionNames) {
@@ -187,7 +188,7 @@ export default createReactClass({
       return [];
     }
     return flow(
-      filter(this.constrainBy(...optionNames)),
+      filter(this.constraintsFor(...optionNames)),
       sortBy('unique_id')
     )(this.state.meta);
   },
@@ -236,7 +237,7 @@ export default createReactClass({
                   <Col lg={2} md={2}>
                     <EmissionsScenarioSelector
                       bases={this.state.meta}
-                      constraint={this.constrainBy('model')}
+                      constraint={this.constraintsFor('model')}
                       value={this.state.scenario}
                       onChange={this.handleChangeScenario}
                       replaceInvalidValue={this.replaceInvalidScenario}
@@ -245,7 +246,7 @@ export default createReactClass({
                   <Col lg={4} md={4}>
                     <VariableSelector
                       bases={this.state.meta}
-                      constraint={this.constrainBy('model', 'scenario')}
+                      constraint={this.constraintsFor('model', 'scenario')}
                       value={this.state.variable}
                       onChange={this.handleChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
