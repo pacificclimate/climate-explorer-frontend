@@ -27,6 +27,7 @@ import get from 'lodash/fp/get';
 import pick from 'lodash/fp/pick';
 import tap from 'lodash/fp/tap';
 import memoize from 'memoize-one';
+import Loader from 'react-loader';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
@@ -196,7 +197,7 @@ export default class SingleAppController extends React.Component {
 
   render() {
     if (this.state.meta === null) {
-      return 'Loading metadata...'
+      return <Loader/>;
     }
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
