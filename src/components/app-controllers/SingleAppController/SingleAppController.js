@@ -54,6 +54,7 @@ import UnfilteredDatasetsSummary
 import axios from 'axios';
 import urljoin from 'url-join';
 import { timestampToYear } from '../../../core/util';
+import { getMetadata } from '../../../data-services/ce-backend';
 
 // TODO: Extract to utility module.
 function findEnsemble (props) {
@@ -63,27 +64,6 @@ function findEnsemble (props) {
     process.env.REACT_APP_CE_ENSEMBLE_NAME
   );
 }
-
-// TODO: Extract to utility module.
-const transformMetadata = metadata => flow(
-  fp.mapWithKey((metadatum, unique_id) => {
-    return fp.mapWithKey((variable_name, variable_id) => {
-      return {
-        unique_id,
-        experiment: String(metadatum.experiment).replace(',r', ', r'),
-        variable_id,
-        variable_name,
-        start_date: timestampToYear(metadatum.start_date),
-        end_date: timestampToYear(metadatum.end_date),
-        ...pick([
-          'institution', 'model_id', 'model_name', 'ensemble_member',
-          'timescale', 'multi_year_mean'
-        ])(metadatum)
-      };
-    })(metadatum.variables)
-  }),
-  flatten,
-)(metadata);
 
 export default createReactClass({
   displayName: 'SingleAppController',
@@ -125,15 +105,8 @@ export default createReactClass({
 
   updateMetadata: function () {
     console.log('### SingleAppController.updateMetadata')
-
-    // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/124
-    axios({
-      baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
-      params: { ensemble_name: this.state.ensemble_name },
-    })
-    .then(response => response.data)
-    .then(transformMetadata)
-    .then(meta => this.setState({ meta }));
+    getMetadata(this.state.ensemble_name)
+      .then(meta => this.setState({ meta }));
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
