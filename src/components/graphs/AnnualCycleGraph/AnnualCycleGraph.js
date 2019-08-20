@@ -1,16 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, ControlLabel } from 'react-bootstrap';
 
 import _ from 'lodash';
 
-import DataSpecSelector from '../../DataSpecSelector/DataSpecSelector';
+import { DataspecSelector } from 'pcic-react-components';
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 import { exportDataToWorksheet } from '../../../core/export';
 import { getTimeseries } from '../../../data-services/ce-backend';
 import {
-  defaultDataSpec,
   validateAnnualCycleData,
 } from '../../../core/util';
 import {
@@ -18,6 +17,11 @@ import {
   errorMessage,
   loadingDataGraphSpec,
 } from '../graph-helpers';
+import get from 'lodash/fp/get';
+import { datasetSelectorLabel } from
+    '../../guidance-content/info/InformationItems';
+import styles from './AnnualCycleGraph.module.css';
+
 
 // This component renders an annual cycle graph, including a selector
 // for the specific set of data to display and export-data buttons. An annual
@@ -63,7 +67,8 @@ export default class AnnualCycleGraph extends React.Component {
     // Multiple instances of this component are created by SingleDataController.
     // The instance and state variables `instance` are used to identify the
     // instance in debug logging, etc. I'm keeping this because there is still
-    // some sleuthing to do that can use it. (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
+    // some sleuthing to do that can use it.
+    // (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
     super(props);
     this.instance = AnnualCycleGraph.instance++;  // for debugging
 
@@ -75,8 +80,8 @@ export default class AnnualCycleGraph extends React.Component {
       instance: this.instance,  // for debugging
       prevMeta: null,
       prevArea: null,
-      prevDataSpec: null,
-      dataSpec: null,
+      prevDataspec: null,
+      dataspec: undefined,
       fetchingData: false,
       data: null,
       dataError: null,
@@ -84,39 +89,32 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    // This function is called whenever a component may be udpated, either
-    // due to props change or *state change*.
+    // This function is called whenever a component may be updated,
+    // due either to props change or to *state change*.
 
     // Props change.
     // Assumes that metadata changes when model, variable, or experiment does.
-    // Set up dataSpec to default based on new props, signal need for
-    // data fetch.
     if (
       props.meta !== state.prevMeta ||
       props.area !== state.prevArea
     ) {
-      const dataSpec = defaultDataSpec(props);
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        // Avoid triggering an unnecessary second second data fetch due to
-        // change in dataSpec.
-        prevDataSpec: dataSpec,
-        dataSpec,
         fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required due to props change
+        data: null,  // Signal that data fetch is required
         dataError: null,
       };
     }
 
-    // State change (dataSpec). Signal need for data fetch.
+    // State change (dataspec). Signal need for data fetch.
     if (
-      state.prevDataSpec !== state.dataSpec
+      state.prevDataspec !== state.dataspec
     ) {
       return {
-        prevDataSpec: state.dataSpec,
+        prevDataspec: state.dataspec,
         fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required due to state change
+        data: null,  // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -137,6 +135,12 @@ export default class AnnualCycleGraph extends React.Component {
 
   // Data fetching
 
+  // TODO: Factor this out (used in other components)
+  representativeValue = (optionName) => {
+    // Extract a value from the representative for a named option.
+    return get([optionName, 'value', 'representative'])(this.state);
+  };
+
   getAndValidateData = (metadata) => (
     getTimeseries(metadata, this.props.area)
     .then(validateAnnualCycleData)
@@ -145,7 +149,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   getMetadatas = () =>
     // This fn is called multiple times, so memoize it if inefficient
-    this.props.getMetadata(this.state.dataSpec)
+    this.props.getMetadata(this.representativeValue('dataspec'))
     .filter(metadata => !!metadata);
 
   fetchData() {
@@ -171,9 +175,8 @@ export default class AnnualCycleGraph extends React.Component {
 
   // User event handlers
 
-  // TODO: Refactor to eliminate encoding of dataSpec
-  handleChangeDataSpec = (dataSpec) => {
-    this.setState({ dataSpec: JSON.parse(dataSpec) });
+  handleChangeDataspec = (dataspec) => {
+    this.setState({ dataspec });
   };
 
   exportData(format) {
@@ -182,7 +185,7 @@ export default class AnnualCycleGraph extends React.Component {
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
       this.graphSpec(),
       format,
-      this.state.dataSpec
+      this.state.dataspec
     );
   }
 
@@ -209,7 +212,7 @@ export default class AnnualCycleGraph extends React.Component {
       return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
     } catch (error) {
       // dataToGraphSpec may blow a raspberry if the data it is passed is
-      // invalid. This won't happen due to mismatched dataSpec and data,
+      // invalid. This won't happen due to mismatched dataspec and data,
       // because we don't allow that mismatch to occur.
       return noDataMessageGraphSpec(errorMessage(error));
     }
@@ -220,12 +223,14 @@ export default class AnnualCycleGraph extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={6} md={6} sm={6}>
-            <DataSpecSelector
-              meta={this.props.meta}
-              // TODO: Refactor to eliminate encoding of dataSpec.
-              value={JSON.stringify(this.state.dataSpec)}
-              onChange={this.handleChangeDataSpec}
-              inlineLabel
+            <ControlLabel className={styles.selector_label}>
+              {datasetSelectorLabel}
+            </ControlLabel>
+            <DataspecSelector
+              bases={this.props.meta}
+              value={this.state.dataspec}
+              onChange={this.handleChangeDataspec}
+              className={styles.selector}
             />
           </Col>
           <Col lg={6} md={6} sm={6}>
