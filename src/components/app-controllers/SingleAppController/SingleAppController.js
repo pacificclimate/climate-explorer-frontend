@@ -10,10 +10,10 @@
  ***************************************************************/
 
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { Col, Grid, Panel, Row } from 'react-bootstrap';
+import Loader from 'react-loader';
+
 import _ from 'lodash';
-import fp from 'lodash/fp'
 import find from 'lodash/fp/find';
 import flatMap from 'lodash/fp/flatMap';
 import flow from 'lodash/fp/flow';
@@ -24,10 +24,6 @@ import assign from 'lodash/fp/assign';
 import filter from 'lodash/fp/filter';
 import sortBy from 'lodash/fp/sortBy';
 import get from 'lodash/fp/get';
-import pick from 'lodash/fp/pick';
-import tap from 'lodash/fp/tap';
-import memoize from 'memoize-one';
-import Loader from 'react-loader';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
@@ -45,7 +41,6 @@ import {
   variableSelectorLabel,
 } from '../../guidance-content/info/InformationItems';
 
-import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import FilteredDatasetsSummary
@@ -53,9 +48,6 @@ import FilteredDatasetsSummary
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary
   from '../../data-presentation/UnfilteredDatasetsSummary';
-import axios from 'axios';
-import urljoin from 'url-join';
-import { timestampToYear } from '../../../core/util';
 import { getMetadata } from '../../../data-services/ce-backend';
 
 // TODO: Extract to utility module.
