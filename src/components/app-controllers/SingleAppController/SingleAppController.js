@@ -67,100 +67,92 @@ function findEnsemble (props) {
 }
 
 // TODO: Convert this to a class declaration (extends React.Component)
-export default createReactClass({
-  displayName: 'SingleAppController',
+export default class SingleAppController extends React.Component {
 
-  /**
-   * Initial state set upon metadata returning in {@link App#componentDidMount}.
-   * Includes: - model_id - variable_id - experiment
-   */
+  state = {
+    ensemble_name: findEnsemble(this.props),
 
-  getInitialState: function () {
-    return {
-      ensemble_name: findEnsemble(this.props),
+    model: undefined,
+    scenario: undefined,
+    variable: undefined,
 
-      model: undefined,
-      scenario: undefined,
-      variable: undefined,
+    area: undefined,  // geojson object
+    meta: [],
+  };
 
-      area: undefined,  // geojson object
-      meta: [],
-    };
-  },
-
-  componentWillReceiveProps: function(nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
       ensemble_name: findEnsemble(nextProps),
     });
-  },
+  }
 
   //query, parse, and store metadata for all datasets
-  componentDidMount: function () {
+  componentDidMount() {
     this.fetchMetadata();
-  },
+  }
 
-  shouldComponentUpdate: function(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
-  },
+  }
 
-  componentDidUpdate: function(nextProps, nextState) {
+  componentDidUpdate(nextProps, nextState) {
     // The metadata needs to be updated if the ensemble has changed
     if (nextState.ensemble_name !== this.state.ensemble_name) {
       this.fetchMetadata();
     }
-  },
+  }
 
-  fetchMetadata: function () {
+  fetchMetadata() {
     getMetadata(this.state.ensemble_name)
       // Prefilter metadata to show only items we want in this portal.
       .then(filter(
         m => !(m.multi_year_mean === false && m.timescale === 'monthly')
       ))
       .then(meta => this.setState({ meta }));
-  },
+  }
 
   /*
    * Called when user sets an area on the MapController. Propagates the area
    * chosen to a DataController.
    */
-  handleSetArea: function (geojson) {
+  handleSetArea = (geojson) => {
     this.setState({ area: geojson });
-  },
+  };
 
-  handleChangeModel: function (model) {
+  handleChangeModel = (model) => {
     this.setState({ model });
-  },
+  };
 
-  replaceInvalidModel: function (options, value) {
+  replaceInvalidModel = (options, value) => {
     return find({ value: { representative: { model_id: 'PCIC12' }}})(options);
-  },
+  };
 
-  handleChangeScenario: function (scenario) {
+  handleChangeScenario = (scenario) => {
     this.setState({ scenario });
-  },
+  };
 
-  replaceInvalidScenario: function (options, value) {
+  replaceInvalidScenario = (options, value) => {
     return find(
       opt => opt.value.representative.experiment.includes('rcp85')
     )(options);
-  },
+  };
 
-  handleChangeVariable: function (variable) {
+  handleChangeVariable = (variable) => {
     this.setState({ variable });
-  },
+  };
 
-  replaceInvalidVariable: function (options, value) {
+  replaceInvalidVariable = (options, value) => {
     const flatOptions = flatMap('options', options);
     const option = find(opt => !opt.isDisabled)(flatOptions);
     return option;
-  },
+  };
 
-  representativeValue: function (optionName, valueName) {
+  representativeValue = (optionName, valueName) => {
     // Extract a value from the representative for a named option.
     return get([optionName, 'value', 'representative', valueName])(this.state);
-  },
+  };
 
-  constraintsFor: function (...optionNames) {
+  constraintsFor = (...optionNames) => {
     // Returns an object containing the union of all representatives of the
     // options named in the arguments (e.g., 'model', 'scenario').
     // Returned object is suitable as a constraint for a
@@ -171,9 +163,9 @@ export default createReactClass({
       map(option => option && option.value.representative),
       reduce((result, value) => assign(result, value), {})
     )(optionNames)
-  },
+  };
 
-  filterMetaBy: function(...optionNames) {
+  filterMetaBy = (...optionNames) => {
     // Return a filtered subset of `this.meta`, based on the selected
     // model, emissions scenario, and variable.
     //
@@ -191,9 +183,9 @@ export default createReactClass({
       filter(this.constraintsFor(...optionNames)),
       sortBy('unique_id')
     )(this.state.meta);
-  },
+  };
 
-  render: function () {
+  render() {
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
@@ -310,5 +302,5 @@ export default createReactClass({
       </Grid>
 
     );
-  },
-});
+  }
+}
