@@ -58,7 +58,7 @@ import { timestampToYear } from '../../../core/util';
 import { getMetadata } from '../../../data-services/ce-backend';
 
 // TODO: Extract to utility module.
-function findEnsemble (props) {
+function ensemble_name(props) {
   return (
     (props.match && props.match.params && props.match.params.ensemble_name) ||
     props.ensemble_name ||
@@ -66,44 +66,53 @@ function findEnsemble (props) {
   );
 }
 
-// TODO: Convert this to a class declaration (extends React.Component)
 export default class SingleAppController extends React.Component {
+  // To manage fetching of metadata, this component follows React best practice:
+  // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
+  // This affects how initial state is defined (`ensemble_name`) and what
+  // is done in lifecycle hooks. The value determining whether data should
+  // be fetched is `ensemble_name(props)`. (Therefore, unlike the example in
+  // the React documentation, it not a single prop value, but it is derived
+  // directly from the props). The value managed is `this.state.meta`.
 
   state = {
-    ensemble_name: findEnsemble(this.props),
+    prev_ensemble_name: undefined,
 
     model: undefined,
     scenario: undefined,
     variable: undefined,
 
     area: undefined,  // geojson object
-    meta: [],
+    meta: null,
   };
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      ensemble_name: findEnsemble(nextProps),
-    });
+  static getDerivedStateFromProps(props, state) {
+    // Store prev_ensemble_name in state so we can compare when props change.
+    // Clear out previously-loaded data (so we don't render stale stuff).
+    const new_ensemble_name = ensemble_name(props);
+    if (new_ensemble_name !== state.prev_ensemble_name) {
+      return {
+        meta: null,
+        prev_ensemble_name: new_ensemble_name,
+      };
+    }
+
+    // No state update necessary
+    return null;
   }
 
-  //query, parse, and store metadata for all datasets
   componentDidMount() {
-    this.fetchMetadata();
+    this.fetchMetadata(ensemble_name(this.props));
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
-  }
-
-  componentDidUpdate(nextProps, nextState) {
-    // The metadata needs to be updated if the ensemble has changed
-    if (nextState.ensemble_name !== this.state.ensemble_name) {
-      this.fetchMetadata();
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.meta === null) {
+      this.fetchMetadata(ensemble_name(this.props));
     }
   }
 
-  fetchMetadata() {
-    getMetadata(this.state.ensemble_name)
+  fetchMetadata(ensemble_name) {
+    getMetadata(ensemble_name)
       // Prefilter metadata to show only items we want in this portal.
       .then(filter(
         m => !(m.multi_year_mean === false && m.timescale === 'monthly')
@@ -186,6 +195,9 @@ export default class SingleAppController extends React.Component {
   };
 
   render() {
+    if (this.state.meta === null) {
+      return 'Loading metadata...'
+    }
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
