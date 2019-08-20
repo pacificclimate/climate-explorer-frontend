@@ -96,12 +96,7 @@ export default createReactClass({
 
   //query, parse, and store metadata for all datasets
   componentDidMount: function () {
-    this.updateMetadata();
-  },
-
-  updateMetadata: function () {
-    getMetadata(this.state.ensemble_name)
-      .then(meta => this.setState({ meta }));
+    this.fetchMetadata();
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
@@ -111,8 +106,17 @@ export default createReactClass({
   componentDidUpdate: function(nextProps, nextState) {
     // The metadata needs to be updated if the ensemble has changed
     if (nextState.ensemble_name !== this.state.ensemble_name) {
-      this.updateMetadata();
+      this.fetchMetadata();
     }
+  },
+
+  fetchMetadata: function () {
+    getMetadata(this.state.ensemble_name)
+      // Prefilter metadata to show only items we want in this portal.
+      .then(filter(
+        m => !(m.multi_year_mean === false && m.timescale === 'monthly')
+      ))
+      .then(meta => this.setState({ meta }));
   },
 
   /*
@@ -122,12 +126,6 @@ export default createReactClass({
   handleSetArea: function (geojson) {
     this.setState({ area: geojson });
   },
-
-  prefilterMeta: memoize(
-    meta => filter(datafile =>
-      !(datafile.multi_year_mean === false && datafile.timescale === 'monthly')
-    )(meta)
-  ),
 
   handleChangeModel: function (model) {
     this.setState({ model });
@@ -189,14 +187,12 @@ export default createReactClass({
       return [];
     }
     return flow(
-      this.prefilterMeta,
       filter(this.constrainBy(...optionNames)),
       sortBy('unique_id')
     )(this.state.meta);
   },
 
   render: function () {
-    const prefilteredMeta = this.prefilterMeta(this.state.meta);
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
@@ -211,7 +207,7 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <UnfilteredDatasetsSummary meta={prefilteredMeta} />
+            <UnfilteredDatasetsSummary meta={this.state.meta} />
           </FullWidthCol>
         </Row>
 
@@ -231,7 +227,7 @@ export default createReactClass({
                 <Row>
                   <Col lg={2} md={2}>
                     <ModelSelector
-                      bases={prefilteredMeta}
+                      bases={this.state.meta}
                       value={this.state.model}
                       onChange={this.handleChangeModel}
                       replaceInvalidValue={this.replaceInvalidModel}
@@ -239,7 +235,7 @@ export default createReactClass({
                   </Col>
                   <Col lg={2} md={2}>
                     <EmissionsScenarioSelector
-                      bases={prefilteredMeta}
+                      bases={this.state.meta}
                       constraint={this.constrainBy('model')}
                       value={this.state.scenario}
                       onChange={this.handleChangeScenario}
@@ -248,7 +244,7 @@ export default createReactClass({
                   </Col>
                   <Col lg={4} md={4}>
                     <VariableSelector
-                      bases={prefilteredMeta}
+                      bases={this.state.meta}
                       constraint={this.constrainBy('model', 'scenario')}
                       value={this.state.variable}
                       onChange={this.handleChangeVariable}
