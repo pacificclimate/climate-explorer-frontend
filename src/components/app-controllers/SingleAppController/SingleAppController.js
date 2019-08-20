@@ -26,6 +26,7 @@ import sortBy from 'lodash/fp/sortBy';
 import get from 'lodash/fp/get';
 import pick from 'lodash/fp/pick';
 import tap from 'lodash/fp/tap';
+import memoize from 'memoize-one';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
@@ -65,6 +66,7 @@ function findEnsemble (props) {
   );
 }
 
+// TODO: Convert this to a class declaration (extends React.Component)
 export default createReactClass({
   displayName: 'SingleAppController',
 
@@ -73,11 +75,7 @@ export default createReactClass({
    * Includes: - model_id - variable_id - experiment
    */
 
-  ////////////////////////////////////////////////////////////////////
-  // mixins: [AppMixin],
-  
   getInitialState: function () {
-    console.log('### SingleAppController.getInitialState')
     return {
       ensemble_name: findEnsemble(this.props),
 
@@ -91,7 +89,6 @@ export default createReactClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    console.log('### SingleAppController.componentWillReceiveProps')
     this.setState({
       ensemble_name: findEnsemble(nextProps),
     });
@@ -99,23 +96,19 @@ export default createReactClass({
 
   //query, parse, and store metadata for all datasets
   componentDidMount: function () {
-    console.log('### SingleAppController.componentDidMount')
     this.updateMetadata();
   },
 
   updateMetadata: function () {
-    console.log('### SingleAppController.updateMetadata')
     getMetadata(this.state.ensemble_name)
       .then(meta => this.setState({ meta }));
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
-    console.log('### SingleAppController.shouldComponentUpdate')
     return (!_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state));
   },
 
   componentDidUpdate: function(nextProps, nextState) {
-    console.log('### SingleAppController.componentDidUpdate')
     // The metadata needs to be updated if the ensemble has changed
     if (nextState.ensemble_name !== this.state.ensemble_name) {
       this.updateMetadata();
@@ -130,14 +123,11 @@ export default createReactClass({
     this.setState({ area: geojson });
   },
 
-  ////////////////////////////////////////////////////////////////////
-  
-  //This filter controls which datasets are available for viewing on this portal;
-  //only datasets the filter returns a truthy value for are available.
-  //Filters out noisy multi-year monthly datasets.
-  datasetFilter: function (datafile) {
-    return !(datafile.multi_year_mean === false && datafile.timescale === 'monthly');
-  },
+  prefilterMeta: memoize(
+    meta => filter(datafile =>
+      !(datafile.multi_year_mean === false && datafile.timescale === 'monthly')
+    )(meta)
+  ),
 
   handleChangeModel: function (model) {
     this.setState({ model });
@@ -185,22 +175,28 @@ export default createReactClass({
   },
 
   filterMetaBy: function(...optionNames) {
-    // Initially, selectors are undefined, and go through a default selection
+    // Return a filtered subset of `this.meta`, based on the selected
+    // model, emissions scenario, and variable.
+    //
+    // Initially, selectors are undefined, and go through a cascading defaulting
     // process that eventually settles with a defined value for all of them.
     // Returning a metadata set that is filtered by a partially settled
-    // selector set causes problems. This function returns the empty array
-    // unless a full set of constraints (derived from selectors) is available.
+    // selector set causes problems in client components. This function
+    // returns the empty array unless a full set of constraints (derived from
+    // selectors) is available.
     const settled = _.allDefined(this.state, ...optionNames);
     if (!settled) {
       return [];
     }
     return flow(
+      this.prefilterMeta,
       filter(this.constrainBy(...optionNames)),
       sortBy('unique_id')
     )(this.state.meta);
   },
 
   render: function () {
+    const prefilteredMeta = this.prefilterMeta(this.state.meta);
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
@@ -215,7 +211,7 @@ export default createReactClass({
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <UnfilteredDatasetsSummary meta={this.state.meta} />
+            <UnfilteredDatasetsSummary meta={prefilteredMeta} />
           </FullWidthCol>
         </Row>
 
@@ -235,7 +231,7 @@ export default createReactClass({
                 <Row>
                   <Col lg={2} md={2}>
                     <ModelSelector
-                      bases={this.state.meta}
+                      bases={prefilteredMeta}
                       value={this.state.model}
                       onChange={this.handleChangeModel}
                       replaceInvalidValue={this.replaceInvalidModel}
@@ -243,7 +239,7 @@ export default createReactClass({
                   </Col>
                   <Col lg={2} md={2}>
                     <EmissionsScenarioSelector
-                      bases={this.state.meta}
+                      bases={prefilteredMeta}
                       constraint={this.constrainBy('model')}
                       value={this.state.scenario}
                       onChange={this.handleChangeScenario}
@@ -252,7 +248,7 @@ export default createReactClass({
                   </Col>
                   <Col lg={4} md={4}>
                     <VariableSelector
-                      bases={this.state.meta}
+                      bases={prefilteredMeta}
                       constraint={this.constrainBy('model', 'scenario')}
                       value={this.state.variable}
                       onChange={this.handleChangeVariable}
