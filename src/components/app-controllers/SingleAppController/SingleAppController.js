@@ -10,7 +10,7 @@
  ***************************************************************/
 
 import React from 'react';
-import { Col, Grid, Panel, Row } from 'react-bootstrap';
+import { Col, ControlLabel, Grid, Panel, Row } from 'react-bootstrap';
 import Loader from 'react-loader';
 
 import _ from 'lodash';
@@ -224,6 +224,7 @@ export default class SingleAppController extends React.Component {
               <Panel.Body>
                 <Row>
                   <Col lg={2} md={2}>
+                    <ControlLabel>{modelSelectorLabel}</ControlLabel>
                     <ModelSelector
                       bases={this.state.meta}
                       value={this.state.model}
@@ -232,6 +233,7 @@ export default class SingleAppController extends React.Component {
                     />
                   </Col>
                   <Col lg={2} md={2}>
+                    <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
                     <EmissionsScenarioSelector
                       bases={this.state.meta}
                       constraint={this.constraintsFor('model')}
@@ -241,6 +243,7 @@ export default class SingleAppController extends React.Component {
                     />
                   </Col>
                   <Col lg={4} md={4}>
+                    <ControlLabel>{variableSelectorLabel}</ControlLabel>
                     <VariableSelector
                       bases={this.state.meta}
                       constraint={this.constraintsFor('model', 'scenario')}
