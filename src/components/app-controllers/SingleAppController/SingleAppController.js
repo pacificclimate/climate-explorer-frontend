@@ -149,6 +149,7 @@ export default class SingleAppController extends React.Component {
     return option;
   };
 
+  // TODO: Factor this out (used in other components)
   representativeValue = (optionName, valueName) => {
     // Extract a value from the representative for a named option.
     return get([optionName, 'value', 'representative', valueName])(this.state);
@@ -297,7 +298,7 @@ export default class SingleAppController extends React.Component {
           </HalfWidthCol>
           <HalfWidthCol>
             <SingleDataController
-              ensemble_name={this.state.ensemble_name}
+              ensemble_name={ensemble_name(this.props)}
               model_id={model_id}
               variable_id={variable_id}
               experiment={experiment}
