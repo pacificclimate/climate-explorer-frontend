@@ -3,14 +3,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, ControlLabel } from 'react-bootstrap';
 
 import _ from 'lodash';
 
 import DataTable from '../DataTable/DataTable';
-import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
+import TimeOfYearSelector from '../Selector/NewTimeOfYearSelector';
 import ExportButtons from '../graphs/ExportButtons';
-import { statsTableLabel } from '../guidance-content/info/InformationItems';
+import { statsTableLabel, timeOfYearSelectorLabel } from
+    '../guidance-content/info/InformationItems';
 import { MEVSummary } from '../data-presentation/MEVSummary';
 
 import styles from './StatisticalSummaryTable.module.css';
@@ -52,8 +53,8 @@ export default class StatisticalSummaryTable extends React.Component {
     this.state = {
       prevMeta: null,
       prevArea: null,
-      prevTimeOfYear: null,
-      timeOfYear: null,
+      prevTimeOfYear: undefined,
+      timeOfYear: undefined,
       fetchingData: false,
       data: null,
       dataError: null,
@@ -66,10 +67,6 @@ export default class StatisticalSummaryTable extends React.Component {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        // Avoid triggering an unnecessary second second data fetch due to
-        // change in timeOfYear.
-        prevTimeOfYear: timeOfYear,
-        timeOfYear,
         fetchingData: false,  // not quite yet
         data: null,  // Signal that data fetch is required
         dataError: null,
@@ -81,7 +78,7 @@ export default class StatisticalSummaryTable extends React.Component {
       return {
         prevTimeOfYear: state.timeOfYear,
         fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required due to state change
+        data: null,  // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -125,7 +122,8 @@ export default class StatisticalSummaryTable extends React.Component {
     const metadata = {
       ..._.pick(this.props,
         'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'),
-      ...timeKeyToResolutionIndex(this.state.timeOfYear),
+      ...timeKeyToResolutionIndex(
+        this.state.timeOfYear && this.state.timeOfYear.value),
     };
     this.getAndValidateData(metadata)
     .then(data => {
@@ -154,7 +152,8 @@ export default class StatisticalSummaryTable extends React.Component {
   exportDataTable(format) {
     exportDataToWorksheet(
       'stats', this.props, this.state.data, format,
-      timeKeyToResolutionIndex(this.state.timeOfYear)
+      timeKeyToResolutionIndex(
+        this.state.timeOfYear && this.state.timeOfYear.value)
     );
   }
 
@@ -178,6 +177,7 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   render() {
+    console.log('### Stats Summary Tbl')
     return (
       <Panel>
         <Panel.Heading>
@@ -195,11 +195,11 @@ export default class StatisticalSummaryTable extends React.Component {
         <Panel.Body className={styles.data_panel}>
           <Row>
             <Col lg={6} md={6} sm={6}>
+              <ControlLabel>{timeOfYearSelectorLabel}</ControlLabel>
               <TimeOfYearSelector
                 value={this.state.timeOfYear}
                 onChange={this.handleChangeTimeOfYear}
                 {...timeResolutions(this.props.meta)}
-                inlineLabel
               />
             </Col>
             <Col lg={6} md={6} sm={6}>
