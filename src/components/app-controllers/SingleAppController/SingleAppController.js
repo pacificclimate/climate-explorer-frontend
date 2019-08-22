@@ -107,16 +107,13 @@ export default class SingleAppController extends React.Component {
   fetchMetadata(ensemble_name) {
     getMetadata(ensemble_name)
       // Prefilter metadata to show only items we want in this portal.
+      // TODO: Extract this to a common component
       .then(filter(
         m => !(m.multi_year_mean === false && m.timescale === 'monthly')
       ))
       .then(meta => this.setState({ meta }));
   }
 
-  /*
-   * Called when user sets an area on the MapController. Propagates the area
-   * chosen to a DataController.
-   */
   handleSetArea = (geojson) => {
     this.setState({ area: geojson });
   };
@@ -125,6 +122,7 @@ export default class SingleAppController extends React.Component {
     this.setState({ model });
   };
 
+  // TODO: Extract (common)
   replaceInvalidModel = (options, value) => {
     return find({ value: { representative: { model_id: 'PCIC12' }}})(options);
   };
@@ -133,6 +131,7 @@ export default class SingleAppController extends React.Component {
     this.setState({ scenario });
   };
 
+  // TODO: Extract (common)
   replaceInvalidScenario = (options, value) => {
     return find(
       opt => opt.value.representative.experiment.includes('rcp85')
@@ -143,6 +142,7 @@ export default class SingleAppController extends React.Component {
     this.setState({ variable });
   };
 
+  // TODO: Extract (common)
   replaceInvalidVariable = (options, value) => {
     const flatOptions = flatMap('options', options);
     const option = find(opt => !opt.isDisabled)(flatOptions);
@@ -155,6 +155,7 @@ export default class SingleAppController extends React.Component {
     return get([optionName, 'value', 'representative', valueName])(this.state);
   };
 
+  // TODO: Extract (common)
   constraintsFor = (...optionNames) => {
     // Returns an object containing the union of all representatives of the
     // options named in the arguments (e.g., 'model', 'scenario').
@@ -168,6 +169,7 @@ export default class SingleAppController extends React.Component {
     )(optionNames)
   };
 
+  // TODO: Extract (common)
   filterMetaBy = (...optionNames) => {
     // Return a filtered subset of `this.meta`, based on the selected
     // model, emissions scenario, and variable.
