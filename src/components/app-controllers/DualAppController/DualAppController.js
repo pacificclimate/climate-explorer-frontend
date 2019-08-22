@@ -207,7 +207,6 @@ export default class DualAppController extends React.Component {
 
     const filteredMetaVariable = this.filterMetaBy('model', 'scenario', 'variable');
     const filteredMetaComparand = this.filterMetaBy('model', 'scenario', 'comparand');
-    const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');
