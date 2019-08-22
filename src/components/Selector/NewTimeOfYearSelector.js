@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import fp, { find } from 'lodash/fp';
-import withValueReplacement from './withValueReplacement';
+import withValueReplacement from '../../HOCs/withValueReplacement';
 
 const WVRSelect = withValueReplacement()(Select);
 
