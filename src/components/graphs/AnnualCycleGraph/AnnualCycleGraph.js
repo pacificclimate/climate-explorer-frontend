@@ -185,7 +185,7 @@ export default class AnnualCycleGraph extends React.Component {
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
       this.graphSpec(),
       format,
-      this.state.dataspec
+      this.representativeValue('dataspec')
     );
   }
 
