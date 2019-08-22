@@ -13,6 +13,10 @@
  * stats with no user interaction supported, and SingleMapController,
  * which displays the selected ensemble average as a colour-coded
  * raster map.
+ *
+ * IMPORTANT: This component has fallen into disuse and has not been
+ * kept up to date with changes to other similar components. See
+ * https://github.com/pacificclimate/climate-explorer-frontend/issues/218
  ******************************************************************/
 
 import React from 'react';
@@ -23,7 +27,6 @@ import SingleMapController from '../../map-controllers/SingleMapController/Singl
 import MotiDataController from '../../data-controllers/MotiDataController';
 import Selector from '../../Selector';
 import VariableDescriptionSelector from '../../VariableDescriptionSelector';
-import AppMixin from '../../AppMixin';
 import g from "../../../core/geo";
 
 
@@ -35,7 +38,9 @@ export default createReactClass({
    * Includes: - model_id - variable_id - experiment
    */
 
-  mixins: [AppMixin],
+  // TODO: Convert this to the non-mixin pattern.
+  //  Use SingleAppController as template.
+  // mixins: [AppMixin],
 
   //This function is used to filter which datasets will be used by this
   //portal. Datasets the filter returns "false" on will not be added to
