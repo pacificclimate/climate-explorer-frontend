@@ -1,6 +1,9 @@
-// Higher Order Component that adds invalid-value replacement to a typical
-// controlled component with props `value` and `onChange` (e.g., most
-// UI controls such as dropdown type selectors).
+// Higher-order function that returns a Higher Order Component that adds
+// invalid-value replacement to a typical controlled component with props
+// `value` and `onChange` (e.g., most UI controls such as dropdown selectors).
+//
+// (See https://reactjs.org/docs/higher-order-components.html#convention-maximizing-composability
+// for why this HOC is separated into two parts like this.)
 //
 // Invalid-value replacement means that when a value supplied to the component
 // is invalid, it is replaced with a valid value by calling `onChange` with
@@ -34,6 +37,11 @@
 //     isInvalidValue={isInvalidValue}
 //   />
 // }
+//
+// Note: for greater flexibility, `withValueReplacement` could accept arguments
+// naming the `value` and `onChange` props expected by the base component.
+// But that is an unnecessary complication at this point.
+
 // TODO: Move to pcic-react-components
 
 import React from 'react';
@@ -41,14 +49,6 @@ import PropTypes from 'prop-types';
 import isFunction from 'lodash/fp/isFunction';
 
 export default function withValueReplacement() {
-  // Returns a HOC that applies value replacement to a component.
-  // See https://reactjs.org/docs/higher-order-components.html#convention-maximizing-composability
-  // for why this HOC is separated into two parts like this.
-
-  // Note: for greater flexibility, this function could accept argument(s)
-  // naming the `value` and `onChange` props expected by the base component.
-  // But that is an unnecessary complication at this point.
-
   return function (BaseComponent) {
     return class extends React.Component {
       static propTypes = {
@@ -74,13 +74,6 @@ export default function withValueReplacement() {
       // done in `componentDidMount` or `componentDidUpdate`, where side
       // effects are permitted.
 
-      condReplaceValue() {
-        if (this.willReplaceValue) {
-          this.log(`.condReplaceValue: replacing with option:`, this.valueToUse)
-          this.props.onChange(this.valueToUse);
-        }
-      }
-
       componentDidMount() {
         this.condReplaceValue();
       }
@@ -89,9 +82,9 @@ export default function withValueReplacement() {
         this.condReplaceValue();
       }
 
-      log(...args) {
-        if (this.props.debug) {
-          console.log(`withValueReplacement[${this.props.debugValue}]`, ...args);
+      condReplaceValue() {
+        if (this.willReplaceValue) {
+          this.props.onChange(this.valueToUse);
         }
       }
 
