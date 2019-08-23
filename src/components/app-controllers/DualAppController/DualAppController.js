@@ -101,7 +101,6 @@ export default class DualAppController extends React.Component {
   fetchMetadata(ensemble_name) {
     getMetadata(ensemble_name)
     // Prefilter metadata to show only items we want in this portal.
-    // TODO: Extract this to a common component
       .then(filterOutMonthlyMym)
       .then(meta => this.setState({ meta }));
   }
@@ -113,21 +112,24 @@ export default class DualAppController extends React.Component {
   handleChangeVariable = setState(this, 'variable');
   handleChangeComparand = setState(this, 'comparand');
 
-  replaceInvalidModel = findModelNamed('CanESM2');
+  replaceInvalidModel = findModelNamed('PCIC12');
   replaceInvalidScenario = findScenarioIncluding('rcp85');
   replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
 
   representativeValue = (...args) => representativeValue(...args)(this.state);
   constraintsFor = (...args) => constraintsFor(...args)(this.state);
-  filterMetaBy = (...args) => filterMetaBy(...args)(this.state)(this.state.meta);
+  filterMetaBy = (...args) =>
+    filterMetaBy(...args)(this.state)(this.state.meta);
 
   render() {
     if (this.state.meta === null) {
       return <Loader/>;
     }
 
-    const filteredMetaVariable = this.filterMetaBy('model', 'scenario', 'variable');
-    const filteredMetaComparand = this.filterMetaBy('model', 'scenario', 'comparand');
+    const filteredMetaVariable =
+      this.filterMetaBy('model', 'scenario', 'variable');
+    const filteredMetaComparand =
+      this.filterMetaBy('model', 'scenario', 'comparand');
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');

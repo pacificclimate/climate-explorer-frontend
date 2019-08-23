@@ -21,7 +21,6 @@ import {
   ModelSelector,
   VariableSelector,
 } from 'pcic-react-components';
-import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import {
   datasetFilterPanelLabel,
   emissionScenarioSelectorLabel,
@@ -101,7 +100,7 @@ export default class SingleAppController extends React.Component {
       .then(meta => this.setState({ meta }));
   }
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
   handleSetArea = setState(this, 'area');
   handleChangeModel = setState(this, 'model');
   handleChangeScenario = setState(this, 'scenario');
@@ -113,7 +112,8 @@ export default class SingleAppController extends React.Component {
 
   representativeValue = (...args) => representativeValue(...args)(this.state);
   constraintsFor = (...args) => constraintsFor(...args)(this.state);
-  filterMetaBy = (...args) => filterMetaBy(...args)(this.state)(this.state.meta);
+  filterMetaBy = (...args) =>
+    filterMetaBy(...args)(this.state)(this.state.meta);
 
   render() {
     if (this.state.meta === null) {

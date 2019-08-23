@@ -68,13 +68,11 @@ export default class PrecipAppController extends React.Component {
     model: undefined,
     scenario: undefined,
     variable: undefined,
-    // This is an unmitigated hack, but it is simple and leads to simple
-    // code. In this controller, `comparand` is a fixed value. Even
-    // though we never change it, it is easiest to store it here and let
-    // existing tools use the data in it, rather than coding a special solution
-    // for this case.
-    // TODO: Actually, when common code is factored out, this can probably
-    // be moved to a separate, true constant. Here for now.
+    // This is a hack, but it is simple and leads to simplified code.
+    // In this controller, `comparand` is a fixed value. Even though it never
+    // changes, it is easiest to store it on state and let existing
+    // state-based methods use the comparand data in it, rather than coding
+    // a special solution for this case.
     comparand: {
       value: {
         representative: {
@@ -133,7 +131,8 @@ export default class PrecipAppController extends React.Component {
 
   representativeValue = (...args) => representativeValue(...args)(this.state);
   constraintsFor = (...args) => constraintsFor(...args)(this.state);
-  filterMetaBy = (...args) => filterMetaBy(...args)(this.state)(this.state.meta);
+  filterMetaBy = (...args) =>
+    filterMetaBy(...args)(this.state)(this.state.meta);
 
   render() {
     if (this.state.meta === null) {
