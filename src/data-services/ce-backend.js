@@ -143,7 +143,7 @@ function getStats (
 
 // Downscaled GCM data has experiment strings like 'historical,rcp26'
 // while climdex data uses 'historical, rcp26'
-// These are regularized by AppMixin.updateMetadata(), but the 'data'
+// These are regularized by the app controllers, but the 'data'
 // API backend requires the original format.
 // TODO: remove this function when no longer needed.
 function guessExperimentFormatFromVariable(variable, experiment) {

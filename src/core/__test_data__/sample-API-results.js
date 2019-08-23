@@ -277,11 +277,10 @@ var metadata = {
  ****************************************************************/
 
 /*
- * this functon reproduces the process used in AppMixin.js to create
+ * this functon reproduces the process used in the app controllers to create
  * an array of flat metadata from the attributed-formatted results of 
  * the multimeta API call; it converts the raw API results into the 
  * array format used internally by the climate explorer frontend. 
- * Mimics part of AppMixin.componentDidLoad()
  */
 var metadataToArray = function () {
   var models = [];
