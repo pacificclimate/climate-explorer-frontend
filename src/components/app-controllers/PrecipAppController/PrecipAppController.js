@@ -16,9 +16,9 @@
  * is always precipitation.
  ************************************************************************/
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Grid, Row, Col, Panel, ControlLabel } from 'react-bootstrap';
-import Loader from 'react-loader';
 
 import DualDataController from
     '../../data-controllers/DualDataController/DualDataController';
@@ -36,7 +36,6 @@ import FilteredDatasetsSummary from
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary from
     '../../data-presentation/UnfilteredDatasetsSummary';
-import { getMetadata } from '../../../data-services/ce-backend';
 import {
   EmissionsScenarioSelector,
   ModelSelector, VariableSelector
@@ -46,99 +45,40 @@ import {
   ensemble_name, filterOutMonthlyMym,
   findModelNamed, findScenarioIncluding, findVariableMatching,
   representativeValue, constraintsFor, filterMetaBy,
-  setState,
+  setState, withMetadata,
 } from '../common';
 
 
-export default class PrecipAppController extends React.Component {
-  // To manage fetching of metadata, this component follows React best practice:
-  // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
-  // This affects how initial state is defined (`ensemble_name`) and what
-  // is done in lifecycle hooks. The value determining whether data should
-  // be fetched is `ensemble_name(props)`. (Therefore, unlike the example in
-  // the React documentation, it not a single prop value, but it is derived
-  // directly from the props). The value managed is `this.state.meta`.
-  // TODO: Async data fetching is common to all app controllers and can
-  //  almost certainly be factored out as a HOC to be applied to simpler,
-  //  more app-specific components.
+class PrecipAppControllerDisplay extends React.Component {
+  // This is a pure (state-free), controlled component that renders the
+  // entire content of PrecipAppController, including the controls.
+  // It is wrapped by `withMetadata` to inject the asynchronously fetched
+  // metadata that it needs.
 
-  state = {
-    prev_ensemble_name: undefined,
-
-    model: undefined,
-    scenario: undefined,
-    variable: undefined,
-    // This is a hack, but it is simple and leads to simplified code.
-    // In this controller, `comparand` is a fixed value. Even though it never
-    // changes, it is easiest to store it on state and let existing
-    // state-based methods use the comparand data in it, rather than coding
-    // a special solution for this case.
-    comparand: {
-      value: {
-        representative: {
-          variable_id: 'pr',
-          variable_name: 'Precipitation',
-          multi_year_mean: true
-        }
-      }
-    },
-
-    area: undefined,  // geojson object
-    meta: null,
+  static propTypes = {
+    ensemble_name: PropTypes.string,
+    model: PropTypes.object,
+    scenario: PropTypes.object,
+    variable: PropTypes.object,
+    comparand: PropTypes.object,
+    area: PropTypes.object,
+    onChangeModel: PropTypes.func,
+    onChangeScenario: PropTypes.func,
+    onChangeVariable: PropTypes.func,
+    onChangeArea: PropTypes.func,
+    meta: PropTypes.array,
   };
-
-  static getDerivedStateFromProps(props, state) {
-    // Store prev_ensemble_name in state so we can compare when props change.
-    // Clear out previously-loaded data (so we don't render stale stuff).
-    const new_ensemble_name = ensemble_name(props);
-    if (new_ensemble_name !== state.prev_ensemble_name) {
-      return {
-        meta: null,
-        prev_ensemble_name: new_ensemble_name,
-      };
-    }
-
-    // No state update necessary
-    return null;
-  }
-
-  componentDidMount() {
-    this.fetchMetadata(ensemble_name(this.props));
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.meta === null) {
-      this.fetchMetadata(ensemble_name(this.props));
-    }
-  }
-
-  fetchMetadata(ensemble_name) {
-    getMetadata(ensemble_name)
-      .then(filterOutMonthlyMym)
-      .then(meta => this.setState({ meta }))
-    ;
-  }
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleSetArea = setState(this, 'area');
-  handleChangeModel = setState(this, 'model');
-  handleChangeScenario = setState(this, 'scenario');
-  handleChangeVariable = setState(this, 'variable');
 
   replaceInvalidModel = findModelNamed('CanESM2');
   replaceInvalidScenario = findScenarioIncluding('rcp85');
-  replaceInvalidVariable = findVariableMatching(this.state.comparand);
+  replaceInvalidVariable = findVariableMatching(this.props.comparand);
 
-  representativeValue = (...args) => representativeValue(...args)(this.state);
-  constraintsFor = (...args) => constraintsFor(...args)(this.state);
+  representativeValue = (...args) => representativeValue(...args)(this.props);
+  constraintsFor = (...args) => constraintsFor(...args)(this.props);
   filterMetaBy = (...args) =>
-    filterMetaBy(...args)(this.state)(this.state.meta);
+    filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    if (this.state.meta === null) {
-      return <Loader/>;
-    }
-
     const filteredMetaVariable =
       this.filterMetaBy('model', 'scenario', 'variable');
     const filteredMetaComparand =
@@ -153,7 +93,7 @@ export default class PrecipAppController extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <UnfilteredDatasetsSummary meta={this.state.meta} />
+            <UnfilteredDatasetsSummary meta={this.props.meta} />
           </FullWidthCol>
         </Row>
 
@@ -174,29 +114,29 @@ export default class PrecipAppController extends React.Component {
                   <Col lg={2} md={2}>
                     <ControlLabel>{modelSelectorLabel}</ControlLabel>
                     <ModelSelector
-                      bases={this.state.meta}
-                      value={this.state.model}
-                      onChange={this.handleChangeModel}
+                      bases={this.props.meta}
+                      value={this.props.model}
+                      onChange={this.props.onChangeModel}
                       replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
-                    <Col lg={2} md={2}>
-                      <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
-                      <EmissionsScenarioSelector
-                        bases={this.state.meta}
-                        constraint={this.constraintsFor('model')}
-                        value={this.state.scenario}
-                        onChange={this.handleChangeScenario}
-                        replaceInvalidValue={this.replaceInvalidScenario}
-                      />
+                  <Col lg={2} md={2}>
+                    <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
+                    <EmissionsScenarioSelector
+                      bases={this.props.meta}
+                      constraint={this.constraintsFor('model')}
+                      value={this.props.scenario}
+                      onChange={this.props.onChangeScenario}
+                      replaceInvalidValue={this.replaceInvalidScenario}
+                    />
                   </Col>
                   <Col lg={4} md={4}>
                     <ControlLabel>{variableSelectorLabel}</ControlLabel>
                     <VariableSelector
-                      bases={this.state.meta}
+                      bases={this.props.meta}
                       constraint={this.constraintsFor('model', 'scenario')}
-                      value={this.state.variable}
-                      onChange={this.handleChangeVariable}
+                      value={this.props.variable}
+                      onChange={this.props.onChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
@@ -244,7 +184,7 @@ export default class PrecipAppController extends React.Component {
               meta={filteredMetaVariable}
               comparand_id={comparand_id}
               comparandMeta = {filteredMetaComparand}
-              area={this.state.area}
+              area={this.props.area}
               onSetArea={this.handleSetArea}
             />
           </HalfWidthCol>
@@ -257,12 +197,60 @@ export default class PrecipAppController extends React.Component {
               meta={filteredMetaVariable}
               comparand_id={comparand_id}
               comparandMeta = {filteredMetaComparand}
-              area={g.geojson(this.state.area).toWKT()}
+              area={g.geojson(this.props.area).toWKT()}
             />
           </HalfWidthCol>
         </Row>
       </Grid>
+    );
+  }
+}
 
+
+// Inject asynchronously fetched metadata into controlled component.
+const WmdPrecipAppControllerDisplay = withMetadata(PrecipAppControllerDisplay);
+
+
+// In this controller, `comparand` is a fixed value. It is easiest to
+// let existing state-based methods, which expect variable selector option
+// value, do the work, rather than coding a special solution for this case.
+// Hence this:
+const comparand = {
+  value: {
+    representative: {
+      variable_id: 'pr',
+      variable_name: 'Precipitation',
+      multi_year_mean: true
+    }
+  }
+};
+
+export default class PrecipAppController extends React.Component {
+  state = {
+    model: undefined,
+    scenario: undefined,
+    variable: undefined,
+    area: undefined,  // geojson object
+  };
+
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
+  handleChangeArea = setState(this, 'area');
+  handleChangeModel = setState(this, 'model');
+  handleChangeScenario = setState(this, 'scenario');
+  handleChangeVariable = setState(this, 'variable');
+
+  render() {
+    console.log('### PrecipAppController')
+    return (
+      <WmdPrecipAppControllerDisplay
+        ensemble_name={ensemble_name(this.props)}
+        {...this.state}
+        comparand={comparand}
+        onChangeArea={this.handleChangeArea}
+        onChangeModel={this.handleChangeModel}
+        onChangeScenario={this.handleChangeScenario}
+        onChangeVariable={this.handleChangeVariable}
+      />
     );
   }
 }

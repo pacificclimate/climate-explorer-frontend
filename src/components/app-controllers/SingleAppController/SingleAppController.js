@@ -1,7 +1,7 @@
 /***************************************************************
  * SingleAppController.js 
  * 
- * This controller represent climate explorer's main portal. It
+ * This controller represents climate explorer's main portal. It
  * has dropdowns to allow a user to select a model, emission
  * scenario, and variable. It loads and filters metadata for 
  * the selected datasets and passes them to its children:  
@@ -9,9 +9,9 @@
  * - SingleDataController (displays graphs and a statistical table).
  ***************************************************************/
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, ControlLabel, Grid, Panel, Row } from 'react-bootstrap';
-import Loader from 'react-loader';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import SingleDataController
@@ -35,90 +35,45 @@ import FilteredDatasetsSummary
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary
   from '../../data-presentation/UnfilteredDatasetsSummary';
-import { getMetadata } from '../../../data-services/ce-backend';
 
 import {
   ensemble_name, filterOutMonthlyMym,
   findModelNamed, findScenarioIncluding, findVariableMatching,
   representativeValue, constraintsFor, filterMetaBy,
-  setState,
+  setState, withMetadata,
 } from '../common';
 
 
-export default class SingleAppController extends React.Component {
-  // To manage fetching of metadata, this component follows React best practice:
-  // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
-  // This affects how initial state is defined (`ensemble_name`) and what
-  // is done in lifecycle hooks. The value determining whether data should
-  // be fetched is `ensemble_name(props)`. (Therefore, unlike the example in
-  // the React documentation, it not a single prop value, but it is derived
-  // directly from the props). The value managed is `this.state.meta`.
-  // TODO: Async data fetching is common to all app controllers and can
-  //  almost certainly be factored out as a HOC to be applied to simpler,
-  //  more app-specific components.
+class SingleAppControllerDisplay extends React.Component {
+  // This is a pure (state-free), controlled component that renders the
+  // entire content of SingleAppController, including the controls.
+  // It is wrapped by `withMetadata` to inject the asynchronously fetched
+  // metadata that it needs.
 
-  state = {
-    prev_ensemble_name: undefined,
-
-    model: undefined,
-    scenario: undefined,
-    variable: undefined,
-
-    area: undefined,  // geojson object
-    meta: null,
+  static propTypes = {
+    ensemble_name: PropTypes.string,
+    model: PropTypes.object,
+    scenario: PropTypes.object,
+    variable: PropTypes.object,
+    area: PropTypes.object,
+    onChangeModel: PropTypes.func,
+    onChangeScenario: PropTypes.func,
+    onChangeVariable: PropTypes.func,
+    onChangeArea: PropTypes.func,
+    meta: PropTypes.array,
   };
-
-  static getDerivedStateFromProps(props, state) {
-    // Store prev_ensemble_name in state so we can compare when props change.
-    // Clear out previously-loaded data (so we don't render stale stuff).
-    const new_ensemble_name = ensemble_name(props);
-    if (new_ensemble_name !== state.prev_ensemble_name) {
-      return {
-        meta: null,
-        prev_ensemble_name: new_ensemble_name,
-      };
-    }
-
-    // No state update necessary
-    return null;
-  }
-
-  componentDidMount() {
-    this.fetchMetadata(ensemble_name(this.props));
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.meta === null) {
-      this.fetchMetadata(ensemble_name(this.props));
-    }
-  }
-
-  fetchMetadata(ensemble_name) {
-    getMetadata(ensemble_name)
-      // Prefilter metadata to show only items we want in this portal.
-      .then(filterOutMonthlyMym)
-      .then(meta => this.setState({ meta }));
-  }
-
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleSetArea = setState(this, 'area');
-  handleChangeModel = setState(this, 'model');
-  handleChangeScenario = setState(this, 'scenario');
-  handleChangeVariable = setState(this, 'variable');
 
   replaceInvalidModel = findModelNamed('PCIC12');
   replaceInvalidScenario = findScenarioIncluding('rcp85');
   replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
 
-  representativeValue = (...args) => representativeValue(...args)(this.state);
-  constraintsFor = (...args) => constraintsFor(...args)(this.state);
+  representativeValue = (...args) => representativeValue(...args)(this.props);
+  constraintsFor = (...args) => constraintsFor(...args)(this.props);
   filterMetaBy = (...args) =>
-    filterMetaBy(...args)(this.state)(this.state.meta);
+    filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    if (this.state.meta === null) {
-      return <Loader/>;
-    }
+    console.log('### SingleAppControllerDisplay')
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
@@ -130,7 +85,7 @@ export default class SingleAppController extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <UnfilteredDatasetsSummary meta={this.state.meta} />
+            <UnfilteredDatasetsSummary meta={this.props.meta} />
           </FullWidthCol>
         </Row>
 
@@ -151,29 +106,29 @@ export default class SingleAppController extends React.Component {
                   <Col lg={2} md={2}>
                     <ControlLabel>{modelSelectorLabel}</ControlLabel>
                     <ModelSelector
-                      bases={this.state.meta}
-                      value={this.state.model}
-                      onChange={this.handleChangeModel}
+                      bases={this.props.meta}
+                      value={this.props.model}
+                      onChange={this.props.onChangeModel}
                       replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
                   <Col lg={2} md={2}>
                     <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
                     <EmissionsScenarioSelector
-                      bases={this.state.meta}
+                      bases={this.props.meta}
                       constraint={this.constraintsFor('model')}
-                      value={this.state.scenario}
-                      onChange={this.handleChangeScenario}
+                      value={this.props.scenario}
+                      onChange={this.props.onChangeScenario}
                       replaceInvalidValue={this.replaceInvalidScenario}
                     />
                   </Col>
                   <Col lg={4} md={4}>
                     <ControlLabel>{variableSelectorLabel}</ControlLabel>
                     <VariableSelector
-                      bases={this.state.meta}
+                      bases={this.props.meta}
                       constraint={this.constraintsFor('model', 'scenario')}
-                      value={this.state.variable}
-                      onChange={this.handleChangeVariable}
+                      value={this.props.variable}
+                      onChange={this.props.onChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
@@ -216,24 +171,59 @@ export default class SingleAppController extends React.Component {
               experiment={experiment}
               variable_id={variable_id}
               meta = {filteredMeta}
-              area={this.state.area}
+              area={this.props.area}
               onSetArea={this.handleSetArea}
             />
           </HalfWidthCol>
           <HalfWidthCol>
             <SingleDataController
-              ensemble_name={ensemble_name(this.props)}
+              ensemble_name={this.props.ensemble_name}
               model_id={model_id}
               variable_id={variable_id}
               experiment={experiment}
-              area={g.geojson(this.state.area).toWKT()}
+              area={g.geojson(this.props.area).toWKT()}
               meta = {filteredMeta}
               contextMeta={modelContextMetadata} //to generate Model Context graph
             />
           </HalfWidthCol>
         </Row>
       </Grid>
+    );
+  }
+}
 
+
+// Inject asynchronously fetched metadata into controlled component.
+const WmdSingleAppControllerDisplay = withMetadata(SingleAppControllerDisplay);
+
+
+export default class SingleAppController extends React.Component {
+  // This manages the state of selectors and renders the display component.
+
+  state = {
+    model: undefined,
+    scenario: undefined,
+    variable: undefined,
+    area: undefined,  // geojson object
+  };
+
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
+  handleChangeArea = setState(this, 'area');
+  handleChangeModel = setState(this, 'model');
+  handleChangeScenario = setState(this, 'scenario');
+  handleChangeVariable = setState(this, 'variable');
+
+  render() {
+    console.log('### SingleAppController')
+    return (
+      <WmdSingleAppControllerDisplay
+        ensemble_name={ensemble_name(this.props)}
+        {...this.state}
+        onChangeArea={this.handleChangeArea}
+        onChangeModel={this.handleChangeModel}
+        onChangeScenario={this.handleChangeScenario}
+        onChangeVariable={this.handleChangeVariable}
+      />
     );
   }
 }

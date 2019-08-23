@@ -21,6 +21,13 @@ import reduce from 'lodash/fp/reduce';
 import assign from 'lodash/fp/assign';
 import _ from 'lodash';
 import sortBy from 'lodash/fp/sortBy';
+import withAsyncData from '../../HOCs/withAsyncData';
+import { getMetadata } from '../../data-services/ce-backend';
+
+
+// Generic state setter (alas, side effects)
+export const setState = (this_, name) =>
+  value => this_.setState({ [name]: value });
 
 
 // Get the ensemble name from props (as passed to an app controller),
@@ -88,6 +95,11 @@ export const filterMetaBy = (...optionNames) => options => meta => {
 };
 
 
-// Generic state setter
-export const setState = (this_, name) =>
-    value => this_.setState({ [name]: value });
+const loadMetadata = ensemble_name =>
+  // Prefilter metadata to show only items we want in this portal.
+  getMetadata(ensemble_name).then(filterOutMonthlyMym);
+
+// A HOC to inject asynchronously fetched metadata.
+export const withMetadata = withAsyncData(
+  loadMetadata, 'ensemble_name', 'meta'
+);
