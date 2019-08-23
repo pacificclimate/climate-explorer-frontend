@@ -55,8 +55,8 @@ export default function AnomalyAnnualCycleGraph(props) {
     //used (usually 1981 - 2010). if there are two equally recent datasets
     //(such as 1971-2000 and 1981-2000) for some reason, one will be arbitrarily selected.
     let historicalMetadatas = getDateRangeMetadatas(undefined, currentYear());
-    const end_date = _.max(_.map(historicalMetadatas, "end_date"));
-    historicalMetadatas = _.filter(historicalMetadatas, {"end_date": end_date});
+    const end_date = _.maxBy(_.map(historicalMetadatas, 'end_date'), v => +v);
+    historicalMetadatas = _.filter(historicalMetadatas, { end_date });
 
     //pick the highest-resolution dataset available for that climatology
     const baselineMetadata = _.find(historicalMetadatas, {timescale: "monthly"})
