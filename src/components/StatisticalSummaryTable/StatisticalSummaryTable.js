@@ -1,6 +1,8 @@
 // Statistical Summary Table: Panel containing a Data Table viewer component
 // showing statistical information for each climatology period or timeseries.
 
+// TODO: Use HOC `withAsyncData` to manage fetching data
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Panel, ControlLabel } from 'react-bootstrap';
@@ -133,7 +135,8 @@ export default class StatisticalSummaryTable extends React.Component {
       });
     }).catch(dataError => {
       this.setState({
-        // Do we have to set data non-null here to prevent infinite update loop?
+        // Set data non-null here to prevent infinite update loop.
+        data: undefined,
         fetchingData: false,
         dataError,
       });
@@ -175,7 +178,6 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   render() {
-    console.log('### Stats Summary Tbl')
     return (
       <Panel>
         <Panel.Heading>
