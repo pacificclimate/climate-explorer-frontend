@@ -17,7 +17,6 @@ import { MEVSummary } from '../data-presentation/MEVSummary';
 import styles from './StatisticalSummaryTable.module.css';
 import { getStats } from '../../data-services/ce-backend';
 import {
-  defaultTimeOfYear,
   parseBootstrapTableData,
   timeKeyToResolutionIndex,
   timeResolutions,
@@ -63,7 +62,6 @@ export default class StatisticalSummaryTable extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.meta !== state.prevMeta || props.area !== state.prevArea) {
-      const timeOfYear = defaultTimeOfYear(timeResolutions(props.meta))
       return {
         prevMeta: props.meta,
         prevArea: props.area,
