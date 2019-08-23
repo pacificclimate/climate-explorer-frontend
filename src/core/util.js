@@ -224,27 +224,6 @@ export function getDataUnits(data, variable_id) {
 }
 
 /************************************************************
- * Data spec helper functions
- ************************************************************/
-
-/*
- * Determine a valid default data spec given a set of metadata
- * and model, variable, and experiment values.
- *
- * Prefers the highest-resolution data available
- */
-export function defaultDataSpec({ meta, model_id, variable_id, experiment }) {
-  for (const timescale of ['monthly', 'seasonal', 'yearly']) {
-    const matchingMetadata =
-      _.find(meta, { model_id, variable_id, experiment, timescale });
-    if (matchingMetadata) {
-      return _.pick(matchingMetadata,
-        'start_date', 'end_date', 'ensemble_member');
-    }
-  }
-}
-
-/************************************************************
  * Metadata helper functions
 ************************************************************/
 
@@ -363,23 +342,6 @@ export function timeResolutions(meta) {
     seasonal: _.includes(timescales, 'seasonal'),
     yearly: _.includes(timescales, 'yearly'),
   };
-}
-
-export function defaultTimeOfYear({ monthly, seasonal, yearly }) {
-  // Given a set of flags indicating the timescales present,
-  // return an object giving the default timescale and time index.
-  // The default timescale is the highest-resolution one present;
-  // the default time index is the first item in the default timescale.
-  if (monthly) {
-    return 0;  // January
-  }
-  if (seasonal) {
-    return 12;  // Winter
-  }
-  if (yearly) {
-    return 16;  // Annual
-  }
-  return undefined;
 }
 
 /*
