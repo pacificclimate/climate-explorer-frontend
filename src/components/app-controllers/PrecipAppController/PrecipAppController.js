@@ -30,39 +30,27 @@ import {
 import g from '../../../core/geo';
 import PrecipMapController from '../../map-controllers/PrecipMapController';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
+import FilteredDatasetsSummary from
+    '../../data-presentation/FilteredDatasetsSummary';
 
-
-import _ from 'lodash';
 import FlowArrow from '../../data-presentation/FlowArrow';
-import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
+import UnfilteredDatasetsSummary from
+    '../../data-presentation/UnfilteredDatasetsSummary';
 import { getMetadata } from '../../../data-services/ce-backend';
-import filter from 'lodash/fp/filter';
-import find from 'lodash/fp/find';
-import flatMap from 'lodash/fp/flatMap';
-import get from 'lodash/fp/get';
-import flow from 'lodash/fp/flow';
-import flatten from 'lodash/fp/flatten';
-import map from 'lodash/fp/map';
-import reduce from 'lodash/fp/reduce';
-import assign from 'lodash/fp/assign';
-import sortBy from 'lodash/fp/sortBy';
 import {
   EmissionsScenarioSelector,
   ModelSelector, VariableSelector
 } from 'pcic-react-components';
 
-// TODO: Extract to utility module.
-function ensemble_name(props) {
-  return (
-    (props.match && props.match.params && props.match.params.ensemble_name) ||
-    props.ensemble_name ||
-    process.env.REACT_APP_CE_ENSEMBLE_NAME
-  );
-}
+import {
+  ensemble_name, filterOutMonthlyMym,
+  findModelNamed, findScenarioIncluding, findVariableMatching,
+  representativeValue, constraintsFor, filterMetaBy,
+  setState,
+} from '../common';
+
 
 export default class PrecipAppController extends React.Component {
-
   // To manage fetching of metadata, this component follows React best practice:
   // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
   // This affects how initial state is defined (`ensemble_name`) and what
@@ -70,6 +58,9 @@ export default class PrecipAppController extends React.Component {
   // be fetched is `ensemble_name(props)`. (Therefore, unlike the example in
   // the React documentation, it not a single prop value, but it is derived
   // directly from the props). The value managed is `this.state.meta`.
+  // TODO: Async data fetching is common to all app controllers and can
+  //  almost certainly be factored out as a HOC to be applied to simpler,
+  //  more app-specific components.
 
   state = {
     prev_ensemble_name: undefined,
@@ -125,101 +116,34 @@ export default class PrecipAppController extends React.Component {
 
   fetchMetadata(ensemble_name) {
     getMetadata(ensemble_name)
-    // Prefilter metadata to show only items we want in this portal.
-    // TODO: Extract this to a common component
-      .then(filter(
-        m => !(m.multi_year_mean === false && m.timescale === 'monthly')
-      ))
+      .then(filterOutMonthlyMym)
       .then(meta => this.setState({ meta }))
     ;
   }
 
-  handleSetArea = (geojson) => {
-    this.setState({ area: geojson });
-  };
-
-  handleChangeModel = (model) => {
-    this.setState({ model });
-  };
-
-  // TODO: Extract (common)
-  // Default to first option if cannot be found
-  replaceInvalidModel = (options, value) => {
-    return find({ value: { representative: { model_id: 'CanESM2' }}})(options);
-  };
-
-  handleChangeScenario = (scenario) => {
-    this.setState({ scenario });
-  };
-
-  // TODO: Extract (common)
-  replaceInvalidScenario = (options, value) => {
-    return find(
-      opt => opt.value.representative.experiment.includes('rcp85')
-    )(options);
-  };
-
-  handleChangeVariable = (variable) => {
-    this.setState({ variable });
-  };
-
-  // TODO: Extract (common)
-  replaceInvalidVariable = (options, value) => {
-    const flatOptions = flatMap('options', options);
-    const option = find(this.state.comparand)(flatOptions);
-    return option;
-  };
-
-  // TODO: Factor this out (used in other components)
-  representativeValue = (optionName, valueName) => {
-    // Extract a value from the representative for a named option.
-    return get([optionName, 'value', 'representative', valueName])(this.state);
-  };
-
-  // TODO: Extract (common)
-  constraintsFor = (...optionNames) => {
-    // Returns an object containing the union of all representatives of the
-    // options named in the arguments (e.g., 'model', 'scenario').
-    // Returned object is suitable as a constraint for a
-    // `SimpleConstraintGroupingSelector`.
-    return flow(
-      flatten,
-      map(name => this.state[name]),
-      map(option => option && option.value.representative),
-      reduce((result, value) => assign(result, value), {})
-    )(optionNames)
-  };
-
-  // TODO: Extract (common)
-  filterMetaBy = (...optionNames) => {
-    // Return a filtered subset of `this.meta`, based on the selected
-    // model, emissions scenario, and variable.
-    //
-    // Initially, selectors are undefined, and go through a cascading defaulting
-    // process that eventually settles with a defined value for all of them.
-    // Returning a metadata set that is filtered by a partially settled
-    // selector set causes problems in client components. This function
-    // returns the empty array unless a full set of constraints (derived from
-    // selectors) is available.
-    const settled = _.allDefined(this.state, ...optionNames);
-    if (!settled) {
-      return [];
-    }
-    return flow(
-      filter(this.constraintsFor(...optionNames)),
-      sortBy('unique_id')
-    )(this.state.meta);
-  };
-
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
+  handleSetArea = setState(this, 'area');
+  handleChangeModel = setState(this, 'model');
+  handleChangeScenario = setState(this, 'scenario');
+  handleChangeVariable = setState(this, 'variable');
+
+  replaceInvalidModel = findModelNamed('CanESM2');
+  replaceInvalidScenario = findScenarioIncluding('rcp85');
+  replaceInvalidVariable = findVariableMatching(this.state.comparand);
+
+  representativeValue = (...args) => representativeValue(...args)(this.state);
+  constraintsFor = (...args) => constraintsFor(...args)(this.state);
+  filterMetaBy = (...args) => filterMetaBy(...args)(this.state)(this.state.meta);
+
   render() {
     if (this.state.meta === null) {
       return <Loader/>;
     }
 
-    const filteredMetaVariable = this.filterMetaBy('model', 'scenario', 'variable');
-    const filteredMetaComparand = this.filterMetaBy('model', 'scenario', 'comparand');
+    const filteredMetaVariable =
+      this.filterMetaBy('model', 'scenario', 'variable');
+    const filteredMetaComparand =
+      this.filterMetaBy('model', 'scenario', 'comparand');
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');
