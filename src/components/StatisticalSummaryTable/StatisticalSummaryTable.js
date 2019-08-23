@@ -10,7 +10,7 @@ import { Row, Col, Panel, ControlLabel } from 'react-bootstrap';
 import _ from 'lodash';
 
 import DataTable from '../DataTable/DataTable';
-import TimeOfYearSelector from '../Selector/NewTimeOfYearSelector';
+import TimeOfYearSelector from '../Selector/TimeOfYearSelector';
 import ExportButtons from '../graphs/ExportButtons';
 import { statsTableLabel, timeOfYearSelectorLabel } from
     '../guidance-content/info/InformationItems';
