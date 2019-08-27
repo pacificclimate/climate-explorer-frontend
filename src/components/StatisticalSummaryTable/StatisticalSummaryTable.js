@@ -16,7 +16,6 @@ import { statsTableLabel, timeOfYearSelectorLabel } from
     '../guidance-content/info/InformationItems';
 import { MEVSummary } from '../data-presentation/MEVSummary';
 
-import styles from './StatisticalSummaryTable.module.css';
 import { getStats } from '../../data-services/ce-backend';
 import {
   parseBootstrapTableData,
@@ -27,7 +26,10 @@ import {
 import { errorMessage } from '../graphs/graph-helpers';
 import { exportDataToWorksheet } from '../../core/export';
 
+import styles from './StatisticalSummaryTable.module.css';
 
+
+// TODO: Use `withAsyncData` to factor out common data-fetching code here
 export default class StatisticalSummaryTable extends React.Component {
   static propTypes = {
     model_id: PropTypes.string,
@@ -195,11 +197,14 @@ export default class StatisticalSummaryTable extends React.Component {
         <Panel.Body className={styles.data_panel}>
           <Row>
             <Col lg={6} md={6} sm={6}>
-              <ControlLabel>{timeOfYearSelectorLabel}</ControlLabel>
+              <ControlLabel className={styles.selector_label}>
+                {timeOfYearSelectorLabel}
+              </ControlLabel>
               <TimeOfYearSelector
                 value={this.state.timeOfYear}
                 onChange={this.handleChangeTimeOfYear}
                 {...timeResolutions(this.props.meta)}
+                className={styles.selector}
               />
             </Col>
             <Col lg={6} md={6} sm={6}>

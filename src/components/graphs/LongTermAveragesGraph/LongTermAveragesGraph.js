@@ -32,7 +32,9 @@ import {
 } from '../../../core/util';
 import { getData } from '../../../data-services/ce-backend';
 import { exportDataToWorksheet } from '../../../core/export';
-import { timeOfYearSelectorLabel } from '../../guidance-content/info/InformationItems';
+import { timeOfYearSelectorLabel } from
+    '../../guidance-content/info/InformationItems';
+import styles from './LongTermAveragesGraph.module.css';
 
 export default class LongTermAveragesGraph extends React.Component {
   static propTypes = {
@@ -197,16 +199,18 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
-    console.log('### LTAGraph')
     return (
       <React.Fragment>
         <Row>
           <Col lg={6} md={6} sm={6}>
-            <ControlLabel>{timeOfYearSelectorLabel}</ControlLabel>
+            <ControlLabel className={styles.selector_label}>
+              {timeOfYearSelectorLabel}
+            </ControlLabel>
             <TimeOfYearSelector
               value={this.state.timeOfYear}
               onChange={this.handleChangeTimeOfYear}
               {...timeResolutions(this.props.meta)}
+              className={styles.selector}
             />
           </Col>
           <Col lg={6} md={6} sm={6}>

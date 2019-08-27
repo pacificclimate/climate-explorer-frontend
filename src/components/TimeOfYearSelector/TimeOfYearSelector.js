@@ -38,7 +38,7 @@ export default class TimeOfYearSelector extends React.Component {
   };
 
   render() {
-    const { monthly, seasonal, yearly } = this.props;
+    const { value, onChange, monthly, seasonal, yearly, ...rest } = this.props;
     const options = fp.mapWithKey(
       (label, index) => ({
         label,
@@ -57,6 +57,7 @@ export default class TimeOfYearSelector extends React.Component {
       onChange={this.props.onChange}
       isInvalidValue={isInvalidValue}
       replaceInvalidValue={replaceInvalidValue(options)}
+      {...rest}
     />
   }
 }
