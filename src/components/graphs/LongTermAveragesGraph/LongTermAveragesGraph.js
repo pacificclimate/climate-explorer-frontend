@@ -16,7 +16,7 @@ import { Row, Col, ControlLabel } from 'react-bootstrap';
 
 import _ from 'lodash';
 
-import TimeOfYearSelector from '../../TimeOfYearSelector';
+import { TimeOfYearSelector } from 'pcic-react-components';
 import DataGraph from '../DataGraph/DataGraph';
 import ExportButtons from '../ExportButtons';
 
