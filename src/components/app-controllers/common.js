@@ -44,16 +44,28 @@ export const filterOutMonthlyMym = filter(
 );
 
 
-export const findModelNamed = model_id =>
-  find({ value: { representative: { model_id }}});
+// Default-value replacers for selectors for model, emissions scenario,
+// and variable.
+
+// Warning: This will fail, with an infinite update loop, if there is no
+// enabled option.
+const fallback = options => find(opt => !opt.isDisabled)(options);
+
+export const findModelNamed = model_id => options =>
+  find({ value: { representative: { model_id }}})(options) ||
+  fallback(options);
 
 
-export const findScenarioIncluding = s =>
-  find(opt => opt.value.representative.experiment.includes(s));
+export const findScenarioIncluding = s => options =>
+  find(opt => opt.value.representative.experiment.includes(s))(options) ||
+  fallback(options);
 
 
-export const findVariableMatching = match =>
-  flow(flatMap('options'), find(match));
+export const findVariableMatching = match => options => {
+  const flattenOptions = flatMap('options');
+  return flow(flattenOptions, find(match))(options) ||
+    fallback(flattenOptions(options));
+};
 
 
 // Extract a value from the representative for a named option in source.
@@ -69,7 +81,7 @@ export const constraintsFor = (...optionNames) => options =>
   flow(
     flatten,
     map(name => options[name]),
-    map(option => option && option.value.representative),
+    map(option => option && option.value && option.value.representative),
     reduce((result, value) => assign(result, value), {})
   )(optionNames);
 
