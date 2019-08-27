@@ -31,7 +31,7 @@
     "leaflet-image": "^0.4.0",
     "lodash": "^4.17.14",
     "moment": "^2.10.6",
-    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.0.0",
+    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
     "proj4": "^2.4.4",
     "proj4leaflet": "^1.0.2",
