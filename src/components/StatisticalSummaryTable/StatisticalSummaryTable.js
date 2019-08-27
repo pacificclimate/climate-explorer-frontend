@@ -120,12 +120,15 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   fetchData() {
+    if (!this.state.timeOfYear) {
+      // Don't fetch data when ToY hasn't settled yet.
+      return;
+    }
     this.setState({ fetchingData: true });
     const metadata = {
       ..._.pick(this.props,
         'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'),
-      ...timeKeyToResolutionIndex(
-        this.state.timeOfYear && this.state.timeOfYear.value),
+      ...timeKeyToResolutionIndex(this.state.timeOfYear.value),
     };
     this.getAndValidateData(metadata)
     .then(data => {
