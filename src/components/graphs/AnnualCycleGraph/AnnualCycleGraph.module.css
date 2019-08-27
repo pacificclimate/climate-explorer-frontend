@@ -1,16 +1,8 @@
 .selector_label {
-    /*color: red;*/
-    /*display: inline-block;*/
     margin-right: 1em;
 }
 
 .selector {
     display: inline-block;
     width: 80%;
-}
-
-.selector_wrapper {
-    border: 1px solid red;
-    display: inline-block;
-    width: 100%;
 }
