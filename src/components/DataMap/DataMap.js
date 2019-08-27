@@ -80,7 +80,6 @@ import { EditControl } from 'react-leaflet-draw';
 import GeoLoader from '../GeoLoader';
 import GeoExporter from '../GeoExporter';
 
-import './DataMap.css';
 import { getLayerMinMax } from '../../data-services/ncwms';
 import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
 import CanadaBaseMap from '../CanadaBaseMap';
@@ -93,6 +92,9 @@ import StaticControl from '../StaticControl';
 
 import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 import LayerOpacityControl from '../LayerOpacityControl';
+
+import './DataMap.css';
+
 
 class DataMap extends React.Component {
   static propTypes = {
