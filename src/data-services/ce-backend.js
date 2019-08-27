@@ -53,6 +53,7 @@ function getTimeMetadata(uniqueId) {
   return axios({
     baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'metadata'),
     params: {
+      // Note misleading naming: Param model_id is actually unique_id. FFS.
       model_id: uniqueId,
     },
   });
