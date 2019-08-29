@@ -4,7 +4,7 @@
 # version information to the build which is triggered when the image is run.
 # To do this, issue the following build command:
 #
-# docker build --build-arg REACT_APP_CE_CURRENT_VERSION=$(./generate-commitish.sh)
+# docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
 # At this moment, Node.js 10.16 LTS is recommended for most users.
 #
