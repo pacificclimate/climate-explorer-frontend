@@ -52,7 +52,8 @@ Environment variables for configuring the app are:
 
 `REACT_APP_CE_CURRENT_VERSION`
 * Current version of the app.
-* This value is set automatically by the Dockerfile (via `./entrypoint.sh`)
+* This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
+* It is not recommended to manually override the automatically generated value when the image is run.
 * No default value for this variable is provided in any `.env` file.
 
 `REACT_APP_CE_BACKEND_URL`
@@ -235,8 +236,14 @@ of the name and just using `climate-explorer-frontend`.
 Build a docker image:
 
 ```bash
-docker build -t climate-explorer-frontend .
+docker build -t climate-explorer-frontend \
+    --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" .
 ```
+
+Setting build arg `REACT_APP_CE_CURRENT_VERSION` as above is the most reliable
+way to inject an accurate version into the final app. This value can be overridden
+when the image is run, but it is not recommended, as it introduces the possibility 
+of error.
 
 #### Tag docker image
 
@@ -279,12 +286,6 @@ All are given standard development and production values in the files
 `.env`, `.env.development`, and `.env.production`.
 
 These can be overridden at run time by providing them in the `docker run` command (`-e` option).
-
-The only environment variable that must be set outside of the `.env` files is:
-
-* `REACT_APP_CE_CURRENT_VERSION` 
-  * (If no value is set for this variable, the app still works, but the version
-    cannot be displayed in the Help.)
 
 In addition, we mount the configuration files as volumes in the container.
 This enables us to update these files without rebuilding or redeploying the app. 
