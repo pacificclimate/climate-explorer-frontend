@@ -52,7 +52,7 @@ Environment variables for configuring the app are:
 
 `REACT_APP_CE_CURRENT_VERSION`
 * Current version of the app.
-* In production, suggested value is release semver, e.g., 2.0.1.
+* This value is set automatically by the Dockerfile (via `./entrypoint.sh`)
 * No default value for this variable is provided in any `.env` file.
 
 `REACT_APP_CE_BACKEND_URL`
@@ -296,7 +296,6 @@ Typical production run:
 docker run --restart=unless-stopped -d 
   -e PUBLIC_URL=<deployment url, including base path>
   -e REACT_APP_CE_BASE_PATH=<deployment base path>
-  -e REACT_APP_CE_CURRENT_VERSION=<semver>
   -e <other env variable>=<value>
   -p <external port>:8080 
   --name climate-explorer-frontend
