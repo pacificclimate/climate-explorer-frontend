@@ -17,9 +17,10 @@ import {
   errorMessage,
   loadingDataGraphSpec,
 } from '../graph-helpers';
-import get from 'lodash/fp/get';
 import { datasetSelectorLabel } from
     '../../guidance-content/info/InformationItems';
+import { representativeValue } from '../../../core/selectors';
+import { setNamedState } from '../../../core/react-component-utils';
 import styles from './AnnualCycleGraph.module.css';
 
 
@@ -135,11 +136,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   // Data fetching
 
-  // TODO: Factor this out (used in other components)
-  representativeValue = (optionName) => {
-    // Extract a value from the representative for a named option.
-    return get([optionName, 'value', 'representative'])(this.state);
-  };
+  representativeValue = (...args) => representativeValue(...args)(this.state);
 
   getAndValidateData = (metadata) => (
     getTimeseries(metadata, this.props.area)
@@ -175,9 +172,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   // User event handlers
 
-  handleChangeDataspec = (dataspec) => {
-    this.setState({ dataspec });
-  };
+  handleChangeDataspec = setNamedState(this, 'dataspec');
 
   exportData(format) {
     exportDataToWorksheet(
