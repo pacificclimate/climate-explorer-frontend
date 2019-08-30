@@ -73,7 +73,6 @@ class SingleAppControllerDisplay extends React.Component {
     filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    console.log('### SingleAppControllerDisplay')
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
     const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
 
@@ -214,7 +213,6 @@ export default class SingleAppController extends React.Component {
   handleChangeVariable = setState(this, 'variable');
 
   render() {
-    console.log('### SingleAppController')
     return (
       <WmdSingleAppControllerDisplay
         ensemble_name={ensemble_name(this.props)}

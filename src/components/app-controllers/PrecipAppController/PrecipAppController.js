@@ -240,7 +240,6 @@ export default class PrecipAppController extends React.Component {
   handleChangeVariable = setState(this, 'variable');
 
   render() {
-    console.log('### PrecipAppController')
     return (
       <WmdPrecipAppControllerDisplay
         ensemble_name={ensemble_name(this.props)}

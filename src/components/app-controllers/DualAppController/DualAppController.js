@@ -80,7 +80,6 @@ class DualAppControllerDisplay extends React.Component {
     filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    console.log('### DualAppControllerDisplay')
     const filteredMetaVariable =
       this.filterMetaBy('model', 'scenario', 'variable');
     const filteredMetaComparand =
@@ -247,7 +246,6 @@ export default class DualAppController extends React.Component {
   handleChangeComparand = setState(this, 'comparand');
 
   render() {
-    console.log('### DualAppController')
     return (
       <WmdDualAppControllerDisplay
         ensemble_name={ensemble_name(this.props)}
