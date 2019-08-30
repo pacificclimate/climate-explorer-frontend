@@ -16,91 +16,88 @@
  * comparand lacks data, it won't be displayed.
  ************************************************************************/
 
+import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import { Grid, Row, Col, Panel } from 'react-bootstrap';
+import { Grid, Row, Col, Panel, ControlLabel } from 'react-bootstrap';
 
 import DualDataController from '../../data-controllers/DualDataController/DualDataController';
-import Selector from '../../Selector';
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel,
-  variable1SelectorLabel, variable2SelectorLabel, datasetFilterPanelLabel,
+  modelSelectorLabel,
+  emissionScenarioSelectorLabel,
+  variable1SelectorLabel,
+  variable2SelectorLabel,
+  datasetFilterPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
-import AppMixin from '../../AppMixin';
 import g from '../../../core/geo';
 import DualMapController from '../../map-controllers/DualMapController';
-import VariableDescriptionSelector from '../../VariableDescriptionSelector';
 import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
 import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
 
-import _ from 'lodash';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
+import {
+  EmissionsScenarioSelector,
+  ModelSelector, VariableSelector
+} from 'pcic-react-components';
+import { getMetadata } from '../../../data-services/ce-backend';
+import {
+  ensemble_name,
+} from '../common';
+import { setNamedState } from '../../../core/react-component-utils';
+import withAsyncMetadata from '../../../HOCs/withAsyncMetadata';
+import {
+  findModelNamed, findScenarioIncluding, findVariableMatching,
+  representativeValue, constraintsFor, filterMetaBy,
+} from '../../../core/selectors';
 
-export default createReactClass({
-  displayName: 'DualAppController',
 
-  /*
-   * Initial state is set after the multimeta API query run in AppMixin.componentDidMount()
-   * State provided by componentDidMount():
-   *  - model_id
-   *  - variable_id
-   *  - experiment
-   *  - meta
-   */
+class DualAppControllerDisplay extends React.Component {
+  // This is a pure (state-free), controlled component that renders the
+  // entire content of DualAppController, including the controls.
+  // It is wrapped by `withAsyncMetadata` to inject the asynchronously fetched
+  // metadata that it needs.
 
-  mixins: [AppMixin],
+  static propTypes = {
+    ensemble_name: PropTypes.string,
+    model: PropTypes.object,
+    scenario: PropTypes.object,
+    variable: PropTypes.object,
+    comparand: PropTypes.object,
+    area: PropTypes.object,
+    onChangeModel: PropTypes.func,
+    onChangeScenario: PropTypes.func,
+    onChangeVariable: PropTypes.func,
+    onChangeComparand: PropTypes.func,
+    onChangeArea: PropTypes.func,
+    meta: PropTypes.array,
+  };
 
-  //This function filters out datasets inappropriate for this portal. A dataset
-  //the filter returns "false" on will be removed.
-  //Filters out multi-year monthly datasets; too noisy to be useful.
-  datasetFilter: function (datafile) {
-    return !(datafile.multi_year_mean == false && datafile.timescale == "monthly");
-  },
+  replaceInvalidModel = findModelNamed('PCIC12');
+  replaceInvalidScenario = findScenarioIncluding('rcp85');
+  replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
 
-  //because componentDidMount() is shared by all three App Controllers via a 
-  //mixin, it doesn't set the initial state of DualController's unique comparison
-  //variable (comparand_id), which is handled seperately here.
-  componentDidUpdate: function (prevProps, prevState) {
-    if(!this.state.comparand_id) {//comparand uninitialized
-      this.setState({
-        comparand_id: this.state.variable_id,
-        comparand_name: this.state.variable_name
-      });
-    }
-    else if(!_.includes(_.map(this.state.meta, "variable_id"), this.state.comparand_id)) {
-      //comparand leftover from previous ensemble; not present in current one
-      this.setState({
-        comparand_id: this.state.variable_id,
-        comparand_name: this.state.variable_name
-      });
-    }
-  },
+  representativeValue = (...args) => representativeValue(...args)(this.props);
+  constraintsFor = (...args) => constraintsFor(...args)(this.props);
+  filterMetaBy = (...args) =>
+    filterMetaBy(...args)(this.props)(this.props.meta);
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  render: function () {
-    //hierarchical data selection: model, then experiments (filtered by model),
-    // then variable (filtered by model and experiments),
-    // then comparison variable (filtered by model and experiment, must be MYM if var is.)
-    var modOptions = this.getMetadataItems('model_id');
-    var expOptions = this.markDisabledMetadataItems(this.getMetadataItems('experiment'),
-        this.getFilteredMetadataItems('experiment', {model_id: this.state.model_id}));
-    var selectedVariable = _.find(this.state.meta, { model_id: this.state.model_id,
-                                                          variable_id: this.state.variable_id,
-                                                          experiment: this.state.experiment });
-    let comparandConstraints = _.pick(this.state, 'model_id', 'experiment');
-    comparandConstraints.multi_year_mean = selectedVariable ? selectedVariable.multi_year_mean : true;
+  render() {
+    const filteredMetaVariable =
+      this.filterMetaBy('model', 'scenario', 'variable');
+    const filteredMetaComparand =
+      this.filterMetaBy('model', 'scenario', 'comparand');
 
-    const filteredMeta = this.getFilteredMeta();
-    const filteredComparandMeta = this.getFilteredMeta(this.state.comparand_id, this.state.comparand_name);
+    const model_id = this.representativeValue('model', 'model_id');
+    const experiment = this.representativeValue('scenario', 'experiment');
+    const variable_id = this.representativeValue('variable', 'variable_id');
+    const comparand_id = this.representativeValue('comparand', 'variable_id');
 
     return (
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <UnfilteredDatasetsSummary meta={this.state.meta} />
+            <UnfilteredDatasetsSummary meta={this.props.meta} />
           </FullWidthCol>
         </Row>
 
@@ -119,37 +116,42 @@ export default createReactClass({
               <Panel.Body>
                 <Row>
                   <Col lg={2} md={2}>
-                    <Selector
-                      label={modelSelectorLabel}
-                      onChange={this.updateSelection.bind(this, 'model_id')}
-                      items={modOptions}
-                      value={this.state.model_id}
+                    <ControlLabel>{modelSelectorLabel}</ControlLabel>
+                    <ModelSelector
+                      bases={this.props.meta}
+                      value={this.props.model}
+                      onChange={this.props.onChangeModel}
+                      replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
                   <Col lg={2} md={2}>
-                    <Selector
-                      label={emissionScenarioSelectorLabel}
-                      onChange={this.updateSelection.bind(this, 'experiment')}
-                      items={expOptions}
-                      value={this.state.experiment}
+                    <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
+                    <EmissionsScenarioSelector
+                      bases={this.props.meta}
+                      constraint={this.constraintsFor('model')}
+                      value={this.props.scenario}
+                      onChange={this.props.onChangeScenario}
+                      replaceInvalidValue={this.replaceInvalidScenario}
                     />
                   </Col>
                   <Col lg={3} md={3}>
-                    <VariableDescriptionSelector
-                      label={variable1SelectorLabel}
-                      onChange={this.handleSetVariable.bind(this, "variable")}
-                      meta={this.state.meta}
-                      constraints={{model_id: this.state.model_id, experiment: this.state.experiment}}
-                      value={_.pick(this.state, "variable_id", "variable_name")}
+                    <ControlLabel>{variable1SelectorLabel}</ControlLabel>
+                    <VariableSelector
+                      bases={this.props.meta}
+                      constraint={this.constraintsFor('model', 'scenario')}
+                      value={this.props.variable}
+                      onChange={this.props.onChangeVariable}
+                      replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
                   <Col lg={3} md={3}>
-                    <VariableDescriptionSelector
-                      label={variable2SelectorLabel}
-                      onChange={this.handleSetVariable.bind(this, "comparand")}
-                      meta={this.state.meta}
-                      constraints={comparandConstraints}
-                      value={{variable_id: this.state.comparand_id, variable_name: this.state.comparand_name}}
+                    <ControlLabel>{variable2SelectorLabel}</ControlLabel>
+                    <VariableSelector
+                      bases={this.props.meta}
+                      constraint={this.constraintsFor('model', 'scenario')}
+                      value={this.props.comparand}
+                      onChange={this.props.onChangeComparand}
+                      replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
                 </Row>
@@ -167,12 +169,12 @@ export default createReactClass({
         <Row>
           <FullWidthCol>
             <FilteredDatasetsSummary
-              model_id={this.state.model_id}
-              experiment={this.state.experiment}
-              variable_id={this.state.variable_id}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-              meta={filteredMeta}
-              comparandMeta={filteredComparandMeta}
+              model_id={model_id}
+              experiment={experiment}
+              variable_id={variable_id}
+              comparand_id={comparand_id}
+              meta={filteredMetaVariable}
+              comparandMeta={filteredMetaComparand}
               dual
             />
           </FullWidthCol>
@@ -190,33 +192,73 @@ export default createReactClass({
         <Row>
           <HalfWidthCol>
             <DualMapController
-              variable_id={this.state.variable_id}
-              model_id={this.state.model_id}
-              experiment={this.state.experiment}
-              meta={filteredMeta}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-              comparandMeta={filteredComparandMeta}
-              area={this.state.area}
+              model_id={model_id}
+              experiment={experiment}
+              variable_id={variable_id}
+              meta={filteredMetaVariable}
+              comparand_id={comparand_id}
+              comparandMeta={filteredMetaComparand}
+              area={this.props.area}
               onSetArea={this.handleSetArea}
             />
           </HalfWidthCol>
           <HalfWidthCol>
             <DualDataController
-              ensemble_name={this.state.ensemble_name}
-              model_id={this.state.model_id}
-              variable_id={this.state.variable_id}
-              comparand_id={this.state.comparand_id ? this.state.comparand_id : this.state.variable_id}
-              experiment={this.state.experiment}
-              area={g.geojson(this.state.area).toWKT()}
-              meta={filteredMeta}
+              ensemble_name={this.props.ensemble_name}
+              model_id={model_id}
+              experiment={experiment}
+              variable_id={variable_id}
+              meta={filteredMetaVariable}
+              comparand_id={comparand_id}
               comparandMeta={
-                this.state.comparand_id ? filteredComparandMeta : filteredMeta
+                // TODO: Is this conditional necessary?
+                this.props.comparand ?
+                  filteredMetaComparand :
+                  filteredMetaVariable
               }
+              area={g.geojson(this.props.area).toWKT()}
             />
           </HalfWidthCol>
         </Row>
       </Grid>
-
     );
-  },
-});
+  }
+}
+
+
+// Inject asynchronously fetched metadata into controlled component.
+const WmdDualAppControllerDisplay = withAsyncMetadata(DualAppControllerDisplay);
+
+
+export default class DualAppController extends React.Component {
+  // This manages the state of selectors and renders the display component.
+
+  state = {
+    model: undefined,
+    scenario: undefined,
+    variable: undefined,
+    comparand: undefined,
+    area: undefined,  // geojson object
+  };
+
+  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
+  handleChangeArea = setNamedState(this, 'area');
+  handleChangeModel = setNamedState(this, 'model');
+  handleChangeScenario = setNamedState(this, 'scenario');
+  handleChangeVariable = setNamedState(this, 'variable');
+  handleChangeComparand = setNamedState(this, 'comparand');
+
+  render() {
+    return (
+      <WmdDualAppControllerDisplay
+        ensemble_name={ensemble_name(this.props)}
+        {...this.state}
+        onChangeArea={this.handleChangeArea}
+        onChangeModel={this.handleChangeModel}
+        onChangeScenario={this.handleChangeScenario}
+        onChangeVariable={this.handleChangeVariable}
+        onChangeComparand={this.handleChangeComparand}
+      />
+    );
+  }
+}

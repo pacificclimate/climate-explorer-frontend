@@ -97,6 +97,11 @@ export default class SingleDataController extends React.Component {
   };
 
   render() {
+    // TODO: Improve returned item
+    if (!_.allDefined(this.props, 'model_id', 'experiment', 'variable_id')) {
+      return 'Readying...';
+    }
+
     return (
       // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
       <div>

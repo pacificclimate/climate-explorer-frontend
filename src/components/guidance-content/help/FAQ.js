@@ -11,7 +11,6 @@ export default class FAQ extends React.Component {
 
   render() {
     const faqs = T.get(this.context, 'help.faq.items');
-    console.log('FAQ: faqs =', faqs);
 
     if (!_.isArray(faqs)) {
       return null;

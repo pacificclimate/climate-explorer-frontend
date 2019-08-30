@@ -31,6 +31,7 @@
     "leaflet-image": "^0.4.0",
     "lodash": "^4.17.14",
     "moment": "^2.10.6",
+    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
     "proj4": "^2.4.4",
     "proj4leaflet": "^1.0.2",
@@ -63,7 +64,7 @@
     "start": "react-scripts start",
     "start:rg": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(leaflet|pcic-react-components)/)\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -85,6 +86,7 @@
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-lodash-fp": "^2.2.0-a1",
     "eslint-plugin-react": "^7.13.0"
   }
 }
