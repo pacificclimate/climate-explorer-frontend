@@ -38,12 +38,6 @@ export const ensemble_name = props =>
   process.env.REACT_APP_CE_ENSEMBLE_NAME;
 
 
-// Filters out noisy multi-year monthly datasets.
-export const filterOutMonthlyMym = filter(
-  m => !(m.multi_year_mean === false && m.timescale === 'monthly')
-);
-
-
 // Default-value replacers for selectors for model, emissions scenario,
 // and variable.
 
@@ -107,11 +101,7 @@ export const filterMetaBy = (...optionNames) => options => meta => {
 };
 
 
-const loadMetadata = ensemble_name =>
-  // Prefilter metadata to show only items we want in this portal.
-  getMetadata(ensemble_name).then(filterOutMonthlyMym);
-
 // A HOC to inject asynchronously fetched metadata.
 export const withMetadata = withAsyncData(
-  loadMetadata, 'ensemble_name', 'meta'
+  getMetadata, 'ensemble_name', 'meta'
 );
