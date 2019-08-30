@@ -10,6 +10,7 @@
 //
 //    - Most methods are partially or fully curried.
 
+import compact from 'lodash/fp/compact';
 import find from 'lodash/fp/find';
 import flatMap from 'lodash/fp/flatMap';
 import flow from 'lodash/fp/flow';
@@ -48,7 +49,7 @@ export const findVariableMatching = match => options => {
 
 // Extract a value from the representative for a named option in source.
 export const representativeValue = (optionName, valueName) =>
-  get([optionName, 'value', 'representative', valueName]);
+  get(compact([optionName, 'value', 'representative', valueName]));
 
 
 // Returns an object containing the union of all representatives of the
