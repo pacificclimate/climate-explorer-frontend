@@ -81,8 +81,8 @@ export default class AnnualCycleGraph extends React.Component {
       instance: this.instance,  // for debugging
       prevMeta: null,
       prevArea: null,
-      prevDataspec: null,
-      dataspec: undefined,
+      prevDataSpec: null,
+      dataSpec: undefined,
       fetchingData: false,
       data: null,
       dataError: null,
@@ -108,12 +108,12 @@ export default class AnnualCycleGraph extends React.Component {
       };
     }
 
-    // State change (dataspec). Signal need for data fetch.
+    // State change (dataSpec). Signal need for data fetch.
     if (
-      state.prevDataspec !== state.dataspec
+      state.prevDataSpec !== state.dataSpec
     ) {
       return {
-        prevDataspec: state.dataspec,
+        prevDataSpec: state.dataSpec,
         fetchingData: false,  // not quite yet
         data: null,  // Signal that data fetch is required
         dataError: null,
@@ -146,7 +146,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   getMetadatas = () =>
     // This fn is called multiple times, so memoize it if inefficient
-    this.props.getMetadata(this.representativeValue('dataspec'))
+    this.props.getMetadata(this.representativeValue('dataSpec'))
     .filter(metadata => !!metadata);
 
   fetchData() {
@@ -172,7 +172,7 @@ export default class AnnualCycleGraph extends React.Component {
 
   // User event handlers
 
-  handleChangeDataspec = setNamedState(this, 'dataspec');
+  handleChangeDataSpec = setNamedState(this, 'dataSpec');
 
   exportData(format) {
     exportDataToWorksheet(
@@ -180,7 +180,7 @@ export default class AnnualCycleGraph extends React.Component {
       _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
       this.graphSpec(),
       format,
-      this.representativeValue('dataspec')
+      this.representativeValue('dataSpec')
     );
   }
 
@@ -207,7 +207,7 @@ export default class AnnualCycleGraph extends React.Component {
       return this.props.dataToGraphSpec(this.getMetadatas(), this.state.data);
     } catch (error) {
       // dataToGraphSpec may blow a raspberry if the data it is passed is
-      // invalid. This won't happen due to mismatched dataspec and data,
+      // invalid. This won't happen due to mismatched dataSpec and data,
       // because we don't allow that mismatch to occur.
       return noDataMessageGraphSpec(errorMessage(error));
     }
@@ -223,8 +223,8 @@ export default class AnnualCycleGraph extends React.Component {
             </ControlLabel>
             <DataspecSelector
               bases={this.props.meta}
-              value={this.state.dataspec}
-              onChange={this.handleChangeDataspec}
+              value={this.state.dataSpec}
+              onChange={this.handleChangeDataSpec}
               className={styles.selector}
             />
           </Col>
