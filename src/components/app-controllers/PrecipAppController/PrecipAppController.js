@@ -42,17 +42,20 @@ import {
 } from 'pcic-react-components';
 
 import {
-  ensemble_name, filterOutMonthlyMym,
+  ensemble_name,
+} from '../common';
+import { setNamedState } from '../../../core/react-component-utils';
+import withAsyncMetadata from '../../../HOCs/withAsyncMetadata'
+import {
   findModelNamed, findScenarioIncluding, findVariableMatching,
   representativeValue, constraintsFor, filterMetaBy,
-  setState, withMetadata,
-} from '../common';
+} from '../../../core/selectors';
 
 
 class PrecipAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
   // entire content of PrecipAppController, including the controls.
-  // It is wrapped by `withMetadata` to inject the asynchronously fetched
+  // It is wrapped by `withAsyncMetadata` to inject the asynchronously fetched
   // metadata that it needs.
 
   static propTypes = {
@@ -208,7 +211,7 @@ class PrecipAppControllerDisplay extends React.Component {
 
 
 // Inject asynchronously fetched metadata into controlled component.
-const WmdPrecipAppControllerDisplay = withMetadata(PrecipAppControllerDisplay);
+const WmdPrecipAppControllerDisplay = withAsyncMetadata(PrecipAppControllerDisplay);
 
 
 // In this controller, `comparand` is a fixed value. It is easiest to
@@ -234,10 +237,10 @@ export default class PrecipAppController extends React.Component {
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleChangeArea = setState(this, 'area');
-  handleChangeModel = setState(this, 'model');
-  handleChangeScenario = setState(this, 'scenario');
-  handleChangeVariable = setState(this, 'variable');
+  handleChangeArea = setNamedState(this, 'area');
+  handleChangeModel = setNamedState(this, 'model');
+  handleChangeScenario = setNamedState(this, 'scenario');
+  handleChangeVariable = setNamedState(this, 'variable');
 
   render() {
     return (

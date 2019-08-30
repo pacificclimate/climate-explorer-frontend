@@ -37,17 +37,20 @@ import UnfilteredDatasetsSummary
   from '../../data-presentation/UnfilteredDatasetsSummary';
 
 import {
-  ensemble_name, filterOutMonthlyMym,
+  ensemble_name,
+} from '../common';
+import { setNamedState } from '../../../core/react-component-utils';
+import withAsyncMetadata from '../../../HOCs/withAsyncMetadata'
+import {
   findModelNamed, findScenarioIncluding, findVariableMatching,
   representativeValue, constraintsFor, filterMetaBy,
-  setState, withMetadata,
-} from '../common';
+} from '../../../core/selectors';
 
 
 class SingleAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
   // entire content of SingleAppController, including the controls.
-  // It is wrapped by `withMetadata` to inject the asynchronously fetched
+  // It is wrapped by `withAsyncMetadata` to inject the asynchronously fetched
   // metadata that it needs.
 
   static propTypes = {
@@ -193,7 +196,7 @@ class SingleAppControllerDisplay extends React.Component {
 
 
 // Inject asynchronously fetched metadata into controlled component.
-const WmdSingleAppControllerDisplay = withMetadata(SingleAppControllerDisplay);
+const WmdSingleAppControllerDisplay = withAsyncMetadata(SingleAppControllerDisplay);
 
 
 export default class SingleAppController extends React.Component {
@@ -207,10 +210,10 @@ export default class SingleAppController extends React.Component {
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleChangeArea = setState(this, 'area');
-  handleChangeModel = setState(this, 'model');
-  handleChangeScenario = setState(this, 'scenario');
-  handleChangeVariable = setState(this, 'variable');
+  handleChangeArea = setNamedState(this, 'area');
+  handleChangeModel = setNamedState(this, 'model');
+  handleChangeScenario = setNamedState(this, 'scenario');
+  handleChangeVariable = setNamedState(this, 'variable');
 
   render() {
     return (
