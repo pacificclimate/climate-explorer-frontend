@@ -175,6 +175,8 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
         this.redraw();
       })
         .catch(reason => {
+          // See TO DO note above re. this catch. It's a hack. Possibly a bit
+          // noisy, but at least that way we can't ignore it as easily.
           console.log('LeafletNcWMSColorbarControl: failure, ignoring:', reason)
         });
     }
