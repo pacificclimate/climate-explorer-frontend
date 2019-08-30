@@ -2,11 +2,13 @@ import _ from 'lodash';
 import fp from 'lodash/fp';
 
 
+const throwOnAssertionFailure = false;
+
 const orig = _.pick(_, ['min', 'max']);
 
 const assert = (cond, msg) => {
   console.assert(cond, msg);
-  if (!cond) {
+  if (throwOnAssertionFailure && !cond) {
     throw new Error(msg);
   }
 } ;
