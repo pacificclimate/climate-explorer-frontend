@@ -126,7 +126,7 @@ export default class FilteredDatasetsSummary extends React.Component {
                   comparand_id={this.props.comparand_id}
                   dual={this.props.dual}
                 />
-                {' 🡒 '}
+                {' \u27F6 '}
                 <span>{this.props.meta.length} datasets</span>
                 {
                   this.props.dual &&
