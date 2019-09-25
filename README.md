@@ -147,7 +147,7 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 #### Jenkins
 
-To be filled
+Jenkins automatically handles the generation of docker images.
 
 ##### Configuration, environment variables, and Docker
 
