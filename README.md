@@ -147,7 +147,7 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 #### Jenkins
 
-Jenkins automatically handles the generation of docker images.
+Jenkins automatically handles the generation of docker images.  Currently it is configured to trigger an image build each push on individual branches.
 
 ##### Configuration, environment variables, and Docker
 
