@@ -5,7 +5,7 @@ node {
         }
 
         stage('Test Suite') {
-            sh 'npm run ci'
+            sh 'npm run jenkins-test'
         }
     }
 
