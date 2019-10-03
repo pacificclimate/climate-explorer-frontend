@@ -19,7 +19,7 @@ node {
 
         // If branch is under PR review we need to get the name from elsewhere
         if (branch_name.toLowerCase().contains('pr')) {
-            branch_name = CHANGE_NAME
+            branch_name = CHANGE_BRANCH
         }
 
         // Update image name if we are not on the master branch
