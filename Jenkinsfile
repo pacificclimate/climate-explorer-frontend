@@ -15,12 +15,7 @@ node {
 
     stage ('Build Image') {
         String image_name = 'climate-explorer-frontend'
-        String branch_name = BRANCH_NAME
-
-        // If branch is under PR review we need to get the name from elsewhere
-        if (branch_name.toLowerCase().contains('pr')) {
-            branch_name = CHANGE_BRANCH
-        }
+        String branch_name = BRANCH_NAME.toLowerCase()
 
         // Update image name if we are not on the master branch
         if (branch_name != 'master') {
