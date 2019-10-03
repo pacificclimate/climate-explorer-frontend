@@ -1,5 +1,5 @@
 node {
-    stage('Collecting Code') {
+    stage('Code Collection') {
         checkout scm
     }
 
