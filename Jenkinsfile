@@ -1,4 +1,7 @@
 node {
+    stage('Collecting Code') {
+        checkout scm
+    }
     nodejs('node') {
         stage('Installation') {
             sh 'npm install'
