@@ -65,6 +65,7 @@
     "start:rg": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files CE_CURRENT_VERSION=$(./generate-commitish.sh) react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(leaflet|pcic-react-components)/)\"",
+    "jenkins-test": "CI=true react-scripts test --env=jsdom --transformIgnorePatterns \"node_modules/(?!(leaflet|pcic-react-components)/)\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
