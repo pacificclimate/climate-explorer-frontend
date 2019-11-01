@@ -13,17 +13,26 @@ node {
         }
     }
 
-    stage ('Build Image') {
-        String image_name = 'climate-explorer-frontend'
-        String branch_name = BRANCH_NAME.toLowerCase()
+    def image
+    String name = BASE_REGISTRY + 'climate-explorer-frontend'
 
-        // Update image name if we are not on the master branch
-        if (branch_name != 'master') {
-            image_name = image_name + '/' + branch_name
-        }
+    if (BRANCH_NAME.toLowerCase() != 'master') {
+        name = name + '-' + BRANCH_NAME
+    }
 
+    stage('Build and Push Image') {
         withDockerServer([uri: PCIC_DOCKER]) {
-            def image = docker.build(image_name)
+            name = name + ':${BUILD_ID}'
+            image = docker.build(name)
+
+            docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
+                image.push()
+            }
         }
+    }
+
+    stage('Security Scan') {
+        writeFile file: 'anchore_images', text: name
+        anchore name: 'anchore_images'
     }
 }
