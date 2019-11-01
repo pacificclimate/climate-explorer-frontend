@@ -22,7 +22,7 @@ node {
 
     stage('Build and Push Image') {
         withDockerServer([uri: PCIC_DOCKER]) {
-            name = name + ':${BUILD_ID}'
+            name = name + ":${BUILD_ID}"
             image = docker.build(name)
 
             docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
