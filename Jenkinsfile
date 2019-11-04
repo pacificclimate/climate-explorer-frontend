@@ -32,6 +32,6 @@ node {
 
     stage('Security Scan') {
         writeFile file: 'anchore_images', text: name
-        anchore name: 'anchore_images', engineRetries: 700
+        anchore name: 'anchore_images', engineRetries: '700'
     }
 }
