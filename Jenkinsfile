@@ -16,9 +16,12 @@ node {
     def image
     String name = BASE_REGISTRY + 'climate-explorer-frontend'
 
+    // tag branch
     if (BRANCH_NAME != 'master') {
         name = name + ':' + BRANCH_NAME + "_${BUILD_ID}"
     }
+
+    sh 'printenv'
 
     stage('Build and Push Image') {
         withDockerServer([uri: PCIC_DOCKER]) {
