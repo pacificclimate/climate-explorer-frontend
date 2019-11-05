@@ -21,13 +21,7 @@ node {
         name = name + ':' + BRANCH_NAME + "_${BUILD_ID}"
     }
 
-    stage('Get Tag') {
-        sh "git tag --sort version:refname | tail -1 > version.tmp"
-        String tag = readFile('version.tmp')
-        println tag
-    }
-
-    stage('Build and Push Image') {
+    stage('Build and Publish Image') {
         withDockerServer([uri: PCIC_DOCKER]) {
             image = docker.build(name)
 
@@ -37,6 +31,10 @@ node {
         }
     }
 
+    stage('Remove Local Image') {
+        sh "docker rmi ${name}"
+    }
+    
     stage('Security Scan') {
         writeFile file: 'anchore_images', text: name
         anchore name: 'anchore_images', engineRetries: '700'
