@@ -32,9 +32,11 @@ node {
     }
 
     stage('Remove Local Image') {
-        sh "docker rmi ${name}"
+        withDockerServer([uri: PCIC_DOCKER]){
+            sh "docker rmi ${name}"
+        }
     }
-    
+
     stage('Security Scan') {
         writeFile file: 'anchore_images', text: name
         anchore name: 'anchore_images', engineRetries: '700'
