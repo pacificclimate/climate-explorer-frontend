@@ -17,8 +17,19 @@ node {
     String name = BASE_REGISTRY + 'climate-explorer-frontend'
 
     // tag branch
-    if (BRANCH_NAME != 'master') {
+    if (BRANCH_NAME == 'master') {
+        // figure out how to tag
+    } else {
         name = name + ':' + BRANCH_NAME + "_${BUILD_ID}"
+    }
+
+    stage('testing for payload string') {
+        def payloadString = build.buildVariableResolver.resolve("payload")
+        sh "${payloadString}"
+        payloadObject = new groovy.json.JsonSlurper().parseText(payloadString)
+        sh "${payloadObject}"
+        name_test = payloadObject.pusher.name
+        sh "${name_test}"
     }
 
     stage('Build and Publish Image') {
