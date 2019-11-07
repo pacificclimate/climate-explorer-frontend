@@ -24,6 +24,7 @@ node {
     }
 
     stage('testing for payload string') {
+        import hudson.model.*
         def payloadString = build.buildVariableResolver.resolve("payload")
         sh "${payloadString}"
         payloadObject = new groovy.json.JsonSlurper().parseText(payloadString)
