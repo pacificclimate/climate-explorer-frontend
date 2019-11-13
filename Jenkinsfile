@@ -18,19 +18,9 @@ node {
 
     // tag branch
     if (BRANCH_NAME == 'master') {
-        // figure out how to tag
+        // TODO: detect tags and releases for master
     } else {
         name = name + ':' + BRANCH_NAME + "_${BUILD_ID}"
-    }
-
-    stage('testing for payload string') {
-        import hudson.model.*
-        def payloadString = build.buildVariableResolver.resolve("payload")
-        sh "${payloadString}"
-        payloadObject = new groovy.json.JsonSlurper().parseText(payloadString)
-        sh "${payloadObject}"
-        name_test = payloadObject.pusher.name
-        sh "${name_test}"
     }
 
     stage('Build and Publish Image') {
@@ -43,14 +33,14 @@ node {
         }
     }
 
-    stage('Remove Local Image') {
-        withDockerServer([uri: PCIC_DOCKER]){
-            sh "docker rmi ${name}"
-        }
-    }
-
     stage('Security Scan') {
         writeFile file: 'anchore_images', text: name
         anchore name: 'anchore_images', engineRetries: '700'
+    }
+
+    stage('Clean Up Local Image') {
+        withDockerServer([uri: PCIC_DOCKER]){
+            sh "docker rmi ${name}"
+        }
     }
 }
