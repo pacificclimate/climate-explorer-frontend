@@ -20,7 +20,7 @@ node {
     if (BRANCH_NAME == 'master') {
         // TODO: detect tags and releases for master
     } else {
-        name = name + ':' + BRANCH_NAME + "_${BUILD_ID}"
+        name = name + ':' + BRANCH_NAME
     }
 
     stage('Build and Publish Image') {
