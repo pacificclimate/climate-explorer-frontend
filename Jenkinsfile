@@ -13,17 +13,34 @@ node {
         }
     }
 
-    stage ('Build Image') {
-        String image_name = 'climate-explorer-frontend'
-        String branch_name = BRANCH_NAME.toLowerCase()
+    def image
+    String name = BASE_REGISTRY + 'climate-explorer-frontend'
 
-        // Update image name if we are not on the master branch
-        if (branch_name != 'master') {
-            image_name = image_name + '/' + branch_name
-        }
+    // tag branch
+    if (BRANCH_NAME == 'master') {
+        // TODO: detect tags and releases for master
+    } else {
+        name = name + ':' + BRANCH_NAME
+    }
 
+    stage('Build and Publish Image') {
         withDockerServer([uri: PCIC_DOCKER]) {
-            def image = docker.build(image_name)
+            image = docker.build(name)
+
+            docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
+                image.push()
+            }
+        }
+    }
+
+    stage('Security Scan') {
+        writeFile file: 'anchore_images', text: name
+        anchore name: 'anchore_images', engineRetries: '700'
+    }
+
+    stage('Clean Up Local Image') {
+        withDockerServer([uri: PCIC_DOCKER]){
+            sh "docker rmi ${name}"
         }
     }
 }
