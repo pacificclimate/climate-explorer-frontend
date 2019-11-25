@@ -1,6 +1,97 @@
+/**
+ * Given an image name publish it to the PCIC docker registry
+ *
+ * @param image_name the name of the image
+ * @return if successful the same image name
+ */
+def publish_image(image_name) {
+    withDockerServer([uri: PCIC_DOCKER]) {
+        image = docker.build(image_name)
+
+        docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
+            image.push()
+        }
+    }
+
+    return image_name
+}
+
+
+/**
+ * Detect if the branch is tagged then pass to `publish_image()`
+ *
+ * This method is used if Jenkins detects that we are on the master branch. In
+ * the case of master branches we want to push with the tag
+ * (ex. `org/tool:1.0.0`) AND as `latest`.
+ *
+ * @param image_name the name of the image
+ * @return image_names list of image names that were built and published
+ */
+def publish_master_image(image_name) {
+    def image_names = []
+    String tag = sh (script: 'git tag --contains', returnStdout: true).trim()
+
+    if(!tag.isEmpty()) {
+        image_names.add(publish_image(image_name + ':' + tag))
+        image_names.add(publish_image(image_name + ':latest'))
+    } else {
+        image_names.add(publish_image(image_name))
+    }
+
+    return image_names
+}
+
+
+/**
+ * Build Docker images locally and publish them to the PCIC registry
+ *
+ * @return image_names list of image names that were built and published
+ */
+def build_and_publish() {
+    // String image_name = BASE_REGISTRY + 'climate-explorer-frontend'
+    String image_name = BASE_REGISTRY + 'cef-test'
+    def image_names = []
+
+    // if (BRANCH_NAME == 'master') {
+    if (BRANCH_NAME == 'jenkins-tag-tracking') {
+        image_names.plus(publish_master_image(image_name))
+    } else {
+        image_names.add(publish_image(image_name + ":$BRANCH_NAME"))
+    }
+
+    return image_names
+}
+
+
+/**
+ * Conduct Anchore image scan
+ *
+ * @param image_names list of images to scan
+ */
+def scan_image(image_name) {
+    writeFile file: 'anchore_images', text: image_name
+    anchore name: 'anchore_images', engineRetries: '700'
+}
+
+
+/**
+ * Clean up images
+ *
+ * @param image_names list of images to clean
+ */
+def clean_local_images(image_names) {
+    withDockerServer([uri: PCIC_DOCKER]){
+        for(name in image_names) {
+            sh "docker rmi ${name}"
+        }
+    }
+}
+
+
 node {
     stage('Code Collection') {
         checkout scm
+        sh 'git fetch'
     }
 
     nodejs('node') {
@@ -13,34 +104,20 @@ node {
         }
     }
 
-    def image
-    String name = BASE_REGISTRY + 'climate-explorer-frontend'
-
-    // tag branch
-    if (BRANCH_NAME == 'master') {
-        // TODO: detect tags and releases for master
-    } else {
-        name = name + ':' + BRANCH_NAME
-    }
-
+    def image_names
     stage('Build and Publish Image') {
-        withDockerServer([uri: PCIC_DOCKER]) {
-            image = docker.build(name)
-
-            docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
-                image.push()
-            }
-        }
+        image_names = build_and_publish()
     }
 
     stage('Security Scan') {
-        writeFile file: 'anchore_images', text: name
-        anchore name: 'anchore_images', engineRetries: '700'
+        scan_image(image_names[0])
     }
 
-    stage('Clean Up Local Image') {
-        withDockerServer([uri: PCIC_DOCKER]){
-            sh "docker rmi ${name}"
-        }
+    stage('Clean Local') {
+        clean_local_images(image_names)
+    }
+
+    stage('Clean Workspace') {
+        cleanWs()
     }
 }
