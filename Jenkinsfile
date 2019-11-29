@@ -54,7 +54,8 @@ def build_and_publish() {
 
     // if (BRANCH_NAME == 'master') {
     if (BRANCH_NAME == 'jenkins-tag-tracking') {
-        image_names.plus(publish_master_image(image_name))
+        published = publish_master_image(image_name)
+        image_names = image_names + published
     } else {
         image_names.add(publish_image(image_name + ":$BRANCH_NAME"))
     }
@@ -68,9 +69,11 @@ def build_and_publish() {
  *
  * @param image_names list of images to scan
  */
-def scan_image(image_name) {
-    writeFile file: 'anchore_images', text: image_name
-    anchore name: 'anchore_images', engineRetries: '700'
+def scan_images(image_names) {
+    image_names.each { name ->
+        writeFile file: 'anchore_images', text: name
+        anchore name: 'anchore_images', engineRetries: '700'
+    }
 }
 
 
@@ -81,7 +84,7 @@ def scan_image(image_name) {
  */
 def clean_local_images(image_names) {
     withDockerServer([uri: PCIC_DOCKER]){
-        for(name in image_names) {
+        image_names.each { name ->
             sh "docker rmi ${name}"
         }
     }
@@ -89,6 +92,10 @@ def clean_local_images(image_names) {
 
 
 node {
+    stage('Clean Workspace') {
+        cleanWs()
+    }
+
     stage('Code Collection') {
         checkout scm
         sh 'git fetch'
@@ -107,17 +114,14 @@ node {
     def image_names
     stage('Build and Publish Image') {
         image_names = build_and_publish()
+        echo "$image_names"
     }
 
     stage('Security Scan') {
-        scan_image(image_names[0])
+        scan_images(image_names)
     }
 
     stage('Clean Local') {
         clean_local_images(image_names)
-    }
-
-    stage('Clean Workspace') {
-        cleanWs()
     }
 }
