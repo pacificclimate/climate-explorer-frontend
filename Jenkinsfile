@@ -15,8 +15,8 @@ def build_image(image_name) {
 
 
 /**
- * Check if the branch has been tagged.  If so, use the tag as well as `latest`.
- * If not, use the branch name as a tag.
+ * If the master branch has been tagged we also add the `latest` tag.  Otherwise
+ * we just use the branch name as the tag.
  *
  * @return tags a list of the tags for the image
  */
@@ -24,8 +24,10 @@ def get_tags() {
     String tag = sh (script: 'git tag --contains', returnStdout: true).trim()
 
     def tags = []
-    if(!tag.isEmpty()) {
-        tags.add(tag)
+    if(BRANCH_NAME == 'master' && !tag.isEmpty()) {
+        // It is possible that there are multiple git tags so we want to ensure
+        // we add all of them in.
+        tags.addAll(tag.split('\n'))
         tags.add('latest')
     } else {
         tags.add(BRANCH_NAME)
@@ -36,12 +38,14 @@ def get_tags() {
 
 
 /**
- * Push to built image with its tags to our docker hub registry
+ * Given an image publish it with a tag to the PCIC docker registry.
  *
- * @param image the pre-built image
- * @param tags a list of tags for the image
+ * @param image to publish
+ * @return tag to use later in the security scan
  */
-def push_with_tags(image, tags) {
+def publish_image(image) {
+    def tags = get_tags()
+
     withDockerServer([uri: PCIC_DOCKER]){
         docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
             tags.each { tag ->
@@ -49,21 +53,8 @@ def push_with_tags(image, tags) {
             }
         }
     }
-}
 
-
-/**
- * Given an image publish it to the PCIC docker registry
- *
- * @param image to publish
- */
-def publish_image(image) {
-    if(BRANCH_NAME == 'master') {
-        tags = get_tags()
-        push_with_tags(image, tags)
-    } else {
-        push_with_tags(image, BRANCH_NAME)
-    }
+    return tags
 }
 
 
@@ -81,6 +72,7 @@ def clean_local_image(image_name) {
 
 node {
     stage('Code Collection') {
+        cleanWs()
         checkout scm
         sh 'git fetch'
     }
@@ -96,19 +88,24 @@ node {
     }
 
     // Define image items
-    def image_name = BASE_REGISTRY + 'cef-test'
+    def image_name = BASE_REGISTRY + 'climate-explorer-frontend'
     def image
+    def published_tags
+    String scan_name
 
     stage('Build Image') {
         image = build_image(image_name)
     }
 
     stage('Publish Image') {
-        publish_image(image)
+        published_tags = publish_image(image)
     }
 
     stage('Security Scan') {
-        writeFile file: 'anchore_images', text: image_name
+        // Use one of our published tags to identify the image to be scanned
+        scan_name = image_name + ':' + published_tags[0]
+
+        writeFile file: 'anchore_images', text: scan_name
         anchore name: 'anchore_images', engineRetries: '700'
     }
 
