@@ -1,101 +1,85 @@
 /**
- * Given an image name publish it to the PCIC docker registry
+ * Build a docker image given the name
  *
  * @param image_name the name of the image
- * @return if successful the same image name
+ * @return image the built docker image
  */
-def publish_image(image_name) {
+def build_image(image_name) {
+    def image
     withDockerServer([uri: PCIC_DOCKER]) {
         image = docker.build(image_name)
-
-        docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
-            image.push()
-        }
     }
 
-    return image_name
+    return image
 }
 
 
 /**
- * Detect if the branch is tagged then pass to `publish_image()`
+ * Check if the branch has been tagged.  If so, use the tag as well as `latest`.
+ * If not, use the branch name as a tag.
  *
- * This method is used if Jenkins detects that we are on the master branch. In
- * the case of master branches we want to push with the tag
- * (ex. `org/tool:1.0.0`) AND as `latest`.
- *
- * @param image_name the name of the image
- * @return image_names list of image names that were built and published
+ * @return tags a list of the tags for the image
  */
-def publish_master_image(image_name) {
-    def image_names = []
+def get_tags() {
     String tag = sh (script: 'git tag --contains', returnStdout: true).trim()
 
+    def tags = []
     if(!tag.isEmpty()) {
-        image_names.add(publish_image(image_name + ':' + tag))
-        image_names.add(publish_image(image_name + ':latest'))
+        tags.add(tag)
+        tags.add('latest')
     } else {
-        image_names.add(publish_image(image_name))
+        tags.add(BRANCH_NAME)
     }
 
-    return image_names
+    return tags
 }
 
 
 /**
- * Build Docker images locally and publish them to the PCIC registry
+ * Push to built image with its tags to our docker hub registry
  *
- * @return image_names list of image names that were built and published
+ * @param image the pre-built image
+ * @param tags a list of tags for the image
  */
-def build_and_publish() {
-    // String image_name = BASE_REGISTRY + 'climate-explorer-frontend'
-    String image_name = BASE_REGISTRY + 'cef-test'
-    def image_names = []
-
-    // if (BRANCH_NAME == 'master') {
-    if (BRANCH_NAME == 'jenkins-tag-tracking') {
-        published = publish_master_image(image_name)
-        image_names = image_names + published
-    } else {
-        image_names.add(publish_image(image_name + ":$BRANCH_NAME"))
-    }
-
-    return image_names
-}
-
-
-/**
- * Conduct Anchore image scan
- *
- * @param image_names list of images to scan
- */
-def scan_images(image_names) {
-    image_names.each { name ->
-        writeFile file: 'anchore_images', text: name
-        anchore name: 'anchore_images', engineRetries: '700'
-    }
-}
-
-
-/**
- * Clean up images
- *
- * @param image_names list of images to clean
- */
-def clean_local_images(image_names) {
+def push_with_tags(image, tags) {
     withDockerServer([uri: PCIC_DOCKER]){
-        image_names.each { name ->
-            sh "docker rmi ${name}"
+        docker.withRegistry('', 'PCIC_DOCKERHUB_CREDS') {
+            tags.each { tag ->
+                image.push(tag)
+            }
         }
+    }
+}
+
+
+/**
+ * Given an image publish it to the PCIC docker registry
+ *
+ * @param image to publish
+ */
+def publish_image(image) {
+    if(BRANCH_NAME == 'master') {
+        tags = get_tags()
+        push_with_tags(image, tags)
+    } else {
+        push_with_tags(image, BRANCH_NAME)
+    }
+}
+
+
+/**
+ * Clean up image on dev01
+ *
+ * @param image_name name of the image to clean up
+ */
+def clean_local_image(image_name) {
+    withDockerServer([uri: PCIC_DOCKER]){
+        sh "docker rmi ${image_name}"
     }
 }
 
 
 node {
-    stage('Clean Workspace') {
-        cleanWs()
-    }
-
     stage('Code Collection') {
         checkout scm
         sh 'git fetch'
@@ -111,17 +95,28 @@ node {
         }
     }
 
-    def image_names
-    stage('Build and Publish Image') {
-        image_names = build_and_publish()
-        echo "$image_names"
+    // Define image items
+    def image_name = BASE_REGISTRY + 'cef-test'
+    def image
+
+    stage('Build Image') {
+        image = build_image(image_name)
+    }
+
+    stage('Publish Image') {
+        publish_image(image)
     }
 
     stage('Security Scan') {
-        scan_images(image_names)
+        writeFile file: 'anchore_images', text: image_name
+        anchore name: 'anchore_images', engineRetries: '700'
     }
 
-    stage('Clean Local') {
-        clean_local_images(image_names)
+    stage('Clean Local Image') {
+        clean_local_image(image_name)
+    }
+
+    stage('Clean Workspace') {
+        cleanWs()
     }
 }
