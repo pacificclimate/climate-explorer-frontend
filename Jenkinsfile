@@ -13,6 +13,27 @@ def build_image(image_name) {
     return image
 }
 
+/**
+ * Get the original branch name.
+ *
+ * In the case where a branch has been filed as a PR the `BRANCH_NAME`
+ * environment varible updates from `some-branch-name` to `PR-[pull request #]`.
+ * To keep image tagging consistent on Docker Hub we want to use the original
+ * name.
+ *
+ * @return name the name of the branch
+ */
+def get_branch_name() {
+    String name
+    if (BRANCH_NAME.contains('PR')) {
+        name = CHANGE_BRANCH
+    } else {
+        name = BRANCH_NAME
+    }
+
+    return name
+}
+
 
 /**
  * If the master branch has been tagged we also add the `latest` tag.  Otherwise
@@ -25,12 +46,13 @@ def get_tags() {
 
     def tags = []
     if(BRANCH_NAME == 'master' && !tag.isEmpty()) {
-        // It is possible that there are multiple git tags so we want to ensure
-        // we add all of them in.
+        // It is possible for a commit to have multiple git tags. We want to
+        // ensure we add all of them in.
         tags.addAll(tag.split('\n'))
         tags.add('latest')
     } else {
-        tags.add(BRANCH_NAME)
+        String branch_name = get_branch_name()
+        tags.add(branch_name)
     }
 
     return tags
@@ -72,7 +94,6 @@ def clean_local_image(image_name) {
 
 node {
     stage('Code Collection') {
-        cleanWs()
         checkout scm
         sh 'git fetch'
     }
@@ -101,12 +122,15 @@ node {
         published_tags = publish_image(image)
     }
 
-    stage('Security Scan') {
-        // Use one of our published tags to identify the image to be scanned
-        scan_name = image_name + ':' + published_tags[0]
+    // Only conduct security scan on branches filed as pull requests
+    if(BRANCH_NAME.contains('PR')) {
+        stage('Security Scan') {
+            // Use one of our published tags to identify the image to be scanned
+            scan_name = image_name + ':' + published_tags[0]
 
-        writeFile file: 'anchore_images', text: scan_name
-        anchore name: 'anchore_images', engineRetries: '700'
+            writeFile file: 'anchore_images', text: scan_name
+            anchore name: 'anchore_images', engineRetries: '700'
+        }
     }
 
     stage('Clean Local Image') {
