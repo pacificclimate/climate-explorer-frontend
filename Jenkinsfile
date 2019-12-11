@@ -27,7 +27,7 @@ node {
 
     stage('Publish Image') {
         tags = getPublishingTags()
-        publishDockerImage(image, tags)
+        publishDockerImage(image, tags, PCIC_DOCKERHUB_CREDS)
     }
 
     // Only conduct security scan on branches filed as pull requests
