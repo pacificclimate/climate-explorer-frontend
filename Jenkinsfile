@@ -3,7 +3,7 @@
 
 node {
     stage('Code Collection') {
-        gitCheckout()
+        codeCollection()
     }
 
     nodejs('node') {
@@ -17,7 +17,7 @@ node {
     }
 
     // Define image items
-    def image_name = BASE_REGISTRY + 'climate-explorer-frontend'
+    def image_name = BASE_REGISTRY + 'cef-test'
     def image
     def tags
 
@@ -42,7 +42,7 @@ node {
     }
 
     stage('Clean Local Image') {
-        removeLocalDockerImage(image_name)
+        removeDockerImage(image_name)
     }
 
     stage('Clean Workspace') {
