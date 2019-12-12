@@ -11,7 +11,7 @@ node {
     }
 
     // Define image items
-    def image_name = BASE_REGISTRY + 'cef-test'
+    def image_name = BASE_REGISTRY + 'cliamte-explorer-frontend'
     def image
     def tags
 
