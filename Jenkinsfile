@@ -6,14 +6,8 @@ node {
         codeCollection()
     }
 
-    nodejs('node') {
-        stage('Installation') {
-            sh 'npm install'
-        }
-
-        stage('Test Suite') {
-            sh 'npm run jenkins-test'
-        }
+    stage('Node Test Suite') {
+        runNodeTestSuite('node', 'jenkins-test')
     }
 
     // Define image items
