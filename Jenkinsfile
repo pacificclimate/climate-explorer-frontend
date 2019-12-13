@@ -16,7 +16,7 @@ node {
     def tags
 
     stage('Build Image') {
-        image = docker.build(image_name, '--pull .')
+        image = buildDockerImage(image_name)
     }
 
     stage('Publish Image') {
