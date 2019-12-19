@@ -51,9 +51,10 @@ help:
     items:
       - question: Which model should I select?
         answer: |
-          Canada's own General Circulation Model, CanESM2, is the most representative
-          model for Canada. It is a good default choice if you do not have
-          specialized needs that would be better represented by a different model.
+          The PCIC12 model is an ensemble average of twelve models selected to
+          provide the widest spread in projected future climate for Canada. It is
+          a good default choice if you do not have specialized needs that would
+          be better represented by a different model.
 
       - question: What emissions scenario should I select?
         answer: |
@@ -698,6 +699,14 @@ help:
 
         In PCEX, models are indentified by short codes.
         The following table gives the full name and provenance of these models.
+        
+        * **`PCIC12`**
+        
+          An ensemble average of 12 climate models selected to provide the widest spread in
+          projected future climate. For more information, see 
+          **Cannon, A.J.**, 2015: Selecting GCM scenarios that span the range of changes in a multimodel ensemble: application to CMIP5 climate extremes indices.
+          _ Journal of Climate_, **28**(3): 1260-1267. doi:10.1175/JCLI-D-14-00636.1
+        
 
         * **`GFDL-CM3`**
 
