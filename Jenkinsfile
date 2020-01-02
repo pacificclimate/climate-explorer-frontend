@@ -13,15 +13,13 @@ node {
     // Define image items
     def image_name = BASE_REGISTRY + 'climate-explorer-frontend'
     def image
-    def tags
 
     stage('Build Image') {
         image = buildDockerImage(image_name)
     }
 
     stage('Publish Image') {
-        tags = getPublishingTags()
-        publishDockerImage(image, tags, 'PCIC_DOCKERHUB_CREDS')
+        publishDockerImage(image, 'PCIC_DOCKERHUB_CREDS')
     }
 
     // Only conduct security scan on branches filed as pull requests
