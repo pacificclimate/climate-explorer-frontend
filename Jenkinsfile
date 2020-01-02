@@ -1,43 +1,63 @@
 @Library('pcic-pipeline-library')_
 
 
-node {
+pipeline {
+    agent any
+    environment {
+        def image_name = BASE_REGISTRY + 'climate-explorer-frontend'
+        def image = ''
+    }
+
     stage('Code Collection') {
-        codeCollection()
+        steps {
+            codeCollection()
+        }
     }
 
     stage('Node Test Suite') {
-        runNodeTestSuite('node', 'jenkins-test')
+        steps {
+            runNodeTestSuite('node', 'jenkins-test')
+        }
     }
 
-    // Define image items
-    def image_name = BASE_REGISTRY + 'climate-explorer-frontend'
-    def image
-
     stage('Build Image') {
-        image = buildDockerImage(image_name)
+        steps {
+            script {
+                image = buildDockerImage(image_name)
+            }
+        }
     }
 
     stage('Publish Image') {
-        publishDockerImage(image, 'PCIC_DOCKERHUB_CREDS')
+        steps {
+            publishDockerImage(image, 'PCIC_DOCKERHUB_CREDS')
+        }
     }
 
-    // Only conduct security scan on branches filed as pull requests
-    if(BRANCH_NAME.contains('PR')) {
-        stage('Security Scan') {
-            // Use one of our published tags to identify the image to be scanned
-            String scan_name = image_name + ':' + tags[0]
-
+    stage('Security Scan') {
+        environment {
+            def scan_name = image_name + ':' + tags[0]
+        }
+        when {
+            expression {
+                return BRANCH_NAME.contains('PR');
+            }
+        }
+        steps {
             writeFile file: 'anchore_images', text: scan_name
             anchore name: 'anchore_images', engineRetries: '700'
         }
     }
 
     stage('Clean Local Image') {
-        removeDockerImage(image_name)
+        steps {
+            removeDockerImage(image_name)
+        }
     }
 
     stage('Clean Workspace') {
-        cleanWs()
+        steps {
+            cleanWs()
+        }
     }
 }
