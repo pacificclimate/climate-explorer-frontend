@@ -21,7 +21,7 @@ node {
         publishDockerImage(image, 'PCIC_DOCKERHUB_CREDS')
     }
 
-    if(!BRANCH_NAME.contains('PR')) {
+    if(BRANCH_NAME.contains('PR')) {
         stage('Security Scan') {
             writeFile file: 'anchore_images', text: imageName
             anchore name: 'anchore_images', engineRetries: '700'
