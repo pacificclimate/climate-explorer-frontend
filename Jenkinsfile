@@ -3,7 +3,7 @@
 
 node {
     stage('Code Collection') {
-        codeCollection()
+        collectCode()
     }
 
     stage('Node Test Suite') {
