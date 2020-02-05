@@ -1,5 +1,25 @@
 # News / Release Notes
 
+## 2.0.3
+*05-Feb-2020*
+* [Update initial default selected model to PCIC12](https://github.com/pacificclimate/climate-explorer-frontend/pull/323)
+* [Migrate underscore to lowdash to support improving selectors](https://github.com/pacificclimate/climate-explorer-frontend/pull/317)
+* [Switch help text generation to pcic-react-external-text package](https://github.com/pacificclimate/climate-explorer-frontend/pull/331)
+* [Major overhaul of dataset selection UI](https://github.com/pacificclimate/climate-explorer-frontend/pull/333)
+  * Fix a bug affecting variable selection for HadGEM datasets
+  * Fix a bug affecting dataset selection for the Annual Cycle graph
+  * Add category headers to variable selection dropdown
+  * Remove deprecated mixins
+  * more human-friendly menu options
+  * improve handling of asynchronous events around dataset selection
+* [Switch to a unicode arrow with better browser support](https://github.com/pacificclimate/climate-explorer-frontend/pull/345)
+* [Configure Jenkins for this codebase](https://github.com/pacificclimate/climate-explorer-frontend/pull/346)
+* configure Jenkins to [automatically push images to Dockerhub](https://github.com/pacificclimate/climate-explorer-frontend/pull/349) and [tag them with branch names](https://github.com/pacificclimate/climate-explorer-frontend/pull/351)
+
+## 2.0.2
+*15-Jul-2019*
+* [Hotfix to remove lookbehind regex, which was not supported by Firefox](https://github.com/pacificclimate/climate-explorer-frontend/pull/315)
+
 ## 2.0.1
 *10-Jul-2019*
 * [Document export format for unstructured timeseries graphs](https://github.com/pacificclimate/climate-explorer-frontend/pull/310)
