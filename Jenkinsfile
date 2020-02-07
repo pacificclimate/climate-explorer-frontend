@@ -12,9 +12,10 @@ node {
 
     def image
     def imageName
+    def imageSuffix = 'climate-explorer-frontend'
 
     stage('Build Image') {
-        (image, imageName) = buildDockerImage('climate-explorer-frontend')
+        (image, imageName) = buildDockerImage(imageSuffix)
     }
 
     stage('Publish Image') {
@@ -23,7 +24,7 @@ node {
 
     if(BRANCH_NAME.contains('PR')) {
         stage('Security Scan') {
-            writeFile file: 'anchore_images', text: imageName
+            writeFile file: 'anchore_images', text: getScanName(imageSuffix)
             anchore name: 'anchore_images', engineRetries: '700'
         }
     }
