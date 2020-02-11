@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 2.0.4
+*11-Feb-2020*
+
+* [Fix bug where app crashes when a polygon is selected on the map](https://github.com/pacificclimate/climate-explorer-frontend/pull/357)
+
 ## 2.0.3
 *05-Feb-2020*
 * [Update initial default selected model to PCIC12](https://github.com/pacificclimate/climate-explorer-frontend/pull/323)
