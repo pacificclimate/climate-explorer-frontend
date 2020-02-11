@@ -199,7 +199,7 @@ class DualAppControllerDisplay extends React.Component {
               comparand_id={comparand_id}
               comparandMeta={filteredMetaComparand}
               area={this.props.area}
-              onSetArea={this.handleSetArea}
+              onSetArea={this.props.onChangeArea}
             />
           </HalfWidthCol>
           <HalfWidthCol>

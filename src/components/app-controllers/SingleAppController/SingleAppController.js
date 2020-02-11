@@ -174,7 +174,7 @@ class SingleAppControllerDisplay extends React.Component {
               variable_id={variable_id}
               meta = {filteredMeta}
               area={this.props.area}
-              onSetArea={this.handleSetArea}
+              onSetArea={this.props.onChangeArea}
             />
           </HalfWidthCol>
           <HalfWidthCol>
