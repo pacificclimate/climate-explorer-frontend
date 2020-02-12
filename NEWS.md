@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 2.0.5
+*12-Feb-2020*
+
+* [Fix Dataset dropdown in Map Settings](https://github.com/pacificclimate/climate-explorer-frontend/pull/359)
+
 ## 2.0.4
 *11-Feb-2020*
 
