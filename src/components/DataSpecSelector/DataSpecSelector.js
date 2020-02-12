@@ -42,13 +42,13 @@ export default class DataSpecSelector extends React.Component {
   };
 
   makeDataSpecs() {
-    var ids = this.props.meta.map(el =>
+    let ids = this.props.meta.map(el =>
       [
         JSON.stringify(_.pick(el, 'start_date', 'end_date', 'ensemble_member')),
         `${el.ensemble_member} ${el.start_date}-${el.end_date}`
       ]
     );
-    ids = _.sortedUniqBy(ids, false, item => item[1]);
+    ids = _.sortedUniqBy(_.sortBy(ids, item => item[1]), item => item[1]);
     return ids;
   }
 
