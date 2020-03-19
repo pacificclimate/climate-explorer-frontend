@@ -14,7 +14,9 @@ node {
     def imageName = buildImageName('climate-explorer-frontend')
 
     stage('Build Image') {
-        image = buildDockerImage(imageName)
+        def commitish = sh(returnStdout: true, script: './generate-commitish.sh').trim()
+        def options = [buildArgs: "--pull --build-arg REACT_APP_CE_CURRENT_VERSION='${commitish}' ."]
+        image = buildDockerImage(imageName, options)
     }
 
     stage('Publish Image') {
