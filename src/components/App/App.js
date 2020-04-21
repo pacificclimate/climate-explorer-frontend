@@ -36,6 +36,13 @@ export default class App extends React.Component {
     };
   }
 
+  componentDidMount() {
+    const keycloak = Keycloak('/keycloak.json');
+    keycloak.init({onLoad: 'login-required'}).then(authenticated => {
+      this.setState({ keycloak: keycloak, authenticated: authenticated })
+    })
+  }
+
   handleNavigate = navIndex => {
     this.setState({ navIndex });
   };
@@ -70,13 +77,6 @@ export default class App extends React.Component {
       },
     ],
   };
-
-  componentDidMount() {
-    const keycloak = Keycloak('../../../keycloak.json');
-    keycloak.init({onLoad: 'login-required'}).then(authenticated => {
-      this.setState({ keycloak: keycloak, authenticated: authenticated })
-    })
-  }
 
   render() {
     if(this.state.keycloak) {
@@ -162,12 +162,17 @@ export default class App extends React.Component {
               </NavRoutes>
             </div>
           </Router>
-        ); else return (
+        );
+      } else {
+        return (
           <div>
             Unable to authenticate
           </div>
-        )
+        );
       }
     }
+    return (
+      <div>Initializing Keycloak...</div>
+    );
   }
 }
