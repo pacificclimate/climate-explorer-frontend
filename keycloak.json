@@ -1,0 +1,8 @@
+{
+  "realm": "data-portals",
+  "auth-server-url": "http://docker-dev03.pcic.uvic.ca:8080/auth/",
+  "ssl-required": "external",
+  "resource": "climate-explorer-frontend",
+  "public-client": true,
+  "confidential-port": 0
+}

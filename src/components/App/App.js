@@ -68,6 +68,13 @@ export default class App extends React.Component {
     ],
   };
 
+  componentDidMount() {
+    const keycloak = Keycloak('../../../keycloak.json');
+    keycloak.init({onLoad: 'login-required'}).then(authenticated => {
+      this.setState({ keycloak: keycloak, authenticated: authenticated })
+    })
+  }
+
   render() {
     // Setting `Router.basename` correctly is a little tricky, for two reasons:
     //
