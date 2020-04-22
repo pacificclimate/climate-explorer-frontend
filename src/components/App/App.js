@@ -18,6 +18,7 @@ import NavRoutes from '../navigation/NavRoutes';
 import Help from '../guidance-content/help/Help';
 import Science from '../guidance-content/science/Science';
 import About from '../guidance-content/about/About';
+import Account from '../guidance-content/account/Account';
 import Keycloak from 'keycloak-js';
 
 import logo from '../../assets/logo.png';
@@ -74,6 +75,14 @@ export default class App extends React.Component {
         label: 'About',
         subpath: 'about',
         component: About,
+      },
+      {
+        label: 'Account',
+        subpath: 'account',
+        render: props =>
+          <Account
+            keycloak={this.state.keycloak}
+          />,
       },
     ],
   };
@@ -172,7 +181,7 @@ export default class App extends React.Component {
       }
     }
     return (
-      <div>Initializing Keycloak...</div>
+      <div>Initializing Keycloak</div>
     );
   }
 }
