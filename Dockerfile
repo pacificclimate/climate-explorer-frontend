@@ -14,7 +14,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
 
-RUN apk add --no-cache git && \
+RUN apk add --no-cache git bash && \
     npm install --quiet && \
     npm install -g serve
 
