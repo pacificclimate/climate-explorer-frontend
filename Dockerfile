@@ -6,13 +6,7 @@
 #
 # docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
-# At this moment, Node.js 10.16 LTS is recommended for most users.
-#
-# In future, as we scale up, we may want to use an Alpine base image, which would reduce
-# the size of the image by about an order of magnitude and reduce the attack surface of
-# the image as well.
-
-FROM node:10.16
+FROM node:10-alpine
 
 ADD . /app
 WORKDIR /app
@@ -20,9 +14,9 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
 
-RUN npm install --quiet
-RUN npm install -g serve
-COPY . /app
+RUN apk add --no-cache git && \
+    npm install --quiet && \
+    npm install -g serve
 
 EXPOSE 8080
 
