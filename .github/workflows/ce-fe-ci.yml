@@ -1,6 +1,6 @@
 name: Climate Explorer Frontend CI
 
-on: push
+on: [push, pull_request]
 
 jobs:
   node-test:
