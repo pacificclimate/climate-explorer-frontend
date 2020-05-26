@@ -1,0 +1,37 @@
+name: Docker Publishing
+
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - '*'
+
+jobs:
+  docker-publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - run: git fetch --tags
+    - name: Get Branch
+      uses: nelonoel/branch-name@v1
+    - name: Get Tag
+      uses: olegtarasov/get-tag@v2
+    - name: Set env vars for build
+      run: |
+        echo ::set-env name=BRANCH::$(echo ${BRANCH_NAME})
+        echo ::set-env name=TAG::$(echo ${GIT_TAG_NAME})
+    - name: Run commitish script
+      run: ./generate-commitish.sh
+    - name: Test script setting
+      run: echo ${REACT_APP_CE_CURRENT_VERSION}
+    - name: Publish to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: pcic/climate-explorer-frontend
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        tags: "${{ env.BRANCH }},${{ env.TAG }}"
+#         buildargs: REACT_APP_CE_CURRENT_VERSION
