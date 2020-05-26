@@ -1,0 +1,30 @@
+name: Image Scan
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  anchore:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for image to be published
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: docker-publish
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Get Branch Name
+        uses: nelonoel/branch-name@v1
+      - name: Set Branch Name to Environment Variable
+        run: echo ::set-env name=TAG::$(echo ${BRANCH_NAME})
+      - name: Scan Image
+        uses: anchore/scan-action@master
+        with:
+          image-reference: "pcic/climate-explorer-frontend:${{ env.TAG }}"
+          fail-build: true
+        if: steps.wait-for-build.outputs.conclusion == 'success'
