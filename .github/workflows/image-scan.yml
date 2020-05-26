@@ -17,7 +17,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: docker-publish
-          ref: github.event.pull_request.head.sha
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Get Branch Name
         uses: nelonoel/branch-name@v1
       - name: Set Branch Name to Environment Variable
