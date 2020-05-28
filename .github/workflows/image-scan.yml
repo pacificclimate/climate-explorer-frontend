@@ -8,7 +8,7 @@ on:
 jobs:
   anchore:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - name: Wait for image to be published
