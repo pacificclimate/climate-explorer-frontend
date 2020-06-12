@@ -2,10 +2,11 @@ name: Docker Publishing
 
 on:
   push:
-    tags:
-      - '*'
     branches:
       - '*'
+  release:
+    type:
+      - created
 
 jobs:
   docker-publish:
@@ -13,23 +14,16 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@master
-    - run: git pull --unshallow
-    - name: Get Branch
-      uses: nelonoel/branch-name@v1
-    - name: Get Tag
-      uses: olegtarasov/get-tag@v2
-    - name: Set env vars for build
-      run: |
-        echo ::set-env name=BRANCH::$(echo ${BRANCH_NAME})
-        echo ::set-env name=TAG::$(echo ${GIT_TAG_NAME})
-    - name: Run commitish script
-      run: ./generate-commitish.sh
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: pcic/climate-explorer-frontend
-        username: ${{ secrets.pcicdevops_at_dockerhub_username }}
-        password: ${{ secrets.pcicdevops_at_dockerhub_password }}
-        tags: "${{ env.BRANCH }},${{ env.TAG }}"
-        buildargs: ${REACT_APP_CE_CURRENT_VERSION}
+      - uses: actions/checkout@master
+      - name: Export REACT_APP_CE_CURRENT_VERSION env var
+        run: |
+          git fetch --prune --unshallow
+          echo ::set-env name=REACT_APP_CE_CURRENT_VERSION::"$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))"
+      - name: Publish to Registry
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.pcicdevops_at_dockerhub_username }}
+          password: ${{ secrets.pcicdevops_at_dockerhub_password }}
+          repository: pcic/climate-explorer-frontend
+          tag_with_ref: true
+          build_args: REACT_APP_CE_CURRENT_VERSION=${{ env.REACT_APP_CE_CURRENT_VERSION }}
