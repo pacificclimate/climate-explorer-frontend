@@ -1,10 +1,10 @@
 name: Docker Image Scan
 
-on:
-  push:
-    branches:
-      - master
-      - '*security*'
+on: push
+  # push:
+  #   branches:
+  #     - master
+  #     - '*security*'
 
 jobs:
   scan:
