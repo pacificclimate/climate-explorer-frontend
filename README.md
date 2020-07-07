@@ -1,6 +1,7 @@
 # PCIC Climate Explorer
 
-[![Build Status](https://travis-ci.org/pacificclimate/climate-explorer-frontend.svg?branch=master)](https://travis-ci.org/pacificclimate/climate-explorer-frontend)
+![Node CI](https://github.com/pacificclimate/climate-explorer-frontend/workflows/Node%20CI/badge.svg)
+![Docker Publishing](https://github.com/pacificclimate/climate-explorer-frontend/workflows/Docker%20Publishing/badge.svg)
 [![Code Climate](https://codeclimate.com/github/pacificclimate/climate-explorer-frontend/badges/gpa.svg)](https://codeclimate.com/github/pacificclimate/climate-explorer-frontend)
 
 Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babel, ES6+.
@@ -145,9 +146,9 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 ### Notes
 
-#### Jenkins
+#### Github Actions
 
-Jenkins automatically handles the generation of docker images.  Currently it is configured to trigger an image build for each push on individual branches.  The image generated will have the name `climate-explorer-frontend/[branch_name]`.
+The workflows setup in actions will automatically build, tag and publish to our [docker hub](https://hub.docker.com/r/pcic/climate-explorer-frontend).
 
 ##### Configuration, environment variables, and Docker
 
@@ -350,7 +351,7 @@ outside of the version control system.
 
 Creating a versioned release involves:
 
-1. Incrementing `version` in `package.json`
+1. Increment `version` in `package.json`
 2. Summarize the changes from the last version in `NEWS.md`
 3. Commit these changes, then tag the release:
 
