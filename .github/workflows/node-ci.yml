@@ -1,4 +1,4 @@
-name: CI Tests
+name: Node CI
 
 on: push
 
@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [9.x, 10.x]
+        node-version: [9.2, 10.x]
 
     steps:
     - uses: actions/checkout@v2
