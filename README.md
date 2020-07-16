@@ -150,7 +150,7 @@ If you *really* want to skip the linting during a commit, you can always run `gi
 
 The workflows setup in actions will automatically build, tag and publish to our [docker hub](https://hub.docker.com/r/pcic/climate-explorer-frontend).
 
-##### Configuration, environment variables, and Docker
+#### Configuration, environment variables, and Docker
 
 It is best practice to configure a web app externally, at run-time, typically using environment variables for any
 simple (atomic, e.g., string) configuration values.
