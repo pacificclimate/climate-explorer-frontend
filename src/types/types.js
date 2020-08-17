@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
  //used by DataMap and DataLayer
 const layerParamsPropTypes = PropTypes.shape({
   dataset: PropTypes.string,
+  filepath: PropTypes.string,
   variableId: PropTypes.string,
   time: PropTypes.string,
   defaultOpacity: PropTypes.number,
