@@ -69,6 +69,20 @@ Environment variables for configuring the app are:
 `REACT_APP_CE_ENSEMBLE_NAME`
 * Ensemble name to use for backend requests.
 
+`REACT_APP_MAP_LAYER_ID_TYPE`
+* Type of identifier used by the app in requests for map climate layers.
+   * Value `dynamic` selects the dynamic dataset identifier type.
+     A dynamic dataset identifier is formed by prefixing the value of 
+     `REACT_APP_MAP_LAYER_ID_PREFIX` to the filepath of the dataset 
+     (obtained from the metadata).
+   * Any other values selects static (preconfigured) dataset identifier type.
+     A simple dataset identifier is the unqiue_id of the dataset
+     (obtained from the metadata).
+     
+`REACT_APP_MAP_LAYER_ID_PREFIX`
+* Prefix used to form a dynamic dataset identifier, if requested.
+  (See item above.)
+
 `REACT_APP_VARIABLE_OPTIONS`
 * Path within the `public` folder of the variable options file.
 
