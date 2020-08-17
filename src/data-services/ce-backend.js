@@ -30,7 +30,7 @@ const transformMetadata = metadata => flow(
         end_date: timestampToYear(metadatum.end_date),
         ...pick([
           'institution', 'model_id', 'model_name', 'ensemble_member',
-          'timescale', 'multi_year_mean'
+          'timescale', 'multi_year_mean', 'filepath',
         ])(metadatum)
       };
     })(metadatum.variables)
@@ -42,7 +42,10 @@ export function getMetadata(ensemble_name) {
   // Get all the metadata for `ensemble_name` and transform it to CE form.
   return axios({
     baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
-    params: { ensemble_name },
+    params: {
+      ensemble_name,
+      extras: "filepath",
+    },
   })
     .then(response => response.data)
     .then(transformMetadata)
@@ -55,6 +58,7 @@ function getTimeMetadata(uniqueId) {
     params: {
       // Note misleading naming: Param model_id is actually unique_id. FFS.
       model_id: uniqueId,
+      extras: "filepath",
     },
   });
 }
