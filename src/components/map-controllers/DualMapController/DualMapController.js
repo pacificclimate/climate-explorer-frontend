@@ -297,10 +297,6 @@ export default class DualMapController extends React.Component {
                     this.props, this.state,
                     'comparand', this.props.comparandMeta, this.state.isoline.timeIdx
                   ),
-                  // dataset: getDatasetId.bind(
-                  //   this, 'comparand',
-                  //   this.props.comparandMeta, this.state.isoline.timeIdx
-                  // )(),
                   ...this.state.isoline,
                   defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeIsolineRange,

@@ -128,26 +128,6 @@ export default class SingleMapController extends React.Component {
     this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
 
-  // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-  // TODO: There may also be a second issue to do with encoding timeVarIdx
-  getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
-    let dataset = undefined;
-    if (encodedVarTimeIdx) {
-      if (hasValidData(varSymbol, this.props)) {
-        const timeIndex = JSON.parse(encodedVarTimeIdx);
-        dataset = _.find(varMeta, {
-          ensemble_member: this.state.run,
-          start_date: this.state.start_date,
-          end_date: this.state.end_date,
-          timescale: timeIndex.timescale,
-        });
-      }
-    }
-    // dataset may not exist if generating a map for a single-variable portal
-    return dataset && dataset.unique_id;
-  }
-
-
   // Handlers for time selection change
 
   handleChangeVariableTime = updateLayerTime.bind(this, 'raster');

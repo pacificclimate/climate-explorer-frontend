@@ -272,8 +272,6 @@ export default class PrecipMapController extends React.Component {
                     this.props, this.state,
                     'comparand', this.props.comparandMeta, this.state.annotated.timeIdx
                   ),
-                  // dataset: getDatasetId.bind(
-                  //   this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
                   ...this.state.annotated,
                   defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeAnnotatedRange,
