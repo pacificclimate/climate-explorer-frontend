@@ -36,10 +36,16 @@ import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
 
-import { hasValidData, currentDataSpec,
-         updateLayerSimpleState, updateLayerTime,
-         getDatasetId, scalarParams,
-         selectRasterPalette, getTimeParametersPromise} from '../map-helpers.js';
+import {
+  hasValidData,
+  currentDataSpec,
+  updateLayerSimpleState,
+  updateLayerTime,
+  getDatasetIdentifiers,
+  scalarParams,
+  selectRasterPalette,
+  getTimeParametersPromise,
+} from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
@@ -252,16 +258,22 @@ export default class PrecipMapController extends React.Component {
             this.state.raster.times ? (
               <DataMap
                 raster={{
-                  dataset: getDatasetId.bind(
-                    this, 'variable', this.props.meta, this.state.raster.timeIdx)(),
+                  ...getDatasetIdentifiers(
+                    this.props, this.state,
+                    'variable', this.props.meta, this.state.raster.timeIdx
+                  ),
                   ...this.state.raster,
                   defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
                 }}
 
                 annotated={{
-                  dataset: getDatasetId.bind(
-                    this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
+                  ...getDatasetIdentifiers(
+                    this.props, this.state,
+                    'comparand', this.props.comparandMeta, this.state.annotated.timeIdx
+                  ),
+                  // dataset: getDatasetId.bind(
+                  //   this, 'comparand', this.props.comparandMeta, this.state.annotated.timeIdx)(),
                   ...this.state.annotated,
                   defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeAnnotatedRange,

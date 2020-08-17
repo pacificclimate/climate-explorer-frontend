@@ -34,11 +34,17 @@ import MapLegend from '../../MapLegend';
 import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
 
-import { hasValidData, currentDataSpec,
-  scalarParams, getTimeParametersPromise,
-  selectRasterPalette, selectIsolinePalette,
-  updateLayerSimpleState, updateLayerTime,
-  getDatasetId} from '../map-helpers.js';
+import {
+  hasValidData,
+  currentDataSpec,
+  scalarParams,
+  getTimeParametersPromise,
+  selectRasterPalette,
+  selectIsolinePalette,
+  updateLayerSimpleState,
+  updateLayerTime,
+  getDatasetIdentifiers,
+} from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
@@ -277,20 +283,24 @@ export default class DualMapController extends React.Component {
             this.state.raster.times || this.state.isoline.times ? (
               <DataMap
                 raster={{
-                  dataset: getDatasetId.bind(
-                    this, 'variable',
-                    this.props.meta, this.state.raster.timeIdx
-                  )(),
+                  ...getDatasetIdentifiers(
+                    this.props, this.state,
+                    'variable', this.props.meta, this.state.raster.timeIdx
+                  ),
                   ...this.state.raster,
                   defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
                 }}
 
                 isoline={{
-                  dataset: getDatasetId.bind(
-                    this, 'comparand',
-                    this.props.comparandMeta, this.state.isoline.timeIdx
-                  )(),
+                  ...getDatasetIdentifiers(
+                    this.props, this.state,
+                    'comparand', this.props.comparandMeta, this.state.isoline.timeIdx
+                  ),
+                  // dataset: getDatasetId.bind(
+                  //   this, 'comparand',
+                  //   this.props.comparandMeta, this.state.isoline.timeIdx
+                  // )(),
                   ...this.state.isoline,
                   defaultOpacity: 1.0,
                   onChangeRange: this.handleChangeIsolineRange,

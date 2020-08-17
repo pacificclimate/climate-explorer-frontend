@@ -32,9 +32,14 @@ import MapSettings from '../../MapSettings';
 import StaticControl from '../../StaticControl';
 
 import {
-  hasValidData, selectRasterPalette,
-  currentDataSpec, updateLayerSimpleState,
-         updateLayerTime, getTimeParametersPromise, scalarParams,
+  hasValidData,
+  selectRasterPalette,
+  currentDataSpec,
+  updateLayerSimpleState,
+  updateLayerTime,
+  getTimeParametersPromise,
+  scalarParams,
+  getDatasetIdentifiers,
 } from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
@@ -141,7 +146,8 @@ export default class SingleMapController extends React.Component {
     // dataset may not exist if generating a map for a single-variable portal
     return dataset && dataset.unique_id;
   }
-  
+
+
   // Handlers for time selection change
 
   handleChangeVariableTime = updateLayerTime.bind(this, 'raster');
@@ -239,8 +245,10 @@ export default class SingleMapController extends React.Component {
             this.state.raster.times ? (
               <DataMap
                 raster={{
-                  dataset: this.getDatasetId(
-                    'variable', this.props.meta, this.state.raster.timeIdx),
+                  ...getDatasetIdentifiers(
+                    this.props, this.state,
+                    'variable', this.props.meta, this.state.raster.timeIdx
+                  ),
                   ...this.state.raster,
                   defaultOpacity: 0.7,
                   onChangeRange: this.handleChangeRasterRange,
