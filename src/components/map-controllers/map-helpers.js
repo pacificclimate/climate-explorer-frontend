@@ -20,7 +20,7 @@ import { getVariableOptions } from '../../core/util';
  * 0. Data processing helpers
  ************************************************************************/
 
-function hasValidData(symbol, props) {
+export function hasValidData(symbol, props) {
   // Returns true if props contains enough information to generate a map
   // for the primary (symbol is 'variable') or secondary ('comparand') variable.
   var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
@@ -31,17 +31,17 @@ function hasValidData(symbol, props) {
     props[dataLocation].length > 0;
 }
 
-function hasComparand(props) {
+export function hasComparand(props) {
   return this.hasValidData('comparand', props);
 }
 
 // predicate that detects whether a timestamp index is a 0th index:
 // either January, winter, or the first year in a file. 
-const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
+export const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
 // TODO: There may also be a second issue to do with encoding timeVarIdx
-function getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
+export function getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
   let dataset = undefined;
   if (encodedVarTimeIdx) {
     if (hasValidData(varSymbol, this.props)) {
@@ -58,12 +58,34 @@ function getDatasetId(varSymbol, varMeta, encodedVarTimeIdx) {
   return dataset && dataset.unique_id;
 }
 
+// TODO: Fix this ugliness. Good grief.
+export function getDatasetIdentifiers(props, state, varSymbol, relevantMeta, encodedVarTimeIdx) {
+  let metadata = undefined;
+  if (encodedVarTimeIdx) {
+    if (hasValidData(varSymbol, props)) {
+      const timeIndex = JSON.parse(encodedVarTimeIdx);
+      metadata = _.find(relevantMeta, {
+        ensemble_member: state.run,
+        start_date: state.start_date,
+        end_date: state.end_date,
+        timescale: timeIndex.timescale,
+      });
+    }
+  }
+  // dataset may not exist if generating a map for a single-variable portal
+  return metadata && {
+    dataset: metadata.unique_id,
+    filepath: metadata.filepath,
+  };
+}
+
+
 
 /********************************************************************
  * 1. WMS parameter generating functions
  ********************************************************************/
 
-function getTimeParametersPromise(dataSpec, meta) {
+export function getTimeParametersPromise(dataSpec, meta) {
   // Returns a promise for an indexed list of all timestamps available for the
   // selected data specification in files whose metadata is in the "meta" array.
   // The indices are stringified objects with timescale
@@ -98,7 +120,7 @@ function getTimeParametersPromise(dataSpec, meta) {
   });
 }
 
-function scalarParams(variable, times) {
+export function scalarParams(variable, times) {
   // return an object containing initial parameters common to
   // all scalar WMS layers (raster, isoline, annotated isoline):
   //   * variableId (name of displayed variable)
@@ -122,7 +144,7 @@ function scalarParams(variable, times) {
   };
 }
 
-function selectRasterPalette(params) {
+export function selectRasterPalette(params) {
   // add a default raster palette to a ncWMS params object: either rainbow (x-Occam)
   // or a variable default palette if the config file has one.
   let palette = 'x-Occam';
@@ -133,7 +155,7 @@ function selectRasterPalette(params) {
   return params;
 }
 
-function selectIsolinePalette(params) {
+export function selectIsolinePalette(params) {
   // adds the default isoline palette (rainbow / x-Occam) to the params object.
   // TODO: add isoline numContours here when we get it working 
   params.palette = 'x-Occam';
@@ -145,12 +167,12 @@ function selectIsolinePalette(params) {
  **************************************************************************/
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-function currentDataSpec({ run, start_date, end_date }) {
+export function currentDataSpec({ run, start_date, end_date }) {
   // Return encoding of currently selected dataspec
   return `${run} ${start_date}-${end_date}`;
 }
 
-function updateLayerSimpleState(layerType, name, value) {
+export function updateLayerSimpleState(layerType, name, value) {
   this.setState(prevState => ({
     [layerType]: {
       ...prevState[layerType],
@@ -159,7 +181,7 @@ function updateLayerSimpleState(layerType, name, value) {
   }));
 }
 
-function updateLayerTime(layerType, timeIdx) {
+export function updateLayerTime(layerType, timeIdx) {
   // update the timestamp in state
   // timeIdx is a stringified object with a resolution  (monthly, annual, seasonal)
   // and an index denoting the timestamp's position with the file
@@ -171,17 +193,3 @@ function updateLayerTime(layerType, timeIdx) {
     },
   }));
 }
-
-  export {
-    hasValidData,
-    hasComparand,
-    getDatasetId,
-    getTimeParametersPromise,
-    scalarParams,
-    selectRasterPalette,
-    selectIsolinePalette,
-    is0thIndex,
-    currentDataSpec,
-    updateLayerSimpleState,
-    updateLayerTime
-  };
