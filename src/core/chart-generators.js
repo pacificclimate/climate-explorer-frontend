@@ -424,17 +424,14 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   }
 
   // Remove variations that are not useful for identifying datasets.
-
-  // All datasets have unique unique_id.
-  variation.splice(variation.indexOf('unique_id'), 1);
-
-  // All datasets have unique filepath (which are also very long).
-  variation.splice(variation.indexOf('filepath'), 1);
-
-  // Remove variable_name if variable_id is present, since we don't need both
-  if (variation.indexOf('variable_name') !== -1 && variation.indexOf('variable_id' !== -1)) {
-    variation.splice(variation.indexOf('variable_name'), 1);
-  }
+  // All datasets have unique unique_id and unique filepath
+  // (which is also very long).
+  // We don't need both variable_id and variable_name.
+  variation = _.difference(variation, [
+    'unique_id',
+    'filepath',
+    variation.includes('variable_id') && 'variable_name',
+  ]);
 
   if (variation.length === 0) {
     throw new Error('Error: cannot graph identical timeseries');
