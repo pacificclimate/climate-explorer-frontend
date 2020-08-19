@@ -1,5 +1,19 @@
 # News / Release Notes
 
+## 2.1.0
+*19-Aug-2020*
+
+This release adds the ability to request dynamic datasets from ncWMS. There are also a lot of
+improvements to DevOps and a bug fix for mislabelled axes in a graph.
+
+- [Add capability for dynamic dataset map layers](https://github.com/pacificclimate/climate-explorer-frontend/pull/382)
+- [Fix data / axis mismatch in Variable Response Graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/383)
+- [Update workflows](https://github.com/pacificclimate/climate-explorer-frontend/pull/376)
+- [Reduce docker image size](https://github.com/pacificclimate/climate-explorer-frontend/pull/366)
+- [Add workflow to github actions](https://github.com/pacificclimate/climate-explorer-frontend/pull/367)
+- [Add new docker build args](https://github.com/pacificclimate/climate-explorer-frontend/pull/364)
+- [Jenkinsfile update](https://github.com/pacificclimate/climate-explorer-frontend/pull/360)
+
 ## 2.0.5
 *12-Feb-2020*
 
