@@ -75,7 +75,7 @@ function makeVariableResponseGraph (x, y, graph) {
 
   let tuples = [];
   let seriesMatched = false;
-  for(let independent of xseries) {
+  for(const independent of xseries) {
     //Try to match each dependent variable series with an independent variable series
     let dependent = _.find(yseries, series => {
       return series[0].toLowerCase().replace(y.toLowerCase(), x.toLowerCase()) === 
