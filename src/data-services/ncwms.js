@@ -6,10 +6,16 @@ import _ from 'lodash';
 
 
 export function getBaseWMSParams(
-  { dataset, variableId, wmsTime, opacity, logscale, range }
+  { dataset, filepath, variableId, wmsTime, opacity, logscale, range }
 ) {
+  // The dataset identifier can be either a dynamic dataset identifier, which
+  // involves the full filepath, or a simple dataset identifier, which uses
+  // just the dataset unique_id. Default behaviour is "simple".
+  const datasetId = process.env.REACT_APP_MAP_LAYER_ID_TYPE === 'dynamic' ?
+    `${process.env.REACT_APP_MAP_LAYER_ID_PREFIX}${filepath}` :
+    dataset;
   const fixedParams = {
-    layers: `${dataset}/${variableId}`,
+    layers: `${datasetId}/${variableId}`,
     time: wmsTime,
     noWrap: true,
     format: 'image/png',

@@ -21,15 +21,17 @@
  ***************************************************************************/
 
 import _ from 'lodash';
-import { PRECISION,
-        extendedDateToBasicDate,
-        capitalizeWords,
-        getVariableOptions,
-        nestedAttributeIsDefined,
-        caseInsensitiveStringSearch,
-        timeResolutionIndexToTimeOfYear,
-        timestampToTimeOfYear,
-        getDataUnits} from './util';
+import {
+  capitalizeWords,
+  caseInsensitiveStringSearch,
+  extendedDateToBasicDate,
+  getDataUnits,
+  getVariableOptions,
+  nestedAttributeIsDefined,
+  PRECISION,
+  timeResolutionIndexToTimeOfYear,
+  timestampToTimeOfYear
+} from './util';
 
 /* **************************************************
  * 0. Helper functions used by all graph generators *
@@ -402,27 +404,34 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
     return function (m) { return capitalizeWords(`${m.timescale} mean`);};
   }
 
+  // Compile a list of attributes that can potentially be used to distinguish
+  // datasets from each other. These will be used later in forming the naming
+  // function returned (and ultimately used in forming the name of each
+  // dataset).
   let variation = [];
-  const exemplarMetadata = _.find(metadata, function (m) {return m.unique_id === data[0].id;});
+  const exemplarMetadata = _.find(metadata, { unique_id: data[0].id });
 
-  for (let datum of data) {
-    const comparandMetadata = _.find(metadata, function (m) {return m.unique_id === datum.id;});
+  for (const datum of data) {
+    const comparandMetadata = _.find(metadata, { unique_id: datum.id });
 
-    for (let att in comparandMetadata) {
-      if (exemplarMetadata[att] !== comparandMetadata[att] && variation.indexOf(att) === -1) {
+    for (const att of Object.getOwnPropertyNames(comparandMetadata)) {
+      if (exemplarMetadata[att] !== comparandMetadata[att] &&
+        variation.indexOf(att) === -1
+      ) {
         variation.push(att);
       }
     }
   }
 
-  // Remove unique_id from the list of possible variations. All
-  // datasets have unique unique_id's; it's not useful on a graph
-  variation.splice(variation.indexOf('unique_id'), 1);
-
-  // Remove variable_name if variable_id is present, since we don't need both
-  if (variation.indexOf('variable_name') !== -1 && variation.indexOf('variable_id' !== -1)) {
-    variation.splice(variation.indexOf('variable_name'), 1);
-  }
+  // Remove variations that are not useful for identifying datasets.
+  // All datasets have unique unique_id and unique filepath
+  // (which is also very long).
+  // We don't need both variable_id and variable_name.
+  variation = _.difference(variation, [
+    'unique_id',
+    'filepath',
+    variation.includes('variable_id') && 'variable_name',
+  ]);
 
   if (variation.length === 0) {
     throw new Error('Error: cannot graph identical timeseries');
@@ -436,7 +445,9 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
     const fromConfig = getVariableOptions(v, 'seriesLegendString');
     return _.isUndefined(fromConfig) ? "Mean" : fromConfig;
   }
-  const basenameByVariable = _.zipObject(variables, _.map(variables, getVarBasename));
+  const basenameByVariable = _.zipObject(
+    variables, _.map(variables, getVarBasename)
+  );
 
   return function (m) {
     let name = '';
