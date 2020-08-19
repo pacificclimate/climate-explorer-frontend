@@ -37,12 +37,24 @@ export function hasComparand(props) {
 
 // predicate that detects whether a timestamp index is a 0th index:
 // either January, winter, or the first year in a file. 
-export const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx == 0);
+export const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx === 0);
 
+// This function returns two values that are used to request climate layers from
+// ncWMS. Because this app now allows for two different ways to request those
+// layers (simple and dynamic datasets), which require two different kinds of
+// identifiers, we must supply both. (The decision of which to use is deferred
+// until to the moment the request is made.)
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
 // TODO: There may also be a second issue to do with encoding timeVarIdx
-// TODO: Fix this ugliness. Good grief.
-export function getDatasetIdentifiers(props, state, varSymbol, relevantMeta, encodedVarTimeIdx) {
+// TODO: Fix this ugliness. Specifically, we are passing in params `props` and
+//  `state`, which just happens to be convenient for the callers, but is a
+//  horrible interface design. This should be factored out to the elements
+//  of props and state actually used, something perhaps like a first argument
+//  `{ run, start_date, end_date, ...}`, but this gets tangled up with how
+//  `hasValidData` works ... sigh.
+export function getDatasetIdentifiers(
+  props, state, varSymbol, relevantMeta, encodedVarTimeIdx
+) {
   let metadata = undefined;
   if (encodedVarTimeIdx) {
     if (hasValidData(varSymbol, props)) {
