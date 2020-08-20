@@ -14,15 +14,24 @@ improvements to DevOps and a bug fix for mislabelled axes in a graph.
 - [Add new docker build args](https://github.com/pacificclimate/climate-explorer-frontend/pull/364)
 - [Jenkinsfile update](https://github.com/pacificclimate/climate-explorer-frontend/pull/360)
 
+Backend requirements:
+- Climate Explorer Backend >= 3.0.1
+
 ## 2.0.5
 *12-Feb-2020*
 
 * [Fix Dataset dropdown in Map Settings](https://github.com/pacificclimate/climate-explorer-frontend/pull/359)
 
+Backend requirements:
+- Climate Explorer Backend >= 1.0.0
+
 ## 2.0.4
 *11-Feb-2020*
 
 * [Fix bug where app crashes when a polygon is selected on the map](https://github.com/pacificclimate/climate-explorer-frontend/pull/357)
+
+Backend requirements:
+- Climate Explorer Backend >= 1.0.0
 
 ## 2.0.3
 *05-Feb-2020*
@@ -39,6 +48,9 @@ improvements to DevOps and a bug fix for mislabelled axes in a graph.
 * [Switch to a unicode arrow with better browser support](https://github.com/pacificclimate/climate-explorer-frontend/pull/345)
 * [Configure Jenkins for this codebase](https://github.com/pacificclimate/climate-explorer-frontend/pull/346)
 * configure Jenkins to [automatically push images to Dockerhub](https://github.com/pacificclimate/climate-explorer-frontend/pull/349) and [tag them with branch names](https://github.com/pacificclimate/climate-explorer-frontend/pull/351)
+
+Backend requirements:
+- Climate Explorer Backend >= 1.0.0
 
 ## 2.0.2
 *15-Jul-2019*
