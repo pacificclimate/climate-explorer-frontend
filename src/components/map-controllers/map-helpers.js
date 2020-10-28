@@ -37,7 +37,8 @@ export function hasComparand(props) {
 
 // predicate that detects whether a timestamp index is a 0th index:
 // either January, winter, or the first year in a file. 
-export const is0thIndex = timestamp => (JSON.parse(timestamp).timeidx === 0);
+export const is0thIndex = timestamp =>
+  Number(JSON.parse(timestamp).timeidx) === 0;
 
 // This function returns two values that are used to request climate layers from
 // ncWMS. Because this app now allows for two different ways to request those
@@ -130,7 +131,7 @@ export function scalarParams(variable, times) {
   const logscale = "false";
   const variableId = variable;
   const startingIndex = _.find(Object.keys(times), is0thIndex);
-  
+
   return {
     variableId, times, logscale,
     timeIdx: startingIndex,
