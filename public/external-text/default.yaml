@@ -250,7 +250,8 @@ help:
         by global or regional climate models based on a
         combination of historical data and possible future greenhouse
         gas projections. The data is averaged by month over thirty year
-        periods; there are six such periods from 1960 to 2100.
+        periods; there are six such periods from 1960 to 2100, three
+	historical and three projected.
         This data is available for all of Canada.
 
         * **`pr`**
@@ -275,10 +276,10 @@ help:
         Climdex defines 27 [climate extremes indices](${$$.components.climdexUrl}),
         encompassing extreme precipitation, extremes of temperature,
         or lack thereof in different ways.
-        This is a heterogeneous dataset; a given extreme may be calculated
-        either as a monthly index averaged over thirty year periods
-        from 1960 to 2100, or an annual index calculated individually
-        for each year from 1950 to 2100.
+        This is a heterogeneous data collection with some monthly,
+	some seasonal, and some annual resolution data. The data is
+	averaged over 30 year periods; there are six such periods
+	between 1960 and 2100, three historical and three projected.
         This data is available for all of Canada.
 
         * **`altcddETCCDI`**
@@ -587,14 +588,8 @@ help:
         threshold multiplied by how many degrees the threshold is exceeded,
         over a period of a season or year.
         The data is averaged over six thirty year periods between
-        1960 to 2100, namely
-        1961-1990,
-        1971-2000,
-        1981-2010,
-        2010-2039,
-        2040-2069, and
-        2070-2099.
-        This data is available for all of British Columbia.
+        1960 to 2100, three historical and three projected.
+        This data is available for all of Canada.
 
         A degree-day is a measure of how much
         the actual temperature (usually the mean average temperature)
@@ -646,13 +641,10 @@ help:
         20 years.
         These datasets are calculated from model output using a
         generalized extreme value distribution.
-        This data is available for four thirty year climatological
-        periods from 1970 to 2100, namely
-        1971-2000,
-        2011-2040,
-        2041-2070, and
-        2071-2100.
-        This data is available for all of British Columbia.
+        This data is available for six thirty year climatological
+        periods from 1960 to 2100, three historical and three
+	projected.
+        This data is available for all Canada.
 
         * **`rp5pr`**
 
