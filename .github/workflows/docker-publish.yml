@@ -18,7 +18,7 @@ jobs:
       - name: Export REACT_APP_CE_CURRENT_VERSION env var
         run: |
           git fetch --prune --unshallow
-          echo ::set-env name=REACT_APP_CE_CURRENT_VERSION::"$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))"
+          echo "REACT_APP_CE_CURRENT_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
       - name: Publish to Registry
         uses: docker/build-push-action@v1
         with:
