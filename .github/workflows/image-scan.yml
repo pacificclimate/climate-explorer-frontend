@@ -5,22 +5,18 @@ on:
     branches:
       - master
       - '*security*'
+      - '*vulnerability*'
 
 jobs:
   scan:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20s.04
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Docker Build
       run: docker build . --file Dockerfile --tag pcic/climate-explorer-frontend:test-image
-    - uses: anchore/scan-action@v1
+    - uses: anchore/scan-action@v2
       with:
-        image-reference: "pcic/climate-explorer-frontend:test-image"
+        image: "pcic/climate-explorer-frontend:test-image"
         fail-build: true
-    - name: Upload Report
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: AnchoreReports
-        path: ./anchore-reports/
