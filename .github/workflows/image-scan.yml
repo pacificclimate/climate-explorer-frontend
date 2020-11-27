@@ -5,22 +5,24 @@ on:
     branches:
       - master
       - '*security*'
+      - '*vulnerability*'
 
 jobs:
   scan:
-
-    runs-on: ubuntu-18.04
-
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v1
-    - name: Docker Build
-      run: docker build . --file Dockerfile --tag pcic/climate-explorer-frontend:test-image
-    - uses: anchore/scan-action@v1
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag localbuild/testimage:latest
+    - name: Run the local anchore scan action itself with sarif generation enabled
+      uses: anchore/scan-action@v1
       with:
-        image-reference: "pcic/climate-explorer-frontend:test-image"
-        fail-build: true
-    - name: Upload Report
-      uses: actions/upload-artifact@v1.0.0
+        image-reference: "localbuild/testimage:latest"
+        debug: true
+        acs-report-enable: true
+        acs-report-severity-cutoff: "Medium"
+    - name: Upload Anchore Scan ACS Report
+      uses: github/codeql-action/upload-sarif@v1
       with:
-        name: AnchoreReports
-        path: ./anchore-reports/
+        sarif_file: results.sarif
