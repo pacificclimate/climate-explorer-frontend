@@ -1,5 +1,4 @@
-name: Docker Image Scan
-
+name: Anchore Container Scan
 on:
   push:
     branches:
@@ -8,21 +7,21 @@ on:
       - '*vulnerability*'
 
 jobs:
-  scan:
+  Anchore-Build-Scan:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag localbuild/testimage:latest
-    - name: Run the local anchore scan action itself with sarif generation enabled
-      uses: anchore/scan-action@v1
+    - name: Run the Anchore scan
+      uses: anchore/scan-action@main
       with:
-        image-reference: "localbuild/testimage:latest"
-        debug: true
+        image: "localbuild/testimage:latest"
+        fail-build: true
         acs-report-enable: true
-        acs-report-severity-cutoff: "Medium"
-    - name: Upload Anchore Scan ACS Report
+        severity-cutoff: critical
+    - name: Upload Anchore Scan Report
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: results.sarif
