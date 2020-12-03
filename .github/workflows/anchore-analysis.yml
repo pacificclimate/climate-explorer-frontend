@@ -18,7 +18,6 @@ jobs:
       uses: anchore/scan-action@main
       with:
         image: "localbuild/testimage:latest"
-        fail-build: true
         acs-report-enable: true
         severity-cutoff: high
     - name: Upload Anchore Scan Report
