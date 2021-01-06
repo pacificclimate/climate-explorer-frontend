@@ -1,8 +1,18 @@
 # News / Release Notes
 
+## 2.1.3
+
+*06-Jan-2021*
+
+- [Bump axios from 0.16.2 to 0.21.1 (security update)](https://github.com/pacificclimate/climate-explorer-frontend/pull/395)
+
+## 2.1.2
+
+Erroneous tag
+
 ## 2.1.1
 
-*19-Aug-2020*
+*06-Jan-2021*
 
 Bug fixes and improvements.
 
