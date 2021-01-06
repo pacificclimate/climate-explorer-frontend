@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 2.1.1
+
+*19-Aug-2020*
+
+Bug fixes and improvements.
+
+- [Reduce Docker footprint](https://github.com/pacificclimate/climate-explorer-frontend/pull/394)
+- [Fix absent climate layers](https://github.com/pacificclimate/climate-explorer-frontend/pull/388)
+- [Update Help to reflect expanded DD and RP availability](https://github.com/pacificclimate/climate-explorer-frontend/pull/386)
+
 ## 2.1.0
 *19-Aug-2020*
 
