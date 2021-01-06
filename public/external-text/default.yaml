@@ -251,7 +251,7 @@ help:
         combination of historical data and possible future greenhouse
         gas projections. The data is averaged by month over thirty year
         periods; there are six such periods from 1960 to 2100, three
-	historical and three projected.
+        historical and three projected.
         This data is available for all of Canada.
 
         * **`pr`**
@@ -277,9 +277,9 @@ help:
         encompassing extreme precipitation, extremes of temperature,
         or lack thereof in different ways.
         This is a heterogeneous data collection with some monthly,
-	some seasonal, and some annual resolution data. The data is
-	averaged over 30 year periods; there are six such periods
-	between 1960 and 2100, three historical and three projected.
+        some seasonal, and some annual resolution data. The data is
+        averaged over 30 year periods; there are six such periods
+        between 1960 and 2100, three historical and three projected.
         This data is available for all of Canada.
 
         * **`altcddETCCDI`**
@@ -643,7 +643,7 @@ help:
         generalized extreme value distribution.
         This data is available for six thirty year climatological
         periods from 1960 to 2100, three historical and three
-	projected.
+        projected.
         This data is available for all Canada.
 
         * **`rp5pr`**
