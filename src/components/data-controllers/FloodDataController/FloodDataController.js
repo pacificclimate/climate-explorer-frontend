@@ -27,8 +27,11 @@ import React from 'react';
 import { Row, Col, Panel } from 'react-bootstrap';
 import _ from 'lodash';
 
+import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
-import {singleLtaTabLabel, graphsPanelLabel} from '../../guidance-content/info/InformationItems';
+import {
+    singleLtaTabLabel, graphsPanelLabel, timeSeriesTabLabel,
+    } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.module.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
@@ -67,6 +70,9 @@ export default class FloodDataController extends React.Component {
   static graphTabsSpecs = {
     mym: [
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
+    ],
+    notMym: [
+      { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
     ],
   };
 

@@ -175,6 +175,7 @@ class FloodAppControllerDisplay extends React.Component {
               meta = {filteredMeta}
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
+              pointSelect={true}
             />
           </HalfWidthCol>
           <HalfWidthCol>

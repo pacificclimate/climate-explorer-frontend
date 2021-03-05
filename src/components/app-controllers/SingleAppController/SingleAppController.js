@@ -175,6 +175,7 @@ class SingleAppControllerDisplay extends React.Component {
               meta = {filteredMeta}
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
+              pointSelect={false}
             />
           </HalfWidthCol>
           <HalfWidthCol>

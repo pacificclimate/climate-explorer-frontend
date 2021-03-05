@@ -87,6 +87,7 @@ export default createReactClass({
               meta = {this.getFilteredMeta()}
               area={this.state.area}
               onSetArea={this.handleSetArea}
+              pointSelect={false}
             />
           </Col>
           <Col lg={6}>
