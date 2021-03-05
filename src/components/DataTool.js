@@ -5,6 +5,7 @@ import NavRoutes from './navigation/NavRoutes/NavRoutes';
 import SingleAppController from './app-controllers/SingleAppController';
 import PrecipAppController from './app-controllers/PrecipAppController';
 import DualAppController from './app-controllers/DualAppController';
+import FloodAppController from './app-controllers/FloodAppController';
 import { loadVariableOptions } from '../core/util';
 import Await from './Await';
 
@@ -32,6 +33,13 @@ const navSpec = {
       subpath: 'precipitation/:ensemble_name(extreme_precipitation)',
       navSubpath: 'precipitation/extreme_precipitation',
       render: (props) => <PrecipAppController {...props} />,
+    },
+    {
+      label: 'Upper Fraser',
+      info: 'View flood frequency data for the Upper Fraser',
+      subpath: 'flood/:ensemble_name(upper_fraser)',
+      navSubpath: 'flood/upper_fraser',
+      render: (props) => <FloodAppController {...props} />,
     },
   ],
 };
