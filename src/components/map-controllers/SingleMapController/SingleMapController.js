@@ -56,6 +56,7 @@ export default class SingleMapController extends React.Component {
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
+    pointSelect: PropTypes.bool.isRequired
   };
 
   constructor(props) {
@@ -236,6 +237,7 @@ export default class SingleMapController extends React.Component {
 
                 onSetArea={this.props.onSetArea}
                 area={this.props.area}
+                pointSelect={this.props.pointSelect}
               >
 
                 <StaticControl position='topright'>

@@ -106,11 +106,13 @@ class DataMap extends React.Component {
     activeGeometryStyle: PropTypes.object.isRequired,
     inactiveGeometryStyle: PropTypes.object.isRequired,
     children: PropTypes.node,
+    pointSelect: PropTypes.bool,
   };
 
   static defaultProps = {
     activeGeometryStyle: { color: '#3388ff' },
     inactiveGeometryStyle: { color: '#777777' },
+    pointSelect: false,
   };
 
   static layerTypes = ['raster', 'isoline', 'annotated'];
@@ -349,14 +351,14 @@ class DataMap extends React.Component {
             position='topleft'
             draw={{
               marker: false,
-              circlemarker: false,
+              circlemarker: allowGeometryDraw && this.props.pointSelect,
               circle: false,
               polyline: false,
-              polygon: allowGeometryDraw && {
+              polygon: allowGeometryDraw && !this.props.pointSelect && {
                 showArea: false,
                 showLength: false,
               },
-              rectangle: allowGeometryDraw && {
+              rectangle: allowGeometryDraw && !this.props.pointSelect && {
                 showArea: false,
                 showLength: false,
               },

@@ -1,12 +1,12 @@
 /***************************************************************
- * SingleAppController.js 
+ * FloodAppController.js 
  * 
- * This controller represents climate explorer's main portal. It
- * has dropdowns to allow a user to select a model, emission
- * scenario, and variable. It loads and filters metadata for 
- * the selected datasets and passes them to its children:  
- * - SingleMapController (displays a variable as a colour-shaded map) 
- * - SingleDataController (displays graphs and a statistical table).
+ * This controller displays streamflow return period data.
+ * Its differences from regular data display (SingleAppContoller) 
+ * are:
+ *  - all data is annual (different graphs)
+ *  - displays ensemble percentiles
+ *  - point selectionon map
  ***************************************************************/
 
 import PropTypes from 'prop-types';
@@ -14,8 +14,8 @@ import React from 'react';
 import { Col, ControlLabel, Grid, Panel, Row } from 'react-bootstrap';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
-import SingleDataController
-  from '../../data-controllers/SingleDataController/SingleDataController';
+import FloodDataController
+  from '../../data-controllers/FloodDataController/FloodDataController';
 import {
   EmissionsScenarioSelector,
   ModelSelector,
@@ -47,9 +47,9 @@ import {
 } from '../../../core/selectors';
 
 
-class SingleAppControllerDisplay extends React.Component {
+class FloodAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
-  // entire content of SingleAppController, including the controls.
+  // entire content of FloodAppController, including the controls.
   // It is wrapped by `withAsyncMetadata` to inject the asynchronously fetched
   // metadata that it needs.
 
@@ -175,11 +175,11 @@ class SingleAppControllerDisplay extends React.Component {
               meta = {filteredMeta}
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
-              pointSelect={false}
+              pointSelect={true}
             />
           </HalfWidthCol>
           <HalfWidthCol>
-            <SingleDataController
+            <FloodDataController
               ensemble_name={this.props.ensemble_name}
               model_id={model_id}
               variable_id={variable_id}
@@ -197,10 +197,10 @@ class SingleAppControllerDisplay extends React.Component {
 
 
 // Inject asynchronously fetched metadata into controlled component.
-const WmdSingleAppControllerDisplay = withAsyncMetadata(SingleAppControllerDisplay);
+const WmdFloodAppControllerDisplay = withAsyncMetadata(FloodAppControllerDisplay);
 
 
-export default class SingleAppController extends React.Component {
+export default class FloodAppController extends React.Component {
   // This manages the state of selectors and renders the display component.
 
   state = {
@@ -218,7 +218,7 @@ export default class SingleAppController extends React.Component {
 
   render() {
     return (
-      <WmdSingleAppControllerDisplay
+      <WmdFloodAppControllerDisplay
         ensemble_name={ensemble_name(this.props)}
         {...this.state}
         onChangeArea={this.handleChangeArea}

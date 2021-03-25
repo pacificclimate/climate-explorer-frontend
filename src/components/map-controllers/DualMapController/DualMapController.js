@@ -304,6 +304,7 @@ export default class DualMapController extends React.Component {
 
                 onSetArea={this.props.onSetArea}
                 area={this.props.area}
+                pointSelect={false}
               >
 
                 <StaticControl position='topright'>
