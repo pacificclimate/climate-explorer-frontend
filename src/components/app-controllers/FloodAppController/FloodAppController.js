@@ -1,17 +1,26 @@
 /***************************************************************
  * FloodAppController.js 
  * 
- * This controller displays streamflow return period data.
- * Its differences from regular data display (SingleAppContoller) 
- * are:
- *  - all data is annual (different graphs)
- *  - displays ensemble percentiles
- *  - point selectionon map
+ * This controller displays streamflow return period data, which 
+ * is a very simple data collection - annual only, and only one
+ * "model" (actually an ensemble of models).
+ * Each variable has a set of "mean" data representing the ensemble 
+ * mean, and some "percentile" data representing percentiles of the
+ * ensemble of models. The "percentile" datasets are queried separately
+ * from the backend and their metadata is kept in the percentileMeta
+ * prop and passed to the DataController as filteredPercentileMeta.
+ * Percentile data is not passed to the MapController, it is not
+ * anticipated that users will want to see maps of percentile 
+ * datasets.
+ * Children:
+ *  - SingleMapController
+ *  - FloodDataController
  ***************************************************************/
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, ControlLabel, Grid, Panel, Row } from 'react-bootstrap';
+import _ from 'lodash';
 
 import SingleMapController from '../../map-controllers/SingleMapController';
 import FloodDataController
@@ -40,7 +49,8 @@ import {
   ensemble_name,
 } from '../common';
 import { setNamedState } from '../../../core/react-component-utils';
-import withAsyncMetadata from '../../../HOCs/withAsyncMetadata'
+import withAsyncMetadata from '../../../HOCs/withAsyncMetadata';
+import withAsyncPercentileMetadata from '../../../HOCs/withAsyncPercentileMetadata'
 import {
   findModelNamed, findScenarioIncluding, findVariableMatching,
   representativeValue, constraintsFor, filterMetaBy,
@@ -50,8 +60,8 @@ import {
 class FloodAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
   // entire content of FloodAppController, including the controls.
-  // It is wrapped by `withAsyncMetadata` to inject the asynchronously fetched
-  // metadata that it needs.
+  // It is wrapped by `withAsyncMetadata` and `withASynPercentileMeta`
+  // to inject the asynchronously fetched metadata that it needs.
 
   static propTypes = {
     ensemble_name: PropTypes.string,
@@ -64,6 +74,7 @@ class FloodAppControllerDisplay extends React.Component {
     onChangeVariable: PropTypes.func,
     onChangeArea: PropTypes.func,
     meta: PropTypes.array,
+    percentileMeta: PropTypes.array
   };
 
   replaceInvalidModel = findModelNamed('PCIC12');
@@ -74,10 +85,12 @@ class FloodAppControllerDisplay extends React.Component {
   constraintsFor = (...args) => constraintsFor(...args)(this.props);
   filterMetaBy = (...args) =>
     filterMetaBy(...args)(this.props)(this.props.meta);
+  filterPercentileMetaBy = (...args) =>
+    filterMetaBy(...args)(this.props)(this.props.percentileMeta);
 
   render() {
     const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
-    const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
+    const filteredPercentileMeta = this.filterPercentileMetaBy('model', 'scenario', 'variable');
 
     const model_id = this.representativeValue('model', 'model_id');
     const experiment = this.representativeValue('scenario', 'experiment');
@@ -186,7 +199,7 @@ class FloodAppControllerDisplay extends React.Component {
               experiment={experiment}
               area={g.geojson(this.props.area).toWKT()}
               meta = {filteredMeta}
-              contextMeta={modelContextMetadata} //to generate Model Context graph
+              percentileMeta={filteredPercentileMeta} //to generate percentile graphs
             />
           </HalfWidthCol>
         </Row>
@@ -197,8 +210,9 @@ class FloodAppControllerDisplay extends React.Component {
 
 
 // Inject asynchronously fetched metadata into controlled component.
-const WmdFloodAppControllerDisplay = withAsyncMetadata(FloodAppControllerDisplay);
+const withAllAPIData = _.flow(withAsyncPercentileMetadata, withAsyncMetadata)
 
+const WmdFloodAppControllerDisplay = withAllAPIData(FloodAppControllerDisplay);
 
 export default class FloodAppController extends React.Component {
   // This manages the state of selectors and renders the display component.

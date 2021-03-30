@@ -30,7 +30,8 @@ const transformMetadata = metadata => flow(
         end_date: timestampToYear(metadatum.end_date),
         ...pick([
           'institution', 'model_id', 'model_name', 'ensemble_member',
-          'timescale', 'multi_year_mean', 'filepath',
+          'timescale', 'multi_year_mean', 'filepath', 
+          'climatological_statistic',
         ])(metadatum)
       };
     })(metadatum.variables)
@@ -44,6 +45,22 @@ export function getMetadata(ensemble_name) {
     baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
     params: {
       ensemble_name,
+      extras: "filepath",
+    },
+  })
+    .then(response => response.data)
+    .then(transformMetadata)
+}
+
+
+export function getPercentileMetadata(ensemble_name) {
+  // Get all metadata for all percentile datasets in `ensemble_name` 
+  // and transform it to CE form.
+  return axios({
+    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
+    params: {
+      ensemble_name,
+      climatological_statistic: "percentile",
       extras: "filepath",
     },
   })
@@ -80,7 +97,8 @@ function getTimeseries({ variable_id, unique_id }, area) {
 
 // TODO: Find a better name than 'data', really!!
 function getData(
-  { ensemble_name, model_id, variable_id, experiment, timescale, timeidx, area },
+  { ensemble_name, model_id, variable_id, experiment, timescale, timeidx, area,
+  climatological_statistic = null, percentile = null}
 ) {
   // Get from 'data' API endpoint.
   // Description: Get data values from all files matching the following:
@@ -91,21 +109,34 @@ function getData(
   //  timescale,
   //  time (timeidx)
   //  area
+  //  climatological_statistic (optional)
+  //  percentile (optional)
   // Those parameters are all props of components concerned, and so are
   // grouped as a single object for convenience.
 
-  let queryExpString = guessExperimentFormatFromVariable(variable_id, experiment);
+  const queryExpString = guessExperimentFormatFromVariable(variable_id, experiment);
+  let query_params = {
+        ensemble_name: ensemble_name,
+        model: model_id,
+        variable: variable_id,
+        emission: queryExpString,
+        timescale: timescale,
+        time: timeidx,
+        area: area || '',
+    };
+
+  // if the caller has passed optional parameters, add them to the call.
+  if (climatological_statistic == 'percentile' & percentile) {
+    query_params['climatological_statistic'] = climatological_statistic;
+    query_params['percentile'] = percentile;
+  }
+  else if (climatological_statistic) {
+      query_params['climatological_statistic'] = climatological_statistic;
+  }
+
   return axios({
     baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'data'),
-    params: {
-      ensemble_name: ensemble_name,
-      model: model_id,
-      variable: variable_id,
-      emission: queryExpString,
-      timescale: timescale,
-      time: timeidx,
-      area: area || '',
-    },
+    params: query_params
   });
 }
 

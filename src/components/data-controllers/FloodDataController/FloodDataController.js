@@ -1,13 +1,14 @@
 /*******************************************************************
  * FloodDataController.js - controller for numerical visualization of
  * flood frequency data.
- * This data is very simple - there is only one "model" (actually an 
- * ensemble mean) and all data is annual. 
+ * The flood frequency data itself is very simple - there is only one
+ * "model" (an ensemble mean) and all data is annual.
  * So it doesn't display a time slice graph or a context graph - these
  * are used to compare models. It also doesn't display a timeseries
  * graph or anomaly annual cycle graph - these show monthly and
  * seasonal changes. In fact, there is only one graph, a long term 
- * average graph.
+ * average graph. This graph displays both ensemble means and any
+ * available ensemble percentiles.
  * 
  * Receives a model, an experiment, and a variable from its parent,
  * FloodAppController. Manages viewer components that display data as
@@ -28,7 +29,7 @@ import { Row, Col, Panel } from 'react-bootstrap';
 import _ from 'lodash';
 
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
-import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
+import PercentileLongTermAveragesGraph from '../../graphs/PercentileLongTermAveragesGraph';
 import {
     singleLtaTabLabel, graphsPanelLabel, timeSeriesTabLabel,
     } from '../../guidance-content/info/InformationItems';
@@ -37,8 +38,6 @@ import styles from '../DataController.module.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import GraphTabs from '../GraphTabs';
-import StatisticalSummaryTable from '../../StatisticalSummaryTable';
-
 
 export default class FloodDataController extends React.Component {
   static propTypes = {
@@ -47,7 +46,7 @@ export default class FloodDataController extends React.Component {
     experiment: PropTypes.string,
     area: PropTypes.string,
     meta: PropTypes.array,
-    contextMeta: PropTypes.array,
+    percentileMeta: PropTypes.array,
     ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
   };
 
@@ -69,7 +68,7 @@ export default class FloodDataController extends React.Component {
   // TODO: Pull this out into new component SingleVariableGraphs
   static graphTabsSpecs = {
     mym: [
-      { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
+      { title: singleLtaTabLabel, graph: PercentileLongTermAveragesGraph },
     ],
     notMym: [
       { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
@@ -107,10 +106,6 @@ export default class FloodDataController extends React.Component {
             />
           </Panel.Body>
         </Panel>
-
-        <FlowArrow>filtered datasets</FlowArrow>
-
-        <StatisticalSummaryTable {...this.props} />
 
       </div>
     );
