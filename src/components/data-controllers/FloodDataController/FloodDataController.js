@@ -31,7 +31,7 @@ import _ from 'lodash';
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import PercentileLongTermAveragesGraph from '../../graphs/PercentileLongTermAveragesGraph';
 import {
-    singleLtaTabLabel, graphsPanelLabel, timeSeriesTabLabel,
+    percentileLtaTabLabel, graphsPanelLabel, timeSeriesTabLabel,
     } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.module.css';
@@ -68,7 +68,7 @@ export default class FloodDataController extends React.Component {
   // TODO: Pull this out into new component SingleVariableGraphs
   static graphTabsSpecs = {
     mym: [
-      { title: singleLtaTabLabel, graph: PercentileLongTermAveragesGraph },
+      { title: percentileLtaTabLabel, graph: PercentileLongTermAveragesGraph },
     ],
     notMym: [
       { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
