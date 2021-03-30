@@ -682,6 +682,47 @@ help:
 
           50-year annual minimum daily minimum temperature
           
+          
+        ### Annual maximum streamflow quantiles
+
+        The streamflow quantiles describe extreme streamflow events
+        that would be expected to occur once during a specified 
+        "return period," for example once every 20 years. 
+        These datasets are calculated empirically from VIC-GL
+        simulated streamflow driven with the CanESM2 large ensemble,
+        which is forced by the RCP8.5 concentration pathway scenario. 
+        This data is available for six thirty year climatological periods
+        from 1961 to 2099, namely 1961-1990, 1971-2000, 1981-2010, 
+        2010-2039, 2040-2069, and 2070-2099. 
+        This data is available for a region of the Fraser River upstream 
+        of Shelley, British Columbia. Each quantile estimate is also
+        provided with the 95% sampling interval provided as the
+        2.5th and 97.5th percentiles.
+
+        
+        * **`rp2streamflow`**
+
+          2-year annual maximum one day streamflow
+          
+        * **`rp5streamflow`**
+
+          5-year annual maximum one day streamflow
+        
+        * **`rp20streamflow`**
+
+          20-year annual maximum one day streamflow
+          
+        * **`rp50streamflow`**
+
+          50-year annual maximum one day streamflow
+          
+        * **`rp100streamflow`**
+
+          100-year annual maximum one day streamflow
+          
+        * **`rp200streamflow`**
+
+          200-year annual maximum one day streamflow
 
       - |
         ## Models (GCMs)

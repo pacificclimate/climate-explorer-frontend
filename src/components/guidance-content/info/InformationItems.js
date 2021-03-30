@@ -443,6 +443,11 @@ const spatialAveragingDefn = `
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
+const pointAreaDefn = `
+  Data values shown in each graph are from the single grid square selected
+  on the map (or averaged over the entire dataset if no point is selected).
+`;
+
 const datasetSelectorDefn = `
   Model run and averaging period are selected by the Dataset selector
   in the graph.
@@ -498,6 +503,15 @@ export const singleLtaTabLabel = (
     <p>Long term average graphs for the selected variable.</p>
     <p>{ltaGraphDefn}</p>
     <p>{spatialAveragingDefn}</p>
+    <p>{timeOfYearSelectorDefn}</p>
+  </LabelWithInfo>
+);
+
+export const percentileLtaTabLabel = (
+  <LabelWithInfo label='Long Term Average'>
+    <p>Long term average graphs with percentile range for the selected variable.</p>
+    <p>{ltaGraphDefn}</p>
+    <p>{pointAreaDefn}</p>
     <p>{timeOfYearSelectorDefn}</p>
   </LabelWithInfo>
 );
