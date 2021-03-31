@@ -35,7 +35,7 @@ const navSpec = {
       render: (props) => <PrecipAppController {...props} />,
     },
     {
-      label: 'Upper Fraser',
+      label: 'Extreme Streamflow',
       info: 'View flood frequency data for the Upper Fraser',
       subpath: 'flood/:ensemble_name(upper_fraser)',
       navSubpath: 'flood/upper_fraser',
