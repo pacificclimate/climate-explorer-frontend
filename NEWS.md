@@ -1,5 +1,18 @@
 # News / Release Notes
 
+## 2.1.5
+
+*31-Mar-2021*
+
+- [security improvements](https://github.com/pacificclimate/climate-explorer-frontend/pull/402)
+
+## 2.1.4
+
+*31-Mar-2021*
+
+- [flood portal queries and displays ensemble percentiles in a graph](https://github.com/pacificclimate/climate-explorer-frontend/pull/399)
+- [Set up new portal to display flood frequency data](https://github.com/pacificclimate/climate-explorer-frontend/pull/398)
+
 ## 2.1.3
 
 *06-Jan-2021*
