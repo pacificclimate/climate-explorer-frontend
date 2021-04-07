@@ -126,7 +126,7 @@ function getData(
     };
 
   // if the caller has passed optional parameters, add them to the call.
-  if (climatological_statistic == 'percentile' & percentile) {
+  if (climatological_statistic == 'percentile' && percentile) {
     query_params['climatological_statistic'] = climatological_statistic;
     query_params['percentile'] = percentile;
   }
