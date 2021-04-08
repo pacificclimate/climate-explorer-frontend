@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.1.6
+
+*8-Apr-2021*
+
+- [fixes a bug affected formatting of queries to the data API](https://github.com/pacificclimate/climate-explorer-frontend/pull/404)
+
 ## 2.1.5
 
 *31-Mar-2021*
