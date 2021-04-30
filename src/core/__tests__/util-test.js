@@ -53,6 +53,52 @@ jest.mock('../../data-services/public.js');
       expect(result).toEqual(bootstrapTableTestExpected);
     });
   });
+
+  const watershedTableTestExpected = [
+    {
+        "attribute": "Outlet Longitude",
+        "value": -119.15625,
+        "units": "Degrees East"
+        
+    },
+    {
+        "attribute": "Outlet Latitude",
+        "value": 53.09375,
+        "units": "Degrees North"
+        
+    },
+    {
+        "attribute": "Source Elevation",
+        "value": 3929.0,
+        "units": "m"
+        
+    },
+    {
+        "attribute": "Outlet Elevation",
+        "value": 978.0,
+        "units": "m"
+        
+    },
+    {
+        "attribute": "Area",
+        "value":  29003360.546692643,
+        "units": "m^2"
+        
+    },
+    {
+        "attribute": "Melton Ratio",
+        "value": 0.5479551951040129,
+        "units": "km/km"
+        
+    },
+  ];
+  
+  describe('parseWatershedTableData', function () {
+     it('parses a watershed API response into attribute-value-units tuples', function () {
+         var result = util.parseWatershedTableData(mockAPI.watershed, "POINT (-119.15625 53.09375)");
+         expect(result).toEqual(watershedTableTestExpected);
+     }); 
+  });
  
   describe('validateLongTermAverageData', function () {
     it('rejects empty data sets', function () {
@@ -182,6 +228,27 @@ jest.mock('../../data-services/public.js');
       expect(util.validateUnstructuredTimeseriesData({data: concatenatedTasmaxTimeseries})).toEqual({data: concatenatedTasmaxTimeseries});
     });
   });
+  
+  describe('validateWatershedData', function () {
+    it('rejects Workzeug error messages', function () {
+      var func = function () {util.validateUnstructuredTimeseriesData({data:
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects watersheds with missing data', function () {
+        const attributes = ["area", "elevation", "boundary", "hypsometric_curve", "melton_ratio"];
+        _.forEach(attributes, function(att) {
+            const missing = _.omit(mockAPI.watershed, att);
+            const func = function () {util.validateWatershedData({data: missing})}
+            expect(func).toThrow();
+        });
+    });
+    it('accepts a valid watershed', function () {
+        expect(util.validateWatershedData({data:mockAPI.watershed})).toEqual({data: mockAPI.watershed});
+    })
+  });
 
   describe('getVariableOptions', function() {
     it('returns undefined for nonexistent variables', function () {
@@ -303,4 +370,18 @@ jest.mock('../../data-services/public.js');
       expect(util.nestedAttributeIsDefined({attribute: 0}, "missing")).toBe(false);
       expect(util.nestedAttributeIsDefined({attribute: {nested: 0}}, "attribute", "missing")).toBe(false);
     });
+  });
+  
+  describe('WKTPointToGeoJSONPoint', function () {
+     it('throws an error on bad strings', function () {
+         const bad_wkts = ["banana", "POLYGON ((1 2, 3 4, 5 6, 1 2))", "POINTER (10 20)", "POINT+(10+20)"];
+         _.forEach(bad_wkts, function (bad_wkt) {
+             const func = function () {util.WKTPointToGeoJSONPoint(bad_wkt)};
+             expect(func).toThrow();
+         });
+     }); 
+     it('parses WKT Points', function () {
+        const expected_geoJSON = {"type": "Point", "coordinates": [-119.15625,53.09375]};
+        expect(util.WKTPointToGeoJSONPoint("POINT (-119.15625 53.09375)")).toEqual(expected_geoJSON);
+     });
   });
