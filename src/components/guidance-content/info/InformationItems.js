@@ -656,18 +656,18 @@ export const exportStatsTableDataLabel = (
 // Watershed table
 ///////////////////////////////
 export const watershedTableLabel = (
-  <LabelWithInfo label='Watershed Information'>
+  <LabelWithInfo label='Watershed Upstream Of Selected Point'>
     <p>
-      This table presents information about the watershed that drains
-      to a point selected on the map.
+      This table presents information about the selected grid and its upstream area
+      or watershed.
     </p>
     <p>
-      The Outlet Latitude, Longitude, and Elevation describe the point selected on the map.
-      The Source Elevation, Area, and Melton Ratio describe the watershed drained by streams
-      that empty to the selected point. Source Elevation is the highest point in the watershed.
-      Area is the total area of the watershed,
-      The Melton Ratio is defined at the difference in elevation over the watershed divided by
-      the square root of the area of the watershed.
+      The Outlet Latitude and Longitude describe the point selected on the map,
+      which defines the outlet of the watershed. The Source Elevation and Outlet
+      Elevation are the minimum and maximum elevation of the watershed. The Area
+      is the drainage area of the watershed, upstream of the selected point.
+      The Melton Ratio is defined as the relief (maximum minus minimum elevation),
+      over the watershed, divided by the square root of its drainage area.
     </p>
   </LabelWithInfo>
 );

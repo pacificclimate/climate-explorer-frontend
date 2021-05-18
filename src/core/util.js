@@ -65,12 +65,13 @@ export function parseWatershedTableData(data, area) {
     let avus = [];
     // convert the WKT point from the API call to geoJSON
     const point = WKTPointToGeoJSONPoint(area);
+    function prec(num) {return +num.toFixed(PRECISION)};
     avus.push(["Outlet Longitude", point.coordinates[0], "Degrees East"]);
     avus.push(["Outlet Latitude", point.coordinates[1], "Degrees North"]);
-    avus.push(["Source Elevation", data.elevation.maximum, data.elevation.units]);
-    avus.push(["Outlet Elevation", data.elevation.minimum, data.elevation.units]);
-    avus.push(["Area", data.area.value, data.area.units]);
-    avus.push(["Melton Ratio", data.melton_ratio.value, data.melton_ratio.units]);
+    avus.push(["Source Elevation", prec(data.elevation.maximum), data.elevation.units]);
+    avus.push(["Outlet Elevation", prec(data.elevation.minimum), data.elevation.units]);
+    avus.push(["Area", prec(data.area.value), data.area.units]);
+    avus.push(["Melton Ratio", prec(data.melton_ratio.value), data.melton_ratio.units]);
 
     return _.map(avus, function (avu) {
         return {

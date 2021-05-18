@@ -81,13 +81,13 @@ jest.mock('../../data-services/public.js');
     },
     {
         "attribute": "Area",
-        "value":  29003360.546692643,
+        "value":  29003360.55,
         "units": "m^2"
         
     },
     {
         "attribute": "Melton Ratio",
-        "value": 0.5479551951040129,
+        "value": 0.55,
         "units": "km/km"
         
     },
@@ -102,11 +102,11 @@ jest.mock('../../data-services/public.js');
  
   describe('validateLongTermAverageData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateLongTermAverageData({data: {}});};
+      const func = () => {util.validateLongTermAverageData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateLongTermAverageData( { data:
+      const func = () => {util.validateLongTermAverageData( { data:
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -115,7 +115,7 @@ jest.mock('../../data-services/public.js');
     it('rejects data without units', function () {
       var noUnits = {"data": {}};
       noUnits.data["r1i1pi"] = _.omit(noUnits.data["r1i1p1"], 'units');
-      var func = function () {util.validateLongTermAverageData(noUnits);};
+      const func = () => {util.validateLongTermAverageData(noUnits);};
       expect(func).toThrow();
     });
     it('accepts valid data', function () {
@@ -128,11 +128,11 @@ jest.mock('../../data-services/public.js');
   describe('validateStatsData', function () {
     var id = mockAPI.monthlyTasmaxTimeseries.id;
     it('rejects empty data sets', function () {
-      var func = function () {util.validateStatsData({ data: {}});};
+      const func = () => {util.validateStatsData({ data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateStatsData({data:
+      const func = () => {util.validateStatsData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -141,19 +141,19 @@ jest.mock('../../data-services/public.js');
     it('rejects NaN values', function () {
       var nan = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       nan[id].max = Number.NaN;
-      var func = function () {util.validateStatsData({data: nan});};
+      const func = () => {util.validateStatsData({data: nan});};
       expect(func).toThrow();      
     });
     it('rejects missing statistical values', function () {
       var missing = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       missing[id] = _.omit(missing[id], "mean");
-      var func = function() {util.validateStatsData({data: missing});};
+      const func = () => {util.validateStatsData({data: missing});};
       expect(func).toThrow();
     });
     it('rejects datasets missing units', function () {
       var noUnits = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       noUnits[id] = _.omit(noUnits[id], "units");
-      var func = function () {util.validateStatsData({data: noUnits});};
+      const func = () => {util.validateStatsData({data: noUnits});};
       expect(func).toThrow();
     });
     it('accepts valid datasets', function () {
@@ -163,11 +163,11 @@ jest.mock('../../data-services/public.js');
       
   describe('validateAnnualCycleData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateAnnualCycleData({data: {}});};
+      const func = () => {util.validateAnnualCycleData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateAnnualCycleData({data:
+      const func = () => {util.validateAnnualCycleData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -175,7 +175,7 @@ jest.mock('../../data-services/public.js');
     });
     it('rejects data sets without units', function () {
       var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
-      var func = function () {util.validateAnnualCycleData({data: noUnits});};
+      const func = () => {util.validateAnnualCycleData({data: noUnits});};
       expect(func).toThrow();
     });
     it('rejects concatenanted chronology data', function () {
@@ -184,7 +184,7 @@ jest.mock('../../data-services/public.js');
       var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
-      var func = function () {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries});};
+      const func = () => {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries});};
       expect(func).toThrow();
     });
     it('accepts valid monthly resolution data', function () {
@@ -200,11 +200,11 @@ jest.mock('../../data-services/public.js');
   
   describe('validateUnstructureTimeseriesData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data: {}});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data:
+      const func = () => {util.validateUnstructuredTimeseriesData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -212,13 +212,13 @@ jest.mock('../../data-services/public.js');
     });
     it('rejects data sets without units', function () {
       var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
-      var func = function () {util.validateUnstructuredTimeseriesData({data: noUnits});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: noUnits});};
       expect(func).toThrow();
     });
     it('rejects an empty timeseries', function () {
       var noTimestamps = _.omit(mockAPI.monthlyTazmarTimeseries, "times");
       noTimestamps.times = {};
-      var func = function () {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
       expect(func).toThrow();
     });
     it('accepts a valid timeseries', function () {
@@ -231,7 +231,7 @@ jest.mock('../../data-services/public.js');
   
   describe('validateWatershedData', function () {
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data:
+      const func = () => {util.validateUnstructuredTimeseriesData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};

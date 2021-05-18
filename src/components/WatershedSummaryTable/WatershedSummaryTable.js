@@ -126,7 +126,7 @@ export default class WatershedSummaryTable extends React.Component {
 
     // Waiting for data
     if (this.state.fetchingData || this.state.data === null) {
-      return { noDataText: 'Select a point on the map to see watershed information' };
+      return { noDataText: 'Select a point on the map with the circle marker tool to see watershed information' };
     }
 
     // We can haz data
