@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.1.7
+
+*19-May-2021
+
+- [adds a table displaying information about the selected watershed](https://github.com/pacificclimate/climate-explorer-frontend/pull/407)
+
 ## 2.1.6
 
 *8-Apr-2021*
