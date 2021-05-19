@@ -57,6 +57,33 @@ export function parseBootstrapTableData(data, metadata) {
 }
 
 /*
+ * Assembles a list of dictionaries describing a watershed from
+ * the area parameter (latlon) and API response (watershed calculations).
+ * Doesn't use the hypsometric curve or the shape data, only scalars.
+ */
+export function parseWatershedTableData(data, area) {
+    let avus = [];
+    // convert the WKT point from the API call to geoJSON
+    const point = WKTPointToGeoJSONPoint(area);
+    function prec(num) {return +num.toFixed(PRECISION)};
+    avus.push(["Outlet Longitude", point.coordinates[0], "Degrees East"]);
+    avus.push(["Outlet Latitude", point.coordinates[1], "Degrees North"]);
+    avus.push(["Source Elevation", prec(data.elevation.maximum), data.elevation.units]);
+    avus.push(["Outlet Elevation", prec(data.elevation.minimum), data.elevation.units]);
+    avus.push(["Area", prec(data.area.value), data.area.units]);
+    avus.push(["Melton Ratio", prec(data.melton_ratio.value), data.melton_ratio.units]);
+
+    return _.map(avus, function (avu) {
+        return {
+            attribute: avu[0],
+            value: avu[1],
+            units: avu[2]
+        };
+    });
+}
+
+
+/*
  * Basic validation of data fetched from a "data" call to the climate
  * explorer backend. Accepts an axios response object, throws an error if
  * anything is missing, otherwise returns the object unaltered.
@@ -130,6 +157,24 @@ export function validateUnstructuredTimeseriesData(response) {
   }
   return response;
 }
+
+
+/*
+ * Basic validation of data fetched from a "watershed" call to the climate
+ * explorer backend. Accepts an axios response object, throws an error if
+ * anything is missing, otherwise returns the object unaltered.
+ */
+export function validateWatershedData(response) {
+  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
+    throw new Error('Error: watershed information unavailable for this point.');
+  }
+  if (!_.every('area elevation boundary hypsometric_curve melton_ratio'.split(' '),
+        attr => attr in response.data)) {
+    throw new Error('Error: watershed data for this point is incomplete');
+  }
+  return response;
+}
+
 
 /*
  * Get an option defined in the variable options yaml config file.
@@ -449,4 +494,23 @@ export function nestedAttributeIsDefined(o, ...attributes) {
     o = o[attributes[i]];
   }
   return true;
+}
+
+/**********************************************************
+ * Geo-related helper function
+ **********************************************************/
+// Converts a single WKT point string to a geoJSON point object.
+// There are libraries that do this sort of thing, but right now,
+// this is the only such conversion we need.
+export function WKTPointToGeoJSONPoint(wkt) {
+    const elements = _.split(wkt, ' ');
+    if(elements[0] != 'POINT') {
+        throw new Error(`Invalid WKT Point: ${wkt}`);
+    }
+    const lon = parseFloat(_.trim(elements[1], '()'));
+    const lat = parseFloat(_.trim(elements[2], '()'));
+    return {
+        type: "Point",
+        coordinates: [lon, lat]
+    };
 }

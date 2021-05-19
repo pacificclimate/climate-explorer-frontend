@@ -26,7 +26,7 @@ import _ from 'lodash';
 
 //A set of monthly, seasonal, and annual to test time resolutions:
 
-var monthlyTasmaxTimeseries = {
+const monthlyTasmaxTimeseries = {
     "data": {
       "1977-01-15T00:00:00Z": -20.599000150601793,
       "1977-02-15T00:00:00Z": -18.805330621105593,
@@ -45,7 +45,7 @@ var monthlyTasmaxTimeseries = {
     "units": "degC"
   };
   
-var seasonalTasmaxTimeseries = {
+const seasonalTasmaxTimeseries = {
     "data": {
       "1977-01-16T00:00:00Z": -18.78877913696885,
       "1977-04-16T00:00:00Z": -4.774442646969235,
@@ -56,7 +56,7 @@ var seasonalTasmaxTimeseries = {
     "units": "degC"
   };
 
-var annualTasmaxTimeseries = {
+const annualTasmaxTimeseries = {
     "data": {
       "1977-07-02T00:00:00Z": -2.671051067797724
     },
@@ -66,7 +66,7 @@ var annualTasmaxTimeseries = {
 
 //timeseries for other variables to test variable comparison operations:
 
-var monthlyTasminTimeseries = {
+const monthlyTasminTimeseries = {
     "data": {
       "1977-01-15T00:00:00Z": -29.349525294996894,
       "1977-02-15T00:00:00Z": -28.22889203091248,
@@ -85,7 +85,7 @@ var monthlyTasminTimeseries = {
     "units": "degC"
   };
 
-var monthlyPrTimeseries = {
+const monthlyPrTimeseries = {
     "data": {
       "1977-01-15T00:00:00Z": 0.9872395791792838,
       "1977-02-15T00:00:00Z": 0.8930409973169107,
@@ -109,7 +109,7 @@ var monthlyPrTimeseries = {
  * Sample result from the multistats API call.
  **************************************************************/
 
-var tasmaxStats = {
+const tasmaxStats = {
     "tasmax_mClim_BCCAQv2_bcc-csm1-1-m_historical-rcp45_r1i1p1_19610101-19901231_Canada": {
       "min": -37.532611494,
       "units": "degC",
@@ -137,7 +137,7 @@ var tasmaxStats = {
  * Sample results from the data API call.
  ******************************************************************/
 
-var tasmaxData = {
+const tasmaxData = {
     "r1i1p1": {
       "data": {
         "1997-01-15T00:00:00Z": -19.534196834187902,
@@ -151,7 +151,7 @@ var tasmaxData = {
     }
   };
 
-var tasminData = {
+const tasminData = {
     "r1i1p1": {
       "data": {
         "1997-01-15T00:00:00Z": -28.265036079409857,
@@ -165,7 +165,7 @@ var tasminData = {
     }
   };
 
-var prData = {
+const prData = {
     "r1i1p1": {
       "data": {
         "1997-01-15T00:00:00Z": 1.0079478619576079,
@@ -185,7 +185,7 @@ var prData = {
  * the additional dataset in the "multistats" sample data.
  ****************************************************************/
 
-var metadata = {
+const metadata = {
     "tasmax_mClim_BCCAQv2_bcc-csm1-1-m_historical-rcp45_r1i1p1_19610101-19901231_Canada": {
       "institution": "PCIC",
       "ensemble_member": "r1i1p1",
@@ -270,6 +270,42 @@ var metadata = {
       "end_date": "2010"
     }
   };
+  
+/****************************************************************
+ * Sample results from the watershed API.
+ ****************************************************************/
+ const watershed = {
+    "elevation": {"units": "m", "minimum": 978.0, "maximum": 3929.0}, 
+    "area": {"units": "m^2", "value": 29003360.546692643}, 
+    "hypsometric_curve": {
+        "elevation_bin_start": 0, 
+        "elevation_bin_width": 100, 
+        "elevation_num_bins": 46, 
+        "cumulative_areas": [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29003360.546692643,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+        "elevation_units": "m", 
+        "area_units": "m^2"
+    }, 
+    "melton_ratio": {"units": "km/km", "value": 0.5479551951040129}, 
+    "boundary": {
+        "type": "Feature", 
+        "geometry": {
+            "type": "Polygon", 
+            "coordinates": [[
+                [-119.125, 53.0625], [-119.125, 53.125], 
+                [-119.1875, 53.125], [-119.1875, 53.0625], 
+                [-119.125, 53.0625]
+            ]]
+        }, 
+        "properties": {
+            "mouth": {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-119.15625, 53.09375]}}
+        }
+    }, 
+    "debug/test": {"watershed": {"cell_count": 1, "time": 0.056996775791049004}}
+};
 
 /****************************************************************
  * Data-transforming functions that match transformations done
@@ -319,4 +355,4 @@ export {monthlyTasmaxTimeseries, seasonalTasmaxTimeseries, annualTasmaxTimeserie
     monthlyTasminTimeseries, monthlyPrTimeseries,
     tasmaxStats, addRunToStats,
     tasmaxData, tasminData, prData,
-    metadata, metadataToArray};
+    metadata, watershed, metadataToArray};

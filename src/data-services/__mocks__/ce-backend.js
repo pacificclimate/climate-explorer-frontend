@@ -26,3 +26,26 @@ export function getStats() {
         }
     });
 }
+
+// doesn't return valid boundary or hypsometric data, add them if you need to test 
+// those things.
+export function getWatershed() {
+        return Promise.resolve({
+            "elevation": {"units": "m", "minimum": 978.0, "maximum": 3929.0}, 
+            "area": {"units": "m^2", "value": 29003360.546692643}, 
+            "hypsometric_curve": {
+                "elevation_bin_start": 0, 
+                "elevation_bin_width": 100, 
+                "elevation_num_bins": 46, 
+                "cumulative_areas": [0], 
+                "elevation_units": "m", 
+                "area_units": "m^2"
+            }, 
+            "melton_ratio": {"units": "km/km", "value": 0.5479551951040129}, 
+            "boundary": {
+                "type": "Feature", 
+                "geometry": {"type": "Polygon", "coordinates": []}, 
+                "properties": {"mouth": {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-119.15625, 53.09375]}}}
+            }
+        });
+}

@@ -38,6 +38,7 @@ import styles from '../DataController.module.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
 import FlowArrow from '../../data-presentation/FlowArrow';
 import GraphTabs from '../GraphTabs';
+import WatershedSummaryTable from '../../WatershedSummaryTable'
 
 export default class FloodDataController extends React.Component {
   static propTypes = {
@@ -106,6 +107,8 @@ export default class FloodDataController extends React.Component {
             />
           </Panel.Body>
         </Panel>
+
+        <WatershedSummaryTable {...this.props} />
 
       </div>
     );

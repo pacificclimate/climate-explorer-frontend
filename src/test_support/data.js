@@ -15,6 +15,8 @@ const meta = [
   },
 ];
 
+const watershed_wkt = "POINT(-119.15625+53.09375)";
+
 const times = {
   '{"timescale":"yearly","timeidx":"0"}': '1977-07-02T00:00:00Z',
   '{"timescale":"monthly","timeidx":"0"}': '1977-01-15T00:00:00Z',

@@ -53,14 +53,60 @@ jest.mock('../../data-services/public.js');
       expect(result).toEqual(bootstrapTableTestExpected);
     });
   });
+
+  const watershedTableTestExpected = [
+    {
+        "attribute": "Outlet Longitude",
+        "value": -119.15625,
+        "units": "Degrees East"
+        
+    },
+    {
+        "attribute": "Outlet Latitude",
+        "value": 53.09375,
+        "units": "Degrees North"
+        
+    },
+    {
+        "attribute": "Source Elevation",
+        "value": 3929.0,
+        "units": "m"
+        
+    },
+    {
+        "attribute": "Outlet Elevation",
+        "value": 978.0,
+        "units": "m"
+        
+    },
+    {
+        "attribute": "Area",
+        "value":  29003360.55,
+        "units": "m^2"
+        
+    },
+    {
+        "attribute": "Melton Ratio",
+        "value": 0.55,
+        "units": "km/km"
+        
+    },
+  ];
+  
+  describe('parseWatershedTableData', function () {
+     it('parses a watershed API response into attribute-value-units tuples', function () {
+         var result = util.parseWatershedTableData(mockAPI.watershed, "POINT (-119.15625 53.09375)");
+         expect(result).toEqual(watershedTableTestExpected);
+     }); 
+  });
  
   describe('validateLongTermAverageData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateLongTermAverageData({data: {}});};
+      const func = () => {util.validateLongTermAverageData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateLongTermAverageData( { data:
+      const func = () => {util.validateLongTermAverageData( { data:
           `<html>
            <head>
            <title>IndexError // Werkzeug Debugger</title>`});};
@@ -69,7 +115,7 @@ jest.mock('../../data-services/public.js');
     it('rejects data without units', function () {
       var noUnits = {"data": {}};
       noUnits.data["r1i1pi"] = _.omit(noUnits.data["r1i1p1"], 'units');
-      var func = function () {util.validateLongTermAverageData(noUnits);};
+      const func = () => {util.validateLongTermAverageData(noUnits);};
       expect(func).toThrow();
     });
     it('accepts valid data', function () {
@@ -82,11 +128,11 @@ jest.mock('../../data-services/public.js');
   describe('validateStatsData', function () {
     var id = mockAPI.monthlyTasmaxTimeseries.id;
     it('rejects empty data sets', function () {
-      var func = function () {util.validateStatsData({ data: {}});};
+      const func = () => {util.validateStatsData({ data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateStatsData({data:
+      const func = () => {util.validateStatsData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -95,19 +141,19 @@ jest.mock('../../data-services/public.js');
     it('rejects NaN values', function () {
       var nan = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       nan[id].max = Number.NaN;
-      var func = function () {util.validateStatsData({data: nan});};
+      const func = () => {util.validateStatsData({data: nan});};
       expect(func).toThrow();      
     });
     it('rejects missing statistical values', function () {
       var missing = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       missing[id] = _.omit(missing[id], "mean");
-      var func = function() {util.validateStatsData({data: missing});};
+      const func = () => {util.validateStatsData({data: missing});};
       expect(func).toThrow();
     });
     it('rejects datasets missing units', function () {
       var noUnits = JSON.parse(JSON.stringify(mockAPI.tasmaxStats));
       noUnits[id] = _.omit(noUnits[id], "units");
-      var func = function () {util.validateStatsData({data: noUnits});};
+      const func = () => {util.validateStatsData({data: noUnits});};
       expect(func).toThrow();
     });
     it('accepts valid datasets', function () {
@@ -117,11 +163,11 @@ jest.mock('../../data-services/public.js');
       
   describe('validateAnnualCycleData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateAnnualCycleData({data: {}});};
+      const func = () => {util.validateAnnualCycleData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateAnnualCycleData({data:
+      const func = () => {util.validateAnnualCycleData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -129,7 +175,7 @@ jest.mock('../../data-services/public.js');
     });
     it('rejects data sets without units', function () {
       var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
-      var func = function () {util.validateAnnualCycleData({data: noUnits});};
+      const func = () => {util.validateAnnualCycleData({data: noUnits});};
       expect(func).toThrow();
     });
     it('rejects concatenanted chronology data', function () {
@@ -138,7 +184,7 @@ jest.mock('../../data-services/public.js');
       var concatenatedTasmaxTimeseries = JSON.parse(JSON.stringify(mockAPI.monthlyTasmaxTimeseries));
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.seasonalTasmaxTimeseries.data);
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
-      var func = function () {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries});};
+      const func = () => {util.validateAnnualCycleData({data: concatenatedTasmaxTimeseries});};
       expect(func).toThrow();
     });
     it('accepts valid monthly resolution data', function () {
@@ -154,11 +200,11 @@ jest.mock('../../data-services/public.js');
   
   describe('validateUnstructureTimeseriesData', function () {
     it('rejects empty data sets', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data: {}});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: {}});};
       expect(func).toThrow();
     });
     it('rejects Workzeug error messages', function () {
-      var func = function () {util.validateUnstructuredTimeseriesData({data:
+      const func = () => {util.validateUnstructuredTimeseriesData({data:
         `<html>
         <head>
         <title>IndexError // Werkzeug Debugger</title>`});};
@@ -166,13 +212,13 @@ jest.mock('../../data-services/public.js');
     });
     it('rejects data sets without units', function () {
       var noUnits = _.omit(mockAPI.monthlyTasmaxTimeseries, "units");
-      var func = function () {util.validateUnstructuredTimeseriesData({data: noUnits});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: noUnits});};
       expect(func).toThrow();
     });
     it('rejects an empty timeseries', function () {
       var noTimestamps = _.omit(mockAPI.monthlyTazmarTimeseries, "times");
       noTimestamps.times = {};
-      var func = function () {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
+      const func = () => {util.validateUnstructuredTimeseriesData({data: noTimestamps});};
       expect(func).toThrow();
     });
     it('accepts a valid timeseries', function () {
@@ -181,6 +227,27 @@ jest.mock('../../data-services/public.js');
       _.extend(concatenatedTasmaxTimeseries.data, mockAPI.annualTasmaxTimeseries.data);
       expect(util.validateUnstructuredTimeseriesData({data: concatenatedTasmaxTimeseries})).toEqual({data: concatenatedTasmaxTimeseries});
     });
+  });
+  
+  describe('validateWatershedData', function () {
+    it('rejects Workzeug error messages', function () {
+      const func = () => {util.validateUnstructuredTimeseriesData({data:
+        `<html>
+        <head>
+        <title>IndexError // Werkzeug Debugger</title>`});};
+      expect(func).toThrow();
+    });
+    it('rejects watersheds with missing data', function () {
+        const attributes = ["area", "elevation", "boundary", "hypsometric_curve", "melton_ratio"];
+        _.forEach(attributes, function(att) {
+            const missing = _.omit(mockAPI.watershed, att);
+            const func = function () {util.validateWatershedData({data: missing})}
+            expect(func).toThrow();
+        });
+    });
+    it('accepts a valid watershed', function () {
+        expect(util.validateWatershedData({data:mockAPI.watershed})).toEqual({data: mockAPI.watershed});
+    })
   });
 
   describe('getVariableOptions', function() {
@@ -303,4 +370,18 @@ jest.mock('../../data-services/public.js');
       expect(util.nestedAttributeIsDefined({attribute: 0}, "missing")).toBe(false);
       expect(util.nestedAttributeIsDefined({attribute: {nested: 0}}, "attribute", "missing")).toBe(false);
     });
+  });
+  
+  describe('WKTPointToGeoJSONPoint', function () {
+     it('throws an error on bad strings', function () {
+         const bad_wkts = ["banana", "POLYGON ((1 2, 3 4, 5 6, 1 2))", "POINTER (10 20)", "POINT+(10+20)"];
+         _.forEach(bad_wkts, function (bad_wkt) {
+             const func = function () {util.WKTPointToGeoJSONPoint(bad_wkt)};
+             expect(func).toThrow();
+         });
+     }); 
+     it('parses WKT Points', function () {
+        const expected_geoJSON = {"type": "Point", "coordinates": [-119.15625,53.09375]};
+        expect(util.WKTPointToGeoJSONPoint("POINT (-119.15625 53.09375)")).toEqual(expected_geoJSON);
+     });
   });

@@ -176,6 +176,17 @@ function getStats (
 }
 
 
+export function getWatershed ({ensemble_name, area}) {
+    // Query the "watershed" API endpoint to get information on the
+    // physical geology of the watershed.
+    return axios({
+        baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'streamflow/watershed'),
+        params: {
+            ensemble_name: getWatershedGeographyName(ensemble_name),
+            station: area
+        }
+    });
+}
 
 // Downscaled GCM data has experiment strings like 'historical,rcp26'
 // while climdex data uses 'historical, rcp26'
@@ -186,5 +197,16 @@ function guessExperimentFormatFromVariable(variable, experiment) {
   return variable.search("ETCCDI") != -1 ? experiment : experiment.replace(' ', '');
 }
 
+// This is a temporary measure due to a quirk of the maps the backend uses.
+// Long term, we would like to use a single map covers all watersheds,
+// but this map has not yet been created. Currently we have multiple overlapping
+// watershed maps, each in a different ensemble. This function helps the front end
+// match up data ensembles with watershed geography ensembles.
+function getWatershedGeographyName(ensemble){
+    return {
+        "bc_moti": "peace_watershed",
+        "upper_fraser": "upper_fraser_watershed"
+        }[ensemble];
+}
 
 export { getTimeMetadata, getTimeseries, getData, getStats };
