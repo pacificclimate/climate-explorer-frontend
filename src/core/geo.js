@@ -30,7 +30,7 @@ function createZippedShapefile(gj, options) {
 
   [geojson.point(gj), geojson.line(gj), geojson.polygon(gj)]
   .forEach(function(l) {
-    if (l.geometries.length) {
+    if(_.flattenDeep(l.geometries).length > 0){
       write(
         // field definitions
         l.properties,
