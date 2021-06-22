@@ -1,8 +1,15 @@
 # News / Release Notes
 
+## 2.1.8
+
+*22-Jun-2021*
+
+- [fixes a bug that precented downloading polygons drawn on the map as shapefiles](https://github.com/pacificclimate/climate-explorer-frontend/pull/413)
+- [switches security scanner from Anchore to Snyk](https://github.com/pacificclimate/climate-explorer-frontend/pull/411)
+
 ## 2.1.7
 
-*19-May-2021
+*19-May-2021*
 
 - [adds a table displaying information about the selected watershed](https://github.com/pacificclimate/climate-explorer-frontend/pull/407)
 
