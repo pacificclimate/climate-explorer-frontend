@@ -57,7 +57,7 @@
     "underscore.get": "^0.2.9",
     "url-join": "^4.0.0",
     "wellknown": "^0.5.0",
-    "xlsx": "^0.14.3"
+    "xlsx": "^0.17.0"
   },
   "scripts": {
     "reinstall": "rm -rf ./node_modules; npm install",
