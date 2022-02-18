@@ -247,7 +247,7 @@ export const emissionScenarioSelectorLabel = (
     <p>
       Emissions scenarios represent a range of possible future projections for
       greenhouse gas emissions, which are input into climate models.
-      Higher RCP values represent greater projected greenhouse gas emissions.
+      Higher RCP/SSP values represent greater projected greenhouse gas emissions. RCP and SSP scenarios are used for CMIP5 and CMIP6 experiments respectively.
     </p>
     <p>
       Emissions scenarios use the following coding.
@@ -289,6 +289,25 @@ export const emissionScenarioSelectorLabel = (
         <td>rcp85</td>
         <td>
           <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5  ("business as usual"; high emissions).
+          This is the most appropriate sceanario to select for future planning.
+        </td>
+      </tr>
+      <tr>
+        <td>ssp126</td>
+        <td>
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 1-2.6 (very low emissions).
+        </td>
+      </tr>
+      <tr>
+        <td>ssp245</td>
+        <td>
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 2-4.5 (moderate emissions, below current levels).
+        </td>
+      </tr>
+      <tr>
+        <td>ssp585</td>
+        <td>
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 5-8.5 ("business as usual"; high emissions).
           This is the most appropriate sceanario to select for future planning.
         </td>
       </tr>
