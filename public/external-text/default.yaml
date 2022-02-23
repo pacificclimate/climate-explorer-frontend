@@ -181,6 +181,18 @@ help:
           Click on a column header to sort by that column.
 
           Click again to change the direction of sorting.
+          
+      - question: |
+          What is the difference between CMIP5 and CMIP6?
+        answer: |
+          Much of the data in Climate Explorer comes from the Coupled Model Intercomparison Project
+          (CMIP) phases 5 and 6, which houses output from numerous global climate models. For the purposes of Climate Explorer,
+          the main differences between these phases are that they use different sets of models and denote the future emissions scenarios
+          differently, though more differences are explained [here](https://climate-scenarios.canada.ca/?page=cmip6-overview-notes#cmip5-versus-cmip6).
+          
+          Since CMIP6 is ongoing and data from the associated models was added to Climate Explorer very recently,
+          the available data for CMIP5 is much more extensive. Separate links are used to select data from CMIP5 and CMIP6 to more
+          easily distinguish between these phases.
 
   general:
     # This chunk is partway to being ready for presenting the sections as
