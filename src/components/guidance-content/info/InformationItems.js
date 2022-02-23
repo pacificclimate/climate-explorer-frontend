@@ -252,7 +252,7 @@ export const emissionScenarioSelectorLabel = (
     <p>
       Emissions scenarios use the following coding.
       Note that all scenarios include <code>historical</code>,
-      coupled with one of the future RCP emissions scenarios.
+      coupled with one of the future RCP/SSP emissions scenarios.
       For example <code>historical, rcp85</code> indicates an emissions
       scenario that uses historical data up to roughly the date of the
       model run, followed by the RCP 8.5 future emissions scenario from
@@ -276,19 +276,19 @@ export const emissionScenarioSelectorLabel = (
       <tr>
         <td>rcp26</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6 (very low emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 2.6 (very low emissions).
         </td>
       </tr>
       <tr>
         <td>rcp45</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5 (moderate emissions, below current levels).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 4.5 (moderate emissions, below current levels).
         </td>
       </tr>
       <tr>
         <td>rcp85</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5  ("business as usual"; high emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 8.5  ("business as usual"; high emissions).
           This is the most appropriate sceanario to select for future planning.
         </td>
       </tr>
