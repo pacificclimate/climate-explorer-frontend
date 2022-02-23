@@ -57,9 +57,9 @@ help:
 
       - question: What emissions scenario should I select?
         answer: |
-          The worst-case emissions scenario, RCP 8.5
-          (presented in the selectors as `historical, rcp85`),
-          is a good choice for making decisions that adapt to climate change.
+          The worst-case emissions scenarios, RCP 8.5 and SSP 5-8.5
+          (presented in the selectors as `historical, rcp85` and `historical, ssp585` respectively),
+          are good choices for making decisions that adapt to climate change.
 
       - question: How can I upload a polygon successfully?
         answer: |
@@ -730,7 +730,9 @@ help:
         ${$$.components.gcmDefn}
 
         In PCEX, models are indentified by short codes.
-        The following table gives the full name and provenance of these models.
+        The following tables give the full name and provenance of these models.
+
+        #### CMIP5
 
         * **`GFDL-CM3`**
 
@@ -846,7 +848,158 @@ help:
           [Australian Community Climate and Earth System Simulator
             coupled model](http://climate-cms.unsw.wikispaces.net/file/view/Bi_AMOJ_ACCESS-CM_revision.pdf)
         
+        #### CMIP6
 
+        * **`ACCESS-CM2`**
+
+          [Australian Community Climate and Earth System Simulator
+            coupled model ver. 2](https://research.csiro.au/access/about/cm2/)
+        
+        * **`ACCESS-ESM1-5`**
+
+          [Australian Community Climate and Earth System Simulator
+            Earth System Model ver 1.5](https://research.csiro.au/access/about/esm1-5/)
+            
+        * **`BCC-CSM2-MR`**
+
+          [China Beijing Climate Center
+            Climate System Model version 2 (medium-resolution)](https://gmd.copernicus.org/articles/12/1573/2019/)
+            
+        * **`CMCC-ESM2`**
+
+          [Italy Centro Euro-Mediterraneo sui Cambiamenti Climatici
+            (Euro-Mediterranean Center on Climate Change)
+            Earth System Model ver. 2](https://www.cmcc.it/models/cmcc-esm-earth-system-model)
+            
+        * **`CNRM-CM6-1`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-CM6-1 model](http://www.umr-cnrm.fr/cmip6/spip.php?article11)
+            
+        * **`CNRM-ESM2-1`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-ESM2-1 model](http://www.umr-cnrm.fr/cmip6/spip.php?article10)
+               
+        * **`CanESM5`**
+
+          [Canadian Centre for Climate Modelling and Analysis
+            ESM5 (Earth System Model ver. 5)](https://gmd.copernicus.org/articles/12/4823/2019/gmd-12-4823-2019.html)
+        
+        * **`EC-Earth3`**
+
+          [European Community
+            Earth System Model ver. 3](http://www.ec-earth.org/about/)
+            
+        * **`EC-Earth3-Veg`**
+
+          [European Community
+            Earth System Model ver. 3 (vegetation configuration)](https://gmd.copernicus.org/preprints/gmd-2020-446/gmd-2020-446.pdf)
+
+        * **`FGOALS-g3`**
+
+          [China LASG
+            (Laboratory of Numerical Modeling for Atmospheric Sciences
+            and Geophysical Fluid Dynamics)
+            FGOALS-g3 model](https://link.springer.com/article/10.1007/s00376-020-2032-0)
+
+        * **`GFDL-ESM4`**
+
+          [U.S. Geophysical Fluid Dynamics Laboratory
+            ESM4 model](https://www.gfdl.noaa.gov/earth-system-esm4/)
+        
+        * **`HadGEM3-GC31-LL`**
+
+          [U.K. Met Office
+            HadGEM3 GC 3.1
+            (N96ORCA1 resolution)
+            model](https://ukesm.ac.uk/cmip6/)
+        
+        * **`INM-CM4-8`**
+
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 4.8](https://catalogue.ceda.ac.uk/uuid/17179dfb6bc24bbeaba902928c91e5c0)
+
+        * **`INM-CM5-0`**
+  
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 5.0](https://catalogue.ceda.ac.uk/uuid/5b50fd3fe7b74a64be91fb7ebb8c21a9)
+          
+        * **`IPSL-CM6A-LR`**
+
+          [France Institut Pierre Simon Laplace
+            Climate Model 6A (low resolution)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019MS002010)
+
+        * **`KACE-1-0-G`**
+
+          [National Institute of Meteorlogical Sciences (NIMS) and Korea Meteorlogical Administration (KMA)
+            KACE-1-0-G model](https://catalogue.ceda.ac.uk/uuid/db66f62b4b0748fd8b12fd2f3fa327b1)
+            
+        * **`KIOST-ESM`**
+
+          [Korea Institude of Ocean Science and Technology
+            Earth System Model](https://www.researchgate.net/publication/351333170_Korea_Institute_of_Ocean_Science_and_Technology_Earth_System_Model_and_Its_Simulation_Characteristics)
+        
+        * **`MIROC-ES2L`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC-ES2L
+            (Model for Interdisciplinary Research on Climate, version 2 for Long-term simulations)](https://gmd.copernicus.org/articles/13/2197/2020/)
+
+        * **`MIROC6`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC-ES2L
+            (Model for Interdisciplinary Research on Climate, ver. 6)](https://gmd.copernicus.org/articles/12/2727/2019/gmd-12-2727-2019.html)
+
+        * **`MPI-ESM1-2-HR`**
+
+          [Germany Max Planck Institute
+            ESM (Earth System Model ver 1.2 high resolution)](https://gmd.copernicus.org/articles/12/3241/2019/)
+
+        * **`MPI-ESM1-2-LR`**
+
+          [Germany Max Planck Institute
+            ESM (Earth System Model ver 1.2 low resolution)](https://gmd.copernicus.org/articles/12/3241/2019/)
+        
+        * **`MRI-ESM2-0`**
+
+          [Japan Meteorological Research Institute
+            Earth System Model ver 2.0](https://www.jstage.jst.go.jp/article/jmsj/advpub/0/advpub_2019-051/_article/-char/en)
+        
+        * **`NorESM2-LM`**
+
+          [NorESM Climate modeling Consortium (NCC)
+            Norwegian Earth System Model version 2;
+            2 degree resolution for the atmosphere and land components;
+            1 degree resolution for the ocean and sea-ice components;
+            CO2 concentration driven (default)](https://noresm-docs.readthedocs.io/en/latest/start.html)
+            
+        * **`NorESM2-MM`**
+
+          [NorESM Climate modeling Consortium (NCC)
+            Norwegian Earth System Model version 2;
+            1 degree resolution for all model components](https://noresm-docs.readthedocs.io/en/latest/start.html)
+
+        * **`TaiESM1`**
+
+          [Taiwan Earth System Model version 1](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020MS002353)
+   
+        * **`UKESM1-0-LL`**
+
+          [U.K. Met Office
+            UK Earth System Model 1.0
+            (low atmosphere/ocean resolution)
+            model](https://ukesm.ac.uk/cmip6/)
+        
       - |
         ## Datasets and data filtering
 
