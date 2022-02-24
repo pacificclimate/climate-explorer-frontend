@@ -58,7 +58,7 @@ help:
       - question: What emissions scenario should I select?
         answer: |
           The worst-case emissions scenarios, RCP 8.5 and SSP 5-8.5
-          (presented in the selectors as `historical, rcp85` and `historical, ssp585` for CMIP5 and CMIP6 respectively),
+          (presented in the selectors as `Historical, then RCP 8.5` and `Historical, then SSP 5-8.5` for CMIP5 and CMIP6 respectively),
           are good choices for making decisions that adapt to climate change.
 
       - question: How can I upload a polygon successfully?
