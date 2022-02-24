@@ -9,7 +9,7 @@
  *******************************************************************/
 
 import _ from 'lodash';
-import XLSX from 'xlsx';
+import XLSX from 'xlsx/xlsx.js';
 import * as filesaver from 'filesaver.js';
 import axios from 'axios';
 import urljoin from 'url-join';
