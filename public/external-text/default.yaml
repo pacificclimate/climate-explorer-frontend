@@ -186,13 +186,18 @@ help:
           What is the difference between CMIP5 and CMIP6?
         answer: |
           Much of the data in Climate Explorer comes from the Coupled Model Intercomparison Project
-          (CMIP) phases 5 and 6, which houses output from numerous global climate models. For the purposes of Climate Explorer,
-          the main differences between these phases are that they use different sets of models and denote the future emissions scenarios
-          differently, though more differences are explained [here](https://climate-scenarios.canada.ca/?page=cmip6-overview-notes#cmip5-versus-cmip6).
-          
-          Since CMIP6 is ongoing and data from the associated models was added to Climate Explorer very recently,
-          the available data for CMIP5 is much more extensive. Separate links are used to select data from CMIP5 and CMIP6 to more
-          easily distinguish between these phases.
+          (CMIP) phases 5 and 6, which houses output from numerous global climate models. These datasets are
+          referred to as the Canadian Downscaled Climate Scenarios - Univariate method from CMIP5 and CMIP6 (CanDCS-U5 and CanDCS-U6) respectively.
+          Since CMIP6 is ongoing and the associated climatologies were added to Climate Explorer very recently,
+          the available data for CMIP5 is much more extensive.
+
+          For CMIP5, the downscaled scenarios in Climate Explorer are constructed from 27 GCMs and 3 Representative Concentration
+          Pathways (RCPs). The climatologies for these scenarios can be accessed using the `Single Variable` and `Compare Variables`
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_gcms/map/).
+
+          For CMIP6, the downscaled scenarios in Climate Explorer are constructed from 26 GCMs and 3 Shared Socioeconomic
+          Pathways (SSPs). The climatologies for these scenarios can be accessed using the `Single Variable CMIP6` and `Compare Variables CMIP6`
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6/map/).
 
   general:
     # This chunk is partway to being ready for presenting the sections as
@@ -1643,6 +1648,10 @@ science:
     [Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?](https://journals.ametsoc.org/doi/abs/10.1175/JCLI-D-14-00754.1) 
     _Journal of Climate_, **28**(17), 6938-6959, doi:10.1175/JCLI-D-14-00754.1.
 
+    Eyring, V., S. Bony, G.A. Meehl, C. Senior, B. Stevens, R.J. Stouffer and K.E. Taylor, 2016:
+    [Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization](https://gmd.copernicus.org/articles/9/1937/2016/).
+    Geoscientific Model Development, 9(5), 1937-1958.
+
     Giorgi, F. and Francisco, R., 2000: 
     Evaluating uncertainties in the prediction of regional climate change. 
     _Geophysical Research Letters_, **27**(9), 1295-1298.
@@ -1684,6 +1693,10 @@ science:
     Meinshausen, M., et al., 2011: The RCP greenhouse gas concentrations and their extensions from 1765 to 2300.
     _Climatic Change_, **109**(1-2), 213-241.
 
+    Riahi, K. et al. 2017:
+    [The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview](https://www.sciencedirect.com/science/article/pii/S0959378016300681).
+    Global Environmental Change, 42, 153-168, doi:10.1016/j.gloenvcha.2016.05.009.
+
     **Sobie, S.R.**, and **T.Q. Murdock**, 2017: 
     [High-Resolution Statistical Downscaling in Southwestern British Columbia](https://journals.ametsoc.org/doi/abs/10.1175/JAMC-D-16-0287.1).
     _Journal of Applied Meteorology and Climatology_, **56**(6), 1625–1641, doi:10.1175/JAMC-D-16-0287.1.
@@ -1691,6 +1704,10 @@ science:
     Taylor, K.E., R.J. Stouffer, and G.A. Meehl, 2012:
     [ An Overview of CMIP5 and the Experiment Design](http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00094.1).
     _Bulletin of the American Meteorological Society_, **93**, 485–498. doi: 10.1175/BAMS-D-11-00094.1.
+
+    van Vuuren, D.P., et al., 2011:
+    [The Representative Concentration Pathways: An Overview](https://link.springer.com/article/10.1007/s10584-011-0148-z).
+    Climatic Change, 109 (1-2), 5-31, doi:10.1007/s10584-011-0148-z.
 
     **Werner, A.T.**, 2011:
     [_BCSD downscaled transient climate projections for eight select GCMs over British Columbia, Canada_](http://www.pacificclimate.org/sites/default/files/publications/Werner.HydroModelling.FinalReport1.Apr2011.pdf).
