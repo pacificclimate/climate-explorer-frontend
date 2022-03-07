@@ -14,15 +14,15 @@ const navSpec = {
   basePath: '/data',
   items: [
     {
-      label: 'Single Variable',
-      info: 'View a single climate variable from a selected GCM and emission scenario.',
+      label: 'Single Variable CMIP5',
+      info: 'View a single climate variable from a selected GCM and emission scenario in the CMIP5 experiments.',
       subpath: 'climo/:ensemble_name(ce_files)',
       navSubpath: 'climo/ce_files',
       render: (props) => <SingleAppController {...props} />,
     },
     {
-      label: 'Compare Variables',
-      info: 'Simulataneously view and compare two climate variables from a selected GCM and emission scenario.',
+      label: 'Compare Variables CMIP5',
+      info: 'Simulataneously view and compare two climate variables from a selected GCM and emission scenario in the CMIP5 experiments.',
       subpath: 'compare/:ensemble_name(ce_files)',
       navSubpath: 'compare/ce_files',
       render: (props) => <DualAppController {...props} />,
