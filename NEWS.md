@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 2.2.0
+
+*18-Mar-2022*
+
+- [Adds a SingleAppController and DualAppController for selecting CMIP6 climatologies](https://github.com/pacificclimate/climate-explorer-frontend/pull/417)
+- [Adds documentation describing differences between CMIP5 and CMIP6 data](https://github.com/pacificclimate/climate-explorer-frontend/pull/417)
+
 ## 2.1.8
 
 *22-Jun-2021*
