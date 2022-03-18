@@ -247,12 +247,12 @@ export const emissionScenarioSelectorLabel = (
     <p>
       Emissions scenarios represent a range of possible future projections for
       greenhouse gas emissions, which are input into climate models.
-      Higher RCP values represent greater projected greenhouse gas emissions.
+      Higher RCP/SSP values represent greater projected greenhouse gas emissions. RCP and SSP scenarios are used for CMIP5 and CMIP6 experiments respectively.
     </p>
     <p>
       Emissions scenarios use the following coding.
       Note that all scenarios include <code>historical</code>,
-      coupled with one of the future RCP emissions scenarios.
+      coupled with one of the future RCP/SSP emissions scenarios.
       For example <code>historical, rcp85</code> indicates an emissions
       scenario that uses historical data up to roughly the date of the
       model run, followed by the RCP 8.5 future emissions scenario from
@@ -274,21 +274,21 @@ export const emissionScenarioSelectorLabel = (
         </td>
       </tr>
       <tr>
-        <td>rcp26</td>
+        <td>rcp26/ssp126</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 2.6 (very low emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 2.6 / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 1-2.6 (very low emissions).
         </td>
       </tr>
       <tr>
-        <td>rcp45</td>
+        <td>rcp45/ssp245</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 4.5 (moderate emissions, below current levels).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 4.5 / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 2-4.5 (moderate emissions, below current levels).
         </td>
       </tr>
       <tr>
-        <td>rcp85</td>
+        <td>rcp85/ssp585</td>
         <td>
-          <a href='http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome' target='_blank'>RCP</a> 8.5  ("business as usual"; high emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 8.5  / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 5-8.5 ("business as usual"; high emissions).
           This is the most appropriate sceanario to select for future planning.
         </td>
       </tr>

@@ -51,15 +51,15 @@ help:
     items:
       - question: Which model should I select?
         answer: |
-          Canada's own General Circulation Model, CanESM2, is the most representative
+          Canada's own General Circulation Model, CanESM2/CanESM5 (CMIP5/CMIP6 respectively), is the most representative
           model for Canada. It is a good default choice if you do not have
           specialized needs that would be better represented by a different model.
 
       - question: What emissions scenario should I select?
         answer: |
-          The worst-case emissions scenario, RCP 8.5
-          (presented in the selectors as `historical, rcp85`),
-          is a good choice for making decisions that adapt to climate change.
+          The worst-case emissions scenarios, RCP 8.5 and SSP 5-8.5
+          (presented in the selectors as `Historical, then RCP 8.5` and `Historical, then SSP 5-8.5` for CMIP5 and CMIP6 respectively),
+          are good choices for making decisions that adapt to climate change.
 
       - question: How can I upload a polygon successfully?
         answer: |
@@ -181,6 +181,23 @@ help:
           Click on a column header to sort by that column.
 
           Click again to change the direction of sorting.
+          
+      - question: |
+          What is the difference between CMIP5 and CMIP6?
+        answer: |
+          Much of the data in Climate Explorer comes from the Coupled Model Intercomparison Project
+          (CMIP) phases 5 and 6, which houses output from numerous global climate models. These datasets are
+          referred to as the Canadian Downscaled Climate Scenarios - Univariate method from CMIP5 and CMIP6 (CanDCS-U5 and CanDCS-U6) respectively.
+          Since CMIP6 is ongoing and the associated climatologies were added to Climate Explorer very recently,
+          the available data for CMIP5 is much more extensive.
+
+          For CMIP5, the downscaled scenarios in Climate Explorer are constructed from 27 GCMs and 3 Representative Concentration
+          Pathways (RCPs). The climatologies for these scenarios can be accessed using the `Single Variable` and `Compare Variables`
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_gcms/map/).
+
+          For CMIP6, the downscaled scenarios in Climate Explorer are constructed from 26 GCMs and 3 Shared Socioeconomic
+          Pathways (SSPs). The climatologies for these scenarios can be accessed using the `Single Variable CMIP6` and `Compare Variables CMIP6`
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6/map/).
 
   general:
     # This chunk is partway to being ready for presenting the sections as
@@ -730,7 +747,51 @@ help:
         ${$$.components.gcmDefn}
 
         In PCEX, models are indentified by short codes.
-        The following table gives the full name and provenance of these models.
+        The following tables give the full name and provenance of these models.
+
+        #### CMIP5
+
+        * **`ACCESS1-0`**
+
+          [Australian Community Climate and Earth System Simulator
+            coupled model](http://www.bom.gov.au/jshess/docs/2013/bi1_hres.pdf)
+            
+        * **`BNU-ESM`**
+        
+          [Beijin Normal University
+            Earth System Model](https://www.researchgate.net/publication/262954172_Description_and_basic_evaluation_of_BNU-ESM_version_1)
+
+        * **`CCSM4`**
+
+          [U.S. National Center for Atmospheric Research
+            CCSM4 4.0 model](http://www.cesm.ucar.edu/models/ccsm4.0/)
+
+        * **`CESM1-CAM5`**
+        
+          [Community Earth System Model version 1 that includes the Community Atmospheric Model version 5](https://journals.ametsoc.org/view/journals/clim/26/17/jcli-d-12-00572.1.xml)
+
+        * **`CNRM-CM5`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-CM5 model](http://www.umr-cnrm.fr/spip.php?article126&lang=en)
+
+        * **`CSIRO-Mk3-6-0`**
+
+          [Australia Commonwealth Scientific and Industrial Research Organisation
+            CSIRO-Mk3.6.0 model](https://confluence.csiro.au/public/CSIROMk360)
+
+        * **`CanESM2`**
+
+          [Canadian Centre for Climate Modelling and Analysis
+            ESM2 (Earth System Model ver. 2)](https://climate-modelling.canada.ca/climatemodeldata/cgcm4/CanESM2/index.shtml)
+
+        * **`FGOALS-g2`**
+
+          [China LASG
+            (Laboratory of Numerical Modeling for Atmospheric Sciences
+            and Geophysical Fluid Dynamics)
+            FGOALS-g2 model](http://www.lasg.ac.cn/fgoals/index2.asp)
 
         * **`GFDL-CM3`**
 
@@ -753,7 +814,15 @@ help:
             HadGEM2 AO
             (Troposphere, Land Surface &amp; Hydrology,
             Aerosols, Ocean &amp; Sea-ice) model](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
-        
+
+        * **`HadGEM2-CC`**
+
+          [U.K. Met Office
+            HadGEM2 CC
+            (Troposphere, Land Surface &amp; Hydrology,
+            Aerosols, Ocean &amp; Sea-ice, Terrestrial
+            Carbon Cycle, Ocean Biogeochemistry)](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+
         * **`HadGEM2-ES`**
 
           [U.K. Met Office
@@ -763,69 +832,27 @@ help:
             Carbon Cycle, Ocean Biogeochemistry,
             Chemistry)
             model](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+
+        * **`IPSL-CM5A-LR`**
         
-        * **`HadGEM2-CC`**
-
-          [U.K. Met Office
-            HadGEM2 CC
-            (Troposphere, Land Surface &amp; Hydrology,
-            Aerosols, Ocean &amp; Sea-ice, Terrestrial
-            Carbon Cycle, Ocean Biogeochemistry)](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
+          [France Institut Pierre Simon Laplace
+            Climate Model 5A (low resolution)](https://gmd.copernicus.org/articles/13/3011/2020/gmd-13-3011-2020.pdf)
+            
+        * **`IPSL-CM5A-MR`**
         
-        * **`MRI-CGCM3`**
+          [France Institut Pierre Simon Laplace
+            Climate Model 5A (medium resolution)](https://gmd.copernicus.org/articles/13/3011/2020/gmd-13-3011-2020.pdf)
 
-          [Japan Meteorological Research Institute
-            CCGM3 model](https://www.jstage.jst.go.jp/article/jmsj/90A/0/90A_2012-A02/_pdf)
-        
-        * **`CNRM-CM5`**
-
-          [France Centre National de Recherches Météorologiques
-            (National Centre for Meteorological Research)
-            CNRM-CM5 model](http://www.umr-cnrm.fr/spip.php?article126&lang=en)
-        
-        * **`CCSM4`**
-
-          [U.S. National Center for Atmospheric Research
-            CCSM4 4.0 model](http://www.cesm.ucar.edu/models/ccsm4.0/)
-        
-        * **`CSIRO-Mk3-6-0`**
-
-          [Australia Commonwealth Scientific and Industrial Research Organisation
-            CSIRO-Mk3.6.0 model](https://confluence.csiro.au/public/CSIROMk360)
-        
-        * **`inmcm4`**
-
-          [Russia Institute for Numerical Mathematics
-            Climate Model Version 4](http://www.glisaclimate.org/node/2220)
-
-          Note: We are unable to find a more authoritative reference in English
-          for this model.
-
-        * **`bcc-csm1-1-m`**
-          [China Beijing Climate Center
-            Climate System Model version 1.1 (m)](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
-        
-        * **`FGOALS-g2`**
-
-          [China LASG
-            (Laboratory of Numerical Modeling for Atmospheric Sciences
-            and Geophysical Fluid Dynamics)
-            FGOALS-g2 model](http://www.lasg.ac.cn/fgoals/index2.asp)
-        
-        * **`CanESM2`**
-
-          [Canadian Centre for Climate Modelling and Analysis
-            ESM2 (Earth System Model ver. 2)](https://www.ec.gc.ca/ccmac-cccma/default.asp?lang=En&n=1A3B7DF1-1&wbdisable=true)
-        
-        * **`MIROC5`**
+        * **`MIROC-ESM`**
 
           [Japan Agency for Marine-Earth Science and Technology;
             Atmosphere and Ocean Research Institute;
             Centre for Climate System Research -
             National Institute for Environmental Studies
-            MIROC5
-            (Model for Interdisciplinary Research on Climate, ver. 5)](https://journals.ametsoc.org/doi/10.1175/2010JCLI3679.1)
-        
+            MIROC-ESM
+            (Model for Interdisciplinary Research on Climate
+            Earth System Model)](https://www.researchgate.net/publication/253418457_MIROC-ESM_model_description_and_basic_results_of_CMIP5-20c3m_experiments)
+
         * **`MIROC-ESM-CHEM`**
 
           [Japan Agency for Marine-Earth Science and Technology;
@@ -835,18 +862,208 @@ help:
             MIROC-ESM-CHEM
             (Model for Interdisciplinary Research on Climate
             Earth System Model with Atmospheric Chemistry)](https://www.researchgate.net/publication/253418457_MIROC-ESM_model_description_and_basic_results_of_CMIP5-20c3m_experiments)
-        
+
+        * **`MIROC5`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC5
+            (Model for Interdisciplinary Research on Climate, ver. 5)](https://journals.ametsoc.org/doi/10.1175/2010JCLI3679.1)
+
         * **`MPI-ESM-LR`**
 
           [Germany Max Planck Institute
-            ESM (Earth System Model)](https://www.mpimet.mpg.de/en/science/models/mpi-esm/)
+            ESM-LR (Earth System Model - low resolution)](https://www.mpimet.mpg.de/en/science/models/mpi-esm/)
+            
+        * **`MPI-ESM-MR`**
+
+          [Germany Max Planck Institute
+            ESM-MR (Earth System Model - medium resolution)](https://www.mpimet.mpg.de/en/science/models/mpi-esm/)
+
+        * **`MRI-CGCM3`**
+
+          [Japan Meteorological Research Institute
+            CCGM3 model](https://www.jstage.jst.go.jp/article/jmsj/90A/0/90A_2012-A02/_pdf)
         
-        * **`ACCESS1-0`**
+        * **`NorESM1-M`**
+        
+          [Norwegian Climate Center (NCC)
+            Norwegian Earth System Model version 1 (medium resolution)](https://gmd.copernicus.org/articles/6/687/2013/)
+            
+        * **`NorESM1-ME`**
+        
+          [Norwegian Climate Center (NCC)
+            Norwegian Earth System Model version 1 (prognostic biogeochemical cycling)](https://gmd.copernicus.org/articles/6/687/2013/)
+
+        * **`bcc-csm1-1`**
+        
+          [China Beijing Climate Center
+            Climate System Model version 1.1](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
+
+        * **`bcc-csm1-1-m`**
+        
+          [China Beijing Climate Center
+            Climate System Model version 1.1 (moderate resolution)](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
+        
+        * **`inmcm4`**
+
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 4](https://www.researchgate.net/publication/227251252_Simulating_present-day_climate_with_the_INMCM40_coupled_model_of_the_atmospheric_and_oceanic_general_circulations)
+        
+        #### CMIP6
+
+        * **`ACCESS-CM2`**
 
           [Australian Community Climate and Earth System Simulator
-            coupled model](http://climate-cms.unsw.wikispaces.net/file/view/Bi_AMOJ_ACCESS-CM_revision.pdf)
+            coupled model ver. 2](https://research.csiro.au/access/about/cm2/)
         
+        * **`ACCESS-ESM1-5`**
 
+          [Australian Community Climate and Earth System Simulator
+            Earth System Model ver 1.5](https://research.csiro.au/access/about/esm1-5/)
+            
+        * **`BCC-CSM2-MR`**
+
+          [China Beijing Climate Center
+            Climate System Model version 2 (medium-resolution)](https://gmd.copernicus.org/articles/12/1573/2019/)
+            
+        * **`CMCC-ESM2`**
+
+          [Italy Centro Euro-Mediterraneo sui Cambiamenti Climatici
+            (Euro-Mediterranean Center on Climate Change)
+            Earth System Model ver. 2](https://www.cmcc.it/models/cmcc-esm-earth-system-model)
+            
+        * **`CNRM-CM6-1`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-CM6-1 model](http://www.umr-cnrm.fr/cmip6/spip.php?article11)
+            
+        * **`CNRM-ESM2-1`**
+
+          [France Centre National de Recherches Météorologiques
+            (National Centre for Meteorological Research)
+            CNRM-ESM2-1 model](http://www.umr-cnrm.fr/cmip6/spip.php?article10)
+               
+        * **`CanESM5`**
+
+          [Canadian Centre for Climate Modelling and Analysis
+            ESM5 (Earth System Model ver. 5)](https://gmd.copernicus.org/articles/12/4823/2019/gmd-12-4823-2019.html)
+        
+        * **`EC-Earth3`**
+
+          [European Community
+            Earth System Model ver. 3](http://www.ec-earth.org/about/)
+            
+        * **`EC-Earth3-Veg`**
+
+          [European Community
+            Earth System Model ver. 3 (vegetation configuration)](https://gmd.copernicus.org/preprints/gmd-2020-446/gmd-2020-446.pdf)
+
+        * **`FGOALS-g3`**
+
+          [China LASG
+            (Laboratory of Numerical Modeling for Atmospheric Sciences
+            and Geophysical Fluid Dynamics)
+            FGOALS-g3 model](https://link.springer.com/article/10.1007/s00376-020-2032-0)
+
+        * **`GFDL-ESM4`**
+
+          [U.S. Geophysical Fluid Dynamics Laboratory
+            ESM4 model](https://www.gfdl.noaa.gov/earth-system-esm4/)
+        
+        * **`HadGEM3-GC31-LL`**
+
+          [U.K. Met Office
+            HadGEM3 GC 3.1
+            (N96ORCA1 resolution)
+            model](https://ukesm.ac.uk/cmip6/)
+        
+        * **`INM-CM4-8`**
+
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 4.8](https://catalogue.ceda.ac.uk/uuid/17179dfb6bc24bbeaba902928c91e5c0)
+
+        * **`INM-CM5-0`**
+  
+          [Russia Institute for Numerical Mathematics
+            Climate Model Version 5.0](https://catalogue.ceda.ac.uk/uuid/5b50fd3fe7b74a64be91fb7ebb8c21a9)
+          
+        * **`IPSL-CM6A-LR`**
+
+          [France Institut Pierre Simon Laplace
+            Climate Model 6A (low resolution)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019MS002010)
+
+        * **`KACE-1-0-G`**
+
+          [National Institute of Meteorlogical Sciences (NIMS) and Korea Meteorlogical Administration (KMA)
+            KACE-1-0-G model](https://catalogue.ceda.ac.uk/uuid/db66f62b4b0748fd8b12fd2f3fa327b1)
+            
+        * **`KIOST-ESM`**
+
+          [Korea Institude of Ocean Science and Technology
+            Earth System Model](https://www.researchgate.net/publication/351333170_Korea_Institute_of_Ocean_Science_and_Technology_Earth_System_Model_and_Its_Simulation_Characteristics)
+        
+        * **`MIROC-ES2L`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC-ES2L
+            (Model for Interdisciplinary Research on Climate, version 2 for Long-term simulations)](https://gmd.copernicus.org/articles/13/2197/2020/)
+
+        * **`MIROC6`**
+
+          [Japan Agency for Marine-Earth Science and Technology;
+            Atmosphere and Ocean Research Institute;
+            Centre for Climate System Research -
+            National Institute for Environmental Studies
+            MIROC-ES2L
+            (Model for Interdisciplinary Research on Climate, ver. 6)](https://gmd.copernicus.org/articles/12/2727/2019/gmd-12-2727-2019.html)
+
+        * **`MPI-ESM1-2-HR`**
+
+          [Germany Max Planck Institute
+            ESM (Earth System Model ver 1.2 high resolution)](https://gmd.copernicus.org/articles/12/3241/2019/)
+
+        * **`MPI-ESM1-2-LR`**
+
+          [Germany Max Planck Institute
+            ESM (Earth System Model ver 1.2 low resolution)](https://gmd.copernicus.org/articles/12/3241/2019/)
+        
+        * **`MRI-ESM2-0`**
+
+          [Japan Meteorological Research Institute
+            Earth System Model ver 2.0](https://www.jstage.jst.go.jp/article/jmsj/advpub/0/advpub_2019-051/_article/-char/en)
+        
+        * **`NorESM2-LM`**
+
+          [Norwegian Climate Center (NCC)
+            Norwegian Earth System Model version 2;
+            2 degree resolution for the atmosphere and land components;
+            1 degree resolution for the ocean and sea-ice components;
+            CO2 concentration driven (default)](https://noresm-docs.readthedocs.io/en/latest/start.html)
+            
+        * **`NorESM2-MM`**
+
+          [Norwegian Climate Center (NCC)
+            Norwegian Earth System Model version 2;
+            1 degree resolution for all model components](https://noresm-docs.readthedocs.io/en/latest/start.html)
+
+        * **`TaiESM1`**
+
+          [Taiwan Earth System Model version 1](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020MS002353)
+   
+        * **`UKESM1-0-LL`**
+
+          [U.K. Met Office
+            UK Earth System Model 1.0
+            (low atmosphere/ocean resolution)
+            model](https://ukesm.ac.uk/cmip6/)
+        
       - |
         ## Datasets and data filtering
 
@@ -1478,6 +1695,10 @@ science:
     [Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?](https://journals.ametsoc.org/doi/abs/10.1175/JCLI-D-14-00754.1) 
     _Journal of Climate_, **28**(17), 6938-6959, doi:10.1175/JCLI-D-14-00754.1.
 
+    Eyring, V., S. Bony, G.A. Meehl, C. Senior, B. Stevens, R.J. Stouffer and K.E. Taylor, 2016:
+    [Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization](https://gmd.copernicus.org/articles/9/1937/2016/).
+    Geoscientific Model Development, 9(5), 1937-1958.
+
     Giorgi, F. and Francisco, R., 2000: 
     Evaluating uncertainties in the prediction of regional climate change. 
     _Geophysical Research Letters_, **27**(9), 1295-1298.
@@ -1519,6 +1740,10 @@ science:
     Meinshausen, M., et al., 2011: The RCP greenhouse gas concentrations and their extensions from 1765 to 2300.
     _Climatic Change_, **109**(1-2), 213-241.
 
+    Riahi, K. et al. 2017:
+    [The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview](https://www.sciencedirect.com/science/article/pii/S0959378016300681).
+    Global Environmental Change, 42, 153-168, doi:10.1016/j.gloenvcha.2016.05.009.
+
     **Sobie, S.R.**, and **T.Q. Murdock**, 2017: 
     [High-Resolution Statistical Downscaling in Southwestern British Columbia](https://journals.ametsoc.org/doi/abs/10.1175/JAMC-D-16-0287.1).
     _Journal of Applied Meteorology and Climatology_, **56**(6), 1625–1641, doi:10.1175/JAMC-D-16-0287.1.
@@ -1526,6 +1751,10 @@ science:
     Taylor, K.E., R.J. Stouffer, and G.A. Meehl, 2012:
     [ An Overview of CMIP5 and the Experiment Design](http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00094.1).
     _Bulletin of the American Meteorological Society_, **93**, 485–498. doi: 10.1175/BAMS-D-11-00094.1.
+
+    van Vuuren, D.P., et al., 2011:
+    [The Representative Concentration Pathways: An Overview](https://link.springer.com/article/10.1007/s10584-011-0148-z).
+    Climatic Change, 109 (1-2), 5-31, doi:10.1007/s10584-011-0148-z.
 
     **Werner, A.T.**, 2011:
     [_BCSD downscaled transient climate projections for eight select GCMs over British Columbia, Canada_](http://www.pacificclimate.org/sites/default/files/publications/Werner.HydroModelling.FinalReport1.Apr2011.pdf).

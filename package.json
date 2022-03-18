@@ -15,7 +15,7 @@
   },
   "bugs": "https://github.com/pacificclimate/climate-explorer-frontend/issues",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "bootstrap": "^3.3.5",
     "bootstrap-slider": "^5.1.0",
     "c3": "~0.4.11-rc4",
@@ -31,7 +31,7 @@
     "leaflet-image": "^0.4.0",
     "lodash": "^4.17.21",
     "moment": "^2.10.6",
-    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
+    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.1",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
     "proj4": "^2.4.4",
     "proj4leaflet": "^1.0.2",
@@ -57,7 +57,7 @@
     "underscore.get": "^0.2.9",
     "url-join": "^4.0.0",
     "wellknown": "^0.5.0",
-    "xlsx": "^0.14.3"
+    "xlsx": "^0.18.2"
   },
   "scripts": {
     "reinstall": "rm -rf ./node_modules; npm install",
