@@ -51,8 +51,8 @@ const navSpec = {
     {
       label: 'Extreme Streamflow',
       info: 'View flood frequency data for the Upper Fraser',
-      subpath: 'flood/:ensemble_name(upper_fraser)',
-      navSubpath: 'flood/upper_fraser',
+      subpath: 'flood/:ensemble_name(fraser)',
+      navSubpath: 'flood/fraser',
       render: (props) => <FloodAppController {...props} />,
     },
   ],
