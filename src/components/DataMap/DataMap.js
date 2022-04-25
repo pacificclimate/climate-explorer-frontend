@@ -397,6 +397,8 @@ class DataMap extends React.Component {
                 showLength: false,
               },
             }}
+            //don't allow editing watershed boundary polygon
+            edit={this.displayWatershedBoundary() ? {edit: false} : {}} 
             onCreated={this.handleAreaCreated}
             onEdited={this.handleAreaEdited}
             onDeleted={this.handleAreaDeleted}
