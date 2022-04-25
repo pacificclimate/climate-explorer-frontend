@@ -93,6 +93,9 @@ import StaticControl from '../StaticControl';
 import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
 import LayerOpacityControl from '../LayerOpacityControl';
 
+import { getWatershed } from '../../data-services/ce-backend';
+import { validateWatershedData } from '../../core/util';
+
 import './DataMap.css';
 
 
@@ -107,11 +110,13 @@ class DataMap extends React.Component {
     inactiveGeometryStyle: PropTypes.object.isRequired,
     children: PropTypes.node,
     pointSelect: PropTypes.bool,
+    watershedEnsemble: PropTypes.string,
   };
 
   static defaultProps = {
     activeGeometryStyle: { color: '#3388ff' },
     inactiveGeometryStyle: { color: '#777777' },
+    watershedGeometryStyle: {colour: '#336699' },
     pointSelect: false,
   };
 
@@ -134,6 +139,8 @@ class DataMap extends React.Component {
       }
     }
   }
+  
+  displayWatershedBoundary = () => this.props.pointSelect && this.props.watershedEnsemble;
 
   // Handler for base map ref.
 
@@ -217,10 +224,18 @@ class DataMap extends React.Component {
     this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
   };
 
-  layerStyle = (index) => index > 0 ?
-    this.props.inactiveGeometryStyle :
-    this.props.activeGeometryStyle;
-
+  layerStyle = (index) => {
+      if(index === 0) {
+          return this.props.activeGeometryStyle;
+      } 
+      else if (this.displayWatershedBoundary()) {
+          return this.props.watershedGeometryStyle;
+      }
+      else {
+          return this.props.inactiveGeometryStyle;
+      }
+  }
+  
   addGeometryLayer = layer => {
     this.setState(prevState => {
       layer.setStyle(this.layerStyle(prevState.geometryLayers.length));
@@ -264,9 +279,28 @@ class DataMap extends React.Component {
     return layers;
   }
 
-  handleAreaCreated = e => this.addGeometryLayer(e.layer);
+  handleAreaCreated = e => {
+    //add the watershed boundary to the map if relevant
+    if(this.displayWatershedBoundary()) {
+        // get the latitude and longitude of the new point from its layer object
+        // we know the layer is a CircleMarker
+        // TODO: is there some leaflet built-in function for this, rather than 
+        // an _attribute?
+        const outletLat = e.layer._latlng.lat;
+        const outletLon = e.layer._latlng.lng;
+        getWatershed({
+            ensemble_name: this.props.watershedEnsemble, 
+            area: `POINT (${outletLon} ${outletLat})`})
+        .then(validateWatershedData)
+        .then(response => {
+            this.addGeometryLayers(geoJSONToLeafletLayers(response.data.boundary));
+        })        
+    }
+    this.addGeometryLayer(e.layer);
+  };
   handleAreaEdited = e => this.editGeometryLayers(this.eventLayers(e));
   handleAreaDeleted = e => this.deleteGeometryLayers(this.eventLayers(e));
+
 
   handleUploadArea = (geoJSON) => {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));

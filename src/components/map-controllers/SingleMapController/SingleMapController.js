@@ -4,6 +4,12 @@
  * This controller coordinates a map displaying data extracted from
  * netCDF files as a colour-coded raster, as well as a menu of 
  * viewing settings for the raster.
+ *
+ * It allows the user to select an area of interest by interacting
+ * with the map. This area can either be a polygon or a point, which is
+ * controlled by the pointSelect prop. If the selection area is a point,
+ * the watershed of which that point is the mouth will be displayed on
+ * the map if the watershedEnsemble prop has a non-null value.
  * 
  * It is also responsible for passing user-drawn areas up to its 
  * parent.
@@ -56,7 +62,8 @@ export default class SingleMapController extends React.Component {
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
-    pointSelect: PropTypes.bool.isRequired
+    pointSelect: PropTypes.bool.isRequired,
+    watershedEnsemble: PropTypes.string
   };
 
   constructor(props) {
@@ -238,6 +245,7 @@ export default class SingleMapController extends React.Component {
                 onSetArea={this.props.onSetArea}
                 area={this.props.area}
                 pointSelect={this.props.pointSelect}
+                watershedEnsemble={this.props.watershedEnsemble}
               >
 
                 <StaticControl position='topright'>

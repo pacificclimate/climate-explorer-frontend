@@ -189,6 +189,7 @@ class FloodAppControllerDisplay extends React.Component {
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
               pointSelect={true}
+              watershedEnsemble={this.props.ensemble_name}
             />
           </HalfWidthCol>
           <HalfWidthCol>
