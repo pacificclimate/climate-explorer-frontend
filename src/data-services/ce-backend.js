@@ -205,7 +205,8 @@ function guessExperimentFormatFromVariable(variable, experiment) {
 function getWatershedGeographyName(ensemble){
     return {
         "bc_moti": "peace_watershed",
-        "upper_fraser": "upper_fraser_watershed"
+        "upper_fraser": "upper_fraser_watershed",
+        "fraser": "fraser_watershed",
         }[ensemble];
 }
 
