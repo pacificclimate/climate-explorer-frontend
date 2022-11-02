@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.3.0
+
+*02-Nov-2022*
+
+- [Displays the extent of the watershed area that drains to the selected point in the Extreme Streamflow portal](https://github.com/pacificclimate/climate-explorer-frontend/pull/425)
+
 ## 2.2.0
 
 *18-Mar-2022*
