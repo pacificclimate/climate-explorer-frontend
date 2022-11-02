@@ -116,7 +116,7 @@ class DataMap extends React.Component {
   static defaultProps = {
     activeGeometryStyle: { color: '#3388ff' },
     inactiveGeometryStyle: { color: '#777777' },
-    watershedGeometryStyle: {colour: '#336699' },
+    watershedGeometryStyle: {color: '#000000' },
     pointSelect: false,
   };
 
