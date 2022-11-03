@@ -15,6 +15,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
 
 RUN apk add --no-cache git bash && \
+    npm install -g npm && \
     npm install --quiet && \
     npm install -g serve && \
     npm audit fix --quiet
