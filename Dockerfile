@@ -16,7 +16,7 @@ COPY package.json /app/package.json
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
-    npm install -g serve==13.0.4 && \
+    npm install -g serve@13 && \
     npm audit fix --quiet
 
 EXPOSE 8080
