@@ -6,7 +6,7 @@
 #
 # docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
-FROM node:10-alpine
+FROM node:16-alpine
 
 ADD . /app
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY package.json /app/package.json
 RUN apk add --no-cache git bash && \
     npm install -g npm && \
     npm install --quiet && \
-    npm install -g serve@13 && \
+    npm install -g serve && \
     npm audit fix --quiet
 
 EXPOSE 8080
