@@ -6,7 +6,7 @@
 #
 # docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
-FROM node:12-alpine
+FROM node:10-alpine
 
 ADD . /app
 WORKDIR /app
