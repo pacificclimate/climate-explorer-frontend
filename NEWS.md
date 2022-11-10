@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.3.1
+
+*10-Nov-2022*
+
+- [Pins the serve package in docker containers](https://github.com/pacificclimate/climate-explorer-frontend/pull/434)
+
 ## 2.3.0
 
 *02-Nov-2022*
