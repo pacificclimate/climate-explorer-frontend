@@ -16,8 +16,9 @@ COPY package.json /app/package.json
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
-    npm install -g serve && \
-    npm audit fix --quiet
+    npm install -g serve
+
+# removed npm audit --fix as a test. put it back!
 
 EXPOSE 8080
 
