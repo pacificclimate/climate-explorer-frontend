@@ -16,7 +16,7 @@ COPY package.json /app/package.json
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
-    npm install -g serve
+    npm install -g serve@13
 
 # removed npm audit --fix as a test. put it back!
 
