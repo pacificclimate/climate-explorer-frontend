@@ -24,7 +24,7 @@ import DualDataController from
     '../../data-controllers/DualDataController/DualDataController';
 import {
   modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
-  datasetFilterPanelLabel, variable1SelectorLabel
+  datasetFilterPanelLabel,
 } from '../../guidance-content/info/InformationItems';
 
 import g from '../../../core/geo';

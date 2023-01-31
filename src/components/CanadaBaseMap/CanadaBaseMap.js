@@ -5,16 +5,12 @@ import React from 'react';
 import _ from 'lodash';
 import L from 'leaflet';
 
-import { Map, TileLayer, WMSTileLayer, FeatureGroup, GeoJSON } from 'react-leaflet';
+import { Map, TileLayer } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
-import { EditControl } from 'react-leaflet-draw';
 
-import StaticControl from '../StaticControl';
 import './CanadaBaseMap.css';
 import { generateResolutions } from '../../core/map-utils';
-import LeafletNcWMSColorbarControl from '../../core/leaflet-ncwms-colorbar';
-import LeafletNcWMSAutoscaleControl from '../../core/leaflet-ncwms-autoset-colorscale';
 
 
 class CanadaBaseMap extends React.Component {

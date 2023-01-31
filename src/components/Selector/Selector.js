@@ -48,7 +48,7 @@ class Selector extends React.Component {
 
   //store the display string for the already-selected value
   updateDisplayValue = (value, items=this.props.items) => {
-    if(_.indexOf(items, value) != -1) {
+    if(_.indexOf(items, value) !== -1) {
       //display string is the same as value string.
       this.displayString = value;
     }

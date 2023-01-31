@@ -180,7 +180,7 @@ export default class LayerOpacityControl extends PureComponent {
               </Grid>
             ) : (
               <Button>
-                <img src={layersIcon}/>
+                <img alt=''  src={layersIcon}/>
               </Button>
             )
           }

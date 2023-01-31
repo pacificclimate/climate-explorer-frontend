@@ -4,8 +4,6 @@ import _ from 'lodash';
 
 import { dataToLongTermAverageGraph } from '../../core/chart-generators';
 import { emphasizeSeries } from './graph-helpers';
-import { assignColoursByGroup, fadeSeriesByRank,
-         hideSeriesInLegend, sortSeriesByRank } from '../../core/chart-formatters';
 import ContextGraph from './ContextGraph';
 
 

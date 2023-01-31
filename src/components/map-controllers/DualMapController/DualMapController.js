@@ -48,7 +48,6 @@ import {
 
 import styles from '../MapController.module.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { MEVSummary } from '../../data-presentation/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125

@@ -19,7 +19,6 @@ import _ from 'lodash';
 
 import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
 import { makeAnomalyGraph } from '../../core/chart-transformers';
-import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 
 
@@ -44,11 +43,6 @@ export default function AnomalyAnnualCycleGraph(props) {
   }
 
   function getMetadata(dataSpec) {
-
-    const {
-      model_id, experiment,
-      variable_id, meta,
-    } = props;
 
     //Select a base historical dataset to be the baseline.
     //The most recent dataset that does *not* include the present date is

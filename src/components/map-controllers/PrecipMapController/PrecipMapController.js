@@ -49,7 +49,6 @@ import {
 
 import styles from '../MapController.module.css';
 import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { DualMEVSummary } from '../../data-presentation/MEVSummary';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -166,7 +165,7 @@ export default class PrecipMapController extends React.Component {
   handleChangeTime = (timeIdx) => {
     //times are selected from the raster list. annotated map will not appear if not 
     //available for the selected time.
-    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
+    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) !== -1 ? 
         timeIdx : undefined;     
     updateLayerTime.bind(this, 'raster', timeIdx)();
     updateLayerTime.bind(this, 'annotated', annotatedIndex)();

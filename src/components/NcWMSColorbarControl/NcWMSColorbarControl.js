@@ -1,5 +1,3 @@
-import React from 'react';  // Necessary?
-
 import { MapControl, withLeaflet } from 'react-leaflet';
 
 import LeafletNcWMSColorbarControl from './LeafletNcWMSColorbarControl';
