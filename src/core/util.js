@@ -504,7 +504,7 @@ export function nestedAttributeIsDefined(o, ...attributes) {
 // this is the only such conversion we need.
 export function WKTPointToGeoJSONPoint(wkt) {
     const elements = _.split(wkt, ' ');
-    if(elements[0] != 'POINT') {
+    if(elements[0] !== 'POINT') {
         throw new Error(`Invalid WKT Point: ${wkt}`);
     }
     const lon = parseFloat(_.trim(elements[1], '()'));

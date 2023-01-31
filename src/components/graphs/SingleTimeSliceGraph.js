@@ -16,8 +16,6 @@ import _ from 'lodash';
 
 import { dataToLongTermAverageGraph } from '../../core/chart-generators';
 import { makeTimeSliceGraph } from '../../core/chart-transformers';
-import { selectPoint } from '../../core/chart-formatters';
-import {caseInsensitiveStringSearch} from '../../core/util';
 import ContextGraph from './ContextGraph';
 import { emphasizeSeries } from './graph-helpers';
 

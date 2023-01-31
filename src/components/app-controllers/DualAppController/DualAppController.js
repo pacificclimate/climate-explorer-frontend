@@ -40,7 +40,6 @@ import {
   EmissionsScenarioSelector,
   ModelSelector, VariableSelector
 } from 'pcic-react-components';
-import { getMetadata } from '../../../data-services/ce-backend';
 import {
   ensemble_name,
 } from '../common';

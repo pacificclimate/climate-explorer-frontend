@@ -38,8 +38,8 @@ export default function DualVariableResponseGraph(props) {
 
     //determine highest resolution data available.
     const resolutionsAvailable = _.uniq(_.map(meta, 'timescale'));
-    const resolution = _.indexOf(resolutionsAvailable, 'monthly') != -1 ? 'monthly' : 
-                 _.indexOf(resolutionsAvailable, 'seasonal') != -1 ? 'seasonal' : 'yearly';
+    const resolution = _.indexOf(resolutionsAvailable, 'monthly') !== -1 ? 'monthly' : 
+                 _.indexOf(resolutionsAvailable, 'seasonal') !== -1 ? 'seasonal' : 'yearly';
     
     // Set up metadata sets for primary variable
     const primaryVariableMetadata = _.filter(meta, {

@@ -2,7 +2,6 @@ import React from 'react';
 import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
 import FAQ from './FAQ';
 import General from './General';
-import Glossary from './Glossary';
 
 const navSpec = {
   basePath: '/help',

@@ -63,7 +63,7 @@ var ncWMSAutoscaleControl = L.Control.extend({
         },
       }).then(response => {
         this.layers.forEach(layer => {
-          if(layer.wmsParams.layers == response.config.params.layers) {
+          if(layer.wmsParams.layers === response.config.params.layers) {
             layer.setParams({ colorscalerange: response.data.min + ',' + response.data.max });
           }
         });

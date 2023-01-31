@@ -32,14 +32,6 @@
  *    data range
  ***************************************************************************/
 import _ from 'lodash';
-import {
-  PRECISION,
-  extendedDateToBasicDate,
-  capitalizeWords,
-  caseInsensitiveStringSearch,
-  nestedAttributeIsDefined,
-  getVariableOptions
-} from './util';
 import { seriesData } from './chart-accessors';
 import chroma from 'chroma-js';
 
@@ -261,7 +253,7 @@ function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
     throw new Error("Error: Graph axis padding value must be greater than 0");
   }
   
-  if(direction != "top" && direction != "bottom") {
+  if(direction !== "top" && direction !== "bottom") {
     throw new Error("Error: Unknown graph axis padding direction");
   }
   

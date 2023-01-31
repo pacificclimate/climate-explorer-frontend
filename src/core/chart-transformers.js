@@ -351,11 +351,11 @@ function makeTimeSliceGraph (timestamp, graph) {
   let timestamps = [];
   let sliceIndex = -1;
 
-  if(graph.axis.x.type == "timeseries") {
+  if(graph.axis.x.type === "timeseries") {
     //x-axis has a series of dates
     timestamps = graph.data.columns.find(function(series) {return series[0] === 'x'});
   }
-  else if(graph.axis.x.type == "category") {
+  else if(graph.axis.x.type === "category") {
     //x-axis is text, most likely month names
     timestamps = graph.axis.x.categories;
   }

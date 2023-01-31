@@ -36,7 +36,6 @@ import {
 
 import styles from '../DataController.module.css';
 import { MEVSummary } from '../../data-presentation/MEVSummary';
-import FlowArrow from '../../data-presentation/FlowArrow';
 import GraphTabs from '../GraphTabs';
 import WatershedSummaryTable from '../../WatershedSummaryTable'
 

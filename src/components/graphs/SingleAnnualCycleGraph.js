@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
 import { sortSeriesByRank } from '../../core/chart-formatters';
 
-import { findMatchingMetadata } from './graph-helpers';
 import AnnualCycleGraph from './AnnualCycleGraph';
 
 

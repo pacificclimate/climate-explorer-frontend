@@ -9,12 +9,10 @@
 // itself to just initialization; any change to the component prop `layers`
 // causes the layers content of the feature group to be updated.
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
 
-import { Path, withLeaflet } from 'react-leaflet';
-import { FeatureGroup as LeafletFeatureGroup } from 'leaflet';
-
+import { Path, withLeaflet } from "react-leaflet";
+import { FeatureGroup as LeafletFeatureGroup } from "leaflet";
 
 class LayerControlledFeatureGroup extends Path {
   static propTypes = {
