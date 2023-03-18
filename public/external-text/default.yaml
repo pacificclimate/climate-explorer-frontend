@@ -702,19 +702,20 @@ help:
           
         ### Annual maximum streamflow quantiles
 
-        The streamflow quantiles describe extreme streamflow events
+        The streamflow quantiles describe daily extreme streamflow events
         that would be expected to occur once during a specified 
         "return period," for example once every 20 years. 
         These datasets are calculated empirically from VIC-GL
         simulated streamflow driven with the CanESM2 large ensemble,
         which is forced by the RCP8.5 concentration pathway scenario. 
-        This data is available for six thirty year climatological periods
-        from 1961 to 2099, namely 1961-1990, 1971-2000, 1981-2010, 
-        2010-2039, 2040-2069, and 2070-2099. 
-        This data is available for a region of the Fraser River upstream 
-        of Shelley, British Columbia. Each quantile estimate is also
-        provided with the 95% sampling interval provided as the
-        2.5th and 97.5th percentiles.
+        The data is available for the period 1951 to 2100 and is divided
+        into a baseline period of 1951-2001 and eight overlapping
+        thirty-year periods of 2001-2031, 2011-2041, 2021-2051,
+        2031-2061, 2041-2071, 2051-2081, 2061-2091 and 2071-2100.
+        This data is available for the Fraser River basin above
+        tidewater and the Peace River basin above Peace River,
+        Alberta. Each quantile estimate is also provided with the 95%
+        sampling interval provided as the 2.5th and 97.5th percentiles.
 
         
         * **`rp2streamflow`**
@@ -724,7 +725,11 @@ help:
         * **`rp5streamflow`**
 
           5-year annual maximum one day streamflow
-        
+
+        * **`rp10streamflow`**
+
+          10-year annual maximum one day streamflow
+
         * **`rp20streamflow`**
 
           20-year annual maximum one day streamflow
@@ -740,6 +745,50 @@ help:
         * **`rp200streamflow`**
 
           200-year annual maximum one day streamflow
+
+        ### Change factors for annual maximum atreamflow quantiles
+
+        Change factors for the streamflow quantiles describe the change
+        in daily extreme streamflow events for a specified return period
+        and are estimated as the ratio of future to baseline (1951-2000)
+        design flow value. Change factors are available for eight
+        overlapping thirty-year periods of 2001-2031, 2011-2041,
+        2021-2051, 2031-2061, 2041-2071, 2051-2081, 2061-2091 and
+        2071-2100. This data is available for the Fraser River basin
+        above tidewater and the Peace River basin above the town of Peace
+        River, Alberta. Each change factor estimate is also provided with
+        the 95% sampling interval provided as the 2.5th and 97.5th
+        percentiles.
+
+
+        * **`cfrp2streamflow`**
+
+          change factor for 2-year annual maximum one day streamflow
+
+        * **`cfrp5streamflow`**
+
+          change factor for 5-year annual maximum one day streamflow
+
+        * **`cfrp10streamflow`**
+
+          change factor for 10-year annual maximum one day streamflow
+
+        * **`cfrp20streamflow`**
+
+          change factor for 20-year annual maximum one day streamflow
+
+        * **`cfrp50streamflow`**
+
+          change factor for 250-year annual maximum one day streamflow
+
+        * **`cfrp100streamflow`**
+
+          change factor for 100-year annual maximum one day streamflow
+
+        * **`cfrp200streamflow`**
+
+          change factor for 200-year annual maximum one day streamflow
+
 
       - |
         ## Models (GCMs)

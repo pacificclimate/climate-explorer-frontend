@@ -309,7 +309,7 @@ const isolinesVariable = `
 
 export const variableSelectorLabel = (
   <LabelWithInfo label='Variable'>
-    <p>Variable to view on the map and in the graphs.</p>
+    <p>Variable to view on the map and in the graphs. For variable details, see <Link to='/help/general'>Help</Link>.</p>
     <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
 );
@@ -659,7 +659,8 @@ export const watershedTableLabel = (
   <LabelWithInfo label='Watershed Upstream Of Selected Point'>
     <p>
       This table presents information about the selected grid and its upstream area
-      or watershed.
+      or watershed. The table is only populated if an outlet location has been
+      selected on the map.
     </p>
     <p>
       The Outlet Latitude and Longitude describe the point selected on the map,
