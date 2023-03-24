@@ -443,6 +443,12 @@ const spatialAveragingDefn = `
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
+const watershedDefn = `
+  When no outlet is selected, the data values shown are spatially
+  averaged over the domain. When an outlet is selected, data values
+  are displayed for the specified outlet location.
+`;
+
 const pointAreaDefn = `
   Data values shown in each graph are from the single grid square selected
   on the map (or averaged over the entire dataset if no point is selected).
@@ -465,6 +471,16 @@ export const graphsPanelLabel = (
       selected by Model, Emissions scenario, and Variable(s).
     </p>
     <p>{spatialAveragingDefn}</p>
+  </LabelWithInfo>
+);
+
+export const watershedGraphsPanelLabel = (
+  <LabelWithInfo label='Data Graphs'>
+    <p>
+      Graphs showing various slices and views of the dataset(s)
+      selected by Model, Emissions scenario, and Variable(s).
+    </p>
+    <p>{watershedDefn}</p>
   </LabelWithInfo>
 );
 
@@ -498,19 +514,29 @@ const ltaGraphDefn = `
   Horizontal axis indicates midpoint of multi-decade averaging period.
 `;
 
+const designValueGraphDefn = `
+  The design value graph presents values of the selected variable (design
+  flow or change factor) as estimated for each multi-decade period. There
+  is one data point per multi-decade period and the horizontal axis
+  indicates the midpoint of each period. Each data point provides the best
+  estimate and the corresponding 2.5% to 97.5% confidence interval derived
+  from bootstrap resampling.
+`;
+
 export const singleLtaTabLabel = (
   <LabelWithInfo label='Long Term Average'>
     <p>Long term average graphs for the selected variable.</p>
     <p>{ltaGraphDefn}</p>
-    <p>{spatialAveragingDefn}</p>
-    <p>{timeOfYearSelectorDefn}</p>
+    <p>{watershedDefn}</p>
+    <p>The Time of Year selector only allows Annual values (i.e. all
+    values represent the annual maximum design flow event).</p>
   </LabelWithInfo>
 );
 
 export const percentileLtaTabLabel = (
-  <LabelWithInfo label='Long Term Average'>
-    <p>Long term average graphs with percentile range for the selected variable.</p>
-    <p>{ltaGraphDefn}</p>
+  <LabelWithInfo label='Design Values'>
+    <p>Design value graphs with percentile range for the selected variable.</p>
+    <p>{designValueGraphDefn}</p>
     <p>{pointAreaDefn}</p>
     <p>{timeOfYearSelectorDefn}</p>
   </LabelWithInfo>
