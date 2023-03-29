@@ -76,6 +76,42 @@ const mapPolygonDrawControls = (
   </span>
 );
 
+const mapCircleMarkerControl = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-draw-circlemarker' href='#' title='Draw a circlemarker'>
+              <span className='sr-only'>Draw a circlemarker</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Add Outlet)
+  </span>
+);
+
+const mapDeleteControl = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+              <span className='sr-only'>Delete layers</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Delete Outlet)
+  </span>
+);
+
 const mapPolygonEditControls = (
   <span>
     <LeafletControlContainer>
@@ -148,6 +184,42 @@ export const mapPanelLabel = (
         {mapPolygonImportExportControls}: Import and export polygons on the map.
         Polygons determine the extents over which spatial data averaging is
         performed.
+      </li>
+      <li>
+        {mapSettingsControl}: Select which dataset(s) are displayed and how.
+      </li>
+      <li>
+        {mapColourScaleControls}: Displays data value ⇄ colour mapping.
+      </li>
+      <li>
+        {mapAutoScaleControl}: Sets bounds of data value ⇄ colour mapping to
+        current range of data.
+      </li>
+    </ul>
+  </LabelWithInfo>
+);
+
+export const floodMapPanelLabel = (
+  <LabelWithInfo label='Data Map'>
+    <p>
+      Map displaying data selected by
+      Model, Emissions scenario, and Variable(s).
+    </p>
+    <p>
+      Summary of map tools and other controls.
+      (For details, see <Link to='/help/general'>Help</Link>.)
+    </p>
+    <ul className={css.controlsList}>
+      <li>
+        {mapZoomControls}: Zoom map in and out.
+      </li>
+      <li>
+        {mapCircleMarkerControl}: Add outlet location to map. When an outlet
+        location is added to the map a polygon will be rendered that shows
+        the upstream area contributing streamflow to the selected location.
+      </li>
+      <li>
+        {mapDeleteControl}: Remove outlet location from map.
       </li>
       <li>
         {mapSettingsControl}: Select which dataset(s) are displayed and how.
