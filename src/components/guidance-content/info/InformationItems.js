@@ -421,7 +421,8 @@ export const filteredDatasetSummaryPanelLabel = (
       Each row of the table represents a group of up to 3 datasets.
       We group datasets by Model Run, Start Date and End Date,
       and each such group is labelled accordingly as shown in the
-      "Label in selectors" column.
+      "Label in selectors" column. Datasets comprising multiple runs are
+      denoted rX.
     </p>
     <p>
       The "Yearly", "Seasonal", and "Monthly" columns indicate whether a

@@ -29,7 +29,7 @@ components:
     GCMs are the most advanced tools currently available for simulating the
     response of the global climate system to increasing greenhouse gas
     concentrations.
-  monthlyAnnualVarNameAmbiguityCaution:
+  monthlyAnnualVarNameAmbiguityCaution: |
     Unlike most Climdex variable names used in PCEX,
     this variable name can refer to either an annual version
     (calculation spanning a calendar year) or to the standard
