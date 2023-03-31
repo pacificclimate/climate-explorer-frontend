@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.3.2
+
+*30-Mar-2023*
+
+- [Updates help text for the extreme stramflow portal](https://github.com/pacificclimate/climate-explorer-frontend/pull/450)
+
 ## 2.3.1
 
 *10-Nov-2022*
