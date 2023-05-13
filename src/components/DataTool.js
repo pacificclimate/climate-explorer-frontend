@@ -51,8 +51,8 @@ const navSpec = {
     {
       label: 'Extreme Streamflow',
       info: 'View streamflow design values for the Fraser and Peace River basins based on the CanESM2 large ensemble.',
-      subpath: 'flood/:ensemble_name(fraser)',
-      navSubpath: 'flood/fraser',
+      subpath: 'flood/:ensemble_name(frapce)',
+      navSubpath: 'flood/frapce',
       render: (props) => <FloodAppController {...props} />,
     },
   ],
