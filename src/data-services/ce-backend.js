@@ -207,6 +207,7 @@ function getWatershedGeographyName(ensemble){
         "bc_moti": "peace_watershed",
         "upper_fraser": "upper_fraser_watershed",
         "fraser": "fraser_watershed",
+        "frapce": "frapce_watershed",
         }[ensemble];
 }
 
