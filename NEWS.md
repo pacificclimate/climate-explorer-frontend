@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.3.3
+
+*16-May-2023*
+
+- [Updates the extreme streamflow portal to new data ensembles containing the merged Peace and Fraser watersheds](https://github.com/pacificclimate/climate-explorer-frontend/pull/454)
+
 ## 2.3.2
 
 *30-Mar-2023*
