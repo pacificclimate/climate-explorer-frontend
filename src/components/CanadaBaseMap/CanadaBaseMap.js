@@ -68,7 +68,7 @@ class CanadaBaseMap extends React.Component {
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url={process.env.REACT_APP_TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
+            url={process.env.REACT_APP_TILECACHE_URL + '/1.0.0/osm/base-4326/{z}/{x}/{y}.png'}
             subdomains={'abc'}
             noWrap
             maxZoom={12}
