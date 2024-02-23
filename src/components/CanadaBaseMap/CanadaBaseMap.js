@@ -66,12 +66,15 @@ class CanadaBaseMap extends React.Component {
           maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
           ref={this.props.mapRef}
         >
-          <TileLayer
+          <WMSTileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url={process.env.REACT_APP_TILECACHE_URL + '/1.0.0/na_4326_osm/{z}/{x}/{y}.png'}
-            subdomains={'abc'}
-            noWrap
-            maxZoom={12}
+            url={process.env.REACT_APP_TILECACHE_URL}
+            layers={'osm'}
+            format={'image/png'}
+            transparent={true}
+            version={'1.3.0'}
+            crs={L.CRS.EPSG4326}
+
           />
           { this.props.children }
         </Map>
