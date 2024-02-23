@@ -78,7 +78,7 @@ class FloodAppControllerDisplay extends React.Component {
   };
 
   replaceInvalidModel = findModelNamed('PCIC12');
-  replaceInvalidScenario = findScenarioIncluding('rcp85');
+  replaceInvalidScenario = findScenarioIncluding(['rcp85']);
   replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
 
   representativeValue = (...args) => representativeValue(...args)(this.props);

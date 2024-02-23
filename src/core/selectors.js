@@ -35,8 +35,8 @@ export const findModelNamed = model_id => options =>
   fallback(options);
 
 
-export const findScenarioIncluding = s => options =>
-  find(opt => opt.value.representative.experiment.includes(s))(options) ||
+export const findScenarioIncluding = scenarios => options =>
+  scenarios.map((s) => find(opt => opt.value.representative.experiment.includes(s))(options)).find(e => typeof e != "undefined") ||
   fallback(options);
 
 
