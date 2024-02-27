@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.3.4
+
+*23-Feb-2024*
+
+- [Replaces tilecache with mapproxy to request basemap tiles](https://github.com/pacificclimate/climate-explorer-frontend/pull/458)
+
 ## 2.3.3
 
 *16-May-2023*
