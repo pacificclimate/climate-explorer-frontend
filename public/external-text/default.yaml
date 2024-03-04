@@ -187,9 +187,7 @@ help:
         answer: |
           Much of the data in Climate Explorer comes from the Coupled Model Intercomparison Project
           (CMIP) phases 5 and 6, which houses output from numerous global climate models. These datasets are
-          referred to as the Canadian Downscaled Climate Scenarios - Univariate method from CMIP5 and CMIP6 (CanDCS-U5 and CanDCS-U6) respectively.
-          Since CMIP6 is ongoing and the associated climatologies were added to Climate Explorer very recently,
-          the available data for CMIP5 is much more extensive.
+          referred to as the Canadian Downscaled Climate Scenarios - Univariate/Multivariate method from CMIP5 and CMIP6 (CanDCS-U5 and CanDCS-M6) respectively.
 
           For CMIP5, the downscaled scenarios in Climate Explorer are constructed from 27 GCMs and 3 Representative Concentration
           Pathways (RCPs). The climatologies for these scenarios can be accessed using the `Single Variable` and `Compare Variables`
@@ -197,7 +195,7 @@ help:
 
           For CMIP6, the downscaled scenarios in Climate Explorer are constructed from 26 GCMs and 3 Shared Socioeconomic
           Pathways (SSPs). The climatologies for these scenarios can be accessed using the `Single Variable CMIP6` and `Compare Variables CMIP6`
-          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6/map/).
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6_multi/map/).
 
   general:
     # This chunk is partway to being ready for presenting the sections as
@@ -267,9 +265,9 @@ help:
         by global or regional climate models based on a
         combination of historical data and possible future greenhouse
         gas projections. The data is averaged by month over thirty year
-        periods; there are six such periods from 1960 to 2100, three
-        historical and three projected.
-        This data is available for all of Canada.
+        periods; there are six such periods, three historical and three projected.
+        For CMIP5, these periods are from 1961-2100, whereas
+        for CMIP6, they are from 1971-2100. This data is available for all of Canada.
 
         * **`pr`**
 
@@ -282,10 +280,18 @@ help:
         * **`tasmin`**
 
           Daily minimum near-surface air temperature
+          
+        * **`tas`** (only CMIP6)
+        
+          Daily mean near-surface air temperature
 
-        * **`prsn`**
+        * **`prsn`** (CMIP5) / **`snow`** (CMIP6)
 
           Precipitation at ground level while mean daily temperature is below freezing
+          
+        * **`rain`** (only CMIP6)
+        
+          Precipitation at ground level while mean daily temperature is above freezing
         
         ### Climdex (climate extremes indices)
 
@@ -295,11 +301,11 @@ help:
         or lack thereof in different ways.
         This is a heterogeneous data collection with some monthly,
         some seasonal, and some annual resolution data. The data is
-        averaged over 30 year periods; there are six such periods
-        between 1960 and 2100, three historical and three projected.
-        This data is available for all of Canada.
+        averaged over 30 year periods; there are six such periods, three historical and three projected.
+        For CMIP5, these periods are from 1961-2100, whereas
+        for CMIP6, they are from 1971-2100. This data is available for all of Canada.
 
-        * **`altcddETCCDI`**
+        * **`altcddETCCDI`** (only CMIP5)
           
           Dry spell duration index spanning years:
           Maximum number of consecutive days in one year with less
@@ -313,7 +319,7 @@ help:
 
           ${$$.components.cddCaution}
 
-        * **`altcsdiETCCDI`** 
+        * **`altcsdiETCCDI`** (only CMIP5)
           
           Cold spell duration index spanning years:
           Count of days with at least 6 consecutive days when
@@ -326,7 +332,7 @@ help:
           of a calendar year.
           
 
-        * **`altcwdETCCDI`** 
+        * **`altcwdETCCDI`** (only CMIP5)
           
           Maximum length of wet spell spanning years:
           Maximum number of consecutive days with at
@@ -339,7 +345,7 @@ help:
           of a calendar year.
           
 
-        * **`altwsdiETCCDI`** 
+        * **`altwsdiETCCDI`** (only CMIP5)
           
           Warm spell duration index spanning years:
           Count of days with at least 6 consecutive days when
@@ -604,9 +610,9 @@ help:
         counts how many days fall below or above a given temperature
         threshold multiplied by how many degrees the threshold is exceeded,
         over a period of a season or year.
-        The data is averaged over six thirty year periods between
-        1960 to 2100, three historical and three projected.
-        This data is available for all of Canada.
+        The data is averaged over six thirty year periods, three historical and three projected.
+        For CMIP5, these periods are from 1961-2100, whereas
+        for CMIP6, they are from 1971-2100. This data is available for all of Canada.
 
         A degree-day is a measure of how much
         the actual temperature (usually the mean average temperature)
@@ -650,50 +656,86 @@ help:
           Frost Degree Days: Degree-days during the specified time 
           period below 0&deg;C.
         
-        ### Return period variables
+        ### Return period/level variables
 
-        A return period variable describes extreme temperature or
+        A return period/level variable (for CMIP5/CMIP6 respectively) describes extreme temperature or
         precipitation events that would be expected to occur once
         during a specified "return period," for example once every
         20 years.
         These datasets are calculated from model output using a
         generalized extreme value distribution.
         This data is available for six thirty year climatological
-        periods from 1960 to 2100, three historical and three
-        projected.
-        This data is available for all Canada.
+        periods, three historical and three projected.
+        For CMIP5, these periods are from 1961-2100, whereas
+        for CMIP6, they are from 1971-2100. This data is available for all Canada.
 
-        * **`rp5pr`**
+        * **`rp5pr`** / **`rl5pr`**
 
           5-year annual maximum one day precipitation amount
           
-        * **`rp20pr`**
+        * **`rl10pr`**
+
+          10-year annual maximum one day precipitation amount
+          
+        * **`rp20pr`** / **`rl20pr`**
 
           20-year annual maximum one day precipitation amount
           
-        * **`rp50pr`**
+        * **`rl25pr`**
+
+          25-year annual maximum one day precipitation amount
+          
+        * **`rl30pr`**
+
+          30-year annual maximum one day precipitation amount
+          
+        * **`rp50pr`** / **`rl50pr`**
 
           50-year annual maximum one day precipitation amount
           
-        * **`rp5tasmax`**
+        * **`rp5tasmax`** / **`rl5tasmax`**
 
           5-year annual maximum daily maximum temperature
           
-        * **`rp20tasmax`**
+        * **`rl10tasmax`**
+
+          10-year annual maximum daily maximum temperature
+          
+        * **`rp20tasmax`** / **`rl20tasmax`**
 
           20-year annual maximum daily maximum temperature
+          
+        * **`rl25tasmax`**
+
+          25-year annual maximum daily maximum temperature
+          
+        * **`rl30tasmax`**
+
+          30-year annual maximum daily maximum temperature
           
         * **`rp50tasmax`**
 
           50-year annual maximum daily maximum temperature
           
-        * **`rp5tasmin`**
+        * **`rp5tasmin`** / **`rl5tasmin`**
 
           5-year annual minimum daily minimum temperature
           
-        * **`rp20tasmin`**
+        * **`rl10tasmin`**
+
+          10-year annual minimum daily minimum temperature
+          
+        * **`rp20tasmin`** / **`rl20tasmin`**
 
           20-year annual minimum daily minimum temperature
+          
+        * **`rl25tasmin`**
+
+          25-year annual minimum daily minimum temperature
+          
+        * **`rl30tasmin`**
+
+          30-year annual minimum daily minimum temperature
           
         * **`rp50tasmin`**
 
