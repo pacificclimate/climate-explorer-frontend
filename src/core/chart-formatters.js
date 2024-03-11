@@ -101,7 +101,11 @@ function assignColoursByGroup (graph, segmentor, colourList = category10Colours)
         }
         index = categories.length - 1;
       }
-      colors[seriesName] = colourList[index];
+      if(seriesName.includes("PCIC12")) {
+        colors[seriesName] = "#000000";
+      } else {
+        colors[seriesName] = colourList[index];
+      }
     }
   }
   graph.data.colors = colors;
@@ -134,7 +138,11 @@ function fadeSeriesByRank (graph, ranker) {
   for(let column of graph.data.columns) {
     const seriesName = column[0];
     if(seriesName !== "x") {
-      rankDictionary[seriesName] = ranker(column);
+      if(seriesName.includes("PCIC12")) {
+        rankDictionary[seriesName] = 1;
+      } else {
+        rankDictionary[seriesName] = ranker(column);
+      }
     }
   }
 
@@ -171,7 +179,7 @@ function hideSeriesInLegend (graph, predicate) {
 
   _.each(graph.data.columns, column => {
     const seriesName = column[0];
-    if(seriesName !== "x" && predicate(column)) {
+    if(seriesName !== "x" && !seriesName.includes("PCIC12") && predicate(column)) {
       hiddenSeries.push(seriesName);
     }
   });
