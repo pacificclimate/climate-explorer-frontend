@@ -54,7 +54,7 @@ export default function SingleContextGraph(props) {
 
     //simplify graph by turning off tooltip and missing data gaps
     graph.line.connectNull = true;
-    graph.tooltip = { show: false };
+    //graph.tooltip = { show: false };
     return graph;
   }
 

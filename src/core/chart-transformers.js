@@ -391,7 +391,7 @@ function makeTimeSliceGraph (timestamp, graph) {
       categories: [date.getFullYear()]
   };
   graph.data.x = undefined;
-  graph.tooltip = {show: false};
+  //graph.tooltip = {show: false};
 
   return graph;
 }
