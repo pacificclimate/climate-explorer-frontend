@@ -399,6 +399,16 @@ export function extendedDateToBasicDate(timestamp) {
 }
 
 /*
+ * Returns the 30-year decadal period from the timestamp (e.g. "1997-07-02" and "1996-07-02"
+ * return "1990s". This prevents the x-axis dates where models differ by one year from overlapping.
+ */
+export function dateToPeriod(timestamp) {
+    const year = new Date(timestamp).getFullYear();
+    const period = (Math.floor(year / 10) * 10).toString() + 's';
+    return period;
+}
+
+/*
  * Produces a human-readable string describing the time of year of displayed data.
  * Used by MapController, since ncWMS doesn't provide any human-friendly time info.
  */

@@ -196,19 +196,6 @@ help:
           For CMIP6, the downscaled scenarios in Climate Explorer are constructed from 26 GCMs and 3 Shared Socioeconomic
           Pathways (SSPs). The climatologies for these scenarios can be accessed using the `Single Variable CMIP6` and `Compare Variables CMIP6`
           tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6_multi/map/).
-          
-      - question: |
-          Why are there overlapping dates for some periods in Model Context?
-        answer: |
-          The dates were chosen based on CF conventions, generally proposing the middle of the period. Using [this code piece as a reference]
-          (https://github.com/pacificclimate/climate-explorer-data-prep/blob/7a8e8a1eb9be229f3842da12d92da03512997f7a/dp/generate_climos.py#L516),
-          the middle year can differ depending on the number of leap years in the period and what type of calendar a model has;
-          however, the month and day are computed in a way that's consistent across all models.
-
-          For example, consider the date for the 1981-2010 period. Regardless of the model, the start date would be 1981-01-01.
-          For a calendar that has more than 360 days per year, the end date would be 2010-12-31. This means that the resulting chosen year would be 1997.
-          However, for a calendar with only 360 days per year (such as the HadGEM models), the end date would be 2010-12-30,
-          and this difference is enough for the chosen year to be 1996.
 
   general:
     # This chunk is partway to being ready for presenting the sections as
