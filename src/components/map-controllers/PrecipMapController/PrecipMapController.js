@@ -45,6 +45,7 @@ import {
   scalarParams,
   selectRasterPalette,
   getTimeParametersPromise,
+  isMultiRun,
 } from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
@@ -72,6 +73,7 @@ export default class PrecipMapController extends React.Component {
       run: undefined,
       start_date: undefined,
       end_date: undefined,
+      multi_run: false,
 
       raster: {
         variableId: undefined, // formerly 'variable'
@@ -118,6 +120,7 @@ export default class PrecipMapController extends React.Component {
     // timestamp is determined at render time and passed to the viewer component.
 
     const { start_date, end_date, ensemble_member } = dataSpec;
+    const multi_run = isMultiRun(props.meta);
     
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
@@ -148,6 +151,7 @@ export default class PrecipMapController extends React.Component {
         run: ensemble_member,
         start_date,
         end_date,
+        multi_run,
         raster: rasterParams,
         annotated: annotatedParams
       }));

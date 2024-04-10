@@ -44,6 +44,7 @@ import {
   updateLayerSimpleState,
   updateLayerTime,
   getDatasetIdentifiers,
+  isMultiRun,
 } from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
@@ -71,6 +72,7 @@ export default class DualMapController extends React.Component {
       run: undefined,
       start_date: undefined,
       end_date: undefined,
+      multi_run: false,
 
       raster: {
         variableId: undefined, // formerly 'variable'
@@ -128,6 +130,7 @@ export default class DualMapController extends React.Component {
     // (aside from variable_id) display the same dataspec.
 
     const { start_date, end_date, ensemble_member } = dataSpec;
+    const multi_run = isMultiRun(props.meta);
     
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
@@ -169,6 +172,7 @@ export default class DualMapController extends React.Component {
         run: ensemble_member,
         start_date,
         end_date,
+        multi_run,
         raster: rasterParams,
         isoline: isolineParams
       }));
