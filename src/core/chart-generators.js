@@ -559,10 +559,10 @@ const missingVariableName = 'defaultVariable';
 
 /*
  * Helper constant for dataToLongTermAverageGraph: Format object
- * for a categorical X axis labelled by the decadal period.
+ * for a timeseries X axis labelled by the decadal period.
  */
 const periodXAxis = {
-  type: 'categories',
+  type: 'timeseries',
   tick: {
     format: '%Ys',
   },
