@@ -55,7 +55,7 @@ export default class FilteredDatasetsSummary extends React.Component {
     const keyedComparandData =
       this.props.comparandMeta &&
       this.props.comparandMeta.map(metaToKeyedData);
-    if (this.props.comparandMeta.length && !isMultiRun(this.props.comparandMeta)) {
+    if (keyedComparandData && this.props.comparandMeta.length && !isMultiRun(this.props.comparandMeta)) {
         keyedComparandData.forEach((el) => el.key = el.key.split(" ")[1]);
     }
 
