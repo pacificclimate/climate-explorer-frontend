@@ -215,7 +215,7 @@ describe('shortestUniqueTimeseriesNamingFunction', function () {
           annualTasmaxTimeseries]);
     expect(nameFunction(metadata[0])).toEqual('Monthly Mean');
     expect(nameFunction(metadata[1])).toEqual('Seasonal Mean');
-    expect(nameFunction(metadata[2])).toEqual('Yearly Mean');
+    expect(nameFunction(metadata[2])).toEqual('Annual Mean');
   });
   it('names series by variable', function () {
     const nameFunction = shortestUniqueTimeseriesNamingFunction(metadata,

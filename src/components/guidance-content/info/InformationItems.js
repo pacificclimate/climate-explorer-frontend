@@ -425,7 +425,7 @@ export const filteredDatasetSummaryPanelLabel = (
       denoted rX.
     </p>
     <p>
-      The "Yearly", "Seasonal", and "Monthly" columns indicate whether a
+      The "Annual", "Seasonal", and "Monthly" columns indicate whether a
       dataset with that timescale (averaging period) is available in the
       group.
     </p>
@@ -560,7 +560,7 @@ export const watershedGraphsPanelLabel = (
 export const singleAnnualCycleTabLabel = (
   <LabelWithInfo label='Annual Cycle'>
     <p>
-      Annual cycle graph showing the yearly, seasonal, and monthly
+      Annual cycle graph showing the annual, seasonal, and monthly
       mean values of the selected variable.
     </p>
     <p>{annualCycleGraphDefn}</p>
@@ -571,7 +571,7 @@ export const singleAnnualCycleTabLabel = (
 
 export const dualAnnualCycleTabLabel = (
   <LabelWithInfo label='Annual Cycle'>
-    Annual cycle graphs showing the yearly, seasonal, and monthly
+    Annual cycle graphs showing the annual, seasonal, and monthly
     mean values of the two selected variables (if different).
     <p>{annualCycleGraphDefn}</p>
     <p>{spatialAveragingDefn}</p>

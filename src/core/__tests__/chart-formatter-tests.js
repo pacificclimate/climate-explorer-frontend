@@ -95,7 +95,7 @@ describe('sortSeriesByRank', function (){
   let graph = cg.timeseriesToAnnualCycleGraph(metadata, mockAPI.monthlyTasmaxTimeseries,
       mockAPI.seasonalTasmaxTimeseries, mockAPI.annualTasmaxTimeseries);
   const rankByTimeResolution = function (series) {
-    const resolutions = ["Yearly", "Seasonal", "Monthly"];
+    const resolutions = ["Annual", "Seasonal", "Monthly"];
     for(let i = 0; i < 3; i++) {
       if(series[0].search(resolutions[i]) != -1) {
         return i;
@@ -104,7 +104,7 @@ describe('sortSeriesByRank', function (){
   }
   it('orders series by ranking', function () {
     const ranked = cf.sortSeriesByRank(graph, rankByTimeResolution);
-    expect(ranked.data.columns[0][0]).toBe("Yearly Mean");
+    expect(ranked.data.columns[0][0]).toBe("Annual Mean");
     expect(ranked.data.columns[1][0]).toBe("Seasonal Mean");
     expect(ranked.data.columns[2][0]).toBe("Monthly Mean");
   });
@@ -119,7 +119,7 @@ describe('hideSeriesInToolTip', function () {
     const hideAll = function(series) {return true};
     graph = cf.hideSeriesInTooltip(graph, hideAll);
     formatFunction = graph.tooltip.format.value;
-    expect(formatFunction(10, 19, "Yearly Mean")).toBeUndefined();
+    expect(formatFunction(10, 19, "Annual Mean")).toBeUndefined();
   });
   it('retains data series in the tooltip', function() {
     const showAll = function(series) {return false};
