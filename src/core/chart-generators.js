@@ -401,7 +401,7 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
 
   // only one timeseries being graphed, simple label.
   if (data.length === 1) {
-    return function (m) { return capitalizeWords(`${m.timescale} mean`);};
+    return function (m) { return m.timescale === 'yearly' ? 'Annual Mean' : capitalizeWords(`${m.timescale} mean`);};
   }
 
   // Compile a list of attributes that can potentially be used to distinguish
@@ -455,7 +455,7 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
       name = name.concat(`${m[v]} `);
     }
     name = name.concat(basenameByVariable[m.variable_id]);
-    return capitalizeWords(name);
+    return capitalizeWords(name.replace('yearly', 'annual'));
   };
 }
 

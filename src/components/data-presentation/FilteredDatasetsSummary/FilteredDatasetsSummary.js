@@ -101,7 +101,7 @@ export default class FilteredDatasetsSummary extends React.Component {
           dataField='yearly'
           width={'10%'}
         >
-          Yearly?
+          Annual?
         </TableHeaderColumn>
         <TableHeaderColumn
           dataField='seasonal'
