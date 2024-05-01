@@ -1,8 +1,8 @@
 /*******************************************************************
  * SingleMapController.js - Raster display of map data
- * 
+ *
  * This controller coordinates a map displaying data extracted from
- * netCDF files as a colour-coded raster, as well as a menu of 
+ * netCDF files as a colour-coded raster, as well as a menu of
  * viewing settings for the raster.
  *
  * It allows the user to select an area of interest by interacting
@@ -10,32 +10,31 @@
  * controlled by the pointSelect prop. If the selection area is a point,
  * the watershed of which that point is the mouth will be displayed on
  * the map if the watershedEnsemble prop has a non-null value.
- * 
- * It is also responsible for passing user-drawn areas up to its 
+ *
+ * It is also responsible for passing user-drawn areas up to its
  * parent.
- * 
+ *
  * Children:
  *   * Datamap, which actually renders the map
  *   * MapSettings, which allows user configuration of map layers
  *******************************************************************/
 
-
 // Wires up components of overall map display for CE.
 // Also contains some legacy code that should be further refactored, primarily
 // `loadMap` and the handling of dataspecs (see TODOs/FIXMEs).
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import Loader from 'react-loader';
-import { Panel, Row, Col } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import Loader from "react-loader";
+import { Panel, Row, Col } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import '../MapController.module.css';
-import DataMap from '../../DataMap';
-import MapLegend from '../../MapLegend';
-import MapSettings from '../../MapSettings';
-import StaticControl from '../../StaticControl';
+import "../MapController.module.css";
+import DataMap from "../../DataMap";
+import MapLegend from "../../MapLegend";
+import MapSettings from "../../MapSettings";
+import StaticControl from "../../StaticControl";
 
 import {
   hasValidData,
@@ -46,14 +45,13 @@ import {
   getTimeParametersPromise,
   scalarParams,
   getDatasetIdentifiers,
-} from '../map-helpers.js';
+} from "../map-helpers.js";
 
-import styles from '../MapController.module.css';
-import { 
+import styles from "../MapController.module.css";
+import {
   mapPanelLabel,
-  floodMapPanelLabel
-} from '../../guidance-content/info/InformationItems';
-
+  floodMapPanelLabel,
+} from "../../guidance-content/info/InformationItems";
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class SingleMapController extends React.Component {
@@ -65,7 +63,7 @@ export default class SingleMapController extends React.Component {
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
     pointSelect: PropTypes.bool.isRequired,
-    watershedEnsemble: PropTypes.string
+    watershedEnsemble: PropTypes.string,
   };
 
   constructor(props) {
@@ -81,8 +79,8 @@ export default class SingleMapController extends React.Component {
         times: undefined,
         timeIdx: undefined,
         wmsTime: undefined,
-        palette: 'x-Occam',
-        logscale: 'false',
+        palette: "x-Occam",
+        logscale: "false",
         range: {},
       },
     };
@@ -91,44 +89,40 @@ export default class SingleMapController extends React.Component {
   // Support functions for event/callback handlers
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  loadMap(
-    props,
-    dataSpec,
-    newVariable = false,
-  ) {
+  loadMap(props, dataSpec, newVariable = false) {
     // update state with all the information needed to display
     // maps for a specific dataSpec.
-    // a 'dataspec' in this case is a variable + emissions + model + 
+    // a 'dataspec' in this case is a variable + emissions + model +
     // period + run combination, which unique describes a set of data that may
-    // spread across up to three files (one annual, one seasonal, one monthly). 
+    // spread across up to three files (one annual, one seasonal, one monthly).
     // SingleMapController receives the variable, emissions, and model parameters
     // from its parent as props. The period and run are selected by this component
     // (by default) or adjusted by the user, and stored in state.
-    // An exact file for ncWMS to read is not selected until render time, when it 
+    // An exact file for ncWMS to read is not selected until render time, when it
     // is passed to the viewer component.
 
     const { start_date, end_date, ensemble_member } = dataSpec;
-    
+
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
       .then(rasterScalarParams)
       .then(selectRasterPalette);
-    
-    rasterParamsPromise.then(params => {
+
+    rasterParamsPromise.then((params) => {
       //if the variable has changed, use the default palette and logscale,
       //otherwise use the previous (user-selected) values from state.
-      if(!newVariable) {
+      if (!newVariable) {
         params.palette = this.state.raster.palette;
         params.logscale = this.state.raster.logscale;
       }
-      
-      this.setState(prevState => ({
+
+      this.setState((prevState) => ({
         run: ensemble_member,
         start_date,
         end_date,
-        raster: params
+        raster: params,
       }));
-    });  
+    });
   }
 
   // Handlers for dataset change
@@ -140,15 +134,23 @@ export default class SingleMapController extends React.Component {
 
   // Handlers for time selection change
 
-  handleChangeVariableTime = updateLayerTime.bind(this, 'raster');
+  handleChangeVariableTime = updateLayerTime.bind(this, "raster");
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "palette",
+  );
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "range",
+  );
 
   // Handlers for scale change
 
@@ -157,7 +159,11 @@ export default class SingleMapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "logscale",
+  );
 
   // React lifecycle event handlers
 
@@ -170,14 +176,21 @@ export default class SingleMapController extends React.Component {
     // the first dataset representing a 0th time index (January, Winter, or Annual)
     // will be displayed.
 
-    if (hasValidData('variable', nextProps)) {      
+    if (hasValidData("variable", nextProps)) {
       const defaultDataset = nextProps.meta[0];
-      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataSpec = _.pick(
+        defaultDataset,
+        "start_date",
+        "end_date",
+        "ensemble_member",
+      );
 
       // check to see whether the variables displayed have been switched.
       // if so, loadMap will reset palette and logarithmic dispay.
-      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
-
+      const switchVariable = !_.isEqual(
+        this.props.variable_id,
+        nextProps.variable_id,
+      );
 
       this.loadMap(nextProps, defaultDataSpec, switchVariable);
     } else {
@@ -207,14 +220,12 @@ export default class SingleMapController extends React.Component {
 
   render() {
     // TODO: Improve returned item
-    if (!_.allDefined(this.props, 'model_id', 'experiment', 'variable_id')) {
-      return 'Readying...';
+    if (!_.allDefined(this.props, "model_id", "experiment", "variable_id")) {
+      return "Readying...";
     }
-    const mapLegend = (<MapLegend
-      {...this.props}
-      {...this.state}
-      hasValidComparand={false}
-    />);
+    const mapLegend = (
+      <MapLegend {...this.props} {...this.state} hasValidComparand={false} />
+    );
 
     return (
       <Panel>
@@ -224,61 +235,52 @@ export default class SingleMapController extends React.Component {
               <Col lg={2}>
                 {this.props.pointSelect ? floodMapPanelLabel : mapPanelLabel}
               </Col>
-              <Col lg={10}>
-                {mapLegend}
-              </Col>
+              <Col lg={10}>{mapLegend}</Col>
             </Row>
-        </Panel.Title>
+          </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
-          {
-            this.state.raster.times ? (
-              <DataMap
-                raster={{
-                  ...getDatasetIdentifiers(
-                    this.props, this.state,
-                    'variable', this.props.meta, this.state.raster.timeIdx
-                  ),
-                  ...this.state.raster,
-                  defaultOpacity: 0.7,
-                  onChangeRange: this.handleChangeRasterRange,
-                }}
+          {this.state.raster.times ? (
+            <DataMap
+              raster={{
+                ...getDatasetIdentifiers(
+                  this.props,
+                  this.state,
+                  "variable",
+                  this.props.meta,
+                  this.state.raster.timeIdx,
+                ),
+                ...this.state.raster,
+                defaultOpacity: 0.7,
+                onChangeRange: this.handleChangeRasterRange,
+              }}
+              onSetArea={this.props.onSetArea}
+              area={this.props.area}
+              pointSelect={this.props.pointSelect}
+              watershedEnsemble={this.props.watershedEnsemble}
+            >
+              <StaticControl position="topright">
+                <MapSettings
+                  title="Map Settings"
+                  meta={this.props.meta}
+                  dataSpec={currentDataSpec(this.state)}
+                  onDataSpecChange={this.updateDataSpec}
+                  raster={{
+                    ...this.state.raster,
+                    onChangeTime: this.handleChangeVariableTime,
+                    onChangePalette: this.handleChangeRasterPalette,
+                    onChangeScale: this.handleChangeRasterScale,
+                  }}
+                  hasComparand={false}
+                  timesLinkable={false}
+                />
+              </StaticControl>
 
-                onSetArea={this.props.onSetArea}
-                area={this.props.area}
-                pointSelect={this.props.pointSelect}
-                watershedEnsemble={this.props.watershedEnsemble}
-              >
-
-                <StaticControl position='topright'>
-                  <MapSettings
-                    title='Map Settings'
-                    meta={this.props.meta}
-
-                    dataSpec={currentDataSpec(this.state)}
-                    onDataSpecChange={this.updateDataSpec}
-
-                    raster={{
-                      ...this.state.raster,
-                      onChangeTime: this.handleChangeVariableTime,
-                      onChangePalette: this.handleChangeRasterPalette,
-                      onChangeScale: this.handleChangeRasterScale,
-                    }}
-
-                    hasComparand={false}
-                    timesLinkable={false}
-                  />
-                </StaticControl>
-
-                <StaticControl position='bottomleft'>
-                  {mapLegend}
-                </StaticControl>
-
-              </DataMap>
-            ) : (
-              <Loader/>
-            )
-          }
+              <StaticControl position="bottomleft">{mapLegend}</StaticControl>
+            </DataMap>
+          ) : (
+            <Loader />
+          )}
         </Panel.Body>
       </Panel>
     );

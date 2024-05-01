@@ -1,12 +1,11 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Grid, Row, Col, Button, Modal } from 'react-bootstrap';
-import _ from 'lodash';
+import PropTypes from "prop-types";
+import React from "react";
+import { Grid, Row, Col, Button, Modal } from "react-bootstrap";
+import _ from "lodash";
 
-import DataSpecSelector from '../DataSpecSelector/DataSpecSelector';
-import DataDisplayControls from './DataDisplayControls';
-import TimeLinkButton from './TimeLinkButton';
-
+import DataSpecSelector from "../DataSpecSelector/DataSpecSelector";
+import DataDisplayControls from "./DataDisplayControls";
+import TimeLinkButton from "./TimeLinkButton";
 
 const layerPropTypes = PropTypes.shape({
   times: PropTypes.object,
@@ -31,8 +30,8 @@ export default class MapSettingsDialog extends React.Component {
     meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,
 
-    dataSpec: PropTypes.string,  // current dataSpec (run + period) selection, encoded as JSON string
-    onDataSpecChange: PropTypes.func.isRequired,  // callback, arg is enocded JSON string
+    dataSpec: PropTypes.string, // current dataSpec (run + period) selection, encoded as JSON string
+    onDataSpecChange: PropTypes.func.isRequired, // callback, arg is enocded JSON string
 
     raster: layerPropTypes.isRequired,
 
@@ -75,7 +74,6 @@ export default class MapSettingsDialog extends React.Component {
 
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
-
         <Modal.Header closeButton>
           <Modal.Title>Map Settings</Modal.Title>
         </Modal.Header>
@@ -96,13 +94,12 @@ export default class MapSettingsDialog extends React.Component {
               <Col lg={rasterColLg}>
                 <h4>Raster</h4>
                 <DataDisplayControls
-                  name='Raster'
-                  {..._.omit(this.props.raster, 'onChangeTime')}
+                  name="Raster"
+                  {..._.omit(this.props.raster, "onChangeTime")}
                   onChangeTime={this.handleChangeVariableTime}
                 />
               </Col>
-              {
-                this.props.hasComparand &&
+              {this.props.hasComparand && (
                 <Col lg={1}>
                   <TimeLinkButton
                     timesLinkable={this.props.timesLinkable}
@@ -110,19 +107,18 @@ export default class MapSettingsDialog extends React.Component {
                     onClick={this.toggleLinkTimes}
                   />
                 </Col>
-              }
-              {
-                this.props.hasComparand &&
+              )}
+              {this.props.hasComparand && (
                 <Col lg={5}>
                   <h4>Isolines</h4>
                   <DataDisplayControls
-                    name='Isoline'
+                    name="Isoline"
                     timeLinked={this.state.linkTimes}
-                    {..._.omit(this.props.isoline, 'onChangeTime')}
+                    {..._.omit(this.props.isoline, "onChangeTime")}
                     onChangeTime={this.handleChangeComparandTime}
                   />
                 </Col>
-              }
+              )}
             </Row>
           </Grid>
         </Modal.Body>
@@ -130,8 +126,7 @@ export default class MapSettingsDialog extends React.Component {
         <Modal.Footer>
           <Button onClick={this.props.close}>Close</Button>
         </Modal.Footer>
-
       </Modal>
-    );    
+    );
   }
 }

@@ -1,44 +1,42 @@
 :global(.LayerOpacityControl .layer-controls-container) {
-    margin: 0 1em;
+  margin: 0 1em;
 }
 
 :global(.LayerOpacityControl .layer-controls) {
-    padding-top: 0.8em;
-    padding-bottom: 0.8em;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
 }
 
 :global(.LayerOpacityControl .layer-identifier) {
-    font-weight: bold;
-    text-align: center;
+  font-weight: bold;
+  text-align: center;
 }
 
 :global(.LayerOpacityControl .opacity) {
-    margin-top: 0.6em;
+  margin-top: 0.6em;
 }
 
 :global(.LayerOpacityControl .opacity-icon) {
-    top: 0.2em;
+  top: 0.2em;
 }
 
 :global(.LayerOpacityControl .input-range) {
-    height: 1.8em;
-    margin: 0em 0em 0.5em 0.5em;
-    width: 10em;
+  height: 1.8em;
+  margin: 0em 0em 0.5em 0.5em;
+  width: 10em;
 }
 
 :global(.LayerOpacityControl .input-range__label) {
-    color: inherit;
-    font-family: inherit;
-    font-size: 90%;
+  color: inherit;
+  font-family: inherit;
+  font-size: 90%;
 }
 
-
 :global(.LayerOpacityControl .input-range__label--min),
-:global(.LayerOpacityControl .input-range__label--max)
-{
-    bottom: -0.9em;
+:global(.LayerOpacityControl .input-range__label--max) {
+  bottom: -0.9em;
 }
 
 :global(.LayerOpacityControl .input-range__label--value) {
-    top: -2em;
+  top: -2em;
 }

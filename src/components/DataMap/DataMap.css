@@ -1,12 +1,12 @@
 .leaflet-top.leaflet-right {
-    /* This positions controls placed in the top right so that there
+  /* This positions controls placed in the top right so that there
     is room for the colour bar. */
-    margin-right: 70px;
+  margin-right: 70px;
 }
 
 .leaflet-container {
-    /* This ensures that selector menus render on top of the map.
+  /* This ensures that selector menus render on top of the map.
     It doesn't appear to cause any problems, but if it does, then the
     selectors must be modified to style the menus with a higher z-index. */
-    z-index: 0;
+  z-index: 0;
 }

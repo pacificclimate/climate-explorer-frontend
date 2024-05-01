@@ -285,7 +285,7 @@ var generateDataCellsFromC3Graph = function (
     return !_.isUndefined(prec)
       ? prec
       : getVariableOptions(word.toLowerCase(), "decimalPrecision");
-  }
+  };
 
   for (let i = 0; i < graph.data.columns.length; i++) {
     //each column contains either data or numerical x-axis values
@@ -312,11 +312,7 @@ var generateDataCellsFromC3Graph = function (
       //
       // 3. the default util.PRECISION.
 
-      let precision = _.reduce(
-        seriesName.split(" "),
-        getVarOptions,
-        undefined,
-      );
+      let precision = _.reduce(seriesName.split(" "), getVarOptions, undefined);
 
       if (_.isUndefined(precision)) {
         precision = getVariableOptions(variable, "decimalPrecision");

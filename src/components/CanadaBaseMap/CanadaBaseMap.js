@@ -1,17 +1,16 @@
 /* eslint-disable no-trailing-spaces */
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import _ from 'lodash';
-import L from 'leaflet';
+import _ from "lodash";
+import L from "leaflet";
 
-import { Map, WMSTileLayer } from 'react-leaflet';
-import 'proj4';
-import 'proj4leaflet';
+import { Map, WMSTileLayer } from "react-leaflet";
+import "proj4";
+import "proj4leaflet";
 
-import './CanadaBaseMap.css';
-import { generateResolutions } from '../../core/map-utils';
-
+import "./CanadaBaseMap.css";
+import { generateResolutions } from "../../core/map-utils";
 
 class CanadaBaseMap extends React.Component {
   // Notes:
@@ -29,8 +28,8 @@ class CanadaBaseMap extends React.Component {
 
   static defaultProps = {
     crs: new L.Proj.CRS(
-      'EPSG:4326',
-      '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
+      "EPSG:4326",
+      "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
       {
         resolutions: generateResolutions(0.09765625, 10),
         // If we don't set the origin correctly, then the projection transforms BC Albers coordinates to lat-lng
@@ -43,37 +42,39 @@ class CanadaBaseMap extends React.Component {
         // correct value for the origin option is `[bounds[0], bounds[3]]`, where `bounds` is the 3rd argument
         // of the TMS constructor.
         origin: [-150, 90],
-      }
+      },
     ),
-    version: '1.1.1',
-    srs: 'EPSG:4326',
+    version: "1.1.1",
+    srs: "EPSG:4326",
     origin: { lat: 60, lng: -100, zoom: 0 },
   };
 
   render() {
-    const center = _.pick(this.props.origin, 'lat', 'lng');
+    const center = _.pick(this.props.origin, "lat", "lng");
     return (
-        <Map
-          crs={this.props.crs}
-          center={center}
-          zoom={this.props.origin.zoom}
-          minZoom={0}
-          maxZoom={10}
-          maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
-          ref={this.props.mapRef}
-        >
-          <WMSTileLayer
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url={process.env.REACT_APP_TILECACHE_URL}
-            layers={'osm'}
-            format={'image/png'}
-            transparent={true}
-            version={'1.3.0'}
-            crs={L.CRS.EPSG4326}
-
-          />
-          { this.props.children }
-        </Map>
+      <Map
+        crs={this.props.crs}
+        center={center}
+        zoom={this.props.origin.zoom}
+        minZoom={0}
+        maxZoom={10}
+        maxBounds={L.latLngBounds([
+          [40, -150],
+          [90, -50],
+        ])}
+        ref={this.props.mapRef}
+      >
+        <WMSTileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url={process.env.REACT_APP_TILECACHE_URL}
+          layers={"osm"}
+          format={"image/png"}
+          transparent={true}
+          version={"1.3.0"}
+          crs={L.CRS.EPSG4326}
+        />
+        {this.props.children}
+      </Map>
     );
   }
 }

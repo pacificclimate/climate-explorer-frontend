@@ -7,23 +7,22 @@
 // Other components could be similarly managed, but it was not deemed useful.
 // Easy enough to do if desired.
 
-import React from 'react';
+import React from "react";
 
-import { Navbar } from 'react-bootstrap';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Navbar } from "react-bootstrap";
+import { BrowserRouter as Router } from "react-router-dom";
 
-import T from 'pcic-react-external-text';
-import DataTool from '../DataTool';
-import NavRoutes from '../navigation/NavRoutes';
-import Help from '../guidance-content/help/Help';
-import Science from '../guidance-content/science/Science';
-import About from '../guidance-content/about/About';
+import T from "pcic-react-external-text";
+import DataTool from "../DataTool";
+import NavRoutes from "../navigation/NavRoutes";
+import Help from "../guidance-content/help/Help";
+import Science from "../guidance-content/science/Science";
+import About from "../guidance-content/about/About";
 
-import logo from '../../assets/logo.png';
-import marmot from '../../assets/marmot.png';
-import styles from './App.module.css';
-import '../../../node_modules/react-input-range/lib/css/index.css';
-
+import logo from "../../assets/logo.png";
+import marmot from "../../assets/marmot.png";
+import styles from "./App.module.css";
+import "../../../node_modules/react-input-range/lib/css/index.css";
 
 export default class App extends React.Component {
   constructor(props) {
@@ -33,36 +32,37 @@ export default class App extends React.Component {
     };
   }
 
-  handleNavigate = navIndex => {
+  handleNavigate = (navIndex) => {
     this.setState({ navIndex });
   };
 
   navSpec = {
-    basePath: '',
+    basePath: "",
     items: [
       {
-        label: 'Home/Data',
-        subpath: 'data',
-        render: props =>
+        label: "Home/Data",
+        subpath: "data",
+        render: (props) => (
           <DataTool
             {...props}
             navIndex={this.state.navIndex}
             onNavigate={this.handleNavigate}
-          />,
+          />
+        ),
       },
       {
-        label: 'Help',
-        subpath: 'help',
+        label: "Help",
+        subpath: "help",
         component: Help,
       },
       {
-        label: 'Science',
-        subpath: 'science',
+        label: "Science",
+        subpath: "science",
         component: Science,
       },
       {
-        label: 'About',
-        subpath: 'about',
+        label: "About",
+        subpath: "about",
         component: About,
       },
     ],
@@ -127,24 +127,25 @@ export default class App extends React.Component {
           <NavRoutes navSpec={this.navSpec} navClassName={styles.mainNav}>
             <Navbar.Header>
               <Navbar.Brand className={styles.pcic_logo}>
-                <a href='https://pacificclimate.org/'>
+                <a href="https://pacificclimate.org/">
                   <img
                     src={logo}
-                    width='328'
-                    height='38'
-                    alt='Pacific Climate Impacts Consortium'
+                    width="328"
+                    height="38"
+                    alt="Pacific Climate Impacts Consortium"
                   />
                 </a>
               </Navbar.Brand>
               <Navbar.Brand className={styles.marmot_logo}>
                 <img
-                  src={marmot} height={68}
-                  alt='Vancouver Island Marmot'
+                  src={marmot}
+                  height={68}
+                  alt="Vancouver Island Marmot"
                   title='"The Marmot": Graphic by permission, V.I. Marmot Recovery Foundation'
                 />
               </Navbar.Brand>
               <Navbar.Brand>
-                <T path='app.title' as='string'/> {' '}
+                <T path="app.title" as="string" />{" "}
               </Navbar.Brand>
             </Navbar.Header>
           </NavRoutes>

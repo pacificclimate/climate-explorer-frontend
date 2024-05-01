@@ -42,15 +42,14 @@
 // For a complex example use case, including chained A-controls-B components,
 // see component `GeoLoader`.
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
+const controlPropNames = "show open close controls".split(" ");
 
-const controlPropNames = 'show open close controls'.split(' ');
-
-export default function compAcontrolsB(A, B, Wrapper = 'div', label = '') {
+export default function compAcontrolsB(A, B, Wrapper = "div", label = "") {
   return class extends React.Component {
     static propTypes = {
       controls: PropTypes.array,
@@ -75,11 +74,13 @@ export default function compAcontrolsB(A, B, Wrapper = 'div', label = '') {
     };
 
     controls() {
-      const control = [{
-        show: this.getShow,
-        open: this.open,
-        close: this.close,
-      }];
+      const control = [
+        {
+          show: this.getShow,
+          open: this.open,
+          close: this.close,
+        },
+      ];
       return control.concat(this.props.controls || []);
     }
 

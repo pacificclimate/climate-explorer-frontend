@@ -1,7 +1,6 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
-
+import PropTypes from "prop-types";
+import React from "react";
+import { Button, Modal } from "react-bootstrap";
 
 export default class GeoloaderErrorDialog extends React.Component {
   static propTypes = {
@@ -12,8 +11,7 @@ export default class GeoloaderErrorDialog extends React.Component {
 
   render() {
     return (
-        <Modal show={this.props.show} onHide={this.props.close}>
-
+      <Modal show={this.props.show} onHide={this.props.close}>
         <Modal.Header closeButton>
           <Modal.Title>Error Importing Polygon</Modal.Title>
         </Modal.Header>
@@ -26,7 +24,6 @@ export default class GeoloaderErrorDialog extends React.Component {
         <Modal.Footer>
           <Button onClick={this.props.close}>Close</Button>
         </Modal.Footer>
-
       </Modal>
     );
   }

@@ -1,28 +1,23 @@
-import React from 'react';
-import { Grid, Row } from 'react-bootstrap';
-import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import Accordion from '../../guidance-tools/Accordion';
-import _ from 'lodash';
-import T from 'pcic-react-external-text';
-
+import React from "react";
+import { Grid, Row } from "react-bootstrap";
+import { FullWidthCol, HalfWidthCol } from "../../layout/rb-derived-components";
+import Accordion from "../../guidance-tools/Accordion";
+import _ from "lodash";
+import T from "pcic-react-external-text";
 
 export default class FAQ extends React.Component {
   static contextType = T.contextType;
 
   render() {
-    const faqs = T.get(this.context, 'help.faq.items');
+    const faqs = T.get(this.context, "help.faq.items");
 
     if (!_.isArray(faqs)) {
       return null;
     }
 
     const items = faqs.map((faq, i) => (
-      <Accordion.Item
-        key={i}
-        eventKey={i}
-        title={`${i + 1}: ${faq.question}`}
-      >
-        <T.Markdown source={faq.answer}/>
+      <Accordion.Item key={i} eventKey={i} title={`${i + 1}: ${faq.question}`}>
+        <T.Markdown source={faq.answer} />
       </Accordion.Item>
     ));
 
@@ -34,27 +29,23 @@ export default class FAQ extends React.Component {
       <Grid fluid>
         <Row>
           <FullWidthCol>
-            <T path='help.faq.title' />
+            <T path="help.faq.title" />
           </FullWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
-            <T path='help.faq.intro' />
+            <T path="help.faq.intro" />
           </HalfWidthCol>
         </Row>
 
         <Row>
           <HalfWidthCol>
-            <Accordion>
-              {firstItems}
-            </Accordion>
+            <Accordion>{firstItems}</Accordion>
           </HalfWidthCol>
 
           <HalfWidthCol>
-            <Accordion>
-              {secondItems}
-            </Accordion>
+            <Accordion>{secondItems}</Accordion>
           </HalfWidthCol>
         </Row>
       </Grid>

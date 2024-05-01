@@ -1,28 +1,24 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col, ControlLabel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { DataspecSelector } from 'pcic-react-components';
-import DataGraph from '../DataGraph/DataGraph';
-import ExportButtons from '../ExportButtons';
-import { exportDataToWorksheet } from '../../../core/export';
-import { getTimeseries } from '../../../data-services/ce-backend';
-import {
-  validateAnnualCycleData,
-} from '../../../core/util';
+import { DataspecSelector } from "pcic-react-components";
+import DataGraph from "../DataGraph/DataGraph";
+import ExportButtons from "../ExportButtons";
+import { exportDataToWorksheet } from "../../../core/export";
+import { getTimeseries } from "../../../data-services/ce-backend";
+import { validateAnnualCycleData } from "../../../core/util";
 import {
   noDataMessageGraphSpec,
   errorMessage,
   loadingDataGraphSpec,
-} from '../graph-helpers';
-import { datasetSelectorLabel } from
-    '../../guidance-content/info/InformationItems';
-import { representativeValue } from '../../../core/selectors';
-import { setNamedState } from '../../../core/react-component-utils';
-import styles from './AnnualCycleGraph.module.css';
-
+} from "../graph-helpers";
+import { datasetSelectorLabel } from "../../guidance-content/info/InformationItems";
+import { representativeValue } from "../../../core/selectors";
+import { setNamedState } from "../../../core/react-component-utils";
+import styles from "./AnnualCycleGraph.module.css";
 
 // This component renders an annual cycle graph, including a selector
 // for the specific set of data to display and export-data buttons. An annual
@@ -63,7 +59,7 @@ export default class AnnualCycleGraph extends React.Component {
   // See https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html
   // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
 
-  static instance = 0;  // for debugging
+  static instance = 0; // for debugging
   constructor(props) {
     // Multiple instances of this component are created by SingleDataController.
     // The instance and state variables `instance` are used to identify the
@@ -71,14 +67,14 @@ export default class AnnualCycleGraph extends React.Component {
     // some sleuthing to do that can use it.
     // (https://github.com/pacificclimate/climate-explorer-frontend/issues/258)
     super(props);
-    this.instance = AnnualCycleGraph.instance++;  // for debugging
+    this.instance = AnnualCycleGraph.instance++; // for debugging
 
     // See ../README for an explanation of the content and usage
     // of state values. This is important for understanding how this
     // component works.
 
     this.state = {
-      instance: this.instance,  // for debugging
+      instance: this.instance, // for debugging
       prevMeta: null,
       prevArea: null,
       prevDataSpec: null,
@@ -95,27 +91,22 @@ export default class AnnualCycleGraph extends React.Component {
 
     // Props change.
     // Assumes that metadata changes when model, variable, or experiment does.
-    if (
-      props.meta !== state.prevMeta ||
-      props.area !== state.prevArea
-    ) {
+    if (props.meta !== state.prevMeta || props.area !== state.prevArea) {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
 
     // State change (dataSpec). Signal need for data fetch.
-    if (
-      state.prevDataSpec !== state.dataSpec
-    ) {
+    if (state.prevDataSpec !== state.dataSpec) {
       return {
         prevDataSpec: state.dataSpec,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -138,54 +129,54 @@ export default class AnnualCycleGraph extends React.Component {
 
   representativeValue = (...args) => representativeValue(...args)(this.state);
 
-  getAndValidateData = (metadata) => (
+  getAndValidateData = (metadata) =>
     getTimeseries(metadata, this.props.area)
-    .then(validateAnnualCycleData)
-    .then(response => response.data)
-  );
+      .then(validateAnnualCycleData)
+      .then((response) => response.data);
 
   getMetadatas = () =>
     // This fn is called multiple times, so memoize it if inefficient
-    this.props.getMetadata(this.representativeValue('dataSpec'))
-    .filter(metadata => !!metadata);
+    this.props
+      .getMetadata(this.representativeValue("dataSpec"))
+      .filter((metadata) => !!metadata);
 
   fetchData() {
     this.setState({ fetchingData: true });
     Promise.all(
-      this.getMetadatas()
-      .map(metadata => this.getAndValidateData(metadata))
+      this.getMetadatas().map((metadata) => this.getAndValidateData(metadata)),
     )
-    .then(data => {
-      this.setState({
-        fetchingData: false,
-        data,
-        dataError: null,
+      .then((data) => {
+        this.setState({
+          fetchingData: false,
+          data,
+          dataError: null,
+        });
+      })
+      .catch((dataError) => {
+        this.setState({
+          // Do we have to set data non-null here to prevent infinite update loop?
+          fetchingData: false,
+          dataError,
+        });
       });
-    }).catch(dataError => {
-      this.setState({
-        // Do we have to set data non-null here to prevent infinite update loop?
-        fetchingData: false,
-        dataError,
-      });
-    });
   }
 
   // User event handlers
 
-  handleChangeDataSpec = setNamedState(this, 'dataSpec');
+  handleChangeDataSpec = setNamedState(this, "dataSpec");
 
   exportData(format) {
     exportDataToWorksheet(
-      'timeseries',
-      _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
+      "timeseries",
+      _.pick(this.props, "model_id", "variable_id", "experiment", "meta"),
       this.graphSpec(),
       format,
-      this.representativeValue('dataSpec')
+      this.representativeValue("dataSpec"),
     );
   }
 
-  handleExportXlsx = this.exportData.bind(this, 'xlsx');
-  handleExportCsv = this.exportData.bind(this, 'csv');
+  handleExportXlsx = this.exportData.bind(this, "xlsx");
+  handleExportCsv = this.exportData.bind(this, "csv");
 
   // render helpers
 
@@ -237,7 +228,7 @@ export default class AnnualCycleGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph {...this.graphSpec()}/>
+            <DataGraph {...this.graphSpec()} />
           </Col>
         </Row>
       </React.Fragment>

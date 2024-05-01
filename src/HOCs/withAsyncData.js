@@ -16,16 +16,15 @@
 // The fetched data is injected into the base component through a prop passed
 // to it named by `dataProp`.
 
-import React from 'react';
-import Loader from 'react-loader';
-
+import React from "react";
+import Loader from "react-loader";
 
 export default function withAsyncData(
-  loadAsyncData,  // Async data fetcher. Returns a promise.
-  controlProp,    // Name of prop that controls data fetching
-  dataProp        // Name of prop to pass data to base component through
+  loadAsyncData, // Async data fetcher. Returns a promise.
+  controlProp, // Name of prop that controls data fetching
+  dataProp, // Name of prop to pass data to base component through
 ) {
-  return function(BaseComponent) {
+  return function (BaseComponent) {
     return class extends React.Component {
       state = {
         externalData: null,
@@ -63,17 +62,15 @@ export default function withAsyncData(
       }
 
       _loadAsyncData(...args) {
-        this._asyncRequest = loadAsyncData(...args).then(
-          externalData => {
-            this._asyncRequest = null;
-            this.setState({ externalData });
-          }
-        );
+        this._asyncRequest = loadAsyncData(...args).then((externalData) => {
+          this._asyncRequest = null;
+          this.setState({ externalData });
+        });
       }
 
       render() {
         if (this.state.externalData === null) {
-          return <Loader/>;
+          return <Loader />;
         }
         return (
           <BaseComponent
@@ -82,6 +79,6 @@ export default function withAsyncData(
           />
         );
       }
-    }
-  }
+    };
+  };
 }

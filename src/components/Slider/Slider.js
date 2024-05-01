@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import BootstrapSlider from 'bootstrap-slider';
+import PropTypes from "prop-types";
+import React from "react";
+import ReactDOM from "react-dom";
+import BootstrapSlider from "bootstrap-slider";
 
 export default class Slider extends React.Component {
   static propTypes = {
@@ -20,7 +20,7 @@ export default class Slider extends React.Component {
   };
 
   static defaultProps = {
-    id: '',
+    id: "",
     min: 0,
     max: 100,
     step: 1,
@@ -29,7 +29,7 @@ export default class Slider extends React.Component {
     ticksLabels: [],
     ticksPositions: [],
     toolTip: false,
-    selection: 'none',
+    selection: "none",
     onSlideStop: function (event) {
       console.log(event);
     },
@@ -40,29 +40,33 @@ export default class Slider extends React.Component {
   }
 
   componentDidMount() {
-    var toolTip = this.props.toolTip ? 'show' : 'hide';
-    var slider = this.slider = new BootstrapSlider(ReactDOM.findDOMNode(this), {
-      id: this.props.id,
-      min: this.props.min,
-      max: this.props.max,
-      step: this.props.step,
-      value: this.props.value,
-      ticks: this.props.ticks,
-      ticks_labels: this.props.ticksLabels,
-      ticks_positions: this.props.ticksPositions,
-      tooltip: toolTip,
-      selection: this.props.selection,
-    });
+    var toolTip = this.props.toolTip ? "show" : "hide";
+    var slider = (this.slider = new BootstrapSlider(
+      ReactDOM.findDOMNode(this),
+      {
+        id: this.props.id,
+        min: this.props.min,
+        max: this.props.max,
+        step: this.props.step,
+        value: this.props.value,
+        ticks: this.props.ticks,
+        ticks_labels: this.props.ticksLabels,
+        ticks_positions: this.props.ticksPositions,
+        tooltip: toolTip,
+        selection: this.props.selection,
+      },
+    ));
 
-    slider.on('slideStop', function (event) {
-      this.props.onSlideStop(event);
-      this.slider.setValue(event);
-    }.bind(this));
+    slider.on(
+      "slideStop",
+      function (event) {
+        this.props.onSlideStop(event);
+        this.slider.setValue(event);
+      }.bind(this),
+    );
   }
 
   render() {
-    return (
-      <div style={{ width: '100%' }} />
-    );
+    return <div style={{ width: "100%" }} />;
   }
 }

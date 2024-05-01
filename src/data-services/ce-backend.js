@@ -224,13 +224,13 @@ function guessExperimentFormatFromVariable(variable, experiment) {
 // but this map has not yet been created. Currently we have multiple overlapping
 // watershed maps, each in a different ensemble. This function helps the front end
 // match up data ensembles with watershed geography ensembles.
-function getWatershedGeographyName(ensemble){
-    return {
-        bc_moti: "peace_watershed",
-        upper_fraser: "upper_fraser_watershed",
-        fraser: "fraser_watershed",
-        frapce: "frapce_watershed",
-        }[ensemble];
+function getWatershedGeographyName(ensemble) {
+  return {
+    bc_moti: "peace_watershed",
+    upper_fraser: "upper_fraser_watershed",
+    fraser: "fraser_watershed",
+    frapce: "frapce_watershed",
+  }[ensemble];
 }
 
 export { getTimeMetadata, getTimeseries, getData, getStats };

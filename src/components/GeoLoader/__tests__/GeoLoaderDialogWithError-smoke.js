@@ -1,11 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import GeoLoaderDialogWithError from '../GeoLoaderDialogWithError';
-import { noop } from 'lodash';
+import React from "react";
+import ReactDOM from "react-dom";
+import GeoLoaderDialogWithError from "../GeoLoaderDialogWithError";
+import { noop } from "lodash";
 
-
-it('renders without crashing', () => {
-  const div = document.createElement('div');
+it("renders without crashing", () => {
+  const div = document.createElement("div");
   ReactDOM.render(
     <GeoLoaderDialogWithError
       show
@@ -20,6 +19,6 @@ it('renders without crashing', () => {
       ]}
       onLoadArea={noop}
     />,
-    div
+    div,
   );
 });

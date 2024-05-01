@@ -1,6 +1,6 @@
 app:
   title: PCIC Climate Explorer
-  
+
 # Bits and chunks used repeatedly in other parts of this document.
 # (Referred to in other elements via `${$$.components}`.)
 # For sanity, let's keep these in alphabetical order.
@@ -14,13 +14,13 @@ components:
     csg:
       name: Computational Support Group
       email: climate@uvic.ca
-      link: '[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})'
+      link: "[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})"
     science:
       # For now, we are directing all inquiries to CSG, and will direct
       # as necessary.
       name: ${$$.components.contacts.csg.name}
       email: ${$$.components.contacts.csg.email}
-      link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
+      link: "[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})"
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
     a numerical model representing
@@ -39,7 +39,7 @@ components:
 
 help:
   faq:
-    title: '# Frequently Asked Questions'
+    title: "# Frequently Asked Questions"
     intro: |
       The content of our FAQ is driven by our users' needs and questions.
 
@@ -181,7 +181,7 @@ help:
           Click on a column header to sort by that column.
 
           Click again to change the direction of sorting.
-          
+
       - question: |
           What is the difference between CMIP5 and CMIP6?
         answer: |
@@ -216,7 +216,7 @@ help:
     #
     # Currently, help.general.sections contains just the content component
     # of the above structure. But it's a start.
-    title: '# Help: General'
+    title: "# Help: General"
     sections:
       - |
         ## Overview
@@ -286,7 +286,7 @@ help:
         * **`prsn`**
 
           Precipitation at ground level while mean daily temperature is below freezing
-        
+
         ### Climdex (climate extremes indices)
 
         Measures of weather extremes calculated from model output.
@@ -357,7 +357,7 @@ help:
           Maximum length of dry spell:
           Maximum number of consecutive days with less than 1 mm of
           precipitation.
-        
+
           For details, see [Climdex variable `CDD`](${$$.components.climdexUrl}/#index-CDD).
            
           ${$$.components.cddCaution}
@@ -636,20 +636,20 @@ help:
           period above 18&deg;C.
 
         * **`hdd`**
-        
+
           Heating Degree Days: Degree-days during the specified time 
           period below 18&deg;C.
 
         * **`gdd`**
-        
+
           Growing Degree Days: Degree-days during the specified time 
           period above 5&deg;C.
 
         * **`fdd`**
-        
+
           Frost Degree Days: Degree-days during the specified time 
           period below 0&deg;C.
-        
+
         ### Return period variables
 
         A return period variable describes extreme temperature or
@@ -717,7 +717,7 @@ help:
         Alberta. Each quantile estimate is also provided with the 95%
         sampling interval provided as the 2.5th and 97.5th percentiles.
 
-        
+
         * **`rp2streamflow`**
 
           2-year annual maximum one day streamflow
@@ -789,7 +789,6 @@ help:
 
           change factor for 200-year annual maximum one day streamflow
 
-
       - |
         ## Models (GCMs)
 
@@ -806,7 +805,7 @@ help:
             coupled model](http://www.bom.gov.au/jshess/docs/2013/bi1_hres.pdf)
             
         * **`BNU-ESM`**
-        
+
           [Beijin Normal University
             Earth System Model](https://www.researchgate.net/publication/262954172_Description_and_basic_evaluation_of_BNU-ESM_version_1)
 
@@ -816,7 +815,7 @@ help:
             CCSM4 4.0 model](http://www.cesm.ucar.edu/models/ccsm4.0/)
 
         * **`CESM1-CAM5`**
-        
+
           [Community Earth System Model version 1 that includes the Community Atmospheric Model version 5](https://journals.ametsoc.org/view/journals/clim/26/17/jcli-d-12-00572.1.xml)
 
         * **`CNRM-CM5`**
@@ -846,17 +845,17 @@ help:
 
           [U.S. Geophysical Fluid Dynamics Laboratory
             Coupled Physical Model CM3](https://www.gfdl.noaa.gov/coupled-physical-model-cm3/)
-        
+
         * **`GFDL-ESM2G`**
 
           [U.S. Geophysical Fluid Dynamics Laboratory
             ESM2G model](https://www.gfdl.noaa.gov/earth-system-model/)
-        
+
         * **`GFDL-ESM2M`**
 
           [U.S. Geophysical Fluid Dynamics Laboratory
             ESM2M model](https://www.gfdl.noaa.gov/earth-system-model/)
-        
+
         * **`HadGEM2-AO`**
 
           [U.K. Met Office
@@ -883,12 +882,12 @@ help:
             model](https://www.geosci-model-dev.net/4/723/2011/gmd-4-723-2011.pdf)
 
         * **`IPSL-CM5A-LR`**
-        
+
           [France Institut Pierre Simon Laplace
             Climate Model 5A (low resolution)](https://gmd.copernicus.org/articles/13/3011/2020/gmd-13-3011-2020.pdf)
             
         * **`IPSL-CM5A-MR`**
-        
+
           [France Institut Pierre Simon Laplace
             Climate Model 5A (medium resolution)](https://gmd.copernicus.org/articles/13/3011/2020/gmd-13-3011-2020.pdf)
 
@@ -935,39 +934,39 @@ help:
 
           [Japan Meteorological Research Institute
             CCGM3 model](https://www.jstage.jst.go.jp/article/jmsj/90A/0/90A_2012-A02/_pdf)
-        
+
         * **`NorESM1-M`**
-        
+
           [Norwegian Climate Center (NCC)
             Norwegian Earth System Model version 1 (medium resolution)](https://gmd.copernicus.org/articles/6/687/2013/)
             
         * **`NorESM1-ME`**
-        
+
           [Norwegian Climate Center (NCC)
             Norwegian Earth System Model version 1 (prognostic biogeochemical cycling)](https://gmd.copernicus.org/articles/6/687/2013/)
 
         * **`bcc-csm1-1`**
-        
+
           [China Beijing Climate Center
             Climate System Model version 1.1](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
 
         * **`bcc-csm1-1-m`**
-        
+
           [China Beijing Climate Center
             Climate System Model version 1.1 (moderate resolution)](http://forecast.bcccsm.ncc-cma.net/web/channel-63.htm)
-        
+
         * **`inmcm4`**
 
           [Russia Institute for Numerical Mathematics
             Climate Model Version 4](https://www.researchgate.net/publication/227251252_Simulating_present-day_climate_with_the_INMCM40_coupled_model_of_the_atmospheric_and_oceanic_general_circulations)
-        
+
         #### CMIP6
 
         * **`ACCESS-CM2`**
 
           [Australian Community Climate and Earth System Simulator
             coupled model ver. 2](https://research.csiro.au/access/about/cm2/)
-        
+
         * **`ACCESS-ESM1-5`**
 
           [Australian Community Climate and Earth System Simulator
@@ -1000,7 +999,7 @@ help:
 
           [Canadian Centre for Climate Modelling and Analysis
             ESM5 (Earth System Model ver. 5)](https://gmd.copernicus.org/articles/12/4823/2019/gmd-12-4823-2019.html)
-        
+
         * **`EC-Earth3`**
 
           [European Community
@@ -1022,21 +1021,21 @@ help:
 
           [U.S. Geophysical Fluid Dynamics Laboratory
             ESM4 model](https://www.gfdl.noaa.gov/earth-system-esm4/)
-        
+
         * **`HadGEM3-GC31-LL`**
 
           [U.K. Met Office
             HadGEM3 GC 3.1
             (N96ORCA1 resolution)
             model](https://ukesm.ac.uk/cmip6/)
-        
+
         * **`INM-CM4-8`**
 
           [Russia Institute for Numerical Mathematics
             Climate Model Version 4.8](https://catalogue.ceda.ac.uk/uuid/17179dfb6bc24bbeaba902928c91e5c0)
 
         * **`INM-CM5-0`**
-  
+
           [Russia Institute for Numerical Mathematics
             Climate Model Version 5.0](https://catalogue.ceda.ac.uk/uuid/5b50fd3fe7b74a64be91fb7ebb8c21a9)
           
@@ -1054,7 +1053,7 @@ help:
 
           [Korea Institude of Ocean Science and Technology
             Earth System Model](https://www.researchgate.net/publication/351333170_Korea_Institute_of_Ocean_Science_and_Technology_Earth_System_Model_and_Its_Simulation_Characteristics)
-        
+
         * **`MIROC-ES2L`**
 
           [Japan Agency for Marine-Earth Science and Technology;
@@ -1082,12 +1081,12 @@ help:
 
           [Germany Max Planck Institute
             ESM (Earth System Model ver 1.2 low resolution)](https://gmd.copernicus.org/articles/12/3241/2019/)
-        
+
         * **`MRI-ESM2-0`**
 
           [Japan Meteorological Research Institute
             Earth System Model ver 2.0](https://www.jstage.jst.go.jp/article/jmsj/advpub/0/advpub_2019-051/_article/-char/en)
-        
+
         * **`NorESM2-LM`**
 
           [Norwegian Climate Center (NCC)
@@ -1105,14 +1104,14 @@ help:
         * **`TaiESM1`**
 
           [Taiwan Earth System Model version 1](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020MS002353)
-   
+
         * **`UKESM1-0-LL`**
 
           [U.K. Met Office
             UK Earth System Model 1.0
             (low atmosphere/ocean resolution)
             model](https://ukesm.ac.uk/cmip6/)
-        
+
       - |
         ## Datasets and data filtering
 
@@ -1127,7 +1126,7 @@ help:
           comprises values of the variable for specific points in space and
           time, usually over a regular spatial grid and sequence of time
           points.
-        
+
 
         Specifically, a dataset is a collection of geospatial
           (longitude-latitude) grids. Each geospatial grid holds the data for
@@ -1142,7 +1141,7 @@ help:
         to select a smaller, more digestible subset of it to be examined.
         This selection goes by the name of _dataset filtering_ or
         just _filtering_.
-        
+
 
         The criteria by which datasets are filtered  are:
 
@@ -1173,13 +1172,13 @@ help:
           
         The result of data filtering is a collection of one or
           more _datasets_.
-        
+
 
         #### Distinguishing datasets within a filtered collection
 
         Filtering (by model, emissions scenario, variable) in general
         results in more than one dataset.
-        
+
         Individual datasets within a filtered collection are characterized by:
 
         * **Model Run**
@@ -1262,7 +1261,6 @@ help:
           over the spatial extent you select by drawing a polygon on the
           map.
 
-          
       - |
         ## Data Map features
 
@@ -1294,7 +1292,7 @@ help:
         To draw a general polygon on the map:
 
         1. Click the **Draw Polygon** button on the map toolbar.
-        
+
         1. Click to place a corner of the polygon.
 
         1. Click on the first point placed to complete the polygon.
@@ -1385,16 +1383,16 @@ help:
           GeoJSON, WKT, KML, GPX.
 
         To export a polygon:
-        
+
         1. Click the **Export Polygon** button.
 
         1. Click a button for the desired export file format.
-        
+
         1. Navigate to the desired location to save the file and enter
           a name for the file.
 
         1. Click **Save**.
-        
+
         1. The polygon on your map is saved to the file in the
           selected format.
 
@@ -1442,7 +1440,7 @@ help:
         the relationship between a colour displayed on the map and the value
         of the data (variable) represented by that colour. Three
         representative data values are shown to the left of the colour band:
-        
+
         * Top: V<sub>max</sub>
 
         * Middle: Mean value.
@@ -1482,16 +1480,16 @@ help:
         ## Exported data file formats</h2>
 
         ### File formats: XSLX and CSV
-        
+
         Both file formats convey information as table with rows and
         columns, as typically managed by spreadsheet programs.
 
         * **XSLX**
-        
+
           This format is compatible with Microsoft Excel.
-        
+
         * **CSV**
-        
+
           This format is plain text in the comma-separated variables format,
           with column separator being the comma (`,`).
 
@@ -1722,9 +1720,8 @@ help:
           </tbody>
         </Table>
 
-
 science:
-  title: '# Scientific References'
+  title: "# Scientific References"
   content: |
     ## Statistically Downscaled Climate Scenarios
 
@@ -1818,7 +1815,7 @@ science:
 
 about:
   pcex:
-    title: '# PCIC Climate Explorer (PCEX)'
+    title: "# PCIC Climate Explorer (PCEX)"
     items:
       - header: Description
         body: |
@@ -1829,7 +1826,7 @@ about:
       - header: Version
         body: ${version}
       - header: Author
-        body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+        body: "[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)"
       - header: Terms of Use
         body: |
           In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
@@ -1849,21 +1846,21 @@ about:
           upon the data or derived information.
 
   credits:
-    title: '# Credits and Acknowledgements'
+    title: "# Credits and Acknowledgements"
     sponsors:
-      title: '## Sponsors'
+      title: "## Sponsors"
       items:
         - header: Ministry of Transportation and Infrastructure (MoTI)
           href: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure
           body: Primary sponsor of the PCIC Climate Explorer (PCEX) project.
     others:
-      title: '## Others'
+      title: "## Others"
       items:
         - header: Vancouver Island Marmot Recovery Foundation
           href: https://marmots.org/
           body: Use of MRF marmot graphic by kind permission.
     data:
-      title: '## Data'
+      title: "## Data"
       items:
         - header: Environment and Climate Change Canada
           href: http://www.ec.gc.ca/
@@ -1896,7 +1893,7 @@ about:
             Earth System Science Portals.
 
   contact:
-    title: '# Contact'
+    title: "# Contact"
     items:
       - header: Feedback on Application
         body: |
@@ -1910,32 +1907,32 @@ about:
         body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
   team:
-    title: '# Team'
+    title: "# Team"
     items:
-    - header: James Hiebert
-      href: https://pacificclimate.org/about-pcic/people/james-hiebert
-      body: |
-        Fearless leader.
-        Ur-Architect of PCIC information systems.
-        Keeper of the clan's lore and history.
-    - header: Lee Zeman
-      href: https://pacificclimate.org/about-pcic/people/lee-zeman
-      body: |
-        Front-end engineer.
-        Valiant contender with GIS legacy backend rebellions.
-        Implementor of wondrous data graphs.
-        Champion of the practical and effective.
-    - header: Rod Glover
-      href: https://pacificclimate.org/about-pcic/people/rod-glover
-      body: |
-        Full-stack engineer.
-        Implementor of fearsome data preparation tools.
-        Wrangler of metadata.
-        React refactorer and perfectionist.
-        Migrator of databases and devotee of the alchemical arts.
-    - header: Matthew Benstead
-      href: https://pacificclimate.org/about-pcic/people/matthew-benstead
-      body: |
-        System administrator and master of all things IT.
-        Docker guru.
-        Restorer of expired servers and ailing disk arrays.
+      - header: James Hiebert
+        href: https://pacificclimate.org/about-pcic/people/james-hiebert
+        body: |
+          Fearless leader.
+          Ur-Architect of PCIC information systems.
+          Keeper of the clan's lore and history.
+      - header: Lee Zeman
+        href: https://pacificclimate.org/about-pcic/people/lee-zeman
+        body: |
+          Front-end engineer.
+          Valiant contender with GIS legacy backend rebellions.
+          Implementor of wondrous data graphs.
+          Champion of the practical and effective.
+      - header: Rod Glover
+        href: https://pacificclimate.org/about-pcic/people/rod-glover
+        body: |
+          Full-stack engineer.
+          Implementor of fearsome data preparation tools.
+          Wrangler of metadata.
+          React refactorer and perfectionist.
+          Migrator of databases and devotee of the alchemical arts.
+      - header: Matthew Benstead
+        href: https://pacificclimate.org/about-pcic/people/matthew-benstead
+        body: |
+          System administrator and master of all things IT.
+          Docker guru.
+          Restorer of expired servers and ailing disk arrays.

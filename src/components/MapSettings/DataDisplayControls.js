@@ -1,10 +1,9 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import TimeSelector from './TimeSelector';
-import PaletteSelector from './PaletteSelector';
-import ColourMapTypeSelector from './ColourMapTypeSelector';
-
+import TimeSelector from "./TimeSelector";
+import PaletteSelector from "./PaletteSelector";
+import ColourMapTypeSelector from "./ColourMapTypeSelector";
 
 export default class DataDisplayControls extends React.Component {
   static propTypes = {

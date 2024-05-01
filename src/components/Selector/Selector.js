@@ -17,12 +17,12 @@
  *               whether this choice is disabled
  **********************************************************************/
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-import React from 'react';
-import { ControlLabel, MenuItem, Dropdown } from 'react-bootstrap';
-import _ from 'lodash';
-import styles from './Selector.module.css';
+import React from "react";
+import { ControlLabel, MenuItem, Dropdown } from "react-bootstrap";
+import _ from "lodash";
+import styles from "./Selector.module.css";
 
 class Selector extends React.Component {
   static propTypes = {
@@ -35,9 +35,9 @@ class Selector extends React.Component {
   };
 
   static defaultProps = {
-    label: 'Selection',
+    label: "Selection",
     items: [],
-    value: '',
+    value: "",
     disabled: false,
     inlineLabel: false,
   };
@@ -47,16 +47,16 @@ class Selector extends React.Component {
   }
 
   //store the display string for the already-selected value
-  updateDisplayValue = (value, items=this.props.items) => {
-    if(_.indexOf(items, value) !== -1) {
+  updateDisplayValue = (value, items = this.props.items) => {
+    if (_.indexOf(items, value) !== -1) {
       //display string is the same as value string.
       this.displayString = value;
-    }
-    else { //display the associated user string,
+    } else {
+      //display the associated user string,
       //if associated user string cannot be found,
       //just display the original string, on the assumption
       //it's something like "Select a Choice"
-      var item = _.find(items, {0: value});
+      var item = _.find(items, { 0: value });
       this.displayString = item ? item[1] : value;
     }
   };
@@ -75,7 +75,12 @@ class Selector extends React.Component {
     var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
 
     return (
-      <MenuItem key={choice} eventKey={eventKey} disabled={disabled} className={styles.selectoritem}>
+      <MenuItem
+        key={choice}
+        eventKey={eventKey}
+        disabled={disabled}
+        className={styles.selectoritem}
+      >
         {choice}
       </MenuItem>
     );
@@ -83,25 +88,30 @@ class Selector extends React.Component {
 
   render() {
     return (
-        <div className={styles.selectorframe}>
-          <ControlLabel
-            className={
-              this.props.inlineLabel ?
-                styles.selectorlabel_inline :
-                styles.selectorlabel_stacked
-            }
-          >
-            {this.props.label}
-          </ControlLabel>
-          <Dropdown vertical disabled={this.props.disabled} onSelect={this.handleChange} id={this.props.label}>
-            <Dropdown.Toggle className={styles.selectortitle}>
-              {this.displayString}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className={styles.selectormenu}>
-              {this.props.items.map(this.createMenuItem)}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+      <div className={styles.selectorframe}>
+        <ControlLabel
+          className={
+            this.props.inlineLabel
+              ? styles.selectorlabel_inline
+              : styles.selectorlabel_stacked
+          }
+        >
+          {this.props.label}
+        </ControlLabel>
+        <Dropdown
+          vertical
+          disabled={this.props.disabled}
+          onSelect={this.handleChange}
+          id={this.props.label}
+        >
+          <Dropdown.Toggle className={styles.selectortitle}>
+            {this.displayString}
+          </Dropdown.Toggle>
+          <Dropdown.Menu className={styles.selectormenu}>
+            {this.props.items.map(this.createMenuItem)}
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
     );
   }
 }

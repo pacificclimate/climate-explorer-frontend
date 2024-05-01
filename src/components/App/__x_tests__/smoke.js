@@ -5,12 +5,13 @@
 
 // TODO: Make this work and rename __x_tests__ --> __tests__
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import App from '../App';
+// TODO: Enzyme has been removed from the project. This test should be rewritten
+// It seems to be locked to react 16 
 
-it('renders without crashing', () => {
-  shallow(
-    <App/>,
-  );
+import React from "react";
+import { shallow } from "enzyme";
+import App from "../App";
+
+it("renders without crashing", () => {
+  shallow(<App />);
 });
