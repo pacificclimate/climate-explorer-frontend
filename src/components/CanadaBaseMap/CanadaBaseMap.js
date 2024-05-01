@@ -5,7 +5,7 @@ import React from 'react';
 import _ from 'lodash';
 import L from 'leaflet';
 
-import { Map, TileLayer } from 'react-leaflet';
+import { Map, TileLayer, WMSTileLayer } from 'react-leaflet';
 import 'proj4';
 import 'proj4leaflet';
 
