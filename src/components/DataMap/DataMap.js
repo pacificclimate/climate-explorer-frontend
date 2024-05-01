@@ -369,7 +369,7 @@ class DataMap extends React.Component {
         />
 
         {
-          allowGeometryDraw &&
+          allowGeometryDraw && !this.props.pointSelect &&
           <StaticControl position='topleft'>
               <GeoLoader
                 onLoadArea={this.handleUploadArea}
@@ -385,7 +385,10 @@ class DataMap extends React.Component {
             position='topleft'
             draw={{
               marker: false,
-              circlemarker: allowGeometryDraw && this.props.pointSelect,
+              circlemarker: allowGeometryDraw && this.props.pointSelect && {
+                  title: 'Select an outlet point',
+                  text: 'Select an outlet point'
+              },
               circle: false,
               polyline: false,
               polygon: allowGeometryDraw && !this.props.pointSelect && {

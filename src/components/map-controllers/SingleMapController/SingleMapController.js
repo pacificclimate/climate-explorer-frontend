@@ -49,7 +49,10 @@ import {
 } from '../map-helpers.js';
 
 import styles from '../MapController.module.css';
-import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
+import { 
+  mapPanelLabel,
+  floodMapPanelLabel
+} from '../../guidance-content/info/InformationItems';
 
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
@@ -219,7 +222,7 @@ export default class SingleMapController extends React.Component {
           <Panel.Title>
             <Row>
               <Col lg={2}>
-                {mapPanelLabel}
+                {this.props.pointSelect ? floodMapPanelLabel : mapPanelLabel}
               </Col>
               <Col lg={10}>
                 {mapLegend}

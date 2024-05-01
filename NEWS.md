@@ -1,5 +1,23 @@
 # News / Release Notes
 
+## 2.3.4
+
+*23-Feb-2024*
+
+- [Replaces tilecache with mapproxy to request basemap tiles](https://github.com/pacificclimate/climate-explorer-frontend/pull/458)
+
+## 2.3.3
+
+*16-May-2023*
+
+- [Updates the extreme streamflow portal to new data ensembles containing the merged Peace and Fraser watersheds](https://github.com/pacificclimate/climate-explorer-frontend/pull/454)
+
+## 2.3.2
+
+*30-Mar-2023*
+
+- [Updates help text for the extreme stramflow portal](https://github.com/pacificclimate/climate-explorer-frontend/pull/450)
+
 ## 2.3.1
 
 *10-Nov-2022*

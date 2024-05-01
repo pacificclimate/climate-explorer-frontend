@@ -123,7 +123,7 @@ export default class WatershedSummaryTable extends React.Component {
     if (this.state.fetchingData || this.state.data === null) {
       return {
         noDataText:
-          "Select a point on the map with the circle marker tool to see watershed information",
+          "Select an outlet point on the map with the circle marker tool to see watershed information",
       };
     }
 

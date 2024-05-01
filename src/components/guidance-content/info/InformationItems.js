@@ -75,6 +75,42 @@ const mapPolygonDrawControls = (
   </span>
 );
 
+const mapCircleMarkerControl = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-draw-circlemarker' href='#' title='Draw a circlemarker'>
+              <span className='sr-only'>Draw a circlemarker</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Add Outlet)
+  </span>
+);
+
+const mapDeleteControl = (
+  <span>
+    <LeafletControlContainer>
+      <div className='leaflet-draw leaflet-control'>
+        <div className='leaflet-draw-section'>
+          <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
+            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+              <span className='sr-only'>Delete layers</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </LeafletControlContainer>
+    {' '}
+    (Delete Outlet)
+  </span>
+);
+
 const mapPolygonEditControls = (
   <span>
     <LeafletControlContainer>
@@ -147,6 +183,42 @@ export const mapPanelLabel = (
         {mapPolygonImportExportControls}: Import and export polygons on the map.
         Polygons determine the extents over which spatial data averaging is
         performed.
+      </li>
+      <li>
+        {mapSettingsControl}: Select which dataset(s) are displayed and how.
+      </li>
+      <li>
+        {mapColourScaleControls}: Displays data value ⇄ colour mapping.
+      </li>
+      <li>
+        {mapAutoScaleControl}: Sets bounds of data value ⇄ colour mapping to
+        current range of data.
+      </li>
+    </ul>
+  </LabelWithInfo>
+);
+
+export const floodMapPanelLabel = (
+  <LabelWithInfo label='Data Map'>
+    <p>
+      Map displaying data selected by
+      Model, Emissions scenario, and Variable(s).
+    </p>
+    <p>
+      Summary of map tools and other controls.
+      (For details, see <Link to='/help/general'>Help</Link>.)
+    </p>
+    <ul className={css.controlsList}>
+      <li>
+        {mapZoomControls}: Zoom map in and out.
+      </li>
+      <li>
+        {mapCircleMarkerControl}: Add outlet location to map. When an outlet
+        location is added to the map a polygon will be rendered that shows
+        the upstream area contributing streamflow to the selected location.
+      </li>
+      <li>
+        {mapDeleteControl}: Remove outlet location from map.
       </li>
       <li>
         {mapSettingsControl}: Select which dataset(s) are displayed and how.
@@ -308,7 +380,7 @@ const isolinesVariable = `
 
 export const variableSelectorLabel = (
   <LabelWithInfo label='Variable'>
-    <p>Variable to view on the map and in the graphs.</p>
+    <p>Variable to view on the map and in the graphs. For variable details, see <Link to='/help/general'>Help</Link>.</p>
     <p>{colourBlocksVariable}</p>
   </LabelWithInfo>
 );
@@ -348,7 +420,8 @@ export const filteredDatasetSummaryPanelLabel = (
       Each row of the table represents a group of up to 3 datasets.
       We group datasets by Model Run, Start Date and End Date,
       and each such group is labelled accordingly as shown in the
-      "Label in selectors" column.
+      "Label in selectors" column. Datasets comprising multiple runs are
+      denoted rX.
     </p>
     <p>
       The "Yearly", "Seasonal", and "Monthly" columns indicate whether a
@@ -442,6 +515,12 @@ const spatialAveragingDefn = `
   drawn on the map (or over the entire dataset if no polygon is drawn).
 `;
 
+const watershedDefn = `
+  When no outlet is selected, the data values shown are spatially
+  averaged over the domain. When an outlet is selected, data values
+  are displayed for the specified outlet location.
+`;
+
 const pointAreaDefn = `
   Data values shown in each graph are from the single grid square selected
   on the map (or averaged over the entire dataset if no point is selected).
@@ -464,6 +543,16 @@ export const graphsPanelLabel = (
       selected by Model, Emissions scenario, and Variable(s).
     </p>
     <p>{spatialAveragingDefn}</p>
+  </LabelWithInfo>
+);
+
+export const watershedGraphsPanelLabel = (
+  <LabelWithInfo label='Data Graphs'>
+    <p>
+      Graphs showing various slices and views of the dataset(s)
+      selected by Model, Emissions scenario, and Variable(s).
+    </p>
+    <p>{watershedDefn}</p>
   </LabelWithInfo>
 );
 
@@ -497,19 +586,29 @@ const ltaGraphDefn = `
   Horizontal axis indicates midpoint of multi-decade averaging period.
 `;
 
+const designValueGraphDefn = `
+  The design value graph presents values of the selected variable (design
+  flow or change factor) as estimated for each multi-decade period. There
+  is one data point per multi-decade period and the horizontal axis
+  indicates the midpoint of each period. Each data point provides the best
+  estimate and the corresponding 2.5% to 97.5% confidence interval derived
+  from bootstrap resampling.
+`;
+
 export const singleLtaTabLabel = (
   <LabelWithInfo label='Long Term Average'>
     <p>Long term average graphs for the selected variable.</p>
     <p>{ltaGraphDefn}</p>
-    <p>{spatialAveragingDefn}</p>
-    <p>{timeOfYearSelectorDefn}</p>
+    <p>{watershedDefn}</p>
+    <p>The Time of Year selector only allows Annual values (i.e. all
+    values represent the annual maximum design flow event).</p>
   </LabelWithInfo>
 );
 
 export const percentileLtaTabLabel = (
-  <LabelWithInfo label='Long Term Average'>
-    <p>Long term average graphs with percentile range for the selected variable.</p>
-    <p>{ltaGraphDefn}</p>
+  <LabelWithInfo label='Design Values'>
+    <p>Design value graphs with percentile range for the selected variable.</p>
+    <p>{designValueGraphDefn}</p>
     <p>{pointAreaDefn}</p>
     <p>{timeOfYearSelectorDefn}</p>
   </LabelWithInfo>
@@ -658,7 +757,8 @@ export const watershedTableLabel = (
   <LabelWithInfo label='Watershed Upstream Of Selected Point'>
     <p>
       This table presents information about the selected grid and its upstream area
-      or watershed.
+      or watershed. The table is only populated if an outlet location has been
+      selected on the map.
     </p>
     <p>
       The Outlet Latitude and Longitude describe the point selected on the map,

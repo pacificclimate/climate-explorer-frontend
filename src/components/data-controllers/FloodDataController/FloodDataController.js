@@ -31,7 +31,7 @@ import _ from 'lodash';
 import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
 import PercentileLongTermAveragesGraph from '../../graphs/PercentileLongTermAveragesGraph';
 import {
-    percentileLtaTabLabel, graphsPanelLabel, timeSeriesTabLabel,
+    percentileLtaTabLabel, watershedGraphsPanelLabel, timeSeriesTabLabel,
     } from '../../guidance-content/info/InformationItems';
 
 import styles from '../DataController.module.css';
@@ -89,7 +89,7 @@ export default class FloodDataController extends React.Component {
             <Panel.Title>
               <Row>
                 <Col lg={4}>
-                  {graphsPanelLabel}
+                  {watershedGraphsPanelLabel}
                 </Col>
                 <Col lg={8}>
                   <MEVSummary
