@@ -88,6 +88,8 @@ var exportDataToWorksheet = function (
       dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}RawTimeseries${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
+    default:
+      break;
   }
 
   // assemble the worksheet and add it to the workbook.
@@ -279,16 +281,22 @@ var generateDataCellsFromC3Graph = function (
     column_labels.push("units");
   }
 
-  for (var i = 0; i < graph.data.columns.length; i++) {
+  const getVarOptions = (prec, word) => {
+    return !_.isUndefined(prec)
+      ? prec
+      : getVariableOptions(word.toLowerCase(), "decimalPrecision");
+  }
+
+  for (let i = 0; i < graph.data.columns.length; i++) {
     //each column contains either data or numerical x-axis values
     //The x-axis goes into column labels, data goes into rows.
-    var column = graph.data.columns[i];
+    const column = graph.data.columns[i];
     if (column[0] === "x" && !graphHasCategoricalXAxis) {
       column_labels = column_labels.concat(column.slice(1, column.length));
       column_labels.push("units");
     } else {
-      var seriesName = column[0];
-      var row = [];
+      const seriesName = column[0];
+      let row = [];
       row = row.concat(column);
 
       // Determine the appropriate decimal precision to display this data's values.
@@ -304,13 +312,9 @@ var generateDataCellsFromC3Graph = function (
       //
       // 3. the default util.PRECISION.
 
-      var precision = _.reduce(
+      let precision = _.reduce(
         seriesName.split(" "),
-        function (prec, word) {
-          return !_.isUndefined(prec)
-            ? prec
-            : getVariableOptions(word.toLowerCase(), "decimalPrecision");
-        },
+        getVarOptions,
         undefined,
       );
 
@@ -330,7 +334,7 @@ var generateDataCellsFromC3Graph = function (
       });
 
       //get the corresponding units (or name of axis) - default to "y" if axis not listed
-      var seriesAxis = graph.data.axes[seriesName]
+      const seriesAxis = graph.data.axes[seriesName]
         ? graph.data.axes[seriesName]
         : "y";
       row.push(graph.axis[seriesAxis].label.text);

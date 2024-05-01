@@ -8,13 +8,15 @@ Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babe
 
 ## Requirements
 
-Node.js >= 9.2.0 (**important**)
+Node.js = 16.x.x (**important**)
 
-All other package requirements are specified in `package.json`.
+All other package requirements are specified in `package.json`. And their specific versions in the package-lock.json.
 
 We **strongly** recommend using [`nvm`](https://github.com/creationix/nvm) to manage your `node`/`npm` install.
 In particular, you will have trouble finding later versions of Node.js in standard Linux installs;
 `nvm` however is up to date with all recent releases.
+
+Devcontainer files are provided in .devcontainer to facilitate these requirements using that development environment.
 
 Note: Avoid `snap` packages. Experience to date suggests it does not result in stable, reliable installations.
 
@@ -117,6 +119,8 @@ If you are using nvm, then run `nvm use 9.2.0` (or higher; ver 11.13 works fine 
 
 (`npm` 5.5.1 / `node` 9.2.0 is known to work; `npm` 3.5.2 / `node` 8.10.0 is known to fail to install certain required dependencies.
 Intermediate versions may or may not work.)
+
+Currently reccomended version is `node` 16.x and `npm` 8.x 
 
 With the appropriate versions of `node`/`npm` in use:
 

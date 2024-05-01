@@ -45,8 +45,8 @@ const mapZoomControls = (
   <span>
     <LeafletControlContainer>
         <span className='leaflet-control-zoom leaflet-bar leaflet-control'>
-          <a className='leaflet-control-zoom-in' href='#'>+</a>
-          <a className='leaflet-control-zoom-out' href='#'>-</a>
+          <button className='leaflet-control-zoom-in'>+</button>
+          <button className='leaflet-control-zoom-out'>-</button>
         </span>
     </LeafletControlContainer>
     {' '}
@@ -60,12 +60,12 @@ const mapPolygonDrawControls = (
       <div className='leaflet-draw leaflet-control'>
         <div className='leaflet-draw-section'>
           <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
-            <a className='leaflet-draw-draw-polygon' href='#' title='Draw a polygon'>
+            <button className='leaflet-draw-draw-polygon' title='Draw a polygon'>
               <span className='sr-only'>Draw a polygon</span>
-            </a>
-            <a className='leaflet-draw-draw-rectangle' href='#' title='Draw a rectangle'>
+            </button>
+            <button className='leaflet-draw-draw-rectangle' title='Draw a rectangle'>
               <span className='sr-only'>Draw a rectangle</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -81,9 +81,9 @@ const mapCircleMarkerControl = (
       <div className='leaflet-draw leaflet-control'>
         <div className='leaflet-draw-section'>
           <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
-            <a className='leaflet-draw-draw-circlemarker' href='#' title='Draw a circlemarker'>
+            <button className='leaflet-draw-draw-circlemarker' title='Draw a circlemarker'>
               <span className='sr-only'>Draw a circlemarker</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -99,9 +99,9 @@ const mapDeleteControl = (
       <div className='leaflet-draw leaflet-control'>
         <div className='leaflet-draw-section'>
           <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
-            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+            <button className='leaflet-draw-edit-remove' title='Delete layers'>
               <span className='sr-only'>Delete layers</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -117,12 +117,12 @@ const mapPolygonEditControls = (
       <div className='leaflet-draw leaflet-control'>
         <div className='leaflet-draw-section'>
           <div className='leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top'>
-            <a className='leaflet-draw-edit-edit' href='#' title='Edit layers'>
+            <button className='leaflet-draw-edit-edit' title='Edit layers'>
               <span className='sr-only'>Edit layers</span>
-            </a>
-            <a className='leaflet-draw-edit-remove' href='#' title='Delete layers'>
+            </button>
+            <button className='leaflet-draw-edit-remove' title='Delete layers'>
               <span className='sr-only'>Delete layers</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -285,11 +285,10 @@ export const datasetFilterPanelLabel = (
 );
 
 export const gcmDefn = (<span>
-      A <
-  a href='http://www.ipcc-data.org/guidelines/pages/gcm_guide.html'
-    target='_blank'
->GCM
-      (General Circulation Model)</a> is
+      A <a href='http://www.ipcc-data.org/guidelines/pages/gcm_guide.html'
+        target='_blank'  rel='noopener noreferrer'>
+      GCM (General Circulation Model)
+      </a> is
       a numerical model representing
       physical processes in the atmosphere, ocean, cryosphere and land surface
       of the Earth.
@@ -318,7 +317,9 @@ export const emissionScenarioSelectorLabel = (
     <p>
       Emissions scenarios represent a range of possible future projections for
       greenhouse gas emissions, which are input into climate models.
-      Higher RCP/SSP values represent greater projected greenhouse gas emissions. RCP and SSP scenarios are used for CMIP5 and CMIP6 experiments respectively.
+      Higher RCP/SSP values represent greater projected greenhouse gas 
+      emissions. RCP and SSP scenarios are used for CMIP5 and CMIP6 experiments 
+      respectively.
     </p>
     <p>
       Emissions scenarios use the following coding.
@@ -347,19 +348,31 @@ export const emissionScenarioSelectorLabel = (
       <tr>
         <td>rcp26/ssp126</td>
         <td>
-          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 2.6 / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 1-2.6 (very low emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' 
+          target='_blank' rel='noopener noreferrer'>RCP</a> 2.6 / 
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' 
+          target='_blank' rel='noopener noreferrer'>SSP</a> 
+          1-2.6 (very low emissions).
         </td>
       </tr>
       <tr>
         <td>rcp45/ssp245</td>
         <td>
-          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 4.5 / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 2-4.5 (moderate emissions, below current levels).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' 
+          target='_blank' rel='noopener noreferrer'>RCP</a> 4.5 / 
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' 
+          target='_blank'  rel='noopener noreferrer'>SSP</a> 
+          2-4.5 (moderate emissions, below current levels).
         </td>
       </tr>
       <tr>
         <td>rcp85/ssp585</td>
         <td>
-          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' target='_blank'>RCP</a> 8.5  / <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' target='_blank'>SSP</a> 5-8.5 ("business as usual"; high emissions).
+          <a href='https://climate-scenarios.canada.ca/?page=scen-rcp' 
+          target='_blank' rel='noopener noreferrer'>RCP</a> 8.5 / 
+          <a href='https://climate-scenarios.canada.ca/?page=cmip6-overview-notes' 
+          target='_blank' rel='noopener noreferrer'>SSP</a> 5-8.5
+          ("business as usual"; high emissions).
           This is the most appropriate sceanario to select for future planning.
         </td>
       </tr>
