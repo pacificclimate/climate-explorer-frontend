@@ -1,4 +1,10 @@
 .leaflet-container {
   height: 100%;
   width: 100%;
+
+  /* Due to interactions between leaflet setting the font size to 0.75rem and boostrap setting
+     our document default to 10px, this results in a very small font. This brings back the older
+     12px default from leaflet. If we upgrade boostrap (newer versions do not change the default
+     font size) this can be removed.*/
+  font-size: 12px !important;
 }
