@@ -8,7 +8,7 @@ Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babe
 
 ## Requirements
 
-Node.js = 16.x.x (**important**)
+Node.js = 22.x.x (**important**)
 
 All other package requirements are specified in `package.json`. And their specific versions in the package-lock.json.
 

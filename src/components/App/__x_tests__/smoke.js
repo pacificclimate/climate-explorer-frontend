@@ -6,7 +6,7 @@
 // TODO: Make this work and rename __x_tests__ --> __tests__
 
 // TODO: Enzyme has been removed from the project. This test should be rewritten
-// It seems to be locked to react 16 
+// It seems to be locked to react 16
 
 import React from "react";
 import { shallow } from "enzyme";
