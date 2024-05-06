@@ -163,13 +163,12 @@ npm test
 
 ### Linting
 
-Linting is configured with ESLint and largely follows the AirBnb preset.
+Linting is handled by [Prettier](https://prettier.io/). Prettier can be run directly from the command
+line or using the two aliased commands from the [package.json](package.json); `npm run lint` and `npm run format`.
+`lint` will check code for errors, format will automatically fix those errors.
 
-You can lint all files `npm run lint`, or a specific file `npm run lint:glob <file_name_or_glob>`.
-
-Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks directory) to abort a commit if any staged `*.js` files fail linting (warnings OK).
-
-If you _really_ want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
+Prettier is also installed as a pre-commit hook as per instructions [here](https://prettier.io/docs/en/precommit.html)
+using "Option 1. lint-staged".
 
 ## Production
 
