@@ -35,7 +35,7 @@
     "--network=host",
     // give a nicer name to the container
     "--name",
-    "${localEnv:USER}_ce_frontend"
+    "ce_frontend_${localEnv:USER}"
   ],
   "customizations": {
     "vscode": {
