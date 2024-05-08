@@ -1,22 +1,26 @@
-import React from 'react';
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { timeseriesToTimeseriesGraph } from '../../core/chart-generators';
-import TimeSeriesGraph from './TimeSeriesGraph';
-
+import { timeseriesToTimeseriesGraph } from "../../core/chart-generators";
+import TimeSeriesGraph from "./TimeSeriesGraph";
 
 export default function DualTimeSeriesGraph(props) {
   function getMetadata() {
     const {
-      model_id, experiment,
-      variable_id, meta,
-      comparand_id, comparandMeta,
+      model_id,
+      experiment,
+      variable_id,
+      meta,
+      comparand_id,
+      comparandMeta,
     } = props;
 
     // Set up metadata sets for primary variable
     const primaryVariableMetadata = _.find(meta, {
-      model_id, experiment, variable_id,
+      model_id,
+      experiment,
+      variable_id,
     });
 
     let metadataSets = [primaryVariableMetadata];
@@ -28,7 +32,8 @@ export default function DualTimeSeriesGraph(props) {
       variable_id: comparand_id,
     });
     if (
-      primaryVariableMetadata && secondaryVariableMetadata &&
+      primaryVariableMetadata &&
+      secondaryVariableMetadata &&
       primaryVariableMetadata.unique_id !== secondaryVariableMetadata.unique_id
     ) {
       metadataSets.push(secondaryVariableMetadata);
@@ -43,8 +48,15 @@ export default function DualTimeSeriesGraph(props) {
     return timeseriesToTimeseriesGraph(meta, ...data);
   }
 
-  const graphProps = _.pick(props,
-    'model_id', 'variable_id', 'comparand_id', 'experiment', 'meta', 'comparandMeta', 'area'
+  const graphProps = _.pick(
+    props,
+    "model_id",
+    "variable_id",
+    "comparand_id",
+    "experiment",
+    "meta",
+    "comparandMeta",
+    "area",
   );
 
   return (

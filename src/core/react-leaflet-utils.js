@@ -4,7 +4,7 @@ function makeHandleLeafletRef(name, leafletAction = () => {}) {
   // optional action function on that leaflet element.
   // Don't forget to bind the result of this function to `this`!!
   return function (element) {
-    console.log('handleLeafletRef:', name);
+    console.log("handleLeafletRef:", name);
     // It's important to check that the element is truthy, because
     // react-leaflet sometimes calls the `ref` callback with a null element
     // in the course of setting up a properly rendered component.

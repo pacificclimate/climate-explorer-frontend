@@ -1,4 +1,4 @@
-import { GeoJSON } from 'leaflet';
+import { GeoJSON } from "leaflet";
 
 export function geoJSONToLeafletLayers(geoJSON) {
   // Returns an *array* of Leaflet `Layer`s
@@ -26,19 +26,19 @@ export function geoJSONToLeafletLayers(geoJSON) {
       // This isn't strictly valid GeoJSON, but there's no need to be
       // *prissy* about it.
       return [];
-    case 'Feature':
-      if (geoJSON.geometry.type === 'GeometryCollection') {
+    case "Feature":
+      if (geoJSON.geometry.type === "GeometryCollection") {
         return geoJSON.geometry.geometries.map(GeoJSON.geometryToLayer);
       }
       return [GeoJSON.geometryToLayer(geoJSON)];
-    case 'FeatureCollection':
+    case "FeatureCollection":
       return geoJSON.features.map(GeoJSON.geometryToLayer);
     default:
       throw new Error(`Invalid GeoJSON object type '${geoJSONType}'`);
   }
 }
 
-const geoJSONProperties = { source: 'PCIC Climate Explorer' };
+const geoJSONProperties = { source: "PCIC Climate Explorer" };
 
 export function layersToGeoJSON(collectionType, layers) {
   // Convert an array of Leaflet layers to GeoJSON according to
@@ -65,21 +65,21 @@ export function layersToGeoJSON(collectionType, layers) {
     return geoJSON;
   }
 
-  if (collectionType === 'FeatureCollection') {
+  if (collectionType === "FeatureCollection") {
     return {
-      type: 'FeatureCollection',
+      type: "FeatureCollection",
       properties: geoJSONProperties,
-      features: layers.map(layer => layer.toGeoJSON()),
+      features: layers.map((layer) => layer.toGeoJSON()),
     };
   }
 
-  if (collectionType === 'GeometryCollection') {
+  if (collectionType === "GeometryCollection") {
     return {
-      type: 'Feature',
+      type: "Feature",
       properties: geoJSONProperties,
       geometry: {
-        type: 'GeometryCollection',
-        geometries: layers.map(layer => layer.toGeoJSON().geometry),
+        type: "GeometryCollection",
+        geometries: layers.map((layer) => layer.toGeoJSON().geometry),
       },
     };
   }

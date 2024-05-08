@@ -1,10 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-
-export function MEVSummary(
-  { model_id, experiment, variable_id, comparand_id, dual }
-) {
+export function MEVSummary({
+  model_id,
+  experiment,
+  variable_id,
+  comparand_id,
+  dual,
+}) {
   // When the props for this component don't have useful values,
   // we want to display a less obnoxious result.
   // The following test is minimal and sufficient for this condition.
@@ -14,13 +17,11 @@ export function MEVSummary(
   return (
     <span>
       {`${model_id} ${experiment}: ${variable_id} `}
-      {
-        dual ?
-          (variable_id === comparand_id ?
-            ' only' :
-            ` & ${comparand_id}`) :
-          ''
-      }
+      {dual
+        ? variable_id === comparand_id
+          ? " only"
+          : ` & ${comparand_id}`
+        : ""}
     </span>
   );
 }
@@ -36,5 +37,4 @@ MEVSummary.defaultProps = {
   dual: false,
 };
 
-export const DualMEVSummary = (props) =>
-  <MEVSummary {...props} dual />;
+export const DualMEVSummary = (props) => <MEVSummary {...props} dual />;

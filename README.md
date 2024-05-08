@@ -8,13 +8,15 @@ Front end interface for the PCIC Climate Explorer. Node, React.js, Webpack, Babe
 
 ## Requirements
 
-Node.js >= 9.2.0 (**important**)
+Node.js = 22.x.x (**important**)
 
-All other package requirements are specified in `package.json`.
+All other package requirements are specified in `package.json`. And their specific versions in the package-lock.json.
 
 We **strongly** recommend using [`nvm`](https://github.com/creationix/nvm) to manage your `node`/`npm` install.
 In particular, you will have trouble finding later versions of Node.js in standard Linux installs;
 `nvm` however is up to date with all recent releases.
+
+Devcontainer files are provided in .devcontainer to facilitate these requirements using that development environment.
 
 Note: Avoid `snap` packages. Experience to date suggests it does not result in stable, reliable installations.
 
@@ -32,9 +34,9 @@ in various contexts (development, production, etc.).
 
 Brief summary:
 
-* `.env`: Global default settings
-* `.env.development`: Development-specific settings (`npm start`)
-* `.env.production`: Production-specific settings (`npm run build`)
+- `.env`: Global default settings
+- `.env.development`: Development-specific settings (`npm start`)
+- `.env.production`: Production-specific settings (`npm run build`)
 
 For more details, see the
 [CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)).
@@ -42,55 +44,67 @@ For more details, see the
 Environment variables for configuring the app are:
 
 `PUBLIC_URL`
-* Base **URL** for CE frontend app.
-* For production, set this to the URL for CE configured in our proxy server.
-* **WARNING**: The path component of this value **MUST** match `REACT_APP_CE_BASE_PATH` (see below).
+
+- Base **URL** for CE frontend app.
+- For production, set this to the URL for CE configured in our proxy server.
+- **WARNING**: The path component of this value **MUST** match `REACT_APP_CE_BASE_PATH` (see below).
 
 `REACT_APP_CE_BASE_PATH`
-* Base **path** of the URL for the CE frontend app;
-* For production, set this to the path component of the URL for CE configured in our proxy server.
-* **WARNING**: This **MUST** match the path component of `PUBLIC_URL` (see above).
+
+- Base **path** of the URL for the CE frontend app;
+- For production, set this to the path component of the URL for CE configured in our proxy server.
+- **WARNING**: This **MUST** match the path component of `PUBLIC_URL` (see above).
 
 `REACT_APP_CE_CURRENT_VERSION`
-* Current version of the app.
-* This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
-* It is not recommended to manually override the automatically generated value when the image is run.
-* No default value for this variable is provided in any `.env` file.
+
+- Current version of the app.
+- This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
+- It is not recommended to manually override the automatically generated value when the image is run.
+- No default value for this variable is provided in any `.env` file.
 
 `REACT_APP_CE_BACKEND_URL`
-* Publicly accessible URL for backend climate data.
+
+- Publicly accessible URL for backend climate data.
 
 `REACT_APP_TILECACHE_URL`
-* Tilecache URL for basemap layers.
+
+- Tilecache URL for basemap layers.
 
 `REACT_APP_NCWMS_URL`
-* ncWMS URL for climate layers.
+
+- ncWMS URL for climate layers.
 
 `REACT_APP_CE_ENSEMBLE_NAME`
-* Ensemble name to use for backend requests.
+
+- Ensemble name to use for backend requests.
 
 `REACT_APP_MAP_LAYER_ID_TYPE`
-* Type of identifier used by the app in requests for map climate layers.
-   * Value `dynamic` selects the dynamic dataset identifier type.
-     A dynamic dataset identifier is formed by prefixing the value of 
-     `REACT_APP_MAP_LAYER_ID_PREFIX` to the filepath of the dataset 
-     (obtained from the metadata).
-   * Any other values selects static (preconfigured) dataset identifier type.
-     A simple dataset identifier is the unqiue_id of the dataset
-     (obtained from the metadata).
-     
+
+- Type of identifier used by the app in requests for map climate layers.
+  - Value `dynamic` selects the dynamic dataset identifier type.
+    A dynamic dataset identifier is formed by prefixing the value of
+    `REACT_APP_MAP_LAYER_ID_PREFIX` to the filepath of the dataset
+    (obtained from the metadata).
+  - Any other values selects static (preconfigured) dataset identifier type.
+    A simple dataset identifier is the unqiue_id of the dataset
+    (obtained from the metadata).
+
 `REACT_APP_MAP_LAYER_ID_PREFIX`
-* Prefix used to form a dynamic dataset identifier, if requested.
+
+- Prefix used to form a dynamic dataset identifier, if requested.
   (See item above.)
 
 `REACT_APP_VARIABLE_OPTIONS`
-* Path within the `public` folder of the variable options file.
+
+- Path within the `public` folder of the variable options file.
 
 `REACT_APP_EXTERNAL_TEXT`
-* Path within the `public` folder of the external text file.
+
+- Path within the `public` folder of the external text file.
 
 `NODE_ENV`
-* [**Automatically set; cannot be overridden manually.**](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
+
+- [**Automatically set; cannot be overridden manually.**](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
 
 ### Variable options
 
@@ -117,6 +131,8 @@ If you are using nvm, then run `nvm use 9.2.0` (or higher; ver 11.13 works fine 
 
 (`npm` 5.5.1 / `node` 9.2.0 is known to work; `npm` 3.5.2 / `node` 8.10.0 is known to fail to install certain required dependencies.
 Intermediate versions may or may not work.)
+
+Currently reccomended version is `node` 16.x and `npm` 8.x
 
 With the appropriate versions of `node`/`npm` in use:
 
@@ -147,14 +163,12 @@ npm test
 
 ### Linting
 
-Linting is configured with ESLint and largely follows the AirBnb preset.
+Linting is handled by [Prettier](https://prettier.io/). Prettier can be run directly from the command
+line or using the two aliased commands from the [package.json](package.json); `npm run lint` and `npm run format`.
+`lint` will check code for errors, format will automatically fix those errors.
 
-You can lint all files `npm run lint`, or a specific file `npm run lint:glob <file_name_or_glob>`.
-
-Use the `git/hooks/pre-commit-eslint` (and install into your .git/hooks directory) to abort a commit if any staged `*.js` files fail linting (warnings OK).
-
-If you *really* want to skip the linting during a commit, you can always run `git commit --no-verify`. However, this is not recommended.
-
+Prettier is also installed as a pre-commit hook as per instructions [here](https://prettier.io/docs/en/precommit.html)
+using "Option 1. lint-staged".
 
 ## Production
 
@@ -183,16 +197,15 @@ It therefore takes some extra effort to inject run-time environment variables (o
 these Dockerized applications. There are two basic approaches:
 
 1. Build the app, and inject run-time environment variables, as part of the image run (i.e., the command run
-by the image includes building the app, which then has access to environment variables provided via the `docker run`
-command).
-    * This is simple but it means that containers are slow to start up and contain a lot of infrastructure
-    (Node.js, etc.) needed to build the image. This isn't an issue for us, because we don't start many instances and
-    we don't do it often.
+   by the image includes building the app, which then has access to environment variables provided via the `docker run`
+   command). \* This is simple but it means that containers are slow to start up and contain a lot of infrastructure
+   (Node.js, etc.) needed to build the image. This isn't an issue for us, because we don't start many instances and
+   we don't do it often.
 
 2. Fetch the environment variables (or a configuration file) from the server.
-    * This approach has several variants, which are outlined in this
-    [CRA issue](https://github.com/facebook/create-react-app/issues/2353).
-    * The way we load the external text and variable options files falls under into this category.
+   - This approach has several variants, which are outlined in this
+     [CRA issue](https://github.com/facebook/create-react-app/issues/2353).
+   - The way we load the external text and variable options files falls under into this category.
 
 A key requirement is to be able to configure at run time the the URL at which the app is deployed.
 CRA provides a (build-time) environment variable for this, `PUBLIC_URL`.
@@ -219,18 +232,19 @@ he relatively simple `package.json` `homepage` property.
 
 Instead we must use CRA-provided build-time environment variable `PUBLIC_URL`.
 
-* It is [discussed briefly](https://facebook.github.io/create-react-app/docs/using-the-public-folder)
-as the URL for the `public` folder, of which we make use for dynamic configuration assets such as
-external text and variable configuration files.
+- It is [discussed briefly](https://facebook.github.io/create-react-app/docs/using-the-public-folder)
+  as the URL for the `public` folder, of which we make use for dynamic configuration assets such as
+  external text and variable configuration files.
 
-* `PUBLIC_URL` is also discussed more interestingly in
-[Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration):
+- `PUBLIC_URL` is also discussed more interestingly in
+  [Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration):
 
-    > Create React App assumes your application is hosted at the serving web server's root or a subpath as
-specified in package.json (homepage). Normally, Create React App ignores the
-hostname. You may use this variable to force assets to be referenced verbatim
-to the url you provide (hostname included). This may be particularly useful
-when using a CDN to host your application.
+      > Create React App assumes your application is hosted at the serving web server's root or a subpath as
+
+  specified in package.json (homepage). Normally, Create React App ignores the
+  hostname. You may use this variable to force assets to be referenced verbatim
+  to the url you provide (hostname included). This may be particularly useful
+  when using a CDN to host your application.
 
 `PUBLIC_URL` serves much the same purpose as our custom env variable `REACT_APP_CE_BASE_PATH`.
 This redundancy will be eliminated in a future verison of CE.
@@ -331,10 +345,10 @@ These configuration files are stored in [the `public` folder](https://facebook.g
 The path to each configuration file inside this folder specified by an environment variable.
 Specifically:
 
-| Configuration     | Env variable                  | Default value                 |
-| ----------------- | ----------------------------- | ------------------------------|
-| External texts    | `REACT_APP_EXTERNAL_TEXT`     |  external-text/default.yaml   |
-| Variable options  | `REACT_APP_VARIABLE_OPTIONS`  | variable-options.yaml         |
+| Configuration    | Env variable                 | Default value              |
+| ---------------- | ---------------------------- | -------------------------- |
+| External texts   | `REACT_APP_EXTERNAL_TEXT`    | external-text/default.yaml |
+| Variable options | `REACT_APP_VARIABLE_OPTIONS` | variable-options.yaml      |
 
 During a build (`npm run build`),
 files in the `public` folder are copied directly, without bundling, to the build directory (normally, `./build`).
@@ -348,12 +362,12 @@ variable options file without needing to modify source code, create a new releas
 
 To change the configuration file without creating a new release of the app:
 
-* Update the configuration file in the external file system.
-* Restart the container (`docker restart climate-explorer-frontend`)
+- Update the configuration file in the external file system.
+- Restart the container (`docker restart climate-explorer-frontend`)
 
 Alternatives:
 
-* Stop the app and start it again with a different value for the associated environment variable,
+- Stop the app and start it again with a different value for the associated environment variable,
   and a corresponding volume mount for this new file.
 
 To prevent tears, hair loss, and the cursing of your name by future developers (including yourself),
@@ -369,12 +383,12 @@ Creating a versioned release involves:
 2. Summarize the changes from the last version in `NEWS.md`
 3. Commit these changes, then tag the release:
 
-  ```bash
+```bash
 git add package.json NEWS.md
 git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
-  ```
+```
 
 ## Code style standard compliance
 

@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-import _ from 'lodash';
+import _ from "lodash";
 import {
   capitalizeWords,
   caseInsensitiveStringSearch,
@@ -30,8 +30,8 @@ import {
   nestedAttributeIsDefined,
   PRECISION,
   timeResolutionIndexToTimeOfYear,
-  timestampToTimeOfYear
-} from './util';
+  timestampToTimeOfYear,
+} from "./util";
 
 /* **************************************************
  * 0. Helper functions used by all graph generators *
@@ -42,14 +42,16 @@ import {
  * Used as a default when a more specialized formatting function isn't
  * available; ignores all its inputs except the number to be formatted.
  */
-function fixedPrecision(n) { return +n.toFixed(PRECISION);}
+function fixedPrecision(n) {
+  return +n.toFixed(PRECISION);
+}
 
 // Generates a typical y-axis configuration, given the text of the label.
 function formatYAxis(label) {
   return {
     label: {
       text: label,
-      position: 'outer-middle',
+      position: "outer-middle",
     },
     tick: {
       format: fixedPrecision,
@@ -68,11 +70,13 @@ function formatYAxis(label) {
 function makePrecisionBySeries(series) {
   let dictionary = {};
   for (let s in series) {
-    const fromConfig = getVariableOptions(series[s], 'decimalPrecision');
+    const fromConfig = getVariableOptions(series[s], "decimalPrecision");
     dictionary[s] = _.isUndefined(fromConfig) ? PRECISION : fromConfig;
   }
 
-  return function (n, name) {return +n.toFixed(dictionary[name]);};
+  return function (n, name) {
+    return +n.toFixed(dictionary[name]);
+  };
 }
 
 /*
@@ -93,14 +97,18 @@ function makePrecisionBySeries(series) {
  * This function only uses the name and index arguments.
  */
 function tooltipAddTimeOfYear(name, ratio, value, index) {
-  if(caseInsensitiveStringSearch(name, "monthly")) {
-    return name.replace(/monthly/gi,
-        timeResolutionIndexToTimeOfYear("monthly", index));
-  } else if(caseInsensitiveStringSearch(name, "seasonal")) {
+  if (caseInsensitiveStringSearch(name, "monthly")) {
+    return name.replace(
+      /monthly/gi,
+      timeResolutionIndexToTimeOfYear("monthly", index),
+    );
+  } else if (caseInsensitiveStringSearch(name, "seasonal")) {
     // timestamp representing this month - only the month is relevant
     const timestamp = new Date(0, index);
-    return name.replace(/seasonal/gi,
-        timestampToTimeOfYear(timestamp.toISOString(), "seasonal", false)); 
+    return name.replace(
+      /seasonal/gi,
+      timestampToTimeOfYear(timestamp.toISOString(), "seasonal", false),
+    );
   } else {
     return name;
   }
@@ -123,13 +131,17 @@ function tooltipAddTimeOfYear(name, ratio, value, index) {
  */
 function makeTooltipDisplayNumbersWithUnits(axes, axis, precisionFunction) {
   let unitsDictionary = {};
-  const pf = _.isUndefined(precisionFunction) ? fixedPrecision : precisionFunction;
+  const pf = _.isUndefined(precisionFunction)
+    ? fixedPrecision
+    : precisionFunction;
 
   // build a dictionary between timeseries names and units
   for (let series in axes) {
-    if (axis[axes[series]].units) { // use explicit units if present
+    if (axis[axes[series]].units) {
+      // use explicit units if present
       unitsDictionary[series] = axis[axes[series]].units;
-    } else { // fall back to axis text label
+    } else {
+      // fall back to axis text label
       unitsDictionary[series] = axis[axes[series]].label.text;
     }
   }
@@ -169,20 +181,22 @@ function makeTooltipDisplayNumbersWithUnits(axes, axis, precisionFunction) {
  */
 function axisSortingParams(graph, yAxis) {
   let params = {
-    units: '',
-    groupBy: { type: '', value: '' },
+    units: "",
+    groupBy: { type: "", value: "" },
   };
   if (graph.axis) {
     const axis = graph.axis[yAxis];
     if (axis) {
-      if (nestedAttributeIsDefined(axis, 'units')
-         && nestedAttributeIsDefined(axis, 'groupBy', 'type')
-         && nestedAttributeIsDefined(axis, 'groupBy', 'value')) {
+      if (
+        nestedAttributeIsDefined(axis, "units") &&
+        nestedAttributeIsDefined(axis, "groupBy", "type") &&
+        nestedAttributeIsDefined(axis, "groupBy", "value")
+      ) {
         params.units = axis.units;
         params.groupBy.type = axis.groupBy.type;
         params.groupBy.value = axis.groupBy.value;
       } else {
-        throw new Error('Error: unable to add data to y axis ' + yAxis);
+        throw new Error("Error: unable to add data to y axis " + yAxis);
       }
     }
   }
@@ -233,34 +247,36 @@ function axisSortingParams(graph, yAxis) {
 function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   // get sorting algorithm, if the chart already has one.
   const sortingParams = {
-    y: axisSortingParams(graph, 'y'),
-    y2: axisSortingParams(graph, 'y2'),
+    y: axisSortingParams(graph, "y"),
+    y2: axisSortingParams(graph, "y2"),
   };
 
   if (sortingParams.y.groupBy.type !== sortingParams.y2.groupBy.type) {
     // make sure both axes agree on the data sorting.
-    throw new Error('Error: axis data grouping inconsistent.');
+    throw new Error("Error: axis data grouping inconsistent.");
   }
 
-  let groupBy = 'variable'; // default and most common case.
+  let groupBy = "variable"; // default and most common case.
 
   if (groupByUnits) {
     // check to make sure the caller of this function didn't request grouping
     // by units when the existing graph is already grouped by variable.
-    if (sortingParams.y.groupBy.type === 'variable') {
-      throw new Error('Error: cannot regroup data series');
+    if (sortingParams.y.groupBy.type === "variable") {
+      throw new Error("Error: cannot regroup data series");
     }
-    groupBy = 'units';
-  } else if (sortingParams.y.groupBy.type === 'units') {
+    groupBy = "units";
+  } else if (sortingParams.y.groupBy.type === "units") {
     // caller didn't specify a grouping algorithm, but
     // this graph is already grouped by units, use that.
-    groupBy = 'units';
+    groupBy = "units";
   }
 
   // collect all data series name, but exclude the data series named "x" - it is
   // a C3 convention used to format labels for the x axis (months & seasons,
   // in our case), not a real data series.
-  const seriesNames = graph.data.columns.map(col => col[0]).filter(n => n !== 'x');
+  const seriesNames = graph.data.columns
+    .map((col) => col[0])
+    .filter((n) => n !== "x");
 
   const allotSeriesToAxis = (axis, seriesName) => {
     // attempts to sort a data series to the named y axis
@@ -281,7 +297,7 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
       // it does!
       if (seriesMeta.units !== sortingParams[axis].units) {
         // ... but the units are wrong. Error.
-        throw new Error('Error: mismatched units for graph axis ' + axis);
+        throw new Error("Error: mismatched units for graph axis " + axis);
       }
       // a valid assignment.
       graph.data.axes[seriesName] = axis;
@@ -292,9 +308,14 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
   };
 
   for (const seriesName of seriesNames) {
-    if (!(allotSeriesToAxis('y', seriesName) || allotSeriesToAxis('y2', seriesName))) {
+    if (
+      !(
+        allotSeriesToAxis("y", seriesName) ||
+        allotSeriesToAxis("y2", seriesName)
+      )
+    ) {
       // this data series is a match for neither Y axis.
-      throw new Error('Error: too many data axes required for graph');
+      throw new Error("Error: too many data axes required for graph");
     }
   }
 
@@ -305,9 +326,11 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
     if (sortingParams[yAxis].groupBy.value && !graph.axis[yAxis]) {
       // data was assigned to this axis, and the axis is not formatted already
       const params = sortingParams[yAxis];
-      let label = '';
-      if (groupBy === 'variable'
-        && params.groupBy.value !== missingVariableName) {
+      let label = "";
+      if (
+        groupBy === "variable" &&
+        params.groupBy.value !== missingVariableName
+      ) {
         label = `${params.groupBy.value} ${params.units}`;
       } else {
         label = params.units;
@@ -321,11 +344,10 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
     }
   };
 
-  formatSortedAxis('y');
-  formatSortedAxis('y2');
+  formatSortedAxis("y");
+  formatSortedAxis("y2");
   return graph;
 }
-
 
 /* ************************************************************
  * 1. timeseriesToAnnualCycleGraph() and its helper functions *
@@ -336,9 +358,21 @@ function assignDataToYAxis(graph, seriesMetadata, groupByUnits = false) {
  * object representing a categorical axis labeled in months.
  */
 const monthlyXAxis = {
-  type: 'category',
-  categories: ['January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'],
+  type: "category",
+  categories: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
 };
 
 /*
@@ -347,17 +381,17 @@ const monthlyXAxis = {
  * and returns an array with twelve values in order by timestamp,
  * repeating values as necessary to get a monthly-resolution sequence.
  */
-function getMonthlyData(data, timescale = 'monthly') {
+function getMonthlyData(data, timescale = "monthly") {
   const expectedTimestamps = { monthly: 12, seasonal: 4, yearly: 1 };
   let monthlyData = [];
   const timestamps = Object.keys(data).sort();
 
   if (timestamps.length === 17) {
-    throw new Error('Error: concatenated 17-point chronology.');
+    throw new Error("Error: concatenated 17-point chronology.");
   }
 
   if (timestamps.length !== expectedTimestamps[timescale]) {
-    throw new Error('Error: inconsistent time resolution in data');
+    throw new Error("Error: inconsistent time resolution in data");
   }
 
   for (let i = 0; i < 12; i++) {
@@ -367,7 +401,7 @@ function getMonthlyData(data, timescale = 'monthly') {
 
   // Seasonal timeseries need one month of winter removed from the beginning of the
   // year and added at the end, since winter wraps around the calendar new year.
-  if (timescale === 'seasonal') {
+  if (timescale === "seasonal") {
     monthlyData = monthlyData.slice(1, 12);
     monthlyData.push(data[timestamps[0]]);
   }
@@ -388,7 +422,7 @@ function getMonthlyData(data, timescale = 'monthly') {
  *
  * Timeseries names include any descriptive  metadata that vary between
  * timeseries and leave out any metadata that doesn't. They end with a
- * basename specific to the variable and set in the variable config file 
+ * basename specific to the variable and set in the variable config file
  * (or "mean" if the config file doesn't specify).
  */
 // TODO: special case climatological period to display as (XXXX-XXXX)
@@ -396,12 +430,14 @@ function getMonthlyData(data, timescale = 'monthly') {
 // "Tasmin Monthly Mean" sounds better than "Monthly Tasmin Mean".
 function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   if (metadata.length === 0) {
-    throw new Error('No data to show');
+    throw new Error("No data to show");
   }
 
   // only one timeseries being graphed, simple label.
   if (data.length === 1) {
-    return function (m) { return capitalizeWords(`${m.timescale} mean`);};
+    return function (m) {
+      return capitalizeWords(`${m.timescale} mean`);
+    };
   }
 
   // Compile a list of attributes that can potentially be used to distinguish
@@ -415,7 +451,8 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
     const comparandMetadata = _.find(metadata, { unique_id: datum.id });
 
     for (const att of Object.getOwnPropertyNames(comparandMetadata)) {
-      if (exemplarMetadata[att] !== comparandMetadata[att] &&
+      if (
+        exemplarMetadata[att] !== comparandMetadata[att] &&
         variation.indexOf(att) === -1
       ) {
         variation.push(att);
@@ -428,29 +465,30 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   // (which is also very long).
   // We don't need both variable_id and variable_name.
   variation = _.difference(variation, [
-    'unique_id',
-    'filepath',
-    variation.includes('variable_id') && 'variable_name',
+    "unique_id",
+    "filepath",
+    variation.includes("variable_id") && "variable_name",
   ]);
 
   if (variation.length === 0) {
-    throw new Error('Error: cannot graph identical timeseries');
+    throw new Error("Error: cannot graph identical timeseries");
   }
-  
+
   // Build a dictionary with the base name for each variable (typically
-  // either "Mean" or "Mean Count") from the variable config file. 
+  // either "Mean" or "Mean Count") from the variable config file.
   // Defaults to "Mean" since all data displayed by this graph is MYMs.
-  const variables = _.uniq(_.map(metadata, 'variable_id'));
+  const variables = _.uniq(_.map(metadata, "variable_id"));
   function getVarBasename(v) {
-    const fromConfig = getVariableOptions(v, 'seriesLegendString');
+    const fromConfig = getVariableOptions(v, "seriesLegendString");
     return _.isUndefined(fromConfig) ? "Mean" : fromConfig;
   }
   const basenameByVariable = _.zipObject(
-    variables, _.map(variables, getVarBasename)
+    variables,
+    _.map(variables, getVarBasename),
   );
 
   return function (m) {
-    let name = '';
+    let name = "";
     for (let v of variation) {
       name = name.concat(`${m[v]} `);
     }
@@ -496,7 +534,10 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
   let seriesMetadata = {};
   let seriesVariables = {};
 
-  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(
+    metadata,
+    data,
+  );
 
   // Add each timeseries to the graph
   for (let timeseries of data) {
@@ -507,12 +548,16 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
 
     // add the actual data to the graph
-    c3Data.columns.push([timeseriesName].concat(
-        getMonthlyData(timeseries.data, timeseriesMetadata.timescale)));
+    c3Data.columns.push(
+      [timeseriesName].concat(
+        getMonthlyData(timeseries.data, timeseriesMetadata.timescale),
+      ),
+    );
 
     // monthly data is displayed as a line graph, but yearly and seasonal
     // display as step graphs.
-    c3Data.types[timeseriesName] = timeseriesMetadata.timescale === 'monthly' ? 'line' : 'step';
+    c3Data.types[timeseriesName] =
+      timeseriesMetadata.timescale === "monthly" ? "line" : "step";
 
     seriesMetadata[timeseriesName] = {
       units: getDataUnits(timeseries, timeseriesMetadata.variable_id),
@@ -533,9 +578,12 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
   // create tooltip
   const precision = makePrecisionBySeries(seriesVariables);
   let c3Tooltip = { format: {} };
-  c3Tooltip.grouped = 'true';
-  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
-      graph.axis, precision);
+  c3Tooltip.grouped = "true";
+  c3Tooltip.format.value = makeTooltipDisplayNumbersWithUnits(
+    graph.data.axes,
+    graph.axis,
+    precision,
+  );
   c3Tooltip.format.name = tooltipAddTimeOfYear;
 
   graph.tooltip = c3Tooltip;
@@ -554,17 +602,16 @@ function timeseriesToAnnualCycleGraph(metadata, ...data) {
  * The 'data' API call, when called for a single run, returns no
  * variable name.
  */
-const missingVariableName = 'defaultVariable';
-
+const missingVariableName = "defaultVariable";
 
 /*
  * Helper constant for dataToLongTermAverageGraph: Format object
  * for a timeseries X axis.
  */
 const timeseriesXAxis = {
-  type: 'timeseries',
+  type: "timeseries",
   tick: {
-    format: '%Y-%m-%d',
+    format: "%Y-%m-%d",
   },
 };
 
@@ -577,23 +624,29 @@ function getAllTimestamps(data) {
 
   const addSeries = function (seriesData) {
     for (let timestamp in seriesData) {
-      if (!_.find(allTimes, function (t) {return t === timestamp;})) {
+      if (
+        !_.find(allTimes, function (t) {
+          return t === timestamp;
+        })
+      ) {
         allTimes.push(timestamp);
       }
     }
   };
 
   for (let i in _.keys(data)) {
-    if (!_.isUndefined(data[i].data)) { // data is from "timeseries" API
+    if (!_.isUndefined(data[i].data)) {
+      // data is from "timeseries" API
       addSeries(data[i].data);
-    } else { // data is from "data" API
+    } else {
+      // data is from "data" API
       for (let run in data[i]) {
         addSeries(data[i][run].data);
       }
     }
   }
   if (allTimes.length === 0) {
-    throw new Error('Error: no time stamps in data');
+    throw new Error("Error: no time stamps in data");
   }
   return allTimes;
 }
@@ -615,7 +668,10 @@ function nameAPICallParametersFunction(contexts) {
 
   for (let context of contexts) {
     for (let att in context) {
-      if (exemplarContext[att] !== context[att] && variation.indexOf(att) === -1) {
+      if (
+        exemplarContext[att] !== context[att] &&
+        variation.indexOf(att) === -1
+      ) {
         variation.push(att);
       }
     }
@@ -624,7 +680,7 @@ function nameAPICallParametersFunction(contexts) {
   // "data" API was called more than once with the same arguments -
   // probably a mistake.
   if (variation.length === 0) {
-    throw new Error('Error: cannot graph two identical queries');
+    throw new Error("Error: cannot graph two identical queries");
   }
 
   // an "area" is just a list of points. The naive algorithm used to generate
@@ -633,12 +689,14 @@ function nameAPICallParametersFunction(contexts) {
   // series name as far as C3 is concerned. At present, throw an error
   // if attempting to graph data series associated with different areas. If
   // this functionality is needed in the future, it can be implemented here.
-  if (variation.indexOf('area') !== -1) {
-    throw new Error('Error: cannot display two datasets associated with different areas.');
+  if (variation.indexOf("area") !== -1) {
+    throw new Error(
+      "Error: cannot display two datasets associated with different areas.",
+    );
   }
 
   return function (run, context) {
-    let name = '';
+    let name = "";
     for (let v of variation) {
       name = name.concat(`${context[v]} `);
     }
@@ -705,18 +763,20 @@ function dataToLongTermAverageGraph(data, contexts = []) {
   let nameSeries;
 
   if (data.length === 1) {
-    nameSeries = function (run) {return run;};
+    nameSeries = function (run) {
+      return run;
+    };
   } else if (data.length === contexts.length) {
     nameSeries = nameAPICallParametersFunction(contexts);
   } else {
-    throw new Error('Error: no context provided for timeseries data');
+    throw new Error("Error: no context provided for timeseries data");
   }
 
   // get the list of all timestamps and add them to the chart
   // (C3 requires x-axis timestamps be added as a data column)
   const timestamps = getAllTimestamps(data);
-  c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
-  c3Data.x = 'x';
+  c3Data.columns.push(["x"].concat(_.map(timestamps, extendedDateToBasicDate)));
+  c3Data.x = "x";
 
   // add each API call to the chart
   for (let i = 0; i < data.length; i++) {
@@ -726,10 +786,12 @@ function dataToLongTermAverageGraph(data, contexts = []) {
     // add each individual dataset from the API to the chart
     for (let run in call) {
       const runName = nameSeries(run, context);
-      const seriesVariable = _.isEmpty(context) ? missingVariableName : context.variable_id;
+      const seriesVariable = _.isEmpty(context)
+        ? missingVariableName
+        : context.variable_id;
       seriesVariables[runName] = seriesVariable;
       seriesMetadata[runName] = {
-        variable: seriesVariable || '', // single-run has no var metadata
+        variable: seriesVariable || "", // single-run has no var metadata
         units: getDataUnits(call[run], seriesVariable),
       };
       const series = [runName];
@@ -739,10 +801,12 @@ function dataToLongTermAverageGraph(data, contexts = []) {
       // in the C3 data object. This will cause C3 to render the
       // line with a break where the missing timestamp is.
       for (let t of timestamps) {
-        series.push(_.isUndefined(call[run].data[t]) ? null : call[run].data[t]);
+        series.push(
+          _.isUndefined(call[run].data[t]) ? null : call[run].data[t],
+        );
       }
       c3Data.columns.push(series);
-      c3Data.types[runName] = 'line';
+      c3Data.types[runName] = "line";
     }
   }
 
@@ -770,9 +834,12 @@ function dataToLongTermAverageGraph(data, contexts = []) {
   // numbers will be formatted with default precision.
   const precision = makePrecisionBySeries(seriesVariables);
   graph.tooltip = { format: {} };
-  graph.tooltip.grouped = 'true';
-  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
-      graph.axis, precision);
+  graph.tooltip.grouped = "true";
+  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(
+    graph.data.axes,
+    graph.axis,
+    precision,
+  );
 
   return graph;
 }
@@ -827,18 +894,22 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
   let seriesVariables = {};
   let seriesMetadata = {};
 
-  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(metadata, data);
+  const getTimeseriesName = shortestUniqueTimeseriesNamingFunction(
+    metadata,
+    data,
+  );
 
   // get list of all timestamps
   const timestamps = getAllTimestamps(data);
-  c3Data.columns.push(['x'].concat(_.map(timestamps, extendedDateToBasicDate)));
-  c3Data.x = 'x';
+  c3Data.columns.push(["x"].concat(_.map(timestamps, extendedDateToBasicDate)));
+  c3Data.x = "x";
 
   // Add each timeseries to the graph
   for (let timeseries of data) {
     // get metadata for this timeseries
-    const timeseriesMetadata = _.find(metadata,
-        function (m) {return m.unique_id === timeseries.id;});
+    const timeseriesMetadata = _.find(metadata, function (m) {
+      return m.unique_id === timeseries.id;
+    });
     const timeseriesName = getTimeseriesName(timeseriesMetadata);
     const seriesVariable = timeseriesMetadata.variable_id;
     seriesVariables[timeseriesName] = seriesVariable;
@@ -853,18 +924,19 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
     for (let t of timestamps) {
       // assigns "null" for any timestamps missing from this series.
       // C3's behaviour toward null values is set by the line.connectNull attribute
-      column.push(_.isUndefined(timeseries.data[t]) ? null : timeseries.data[t]);
+      column.push(
+        _.isUndefined(timeseries.data[t]) ? null : timeseries.data[t],
+      );
     }
 
     c3Data.columns.push(column);
-    c3Data.types[timeseriesName] = 'line';
+    c3Data.types[timeseriesName] = "line";
   }
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
   c3Axis.x = timeseriesXAxis;
-  const c3Subchart = { show: true,
-      size: { height: 20 } };
+  const c3Subchart = { show: true, size: { height: 20 } };
 
   // instructs c3 to connect series across gaps where a timeseries is missing
   // a timestamp. While this could be confusing in cases where a datapoint
@@ -885,17 +957,28 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
 
   const precision = makePrecisionBySeries(seriesVariables);
   graph.tooltip = { format: {} };
-  graph.tooltip.grouped = 'true';
-  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(graph.data.axes,
-      graph.axis, precision);
+  graph.tooltip.grouped = "true";
+  graph.tooltip.format.value = makeTooltipDisplayNumbersWithUnits(
+    graph.data.axes,
+    graph.axis,
+    precision,
+  );
 
   return graph;
 }
 
-export { timeseriesToAnnualCycleGraph, dataToLongTermAverageGraph,
-    timeseriesToTimeseriesGraph,
-    // exported only for testing purposes:
-    formatYAxis, fixedPrecision, makePrecisionBySeries,
-    makeTooltipDisplayNumbersWithUnits, tooltipAddTimeOfYear,
-    getMonthlyData, shortestUniqueTimeseriesNamingFunction,
-    getAllTimestamps, nameAPICallParametersFunction };
+export {
+  timeseriesToAnnualCycleGraph,
+  dataToLongTermAverageGraph,
+  timeseriesToTimeseriesGraph,
+  // exported only for testing purposes:
+  formatYAxis,
+  fixedPrecision,
+  makePrecisionBySeries,
+  makeTooltipDisplayNumbersWithUnits,
+  tooltipAddTimeOfYear,
+  getMonthlyData,
+  shortestUniqueTimeseriesNamingFunction,
+  getAllTimestamps,
+  nameAPICallParametersFunction,
+};

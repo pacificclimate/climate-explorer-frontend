@@ -1,20 +1,18 @@
-import React from 'react';
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { timeseriesToTimeseriesGraph } from '../../core/chart-generators';
-import TimeSeriesGraph from './TimeSeriesGraph';
-
+import { timeseriesToTimeseriesGraph } from "../../core/chart-generators";
+import TimeSeriesGraph from "./TimeSeriesGraph";
 
 export default function SingleTimeSeriesGraph(props) {
   function getMetadata() {
-    const {
-      model_id, experiment,
-      variable_id, meta,
-    } = props;
+    const { model_id, experiment, variable_id, meta } = props;
 
     const primaryVariableMetadata = _.find(meta, {
-      model_id, experiment, variable_id,
+      model_id,
+      experiment,
+      variable_id,
     });
     // Yes, the value of this function is an array of one element.
     const metadataSets = [primaryVariableMetadata];
@@ -27,8 +25,13 @@ export default function SingleTimeSeriesGraph(props) {
     return timeseriesToTimeseriesGraph(meta, ...data);
   }
 
-  const graphProps = _.pick(props,
-    'model_id', 'variable_id', 'experiment', 'meta', 'area'
+  const graphProps = _.pick(
+    props,
+    "model_id",
+    "variable_id",
+    "experiment",
+    "meta",
+    "area",
   );
 
   return (

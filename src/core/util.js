@@ -1,11 +1,11 @@
 /***********************************************************
- * util.js - a collection of data-handling functions 
+ * util.js - a collection of data-handling functions
  ***********************************************************/
 
-import moment from 'moment/moment';
-import _ from 'lodash';
-import yaml from 'js-yaml';
-import { getVariableOptions as httpGetVariableOptions } from '../data-services/public'
+import moment from "moment/moment";
+import _ from "lodash";
+import yaml from "js-yaml";
+import { getVariableOptions as httpGetVariableOptions } from "../data-services/public";
 
 /*****************************************************************
  * Functions for working with data from the Climate Explorer API
@@ -37,10 +37,13 @@ export const PRECISION = 2;
  */
 export function parseBootstrapTableData(data, metadata) {
   return _.map(data, function (stats, model) {
-    const modelMetadata = _.find(metadata, m => m.unique_id === model);
+    const modelMetadata = _.find(metadata, (m) => m.unique_id === model);
     const period = `${modelMetadata.start_date} - ${modelMetadata.end_date}`;
     const variable_id = modelMetadata.variable_id;
-    const configuredPrecision = getVariableOptions(variable_id, "decimalPrecision");
+    const configuredPrecision = getVariableOptions(
+      variable_id,
+      "decimalPrecision",
+    );
     const precision = configuredPrecision ? configuredPrecision : PRECISION;
     const modelInfo = {
       model_period: period,
@@ -62,26 +65,39 @@ export function parseBootstrapTableData(data, metadata) {
  * Doesn't use the hypsometric curve or the shape data, only scalars.
  */
 export function parseWatershedTableData(data, area) {
-    let avus = [];
-    // convert the WKT point from the API call to geoJSON
-    const point = WKTPointToGeoJSONPoint(area);
-    function prec(num) {return +num.toFixed(PRECISION)};
-    avus.push(["Outlet Longitude", point.coordinates[0], "Degrees East"]);
-    avus.push(["Outlet Latitude", point.coordinates[1], "Degrees North"]);
-    avus.push(["Source Elevation", prec(data.elevation.maximum), data.elevation.units]);
-    avus.push(["Outlet Elevation", prec(data.elevation.minimum), data.elevation.units]);
-    avus.push(["Area", prec(data.area.value), data.area.units]);
-    avus.push(["Melton Ratio", prec(data.melton_ratio.value), data.melton_ratio.units]);
+  let avus = [];
+  // convert the WKT point from the API call to geoJSON
+  const point = WKTPointToGeoJSONPoint(area);
+  function prec(num) {
+    return +num.toFixed(PRECISION);
+  }
+  avus.push(["Outlet Longitude", point.coordinates[0], "Degrees East"]);
+  avus.push(["Outlet Latitude", point.coordinates[1], "Degrees North"]);
+  avus.push([
+    "Source Elevation",
+    prec(data.elevation.maximum),
+    data.elevation.units,
+  ]);
+  avus.push([
+    "Outlet Elevation",
+    prec(data.elevation.minimum),
+    data.elevation.units,
+  ]);
+  avus.push(["Area", prec(data.area.value), data.area.units]);
+  avus.push([
+    "Melton Ratio",
+    prec(data.melton_ratio.value),
+    data.melton_ratio.units,
+  ]);
 
-    return _.map(avus, function (avu) {
-        return {
-            attribute: avu[0],
-            value: avu[1],
-            units: avu[2]
-        };
-    });
+  return _.map(avus, function (avu) {
+    return {
+      attribute: avu[0],
+      value: avu[1],
+      units: avu[2],
+    };
+  });
 }
-
 
 /*
  * Basic validation of data fetched from a "data" call to the climate
@@ -89,12 +105,12 @@ export function parseWatershedTableData(data, area) {
  * anything is missing, otherwise returns the object unaltered.
  */
 export function validateLongTermAverageData(response) {
-  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
-    throw new Error('Error: long term data unavailable for this model.');
+  if (_.isEmpty(response.data) || typeof response.data === "string") {
+    throw new Error("Error: long term data unavailable for this model.");
   }
   for (const run in response.data) {
-    if (!('data' in response.data[run]) || !('units' in response.data[run])) {
-      throw new Error('Error: long term data for this model is incomplete.');
+    if (!("data" in response.data[run]) || !("units" in response.data[run])) {
+      throw new Error("Error: long term data for this model is incomplete.");
     }
   }
   return response;
@@ -106,15 +122,19 @@ export function validateLongTermAverageData(response) {
  * any of the expected stats are missing, otherwise, returns the object unaltered.
  */
 export function validateStatsData(response) {
-  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
-    throw new Error('Error: statistical data unavailable for this model');
+  if (_.isEmpty(response.data) || typeof response.data === "string") {
+    throw new Error("Error: statistical data unavailable for this model");
   }
   for (const file in response.data) {
-    if (_.some('mean stdev min max median ncells'.split(' '),
-        attr => !(attr in response.data[file]) || isNaN(response.data[file][attr])) ||
-        _.some('units time'.split(' '),
-            attr => !(attr in response.data[file]))) {
-      throw new Error('Error: statistical data for this model is incomplete');
+    if (
+      _.some(
+        "mean stdev min max median ncells".split(" "),
+        (attr) =>
+          !(attr in response.data[file]) || isNaN(response.data[file][attr]),
+      ) ||
+      _.some("units time".split(" "), (attr) => !(attr in response.data[file]))
+    ) {
+      throw new Error("Error: statistical data for this model is incomplete");
     }
   }
   return response;
@@ -123,19 +143,19 @@ export function validateStatsData(response) {
 /*
  * Basic validation of data fetched from a "timeseries" call to the climate
  * explorer API. Accepts an axios response object, throws an error if
- * any expected data is missing, or if the time resolution isn't monthly, 
+ * any expected data is missing, or if the time resolution isn't monthly,
  * seasonal, or yearly. Otherwise returns the axios response object unaltered.
  */
 export function validateAnnualCycleData(response) {
-  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
-    throw new Error('Error: timeseries data is unavailable for this model.');
+  if (_.isEmpty(response.data) || typeof response.data === "string") {
+    throw new Error("Error: timeseries data is unavailable for this model.");
   }
-  if (!_.every('id units data'.split(' '), attr => attr in response.data)) {
-    throw new Error('Error: timeseries data for this model is incomplete');
+  if (!_.every("id units data".split(" "), (attr) => attr in response.data)) {
+    throw new Error("Error: timeseries data for this model is incomplete");
   }
   const resolution = Object.keys(response.data.data).length;
   if ([1, 4, 12].indexOf(resolution) === -1) {
-    throw new Error('Error: unrecognized time resolution for timeseries');
+    throw new Error("Error: unrecognized time resolution for timeseries");
   }
   return response;
 }
@@ -146,18 +166,17 @@ export function validateAnnualCycleData(response) {
  * sure it has id, units, and at least one timestamp.
  */
 export function validateUnstructuredTimeseriesData(response) {
-  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
-    throw new Error('Error: timeseries data is unavailable for this model.');
+  if (_.isEmpty(response.data) || typeof response.data === "string") {
+    throw new Error("Error: timeseries data is unavailable for this model.");
   }
-  if (!_.every('id units data'.split(' '), attr => attr in response.data)) {
-    throw new Error('Error: timeseries data for this model is incomplete');
+  if (!_.every("id units data".split(" "), (attr) => attr in response.data)) {
+    throw new Error("Error: timeseries data for this model is incomplete");
   }
   if (_.isEmpty(response.data.data)) {
-    throw new Error('Error: no timestamps available for time series');
+    throw new Error("Error: no timestamps available for time series");
   }
   return response;
 }
-
 
 /*
  * Basic validation of data fetched from a "watershed" call to the climate
@@ -165,16 +184,19 @@ export function validateUnstructuredTimeseriesData(response) {
  * anything is missing, otherwise returns the object unaltered.
  */
 export function validateWatershedData(response) {
-  if (_.isEmpty(response.data) || (typeof response.data === 'string')) {
-    throw new Error('Error: watershed information unavailable for this point.');
+  if (_.isEmpty(response.data) || typeof response.data === "string") {
+    throw new Error("Error: watershed information unavailable for this point.");
   }
-  if (!_.every('area elevation boundary hypsometric_curve melton_ratio'.split(' '),
-        attr => attr in response.data)) {
-    throw new Error('Error: watershed data for this point is incomplete');
+  if (
+    !_.every(
+      "area elevation boundary hypsometric_curve melton_ratio".split(" "),
+      (attr) => attr in response.data,
+    )
+  ) {
+    throw new Error("Error: watershed data for this point is incomplete");
   }
   return response;
 }
-
 
 /*
  * Get an option defined in the variable options yaml config file.
@@ -186,7 +208,7 @@ export function validateWatershedData(response) {
  * Returns the option value, or "undefined" if the variable or option
  * is not listed.
  *
- * NOTE: A variable option can legitimately have a value of "false", 
+ * NOTE: A variable option can legitimately have a value of "false",
  * so callers of this function may need to distinguish between "false"
  * and "undefined" when acting on its results.
  *
@@ -223,9 +245,9 @@ let variableOptionsPromise;
 export function loadVariableOptions() {
   if (!variableOptionsPromise) {
     variableOptionsPromise = httpGetVariableOptions()
-      .then(response => response.data)
+      .then((response) => response.data)
       .then(yaml.safeLoad)
-      .then(result => {
+      .then((result) => {
         variableOptions = result;
         return result;
       });
@@ -257,10 +279,13 @@ export function getVariableOptions(variable, option) {
  */
 export function getDataUnits(data, variable_id) {
   const units = data.units;
-  const userFriendlyUnits = getVariableOptions(variable_id, "userFriendlyUnits");
-  if(userFriendlyUnits) {
-    for(let i = 0; i < userFriendlyUnits.length; i++) {
-      if(units in userFriendlyUnits[i]) {
+  const userFriendlyUnits = getVariableOptions(
+    variable_id,
+    "userFriendlyUnits",
+  );
+  if (userFriendlyUnits) {
+    for (let i = 0; i < userFriendlyUnits.length; i++) {
+      if (units in userFriendlyUnits[i]) {
         return userFriendlyUnits[i][units];
       }
     }
@@ -270,25 +295,38 @@ export function getDataUnits(data, variable_id) {
 
 /************************************************************
  * Metadata helper functions
-************************************************************/
+ ************************************************************/
 
 export const valuesWithin = (tolerance, a, b) => Math.abs(+a - +b) <= tolerance;
 
 export const findMatchingMetadata = (
-  metadata, tolerance,
-  { model_id, experiment, variable_id, timescale,
-    start_date, end_date, ensemble_member },
+  metadata,
+  tolerance,
+  {
+    model_id,
+    experiment,
+    variable_id,
+    timescale,
+    start_date,
+    end_date,
+    ensemble_member,
+  },
 ) =>
-  _.find(metadata, metadatum =>
-    // Match exactly on these parameters
-    _.matches(
-      { model_id, experiment, variable_id, timescale, ensemble_member }
-    )(metadatum) &&
-    // Match within `tolerance` on start and end date
-    valuesWithin(tolerance, start_date, metadatum.start_date) &&
-    valuesWithin(tolerance, end_date, metadatum.end_date)
+  _.find(
+    metadata,
+    (metadatum) =>
+      // Match exactly on these parameters
+      _.matches({
+        model_id,
+        experiment,
+        variable_id,
+        timescale,
+        ensemble_member,
+      })(metadatum) &&
+      // Match within `tolerance` on start and end date
+      valuesWithin(tolerance, start_date, metadatum.start_date) &&
+      valuesWithin(tolerance, end_date, metadatum.end_date),
   );
-
 
 /************************************************************
  * Date and calendar helper functions
@@ -320,34 +358,48 @@ export const findMatchingMetadata = (
  */
 export function timeKeyToTimeOfYear(timeidx) {
   const timesOfYear = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-    'Winter-DJF', 'Spring-MAM', 'Summer-JJA', 'Fall-SON', 'Annual',
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+    "Winter-DJF",
+    "Spring-MAM",
+    "Summer-JJA",
+    "Fall-SON",
+    "Annual",
   ];
   return timesOfYear[timeidx];
 }
 
 /*
  * Helper Function for the TimeOfYearSelector component and its controllers.
- * Converts the numerical time key generated by TimeOfYearSelector to an object 
+ * Converts the numerical time key generated by TimeOfYearSelector to an object
  * containing an index (0-11) and a resolution (yearly, seasonal, or monthly).
  *   January would be {timescale: monthly, index: 1}
  *   Summer would be {timescale: seasonal, index:2}
  */
 export function timeKeyToResolutionIndex(index) {
   if (index === 16) {
-    return { timescale: 'yearly', timeidx: 0 };
+    return { timescale: "yearly", timeidx: 0 };
   } else if (index > 11 && index < 16) {
-    return { timescale: 'seasonal', timeidx: index - 12 };
+    return { timescale: "seasonal", timeidx: index - 12 };
   } else if (index >= 0 && index < 12) {
-    return { timescale: 'monthly', timeidx: index };
+    return { timescale: "monthly", timeidx: index };
   }
   return undefined;
 }
 
 /*
  * Helper function for the TimeOfYearSelector component and its controllers.
- * Encodes an object containing an index (0-11) and a resolution (yearly, 
+ * Encodes an object containing an index (0-11) and a resolution (yearly,
  * seasonal, or monthly) as a numerical key for TimeOfYearSelector.
  */
 export function resolutionIndexToTimeKey(res, idx) {
@@ -363,11 +415,21 @@ export function resolutionIndexToTimeKey(res, idx) {
 export function timeResolutionIndexToTimeOfYear(res, idx) {
   const timesOfYear = {
     monthly: [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ],
-    seasonal: ['Winter-DJF', 'Spring-MAM', 'Summer-JJA', 'Fall-SON'],
-    yearly: ['Annual'],
+    seasonal: ["Winter-DJF", "Spring-MAM", "Summer-JJA", "Fall-SON"],
+    yearly: ["Annual"],
   };
   if (res in timesOfYear && idx in timesOfYear[res]) {
     return timesOfYear[res][idx];
@@ -381,21 +443,21 @@ export function timeResolutions(meta) {
   // return an object containing flags indicating whether each of the
   // 3 standard timescales are present in the datasets described by
   // the metadata.
-  const timescales = _.map(meta, 'timescale');
+  const timescales = _.map(meta, "timescale");
   return {
-    monthly: _.includes(timescales, 'monthly'),
-    seasonal: _.includes(timescales, 'seasonal'),
-    yearly: _.includes(timescales, 'yearly'),
+    monthly: _.includes(timescales, "monthly"),
+    seasonal: _.includes(timescales, "seasonal"),
+    yearly: _.includes(timescales, "yearly"),
   };
 }
 
 /*
- * extendedDateToBasicDate: converts an ISO8601 extended-formatted date 
- * (like "1997-01-15T00:00:00Z") to an ISO8601 basic-formatted date 
+ * extendedDateToBasicDate: converts an ISO8601 extended-formatted date
+ * (like "1997-01-15T00:00:00Z") to an ISO8601 basic-formatted date
  * (like "1997-01-15")
  */
 export function extendedDateToBasicDate(timestamp) {
-  return moment(timestamp, moment.ISO_8601).utc().format('YYYY-MM-DD');
+  return moment(timestamp, moment.ISO_8601).utc().format("YYYY-MM-DD");
 }
 
 /*
@@ -403,32 +465,34 @@ export function extendedDateToBasicDate(timestamp) {
  * Used by MapController, since ncWMS doesn't provide any human-friendly time info.
  */
 export function timestampToTimeOfYear(
-  timestamp, resolution='monthly', disambiguateYear = true
+  timestamp,
+  resolution = "monthly",
+  disambiguateYear = true,
 ) {
-  const year = disambiguateYear ? ' '.concat(timestampToYear(timestamp)) : '';
-  const month = moment(timestamp, moment.ISO_8601).utc().format('MMMM');
-  
-  if (resolution === 'yearly') {
+  const year = disambiguateYear ? " ".concat(timestampToYear(timestamp)) : "";
+  const month = moment(timestamp, moment.ISO_8601).utc().format("MMMM");
+
+  if (resolution === "yearly") {
     return `Annual${year}`;
-  } else if (resolution === 'monthly') {
+  } else if (resolution === "monthly") {
     return `${month}${year}`;
-  } else if (resolution === 'seasonal') {
+  } else if (resolution === "seasonal") {
     switch (month) {
-      case 'December':
-      case 'January':
-      case 'February':
+      case "December":
+      case "January":
+      case "February":
         return `Winter-DJF${year}`;
-      case 'March':
-      case 'April':
-      case 'May':
+      case "March":
+      case "April":
+      case "May":
         return `Spring-MAM${year}`;
-      case 'June':
-      case 'July':
-      case 'August':
+      case "June":
+      case "July":
+      case "August":
         return `Summer-JJA${year}`;
-      case 'September':
-      case 'October':
-      case 'November':
+      case "September":
+      case "October":
+      case "November":
         return `Fall-SON${year}`;
       default:
         return timestamp;
@@ -442,12 +506,11 @@ export function timestampToTimeOfYear(
  * extract the four digit year from an ISO 8601 timestamp
  */
 export function timestampToYear(date) {
-  return moment(date, moment.ISO_8601).utc().format('YYYY');
+  return moment(date, moment.ISO_8601).utc().format("YYYY");
 }
 
-
 /*
- * Predicate that calculates whether two dates are the same calendar year. 
+ * Predicate that calculates whether two dates are the same calendar year.
  * (Not whether they're 365 days apart.)
  */
 export function sameYear(date1, date2) {
@@ -463,7 +526,7 @@ export function sameYear(date1, date2) {
  * "a 1st string" -> "A 1st String"
  */
 export function capitalizeWords(s) {
-  return s.replace(/\b\w/g, c => c.toUpperCase());
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /*
@@ -503,14 +566,14 @@ export function nestedAttributeIsDefined(o, ...attributes) {
 // There are libraries that do this sort of thing, but right now,
 // this is the only such conversion we need.
 export function WKTPointToGeoJSONPoint(wkt) {
-    const elements = _.split(wkt, ' ');
-    if(elements[0] != 'POINT') {
-        throw new Error(`Invalid WKT Point: ${wkt}`);
-    }
-    const lon = parseFloat(_.trim(elements[1], '()'));
-    const lat = parseFloat(_.trim(elements[2], '()'));
-    return {
-        type: "Point",
-        coordinates: [lon, lat]
-    };
+  const elements = _.split(wkt, " ");
+  if (elements[0] !== "POINT") {
+    throw new Error(`Invalid WKT Point: ${wkt}`);
+  }
+  const lon = parseFloat(_.trim(elements[1], "()"));
+  const lat = parseFloat(_.trim(elements[2], "()"));
+  return {
+    type: "Point",
+    coordinates: [lon, lat],
+  };
 }

@@ -1,12 +1,14 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import { WMSTileLayer } from 'react-leaflet';
+import { WMSTileLayer } from "react-leaflet";
 import {
-  getIsolineWMSParams, getRasterWMSParams, getAnnotatedWMSParams,
-} from '../../data-services/ncwms';
-import _ from 'lodash';
-import { layerParamsPropTypes } from '../../types/types.js';
+  getIsolineWMSParams,
+  getRasterWMSParams,
+  getAnnotatedWMSParams,
+} from "../../data-services/ncwms";
+import _ from "lodash";
+import { layerParamsPropTypes } from "../../types/types.js";
 
 export default class DataLayer extends React.Component {
   static propTypes = {
@@ -24,9 +26,7 @@ export default class DataLayer extends React.Component {
   }
 
   render() {
-    const {
-      onLayerRef, layerType, layerParams,
-    } = this.props;
+    const { onLayerRef, layerType, layerParams } = this.props;
 
     // TODO: This dispatcher belongs in data-services/ncwms
     const wmsParams = {

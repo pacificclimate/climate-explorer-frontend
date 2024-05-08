@@ -1,56 +1,57 @@
 /************************************************************************
  * DualAppController.js - Two-variable application controller
- * 
- * This controller represents a portal that allows the user to compare 
+ *
+ * This controller represents a portal that allows the user to compare
  * and display two variables at once. It has dropdowns to select a model,
- * experiment, and two seperate variables. 
- * 
+ * experiment, and two seperate variables.
+ *
  * Its children are DualDataController, which coordinates graphs comparing
  * the two selected variables, and DualMapController, which coordinates a map
  * displaying one variable as scalar colours and the other as isolines.
- * 
+ *
  * The main variable is internally referred to as "variable," the variable
- * being compared to it is internally referred to as "comparand." 
- * Timestamps and available datasets are based on what's available for 
- * the main variable; if the user selects parameters for which the 
+ * being compared to it is internally referred to as "comparand."
+ * Timestamps and available datasets are based on what's available for
+ * the main variable; if the user selects parameters for which the
  * comparand lacks data, it won't be displayed.
  ************************************************************************/
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Grid, Row, Col, Panel, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Grid, Row, Col, Panel, ControlLabel } from "react-bootstrap";
 
-import DualDataController from '../../data-controllers/DualDataController/DualDataController';
+import DualDataController from "../../data-controllers/DualDataController/DualDataController";
 import {
   modelSelectorLabel,
   emissionScenarioSelectorLabel,
   variable1SelectorLabel,
   variable2SelectorLabel,
   datasetFilterPanelLabel,
-} from '../../guidance-content/info/InformationItems';
+} from "../../guidance-content/info/InformationItems";
 
-import g from '../../../core/geo';
-import DualMapController from '../../map-controllers/DualMapController';
-import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import FilteredDatasetsSummary from '../../data-presentation/FilteredDatasetsSummary';
+import g from "../../../core/geo";
+import DualMapController from "../../map-controllers/DualMapController";
+import { FullWidthCol, HalfWidthCol } from "../../layout/rb-derived-components";
+import FilteredDatasetsSummary from "../../data-presentation/FilteredDatasetsSummary";
 
-import FlowArrow from '../../data-presentation/FlowArrow';
-import UnfilteredDatasetsSummary from '../../data-presentation/UnfilteredDatasetsSummary';
+import FlowArrow from "../../data-presentation/FlowArrow";
+import UnfilteredDatasetsSummary from "../../data-presentation/UnfilteredDatasetsSummary";
 import {
   EmissionsScenarioSelector,
-  ModelSelector, VariableSelector
-} from 'pcic-react-components';
-import { getMetadata } from '../../../data-services/ce-backend';
+  ModelSelector,
+  VariableSelector,
+} from "pcic-react-components";
+import { ensemble_name } from "../common";
+import { setNamedState } from "../../../core/react-component-utils";
+import withAsyncMetadata from "../../../HOCs/withAsyncMetadata";
 import {
-  ensemble_name,
-} from '../common';
-import { setNamedState } from '../../../core/react-component-utils';
-import withAsyncMetadata from '../../../HOCs/withAsyncMetadata';
-import {
-  findModelNamed, findScenarioIncluding, findVariableMatching,
-  representativeValue, constraintsFor, filterMetaBy,
-} from '../../../core/selectors';
-
+  findModelNamed,
+  findScenarioIncluding,
+  findVariableMatching,
+  representativeValue,
+  constraintsFor,
+  filterMetaBy,
+} from "../../../core/selectors";
 
 class DualAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
@@ -73,9 +74,9 @@ class DualAppControllerDisplay extends React.Component {
     meta: PropTypes.array,
   };
 
-  replaceInvalidModel = findModelNamed('PCIC12');
-  replaceInvalidScenario = findScenarioIncluding('rcp85');
-  replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
+  replaceInvalidModel = findModelNamed("PCIC12");
+  replaceInvalidScenario = findScenarioIncluding("rcp85");
+  replaceInvalidVariable = findVariableMatching((opt) => !opt.isDisabled);
 
   representativeValue = (...args) => representativeValue(...args)(this.props);
   constraintsFor = (...args) => constraintsFor(...args)(this.props);
@@ -83,15 +84,21 @@ class DualAppControllerDisplay extends React.Component {
     filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    const filteredMetaVariable =
-      this.filterMetaBy('model', 'scenario', 'variable');
-    const filteredMetaComparand =
-      this.filterMetaBy('model', 'scenario', 'comparand');
+    const filteredMetaVariable = this.filterMetaBy(
+      "model",
+      "scenario",
+      "variable",
+    );
+    const filteredMetaComparand = this.filterMetaBy(
+      "model",
+      "scenario",
+      "comparand",
+    );
 
-    const model_id = this.representativeValue('model', 'model_id');
-    const experiment = this.representativeValue('scenario', 'experiment');
-    const variable_id = this.representativeValue('variable', 'variable_id');
-    const comparand_id = this.representativeValue('comparand', 'variable_id');
+    const model_id = this.representativeValue("model", "model_id");
+    const experiment = this.representativeValue("scenario", "experiment");
+    const variable_id = this.representativeValue("variable", "variable_id");
+    const comparand_id = this.representativeValue("comparand", "variable_id");
 
     return (
       <Grid fluid>
@@ -128,7 +135,7 @@ class DualAppControllerDisplay extends React.Component {
                     <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
                     <EmissionsScenarioSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model')}
+                      constraint={this.constraintsFor("model")}
                       value={this.props.scenario}
                       onChange={this.props.onChangeScenario}
                       replaceInvalidValue={this.replaceInvalidScenario}
@@ -138,7 +145,7 @@ class DualAppControllerDisplay extends React.Component {
                     <ControlLabel>{variable1SelectorLabel}</ControlLabel>
                     <VariableSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model', 'scenario')}
+                      constraint={this.constraintsFor("model", "scenario")}
                       value={this.props.variable}
                       onChange={this.props.onChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
@@ -148,7 +155,7 @@ class DualAppControllerDisplay extends React.Component {
                     <ControlLabel>{variable2SelectorLabel}</ControlLabel>
                     <VariableSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model', 'scenario')}
+                      constraint={this.constraintsFor("model", "scenario")}
                       value={this.props.comparand}
                       onChange={this.props.onChangeComparand}
                       replaceInvalidValue={this.replaceInvalidVariable}
@@ -212,9 +219,9 @@ class DualAppControllerDisplay extends React.Component {
               comparand_id={comparand_id}
               comparandMeta={
                 // TODO: Is this conditional necessary?
-                this.props.comparand ?
-                  filteredMetaComparand :
-                  filteredMetaVariable
+                this.props.comparand
+                  ? filteredMetaComparand
+                  : filteredMetaVariable
               }
               area={g.geojson(this.props.area).toWKT()}
             />
@@ -225,10 +232,8 @@ class DualAppControllerDisplay extends React.Component {
   }
 }
 
-
 // Inject asynchronously fetched metadata into controlled component.
 const WmdDualAppControllerDisplay = withAsyncMetadata(DualAppControllerDisplay);
-
 
 export default class DualAppController extends React.Component {
   // This manages the state of selectors and renders the display component.
@@ -238,15 +243,15 @@ export default class DualAppController extends React.Component {
     scenario: undefined,
     variable: undefined,
     comparand: undefined,
-    area: undefined,  // geojson object
+    area: undefined, // geojson object
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleChangeArea = setNamedState(this, 'area');
-  handleChangeModel = setNamedState(this, 'model');
-  handleChangeScenario = setNamedState(this, 'scenario');
-  handleChangeVariable = setNamedState(this, 'variable');
-  handleChangeComparand = setNamedState(this, 'comparand');
+  handleChangeArea = setNamedState(this, "area");
+  handleChangeModel = setNamedState(this, "model");
+  handleChangeScenario = setNamedState(this, "scenario");
+  handleChangeVariable = setNamedState(this, "variable");
+  handleChangeComparand = setNamedState(this, "comparand");
 
   render() {
     return (

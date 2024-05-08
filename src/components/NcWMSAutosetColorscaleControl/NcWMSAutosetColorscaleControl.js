@@ -1,8 +1,6 @@
-import React from 'react';  // Necessary?
+import { MapControl, withLeaflet } from "react-leaflet";
 
-import { MapControl, withLeaflet } from 'react-leaflet';
-
-import LeafletNcWMSAutosetColorscaleControl from './LeafletNcWMSAutosetColorscaleControl';
+import LeafletNcWMSAutosetColorscaleControl from "./LeafletNcWMSAutosetColorscaleControl";
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 class NcWMSAutosetColorscaleControl extends MapControl {

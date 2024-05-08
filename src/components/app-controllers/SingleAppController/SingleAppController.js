@@ -1,51 +1,49 @@
 /***************************************************************
- * SingleAppController.js 
- * 
+ * SingleAppController.js
+ *
  * This controller represents climate explorer's main portal. It
  * has dropdowns to allow a user to select a model, emission
- * scenario, and variable. It loads and filters metadata for 
- * the selected datasets and passes them to its children:  
- * - SingleMapController (displays a variable as a colour-shaded map) 
+ * scenario, and variable. It loads and filters metadata for
+ * the selected datasets and passes them to its children:
+ * - SingleMapController (displays a variable as a colour-shaded map)
  * - SingleDataController (displays graphs and a statistical table).
  ***************************************************************/
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Col, ControlLabel, Grid, Panel, Row } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Col, ControlLabel, Grid, Panel, Row } from "react-bootstrap";
 
-import SingleMapController from '../../map-controllers/SingleMapController';
-import SingleDataController
-  from '../../data-controllers/SingleDataController/SingleDataController';
+import SingleMapController from "../../map-controllers/SingleMapController";
+import SingleDataController from "../../data-controllers/SingleDataController/SingleDataController";
 import {
   EmissionsScenarioSelector,
   ModelSelector,
   VariableSelector,
-} from 'pcic-react-components';
+} from "pcic-react-components";
 import {
   datasetFilterPanelLabel,
   emissionScenarioSelectorLabel,
   modelSelectorLabel,
   variableSelectorLabel,
-} from '../../guidance-content/info/InformationItems';
+} from "../../guidance-content/info/InformationItems";
 
-import g from '../../../core/geo';
-import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import FilteredDatasetsSummary
-  from '../../data-presentation/FilteredDatasetsSummary';
-import FlowArrow from '../../data-presentation/FlowArrow';
-import UnfilteredDatasetsSummary
-  from '../../data-presentation/UnfilteredDatasetsSummary';
+import g from "../../../core/geo";
+import { FullWidthCol, HalfWidthCol } from "../../layout/rb-derived-components";
+import FilteredDatasetsSummary from "../../data-presentation/FilteredDatasetsSummary";
+import FlowArrow from "../../data-presentation/FlowArrow";
+import UnfilteredDatasetsSummary from "../../data-presentation/UnfilteredDatasetsSummary";
 
+import { ensemble_name } from "../common";
+import { setNamedState } from "../../../core/react-component-utils";
+import withAsyncMetadata from "../../../HOCs/withAsyncMetadata";
 import {
-  ensemble_name,
-} from '../common';
-import { setNamedState } from '../../../core/react-component-utils';
-import withAsyncMetadata from '../../../HOCs/withAsyncMetadata'
-import {
-  findModelNamed, findScenarioIncluding, findVariableMatching,
-  representativeValue, constraintsFor, filterMetaBy,
-} from '../../../core/selectors';
-
+  findModelNamed,
+  findScenarioIncluding,
+  findVariableMatching,
+  representativeValue,
+  constraintsFor,
+  filterMetaBy,
+} from "../../../core/selectors";
 
 class SingleAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
@@ -66,9 +64,9 @@ class SingleAppControllerDisplay extends React.Component {
     meta: PropTypes.array,
   };
 
-  replaceInvalidModel = findModelNamed('PCIC12');
-  replaceInvalidScenario = findScenarioIncluding('rcp85');
-  replaceInvalidVariable = findVariableMatching(opt => !opt.isDisabled);
+  replaceInvalidModel = findModelNamed("PCIC12");
+  replaceInvalidScenario = findScenarioIncluding("rcp85");
+  replaceInvalidVariable = findVariableMatching((opt) => !opt.isDisabled);
 
   representativeValue = (...args) => representativeValue(...args)(this.props);
   constraintsFor = (...args) => constraintsFor(...args)(this.props);
@@ -76,12 +74,12 @@ class SingleAppControllerDisplay extends React.Component {
     filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    const filteredMeta = this.filterMetaBy('model', 'scenario', 'variable');
-    const modelContextMetadata = this.filterMetaBy('scenario', 'variable');
+    const filteredMeta = this.filterMetaBy("model", "scenario", "variable");
+    const modelContextMetadata = this.filterMetaBy("scenario", "variable");
 
-    const model_id = this.representativeValue('model', 'model_id');
-    const experiment = this.representativeValue('scenario', 'experiment');
-    const variable_id = this.representativeValue('variable', 'variable_id');
+    const model_id = this.representativeValue("model", "model_id");
+    const experiment = this.representativeValue("scenario", "experiment");
+    const variable_id = this.representativeValue("variable", "variable_id");
 
     return (
       <Grid fluid>
@@ -118,7 +116,7 @@ class SingleAppControllerDisplay extends React.Component {
                     <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
                     <EmissionsScenarioSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model')}
+                      constraint={this.constraintsFor("model")}
                       value={this.props.scenario}
                       onChange={this.props.onChangeScenario}
                       replaceInvalidValue={this.replaceInvalidScenario}
@@ -128,7 +126,7 @@ class SingleAppControllerDisplay extends React.Component {
                     <ControlLabel>{variableSelectorLabel}</ControlLabel>
                     <VariableSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model', 'scenario')}
+                      constraint={this.constraintsFor("model", "scenario")}
                       value={this.props.variable}
                       onChange={this.props.onChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
@@ -152,7 +150,7 @@ class SingleAppControllerDisplay extends React.Component {
               model_id={model_id}
               experiment={experiment}
               variable_id={variable_id}
-              meta = {filteredMeta}
+              meta={filteredMeta}
             />
           </FullWidthCol>
         </Row>
@@ -172,7 +170,7 @@ class SingleAppControllerDisplay extends React.Component {
               model_id={model_id}
               experiment={experiment}
               variable_id={variable_id}
-              meta = {filteredMeta}
+              meta={filteredMeta}
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
               pointSelect={false}
@@ -185,7 +183,7 @@ class SingleAppControllerDisplay extends React.Component {
               variable_id={variable_id}
               experiment={experiment}
               area={g.geojson(this.props.area).toWKT()}
-              meta = {filteredMeta}
+              meta={filteredMeta}
               contextMeta={modelContextMetadata} //to generate Model Context graph
             />
           </HalfWidthCol>
@@ -195,10 +193,10 @@ class SingleAppControllerDisplay extends React.Component {
   }
 }
 
-
 // Inject asynchronously fetched metadata into controlled component.
-const WmdSingleAppControllerDisplay = withAsyncMetadata(SingleAppControllerDisplay);
-
+const WmdSingleAppControllerDisplay = withAsyncMetadata(
+  SingleAppControllerDisplay,
+);
 
 export default class SingleAppController extends React.Component {
   // This manages the state of selectors and renders the display component.
@@ -207,14 +205,14 @@ export default class SingleAppController extends React.Component {
     model: undefined,
     scenario: undefined,
     variable: undefined,
-    area: undefined,  // geojson object
+    area: undefined, // geojson object
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleChangeArea = setNamedState(this, 'area');
-  handleChangeModel = setNamedState(this, 'model');
-  handleChangeScenario = setNamedState(this, 'scenario');
-  handleChangeVariable = setNamedState(this, 'variable');
+  handleChangeArea = setNamedState(this, "area");
+  handleChangeModel = setNamedState(this, "model");
+  handleChangeScenario = setNamedState(this, "scenario");
+  handleChangeVariable = setNamedState(this, "variable");
 
   render() {
     return (

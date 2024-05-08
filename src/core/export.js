@@ -1,21 +1,21 @@
 /*******************************************************************
  * export.js - functions for writing data to a CSV or XLSX file
- * 
- * The main function in this file is exportDataToWorksheet; the 
- * other functions are helper functions that create pieces 
- * (headers, data) of the exported file. 
- * 
+ *
+ * The main function in this file is exportDataToWorksheet; the
+ * other functions are helper functions that create pieces
+ * (headers, data) of the exported file.
+ *
  * Built around the js-xlsx library
  *******************************************************************/
 
-import _ from 'lodash';
-import XLSX from 'xlsx/xlsx.js';
-import * as filesaver from 'filesaver.js';
-import axios from 'axios';
-import urljoin from 'url-join';
-import { timeResolutionIndexToTimeOfYear,
-         PRECISION,
-         getVariableOptions} from './util';
+import _ from "lodash";
+import XLSX from "xlsx/xlsx.js";
+import * as filesaver from "filesaver.js";
+import {
+  timeResolutionIndexToTimeOfYear,
+  PRECISION,
+  getVariableOptions,
+} from "./util";
 
 /************************************************************
  * 0. exportDataToWorksheet() - the main export function
@@ -26,55 +26,69 @@ import { timeResolutionIndexToTimeOfYear,
  * Long Term Average graph, along with contextual data from user input, creates
  * an XLSX or CSV file, and serves it to the user for download. Draws on example
  * code from js-xlsx docs: https://github.com/SheetJS/js-xlsx
- * 
+ *
  * Arguments:
  * datatype: a string, either "timeseries", "stats", or "climoseries"
- * metadata: object with the attributes used to generate the data being 
+ * metadata: object with the attributes used to generate the data being
  *     exported: model, emissions scenario, variables(s)
  * data: either a data table or a graph data object
  * format: string indicating file format: "csv" or "xlsx"
- * selection: object indicating which slice of data being exported, either 
- *     1. a specific climatology and run (for an annual cycle graph)  
+ * selection: object indicating which slice of data being exported, either
+ *     1. a specific climatology and run (for an annual cycle graph)
  *     2. time of year (for stats or change graph)
  */
-var exportDataToWorksheet = function(datatype, metadata, data, format, selection) {
+var exportDataToWorksheet = function (
+  datatype,
+  metadata,
+  data,
+  format,
+  selection,
+) {
   // create workbook object containing one or more worksheets
   var wb = {
-      Sheets: {},
-      SheetNames: []
+    Sheets: {},
+    SheetNames: [],
   };
 
   var timeOfYear = "";
   var variable = metadata.variable_id;
-  
+
   // prepare filename, metadata cells, and data cells according to type of export
   var summaryCells, dataCells, outputFilename;
   var filenamePrefix = "PCIC_CE_";
   var filenameInfix = `Export_${metadata.model_id}_${metadata.experiment}_${variable}`;
   var filenameSuffix = "." + format;
-  switch(datatype) {
+  switch (datatype) {
     case "timeseries":
       summaryCells = createTimeseriesWorksheetSummaryCells(metadata, selection);
       dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}Timeseries${filenameInfix}${filenameSuffix}`;
       break;
     case "stats":
-      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timescale, selection.timeidx);
+      timeOfYear = timeResolutionIndexToTimeOfYear(
+        selection.timescale,
+        selection.timeidx,
+      );
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromDataTable(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}StatsTable${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "climoseries":
-      timeOfYear = timeResolutionIndexToTimeOfYear(selection.timescale, selection.timeidx);
+      timeOfYear = timeResolutionIndexToTimeOfYear(
+        selection.timescale,
+        selection.timeidx,
+      );
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Run", variable);
       outputFilename = `${filenamePrefix}LongTermAverage${filenameInfix}_${timeOfYear}${filenameSuffix}`;
       break;
     case "raw_timeseries":
-      timeOfYear = 'Annual';
+      timeOfYear = "Annual";
       summaryCells = createWorksheetSummaryCells(metadata, timeOfYear);
       dataCells = generateDataCellsFromC3Graph(data, "Time Series", variable);
       outputFilename = `${filenamePrefix}RawTimeseries${filenameInfix}_${timeOfYear}${filenameSuffix}`;
+      break;
+    default:
       break;
   }
 
@@ -92,7 +106,7 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
     var buf = new ArrayBuffer(s.length);
     var view = new Uint8Array(buf);
     for (var i = 0; i <= s.length; ++i) {
-      view[i] = s.charCodeAt(i) & 0xFF;
+      view[i] = s.charCodeAt(i) & 0xff;
     }
     return buf;
   }
@@ -100,19 +114,19 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
   // format workbook for either csv or xlsx
   var out_data;
   switch (format) {
-    case 'csv':
-      out_data = new Blob(
-        [XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])],
-        { type:'' }
-      );
+    case "csv":
+      out_data = new Blob([XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])], {
+        type: "",
+      });
       break;
 
-    case 'xlsx':
-      var wbout = XLSX.write(wb, { bookType:'xlsx', bookSST:false, type: 'binary'});
-      out_data = new Blob(
-        [xml_to_binary_string(wbout)],
-        { type:'' }
-      );
+    case "xlsx":
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: false,
+        type: "binary",
+      });
+      out_data = new Blob([xml_to_binary_string(wbout)], { type: "" });
       break;
 
     default:
@@ -124,8 +138,8 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
 };
 
 /*********************************************************
- * 1. summary-generating functions that create cells 
- * containing the metadata needed to describe the exported 
+ * 1. summary-generating functions that create cells
+ * containing the metadata needed to describe the exported
  * data
  *********************************************************/
 
@@ -136,28 +150,32 @@ var exportDataToWorksheet = function(datatype, metadata, data, format, selection
  * https://github.com/SheetJS/js-xlsx
  */
 var createWorksheetSummaryCells = function (metadata, timeOfYear) {
-
   var rows = [];
 
-  var header = ['Model', 'Emissions Scenario', 'Time of Year', 'Variable ID', 'Variable Name'];  
-  
+  var header = [
+    "Model",
+    "Emissions Scenario",
+    "Time of Year",
+    "Variable ID",
+    "Variable Name",
+  ];
+
   var values = [
     metadata.model_id,
     metadata.experiment,
     timeOfYear,
     metadata.variable_id,
-    metadata.meta[0].variable_name
+    metadata.meta[0].variable_name,
   ];
-  
+
   //provide metadata for a second variable, if one is in use.
-  if(metadata.comparand_id && 
-     metadata.comparand_id != metadata.variable_id) {
-    header.push('Comparand ID');
-    header.push('Comparand Name');
+  if (metadata.comparand_id && metadata.comparand_id !== metadata.variable_id) {
+    header.push("Comparand ID");
+    header.push("Comparand Name");
     values.push(metadata.comparand_id);
     values.push(metadata.comparandMeta[0].variable_name);
   }
-  
+
   rows.push(header);
   rows.push(values);
 
@@ -169,9 +187,15 @@ var createWorksheetSummaryCells = function (metadata, timeOfYear) {
  * cells for export of Annual Cycle data.
  */
 var createTimeseriesWorksheetSummaryCells = function (metadata, dataSpec) {
-
   var rows = [];
-  var header = ['Model', 'Emissions Scenario','Period', 'Run', 'Variable ID', 'Variable Name'];
+  var header = [
+    "Model",
+    "Emissions Scenario",
+    "Period",
+    "Run",
+    "Variable ID",
+    "Variable Name",
+  ];
 
   var values = [
     metadata.model_id,
@@ -179,21 +203,20 @@ var createTimeseriesWorksheetSummaryCells = function (metadata, dataSpec) {
     `${dataSpec.start_date}-${dataSpec.end_date}`,
     dataSpec.ensemble_member,
     metadata.variable_id,
-    metadata.meta[0].variable_name
+    metadata.meta[0].variable_name,
   ];
-  
+
   //provide metadata for a second variable, if one is in use.
-  if(metadata.comparand_id && 
-     metadata.comparand_id != metadata.variable_id) {
-    header.push('Comparand ID');
-    header.push('Comparand Name');
+  if (metadata.comparand_id && metadata.comparand_id !== metadata.variable_id) {
+    header.push("Comparand ID");
+    header.push("Comparand Name");
     values.push(metadata.comparand_id);
     values.push(metadata.comparandMeta[0].variable_name);
   }
 
   rows.push(header);
   rows.push(values);
-  
+
   return rows;
 };
 
@@ -202,19 +225,35 @@ var createTimeseriesWorksheetSummaryCells = function (metadata, dataSpec) {
  * the requested data for export
  ************************************************************/
 
-
 /*
  * Helper function for exportDataToWorksheet, creates data column headers and
  * data entries for exported worksheet Draws on example code from js-xlsx docs:
  * https://github.com/SheetJS/js-xlsx
  */
 var generateDataCellsFromDataTable = function (data) {
-
   var rows = _.map(data, function (stats) {
-    return [stats.model_period, stats.run, stats.min, stats.max, stats.mean, stats.median, stats.stdev, stats.units];
+    return [
+      stats.model_period,
+      stats.run,
+      stats.min,
+      stats.max,
+      stats.mean,
+      stats.median,
+      stats.stdev,
+      stats.units,
+    ];
   });
 
-  var column_labels = ['Model Period', 'Run', 'Min', 'Max', 'Mean', 'Median', 'Std.Dev', 'Units'];
+  var column_labels = [
+    "Model Period",
+    "Run",
+    "Min",
+    "Max",
+    "Mean",
+    "Median",
+    "Std.Dev",
+    "Units",
+  ];
   rows.unshift(column_labels);
 
   return rows;
@@ -224,32 +263,40 @@ var generateDataCellsFromDataTable = function (data) {
  * Helper function for exportDataToWorksheet that generates data table cells from
  * a C3 graph configuration object.
  */
-var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series", variable="") {
-  var headers = [];
+var generateDataCellsFromC3Graph = function (
+  graph,
+  seriesLabel = "Time Series",
+  variable = "",
+) {
   var rows = [];
   var column_labels = [seriesLabel];
 
   //This could be either a graph with a categorical x-axis, or a numerical
   //x-axis. The C3 structure is slightly different.
   //Numerical values are treated by C3 as data, categorical as axis metadata.
-  var graphHasCategoricalXAxis = (graph.axis.x.type == "category");
+  var graphHasCategoricalXAxis = graph.axis.x.type === "category";
 
-  if(graphHasCategoricalXAxis) {
+  if (graphHasCategoricalXAxis) {
     column_labels = column_labels.concat(graph.axis.x.categories);
     column_labels.push("units");
   }
 
-  for(var i = 0; i < graph.data.columns.length; i++) {
+  const getVarOptions = (prec, word) => {
+    return !_.isUndefined(prec)
+      ? prec
+      : getVariableOptions(word.toLowerCase(), "decimalPrecision");
+  };
+
+  for (let i = 0; i < graph.data.columns.length; i++) {
     //each column contains either data or numerical x-axis values
     //The x-axis goes into column labels, data goes into rows.
-    var column = graph.data.columns[i];
-    if(column[0] == "x" && !graphHasCategoricalXAxis) {
+    const column = graph.data.columns[i];
+    if (column[0] === "x" && !graphHasCategoricalXAxis) {
       column_labels = column_labels.concat(column.slice(1, column.length));
       column_labels.push("units");
-    }
-    else {
-      var seriesName = column[0];
-      var row = [];
+    } else {
+      const seriesName = column[0];
+      let row = [];
       row = row.concat(column);
 
       // Determine the appropriate decimal precision to display this data's values.
@@ -265,16 +312,13 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series", va
       //
       // 3. the default util.PRECISION.
 
-      var precision = _.reduce(seriesName.split(" "), function(prec, word) {
-        return !_.isUndefined(prec) ? prec
-            : getVariableOptions(word.toLowerCase(), "decimalPrecision");
-      }, undefined);
+      let precision = _.reduce(seriesName.split(" "), getVarOptions, undefined);
 
-      if(_.isUndefined(precision)) {
+      if (_.isUndefined(precision)) {
         precision = getVariableOptions(variable, "decimalPrecision");
       }
 
-      if(_.isUndefined(precision)) {
+      if (_.isUndefined(precision)) {
         precision = PRECISION;
       }
 
@@ -286,14 +330,15 @@ var generateDataCellsFromC3Graph = function(graph, seriesLabel="Time Series", va
       });
 
       //get the corresponding units (or name of axis) - default to "y" if axis not listed
-      var seriesAxis = graph.data.axes[seriesName] ? graph.data.axes[seriesName] : "y";
+      const seriesAxis = graph.data.axes[seriesName]
+        ? graph.data.axes[seriesName]
+        : "y";
       row.push(graph.axis[seriesAxis].label.text);
       rows.push(row);
     }
   }
   rows.unshift(column_labels);
   return rows;
-
 };
 
 /*****************************************************************
@@ -315,22 +360,28 @@ var assembleWorksheet = function (cells) {
       maxCols = row.length;
     }
     row.forEach(function (cellValue, colIndex) {
-      cell_ref = XLSX.utils.encode_cell({ c:colIndex, r:rowIndex });
-      ws[cell_ref] = { v: cellValue, t: 's' };
+      cell_ref = XLSX.utils.encode_cell({ c: colIndex, r: rowIndex });
+      ws[cell_ref] = { v: cellValue, t: "s" };
     });
   });
 
-    // set combined worksheet range bounds
+  // set combined worksheet range bounds
   var range = {
-    s: { c:0, r:0 },
+    s: { c: 0, r: 0 },
     e: {
       c: maxCols - 1,
-      r: cells.length - 1
-    }
+      r: cells.length - 1,
+    },
   };
-  ws['!ref'] = XLSX.utils.encode_range(range);
+  ws["!ref"] = XLSX.utils.encode_range(range);
   return ws;
 };
 
-export {exportDataToWorksheet,createWorksheetSummaryCells, generateDataCellsFromDataTable, assembleWorksheet,
-    createTimeseriesWorksheetSummaryCells, generateDataCellsFromC3Graph};
+export {
+  exportDataToWorksheet,
+  createWorksheetSummaryCells,
+  generateDataCellsFromDataTable,
+  assembleWorksheet,
+  createTimeseriesWorksheetSummaryCells,
+  generateDataCellsFromC3Graph,
+};

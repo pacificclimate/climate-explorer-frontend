@@ -1,15 +1,14 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Tab, Tabs } from "react-bootstrap";
 
-import { multiYearMeanSelected } from '../../graphs/graph-helpers';
-import styles from '../DataController.module.css';
+import { multiYearMeanSelected } from "../../graphs/graph-helpers";
+import styles from "../DataController.module.css";
 
 const graphTabSpecPropType = PropTypes.shape({
   title: PropTypes.node,
   graph: PropTypes.element,
 });
-
 
 export default class GraphTabs extends React.Component {
   static propTypes = {
@@ -26,30 +25,24 @@ export default class GraphTabs extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
     // Convert graph tabs spec to list of tabs.
-    const graphTabs =
-      this.props.specs[multiYearMeanSelected(this.props) ? 'mym' : 'notMym']
-      .map(
-        (spec, i) => {
-          const Graph = spec.graph;
-          return (
-            <Tab
-              eventKey={i} title={spec.title}
-              className={styles.data_panel}
-            >
-              <Graph {...this.props}/>
-            </Tab>
-          );
-        }
+    const graphTabs = this.props.specs[
+      multiYearMeanSelected(this.props) ? "mym" : "notMym"
+    ].map((spec, i) => {
+      const Graph = spec.graph;
+      return (
+        <Tab eventKey={i} title={spec.title} className={styles.data_panel}>
+          <Graph {...this.props} />
+        </Tab>
       );
+    });
 
     return (
-      <Tabs id='Graphs' mountOnEnter>
+      <Tabs id="Graphs" mountOnEnter>
         {graphTabs}
       </Tabs>
     );

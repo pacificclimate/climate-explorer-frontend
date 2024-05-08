@@ -4,13 +4,13 @@
  *
  * Receives a model, an experiment, and a variable from its parent,
  * SingleAppController. Manages viewer components that display data as
- * graphs or tables. 
+ * graphs or tables.
  *
  * Child components vary by whether the selected dataset is a multi year mean
  * climatology. If so:
  *  - a SingleAnnualCycleGraph displaying data with monthly, seasonal, and annual
  *    resolution (as available)
- * 
+ *
  *  - a SingleLongTermAverageGraph showing the mean of each climatology
  *    period as a seperate data point.
  *
@@ -27,34 +27,36 @@
  *  - a freeform SingleTimeSeriesGraph showing each time point available.
  *
  * A Data Table viewer component showing statistical information for each
- * climatology period or timeseries is also generated. 
+ * climatology period or timeseries is also generated.
  *******************************************************************/
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-import React from 'react';
-import { Row, Col, Panel } from 'react-bootstrap';
-import _ from 'lodash';
+import React from "react";
+import { Row, Col, Panel } from "react-bootstrap";
+import _ from "lodash";
 
-import SingleAnnualCycleGraph from '../../graphs/SingleAnnualCycleGraph';
-import SingleLongTermAveragesGraph from '../../graphs/SingleLongTermAveragesGraph';
-import SingleContextGraph from '../../graphs/SingleContextGraph';
-import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
-import AnomalyAnnualCycleGraph from '../../graphs/AnomalyAnnualCycleGraph';
-import SingleTimeSliceGraph from '../../graphs/SingleTimeSliceGraph';
+import SingleAnnualCycleGraph from "../../graphs/SingleAnnualCycleGraph";
+import SingleLongTermAveragesGraph from "../../graphs/SingleLongTermAveragesGraph";
+import SingleContextGraph from "../../graphs/SingleContextGraph";
+import SingleTimeSeriesGraph from "../../graphs/SingleTimeSeriesGraph";
+import AnomalyAnnualCycleGraph from "../../graphs/AnomalyAnnualCycleGraph";
+import SingleTimeSliceGraph from "../../graphs/SingleTimeSliceGraph";
 import {
-  singleAnnualCycleTabLabel, changeFromBaselineTabLabel,
-  singleLtaTabLabel, modelContextTabLabel, snapshotTabLabel,
+  singleAnnualCycleTabLabel,
+  changeFromBaselineTabLabel,
+  singleLtaTabLabel,
+  modelContextTabLabel,
+  snapshotTabLabel,
   timeSeriesTabLabel,
   graphsPanelLabel,
-} from '../../guidance-content/info/InformationItems';
+} from "../../guidance-content/info/InformationItems";
 
-import styles from '../DataController.module.css';
-import { MEVSummary } from '../../data-presentation/MEVSummary';
-import FlowArrow from '../../data-presentation/FlowArrow';
-import GraphTabs from '../GraphTabs';
-import StatisticalSummaryTable from '../../StatisticalSummaryTable';
-
+import styles from "../DataController.module.css";
+import { MEVSummary } from "../../data-presentation/MEVSummary";
+import FlowArrow from "../../data-presentation/FlowArrow";
+import GraphTabs from "../GraphTabs";
+import StatisticalSummaryTable from "../../StatisticalSummaryTable";
 
 export default class SingleDataController extends React.Component {
   static propTypes = {
@@ -64,7 +66,7 @@ export default class SingleDataController extends React.Component {
     area: PropTypes.string,
     meta: PropTypes.array,
     contextMeta: PropTypes.array,
-    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
+    ensemble_name: PropTypes.string, // TODO: Why is this declared? Remove?
   };
 
   // TODO: Is this necessary?
@@ -77,7 +79,7 @@ export default class SingleDataController extends React.Component {
     return !(
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.area, this.props.area)
-     );
+    );
   }
 
   // Spec for generating tabs containing various graphs.
@@ -91,15 +93,13 @@ export default class SingleDataController extends React.Component {
       { title: changeFromBaselineTabLabel, graph: AnomalyAnnualCycleGraph },
       { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
     ],
-    notMym: [
-      { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
-    ],
+    notMym: [{ title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph }],
   };
 
   render() {
     // TODO: Improve returned item
-    if (!_.allDefined(this.props, 'model_id', 'experiment', 'variable_id')) {
-      return 'Readying...';
+    if (!_.allDefined(this.props, "model_id", "experiment", "variable_id")) {
+      return "Readying...";
     }
 
     return (
@@ -109,13 +109,9 @@ export default class SingleDataController extends React.Component {
           <Panel.Heading>
             <Panel.Title>
               <Row>
-                <Col lg={4}>
-                  {graphsPanelLabel}
-                </Col>
+                <Col lg={4}>{graphsPanelLabel}</Col>
                 <Col lg={8}>
-                  <MEVSummary
-                    className={styles.mevSummary} {...this.props}
-                  />
+                  <MEVSummary className={styles.mevSummary} {...this.props} />
                 </Col>
               </Row>
             </Panel.Title>
@@ -131,7 +127,6 @@ export default class SingleDataController extends React.Component {
         <FlowArrow>filtered datasets</FlowArrow>
 
         <StatisticalSummaryTable {...this.props} />
-
       </div>
     );
   }

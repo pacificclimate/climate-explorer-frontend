@@ -1,14 +1,13 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, Glyphicon } from 'react-bootstrap';
-import Accordion from '../../guidance-tools/Accordion';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { MEVSummary } from '../MEVSummary/MEVSummary';
-import { filteredDatasetSummaryPanelLabel } from '../../guidance-content/info/InformationItems';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col } from "react-bootstrap";
+import Accordion from "../../guidance-tools/Accordion";
+import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
+import { MEVSummary } from "../MEVSummary/MEVSummary";
+import { filteredDatasetSummaryPanelLabel } from "../../guidance-content/info/InformationItems";
 
-import _ from 'lodash';
-import { HalfWidthCol } from '../../layout/rb-derived-components';
-
+import _ from "lodash";
+import { HalfWidthCol } from "../../layout/rb-derived-components";
 
 export default class FilteredDatasetsSummary extends React.Component {
   static propTypes = {
@@ -40,20 +39,18 @@ export default class FilteredDatasetsSummary extends React.Component {
         end_date: `${end_date}-12-31`,
       };
       for (const d of data) {
-        row[d.timescale] = 'Yes';
+        row[d.timescale] = "Yes";
       }
       return row;
     };
 
     const keyedData = this.props.meta.map(metaToKeyedData);
     const keyedComparandData =
-      this.props.comparandMeta &&
-      this.props.comparandMeta.map(metaToKeyedData);
+      this.props.comparandMeta && this.props.comparandMeta.map(metaToKeyedData);
 
-    const dataGroupedByKey = _.groupBy(keyedData, 'key');
+    const dataGroupedByKey = _.groupBy(keyedData, "key");
     const comparandDataGroupedByKey =
-      keyedComparandData &&
-      _.groupBy(keyedComparandData, 'key');
+      keyedComparandData && _.groupBy(keyedComparandData, "key");
 
     const dataForTable = _.map(dataGroupedByKey, keyedDataToTableRowData);
     const comparandDataForTable =
@@ -61,49 +58,26 @@ export default class FilteredDatasetsSummary extends React.Component {
       _.map(comparandDataGroupedByKey, keyedDataToTableRowData);
 
     const DataTable = ({ data }) => (
-      <BootstrapTable
-        data={data}
-      >
-        <TableHeaderColumn
-          dataField='id' isKey
-          width={'15%'}
-        >
+      <BootstrapTable data={data}>
+        <TableHeaderColumn dataField="id" isKey width={"15%"}>
           Label in selectors
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='ensemble_member'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="ensemble_member" width={"10%"}>
           Model Run
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='start_date'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="start_date" width={"10%"}>
           Start Date
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='end_date'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="end_date" width={"10%"}>
           End Date
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='yearly'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="yearly" width={"10%"}>
           Yearly?
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='seasonal'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="seasonal" width={"10%"}>
           Seasonal?
         </TableHeaderColumn>
-        <TableHeaderColumn
-          dataField='monthly'
-          width={'10%'}
-        >
+        <TableHeaderColumn dataField="monthly" width={"10%"}>
           Monthly?
         </TableHeaderColumn>
       </BootstrapTable>
@@ -115,9 +89,7 @@ export default class FilteredDatasetsSummary extends React.Component {
           eventKey={2}
           title={
             <Row>
-              <Col lg={2}>
-                {filteredDatasetSummaryPanelLabel}
-              </Col>
+              <Col lg={2}>{filteredDatasetSummaryPanelLabel}</Col>
               <Col lg={10}>
                 <MEVSummary
                   model_id={this.props.model_id}
@@ -126,39 +98,37 @@ export default class FilteredDatasetsSummary extends React.Component {
                   comparand_id={this.props.comparand_id}
                   dual={this.props.dual}
                 />
-                {' \u27F6 '}
+                {" \u27F6 "}
                 <span>{this.props.meta.length} datasets</span>
-                {
-                  this.props.dual &&
+                {this.props.dual && (
                   <span>
-                    {' + '}{this.props.comparandMeta.length} datasets
+                    {" + "}
+                    {this.props.comparandMeta.length} datasets
                   </span>
-                }
+                )}
               </Col>
             </Row>
           }
         >
           <Row>
             <HalfWidthCol>
-              {
-                this.props.dual &&
+              {this.props.dual && (
                 <p>
-                  Variable 1 ({this.props.variable_id}){': '}
+                  Variable 1 ({this.props.variable_id}){": "}
                   {this.props.meta.length} datasets
                 </p>
-              }
-              <DataTable data={dataForTable}/>
+              )}
+              <DataTable data={dataForTable} />
             </HalfWidthCol>
-            {
-              this.props.dual &&
+            {this.props.dual && (
               <HalfWidthCol>
                 <p>
-                  Variable 2 ({this.props.comparand_id}){': '}
+                  Variable 2 ({this.props.comparand_id}){": "}
                   {this.props.comparandMeta.length} datasets
                 </p>
-                <DataTable data={comparandDataForTable}/>
+                <DataTable data={comparandDataForTable} />
               </HalfWidthCol>
-            }
+            )}
           </Row>
         </Accordion.Item>
       </Accordion>

@@ -1,15 +1,14 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import DataGraph from '../DataGraph/DataGraph';
+import DataGraph from "../DataGraph/DataGraph";
 import {
   displayError,
   noDataMessageGraphSpec,
   blankGraphSpec,
-} from '../graph-helpers';
-import { validateLongTermAverageData } from '../../../core/util';
-import { getData } from '../../../data-services/ce-backend';
-
+} from "../graph-helpers";
+import { validateLongTermAverageData } from "../../../core/util";
+import { getData } from "../../../data-services/ce-backend";
 
 // This component renders a "spaghetti plot" to provide context for the
 // selected dataset amongst all equivalent datasets from other models.
@@ -56,30 +55,34 @@ export default class ContextGraph extends React.Component {
   };
 
   getAndValidateTimeseries(metadata) {
-    return (
-      getData(metadata)
-        .then(validateLongTermAverageData)
-        .then(response => response.data)
-    );
+    return getData(metadata)
+      .then(validateLongTermAverageData)
+      .then((response) => response.data);
   }
 
   loadGraph() {
-    this.displayNoDataMessage('Loading Data');
+    this.displayNoDataMessage("Loading Data");
 
-    const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
-    const timeseriesPromises = metadatas.map(metadata =>
-      this.getAndValidateTimeseries(metadata)
+    const metadatas = this.props.getMetadata().filter((metadata) => !!metadata);
+    const timeseriesPromises = metadatas.map((metadata) =>
+      this.getAndValidateTimeseries(metadata),
     );
 
-    Promise.all(timeseriesPromises).then(data => {
-      this.metadatas = metadatas;
-      this.data = data;
-      this.setState({
-        graphSpec: this.props.dataToGraphSpec(metadatas, data, this.props.model_id),
+    Promise.all(timeseriesPromises)
+      .then((data) => {
+        this.metadatas = metadatas;
+        this.data = data;
+        this.setState({
+          graphSpec: this.props.dataToGraphSpec(
+            metadatas,
+            data,
+            this.props.model_id,
+          ),
+        });
+      })
+      .catch((error) => {
+        displayError(error, this.displayNoDataMessage);
       });
-    }).catch(error => {
-      displayError(error, this.displayNoDataMessage);
-    });
   }
 
   // Lifecycle hooks
@@ -105,7 +108,10 @@ export default class ContextGraph extends React.Component {
     ) {
       this.setState({
         graphSpec: this.props.dataToGraphSpec(
-          this.metadatas, this.data, this.props.model_id),
+          this.metadatas,
+          this.data,
+          this.props.model_id,
+        ),
       });
     }
   }
@@ -116,7 +122,7 @@ export default class ContextGraph extends React.Component {
       // doesn't change. See `componentWillReceiveProps`.
       prevProps.variable_id !== this.props.variable_id ||
       prevProps.experiment !== this.props.experiment ||
-      prevProps.contextMeta !== this.props.contextMeta ||  // TODO: Necessary?
+      prevProps.contextMeta !== this.props.contextMeta || // TODO: Necessary?
       prevProps.area !== this.props.area
     ) {
       this.loadGraph();
@@ -124,8 +130,6 @@ export default class ContextGraph extends React.Component {
   }
 
   render() {
-    return (
-      <DataGraph {...this.state.graphSpec}/>
-    );
+    return <DataGraph {...this.state.graphSpec} />;
   }
 }

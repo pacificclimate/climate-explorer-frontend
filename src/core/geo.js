@@ -1,14 +1,14 @@
-import _ from 'lodash';
-import { saveAs } from 'filesaver.js';
-import togeojson from 'togeojson';
-import { parse, stringify } from 'wellknown';
-import _tokml from 'tokml';
-import _togpx from 'togpx';
-import shp from 'shpjs';
-import { write } from 'shp-write';
-import JSZip from 'jszip';  // Installed by `shp-write`; apparently not
-import geojson from 'shp-write/src/geojson';
-import prj from 'shp-write/src/prj';
+import _ from "lodash";
+import { saveAs } from "filesaver.js";
+import togeojson from "togeojson";
+import { parse, stringify } from "wellknown";
+import _tokml from "tokml";
+import _togpx from "togpx";
+import shp from "shpjs";
+import { write } from "shp-write";
+import JSZip from "jszip"; // Installed by `shp-write`; apparently not
+import geojson from "shp-write/src/geojson";
+import prj from "shp-write/src/prj";
 
 function createZippedShapefile(gj, options) {
   // Alternate to function `zip` in `shp-write/src/zip`, but with option to
@@ -28,33 +28,35 @@ function createZippedShapefile(gj, options) {
     folder = options && options.folder,
     layers = folder ? zip : zip.folder(folder);
 
-  [geojson.point(gj), geojson.line(gj), geojson.polygon(gj)]
-  .forEach(function(l) {
-    if (_.flattenDeep(l.geometries).length > 0) {
-      write(
-        // field definitions
-        l.properties,
-        // geometry type
-        l.type,
-        // geometries
-        l.geometries,
-        function (err, files) {
-          const lType = l.type;
-          const optType =
-            options && options.types && options.types[lType.toLowerCase()];
-          const fileName = optType || lType;
-          layers.file(fileName + '.shp', files.shp.buffer, { binary: true });
-          layers.file(fileName + '.shx', files.shx.buffer, { binary: true });
-          layers.file(fileName + '.dbf', files.dbf.buffer, { binary: true });
-          layers.file(fileName + '.prj', prj);
-        });
-    }
-  });
+  [geojson.point(gj), geojson.line(gj), geojson.polygon(gj)].forEach(
+    function (l) {
+      if (_.flattenDeep(l.geometries).length > 0) {
+        write(
+          // field definitions
+          l.properties,
+          // geometry type
+          l.type,
+          // geometries
+          l.geometries,
+          function (err, files) {
+            const lType = l.type;
+            const optType =
+              options && options.types && options.types[lType.toLowerCase()];
+            const fileName = optType || lType;
+            layers.file(fileName + ".shp", files.shp.buffer, { binary: true });
+            layers.file(fileName + ".shx", files.shx.buffer, { binary: true });
+            layers.file(fileName + ".dbf", files.dbf.buffer, { binary: true });
+            layers.file(fileName + ".prj", prj);
+          },
+        );
+      }
+    },
+  );
 
-  const generateOptions = { compression: 'STORE' };
+  const generateOptions = { compression: "STORE" };
 
   if (!process.browser) {
-    generateOptions.type = 'nodebuffer';
+    generateOptions.type = "nodebuffer";
   }
 
   return zip.generate(generateOptions);
@@ -64,11 +66,10 @@ function saveZippedShapefile(gj, options) {
   // Alternate to function `download` in `shp-write`, but with option to
   // store files in root of zipped shapefile. See `createZippedShapefile`.
   const content = createZippedShapefile(gj, options);
-  window.location.href = 'data:application/zip;base64,' + content;
+  window.location.href = "data:application/zip;base64," + content;
 }
 
 var g = {
-
   /* feature stored as geojson object */
   feature: undefined,
 
@@ -112,48 +113,47 @@ var g = {
 
   toFeatureCollection: function () {
     return {
-      type: 'FeatureCollection',
+      type: "FeatureCollection",
       features: [this.feature],
     };
   },
 
   save: function (format) {
     switch (format) {
-      case 'wkt':
+      case "wkt":
         saveAs(
-          new Blob([this.toWKT()], { type: 'text/plain;charset=utf-8' }),
-          'feature.wkt'
+          new Blob([this.toWKT()], { type: "text/plain;charset=utf-8" }),
+          "feature.wkt",
         );
         break;
 
-      case 'geojson':
+      case "geojson":
         saveAs(
-          new Blob([this.toGeoJSONstr()], { type: 'text/plain;charset=utf-8' }),
-          'feature.geojson'
+          new Blob([this.toGeoJSONstr()], { type: "text/plain;charset=utf-8" }),
+          "feature.geojson",
         );
         break;
 
-      case 'kml':
+      case "kml":
         saveAs(
-          new Blob([this.toKML()], { type: 'text/plain;charset=utf-8' }),
-          'feature.kml'
+          new Blob([this.toKML()], { type: "text/plain;charset=utf-8" }),
+          "feature.kml",
         );
         break;
 
-      case 'gpx':
+      case "gpx":
         saveAs(
-          new Blob([this.toGPX()], { type: 'text/plain;charset=utf-8' }),
-          'feature.gpx'
+          new Blob([this.toGPX()], { type: "text/plain;charset=utf-8" }),
+          "feature.gpx",
         );
         break;
 
-      case 'shp':
+      case "shp":
         saveZippedShapefile(this.toFeatureCollection(this.toGeoJSONobj()));
         break;
 
       default:
         break;
-
     }
   },
 
@@ -182,18 +182,16 @@ var g = {
 
   load: function (file, success, fail) {
     /* All load functions must call `success` handler with a GeoJSON feature */
-    var ext = file.name.split('.')[1];
+    var ext = file.name.split(".")[1];
 
-    if (_.includes(['geojson', 'json'], ext)) {
+    if (_.includes(["geojson", "json"], ext)) {
       this.loadTextFormat(file, success);
-    } else if (ext === 'zip') {
+    } else if (ext === "zip") {
       this.loadShapefile(file, success);
     } else {
       fail();
     }
   },
-
 };
-
 
 export default g;

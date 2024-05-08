@@ -3,31 +3,32 @@
 
 // TODO: Use HOC `withAsyncData` to manage fetching data
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, Panel, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col, Panel, ControlLabel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import DataTable from '../DataTable/DataTable';
-import { TimeOfYearSelector } from 'pcic-react-components';
-import ExportButtons from '../graphs/ExportButtons';
-import { statsTableLabel, timeOfYearSelectorLabel } from
-    '../guidance-content/info/InformationItems';
-import { MEVSummary } from '../data-presentation/MEVSummary';
+import DataTable from "../DataTable/DataTable";
+import { TimeOfYearSelector } from "pcic-react-components";
+import ExportButtons from "../graphs/ExportButtons";
+import {
+  statsTableLabel,
+  timeOfYearSelectorLabel,
+} from "../guidance-content/info/InformationItems";
+import { MEVSummary } from "../data-presentation/MEVSummary";
 
-import { getStats } from '../../data-services/ce-backend';
+import { getStats } from "../../data-services/ce-backend";
 import {
   parseBootstrapTableData,
   timeKeyToResolutionIndex,
   timeResolutions,
   validateStatsData,
-} from '../../core/util';
-import { errorMessage } from '../graphs/graph-helpers';
-import { exportDataToWorksheet } from '../../core/export';
+} from "../../core/util";
+import { errorMessage } from "../graphs/graph-helpers";
+import { exportDataToWorksheet } from "../../core/export";
 
-import styles from './StatisticalSummaryTable.module.css';
-
+import styles from "./StatisticalSummaryTable.module.css";
 
 // TODO: Use `withAsyncData` to factor out common data-fetching code here
 export default class StatisticalSummaryTable extends React.Component {
@@ -69,8 +70,8 @@ export default class StatisticalSummaryTable extends React.Component {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -79,8 +80,8 @@ export default class StatisticalSummaryTable extends React.Component {
     if (state.prevTimeOfYear !== state.timeOfYear) {
       return {
         prevTimeOfYear: state.timeOfYear,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -102,20 +103,21 @@ export default class StatisticalSummaryTable extends React.Component {
   // Data fetching
 
   getAndValidateData(metadata) {
-    return (
-      getStats(metadata)
+    return getStats(metadata)
       .then(validateStatsData)
-      .then(response => response.data)
-    );
+      .then((response) => response.data);
   }
 
   injectRunIntoStats(data) {
     // TODO: Make this into a pure function
     // Injects model run information into object returned by stats call
-    _.map(data, function (val, key) {
-      const selected = this.props.meta.filter(el => el.unique_id === key);
-      _.extend(val, { run: selected[0].ensemble_member });
-    }.bind(this));
+    _.map(
+      data,
+      function (val, key) {
+        const selected = this.props.meta.filter((el) => el.unique_id === key);
+        _.extend(val, { run: selected[0].ensemble_member });
+      }.bind(this),
+    );
     return data;
   }
 
@@ -126,26 +128,35 @@ export default class StatisticalSummaryTable extends React.Component {
     }
     this.setState({ fetchingData: true });
     const metadata = {
-      ..._.pick(this.props,
-        'ensemble_name', 'model_id', 'variable_id', 'experiment', 'area'),
+      ..._.pick(
+        this.props,
+        "ensemble_name",
+        "model_id",
+        "variable_id",
+        "experiment",
+        "area",
+      ),
       ...timeKeyToResolutionIndex(this.state.timeOfYear.value),
     };
     this.getAndValidateData(metadata)
-    .then(data => {
-      this.setState({
-        fetchingData: false,
-        data: parseBootstrapTableData(
-          this.injectRunIntoStats(data), this.props.meta),
-        dataError: null,
+      .then((data) => {
+        this.setState({
+          fetchingData: false,
+          data: parseBootstrapTableData(
+            this.injectRunIntoStats(data),
+            this.props.meta,
+          ),
+          dataError: null,
+        });
+      })
+      .catch((dataError) => {
+        this.setState({
+          // Set data non-null here to prevent infinite update loop.
+          data: undefined,
+          fetchingData: false,
+          dataError,
+        });
       });
-    }).catch(dataError => {
-      this.setState({
-        // Set data non-null here to prevent infinite update loop.
-        data: undefined,
-        fetchingData: false,
-        dataError,
-      });
-    });
   }
 
   // User event handlers
@@ -157,9 +168,13 @@ export default class StatisticalSummaryTable extends React.Component {
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/261
   exportDataTable(format) {
     exportDataToWorksheet(
-      'stats', this.props, this.state.data, format,
+      "stats",
+      this.props,
+      this.state.data,
+      format,
       timeKeyToResolutionIndex(
-        this.state.timeOfYear && this.state.timeOfYear.value)
+        this.state.timeOfYear && this.state.timeOfYear.value,
+      ),
     );
   }
 
@@ -175,11 +190,11 @@ export default class StatisticalSummaryTable extends React.Component {
 
     // Waiting for data
     if (this.state.fetchingData || this.state.data === null) {
-      return { noDataText: 'Loading data...' };
+      return { noDataText: "Loading data..." };
     }
 
     // We can haz data
-    return { noDataText: 'We have data and this message should not show' };
+    return { noDataText: "We have data and this message should not show" };
   }
 
   render() {
@@ -188,9 +203,7 @@ export default class StatisticalSummaryTable extends React.Component {
         <Panel.Heading>
           <Panel.Title>
             <Row>
-              <Col lg={4}>
-                {statsTableLabel}
-              </Col>
+              <Col lg={4}>{statsTableLabel}</Col>
               <Col lg={8}>
                 <MEVSummary className={styles.mevSummary} {...this.props} />
               </Col>
@@ -212,8 +225,8 @@ export default class StatisticalSummaryTable extends React.Component {
             </Col>
             <Col lg={6} md={6} sm={6}>
               <ExportButtons
-                onExportXlsx={this.exportDataTable.bind(this, 'xlsx')}
-                onExportCsv={this.exportDataTable.bind(this, 'csv')}
+                onExportXlsx={this.exportDataTable.bind(this, "xlsx")}
+                onExportCsv={this.exportDataTable.bind(this, "csv")}
               />
             </Col>
           </Row>

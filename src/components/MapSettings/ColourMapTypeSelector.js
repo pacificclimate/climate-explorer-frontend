@@ -7,15 +7,12 @@
 // 2) the variable is marked "overrideLogarithmicScale: true" in the
 //    variable-options.yaml config file (but values will be clipped to > 0)
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import Selector from '../Selector';
-import { getVariableOptions } from '../../core/util';
-import {
-  colourMapTypeSelectorLabel,
-} from '../guidance-content/info/InformationItems';
-
+import Selector from "../Selector";
+import { getVariableOptions } from "../../core/util";
+import { colourMapTypeSelectorLabel } from "../guidance-content/info/InformationItems";
 
 export default class ColourMapTypeSelector extends React.Component {
   static propTypes = {
@@ -28,11 +25,13 @@ export default class ColourMapTypeSelector extends React.Component {
 
   render() {
     const override = getVariableOptions(
-      this.props.variableId, 'overrideLogarithmicScale');
+      this.props.variableId,
+      "overrideLogarithmicScale",
+    );
     const layerMin = this.props.layerMin || -1;
     const colourMapTypes = [
-      ['false', 'Linear', false],
-      ['true', 'Logarithmic', layerMin <= 0 && !override],
+      ["false", "Linear", false],
+      ["true", "Logarithmic", layerMin <= 0 && !override],
     ];
 
     return (

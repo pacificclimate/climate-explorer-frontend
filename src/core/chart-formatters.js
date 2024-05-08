@@ -2,47 +2,38 @@
  * chart-formatters.js - functions that modify a C3 chart specification
  *   to alter the way data is displayed to make charts more readable. These
  *   functions do not affect the data itself, only its formatting and display.
- * 
- * Data series format functions accept a C3 graph specification and a 
+ *
+ * Data series format functions accept a C3 graph specification and a
  * segmentation function. The segmentation function will be applied to each
  * data series in the C3 graph object, with the results being used to decide
- * how to format data from that series. 
- * 
+ * how to format data from that series.
+ *
  * Data series formatters:
  *  - assignColoursByGroup: assigns the same display colour to all data series
  *      belonging to the same group
- *      
+ *
  *  - fadeSeriesByRank: lightens the colours used to display data series assigned
  *      a lower rank, to make them less distracting from the "main" data.
- *      
+ *
  *  - hideSeriesInLegend: removes specific data series from the legend
- *  
+ *
  *  - sortSeriesByRank: draw higher ranked data series above (higher z-axis)
  *      lower ranked series
- *      
+ *
  *  - hideSeriesInTooltip: removes specific data series from the tooltip
- * 
+ *
  * Axis formatters accept a C3 graph specification and additional parameters
  * that vary by function. They adjust formatting on graph axes.
- * 
+ *
  * Axis formatters:
  *  - padYAxis: add additional blank space above or below the data series
- *  
+ *
  *  - displayTicksByRange: only display axis ticks for specific parts of the
  *    data range
  ***************************************************************************/
-import _ from 'lodash';
-import {
-  PRECISION,
-  extendedDateToBasicDate,
-  capitalizeWords,
-  caseInsensitiveStringSearch,
-  nestedAttributeIsDefined,
-  getVariableOptions
-} from './util';
-import { seriesData } from './chart-accessors';
-import chroma from 'chroma-js';
-
+import _ from "lodash";
+import { seriesData } from "./chart-accessors";
+import chroma from "chroma-js";
 
 /****************************************************************************
  * 0. Data series formatters
@@ -53,17 +44,18 @@ import chroma from 'chroma-js';
  * colour palettes that use the same colors as the default assignments.
  */
 
-const category10Colours = ["#1f77b4",
-                         "#ff7f03",
-                         "#2ca02c",
-                         "#d62728",
-                         "#9467bd",
-                         "#8c564b",
-                         "#e377c2",
-                         "#7f7f7f",
-                         "#bcbd22",
-                         "#17becf"];
-
+const category10Colours = [
+  "#1f77b4",
+  "#ff7f03",
+  "#2ca02c",
+  "#d62728",
+  "#9467bd",
+  "#8c564b",
+  "#e377c2",
+  "#7f7f7f",
+  "#bcbd22",
+  "#17becf",
+];
 
 /*
  * Post-processing graph function that assigns shared colours to
@@ -72,7 +64,7 @@ const category10Colours = ["#1f77b4",
  * Accepts a C3 graph object and a segmentation function. Applies the
  * segmentation function to each data column in the graph object. All
  * data columns that evaluate to the same result are grouped together
- * and assigned the same display colour. _.isEqual() is used (by _.indexOf()) 
+ * and assigned the same display colour. _.isEqual() is used (by _.indexOf())
  * to evaluate whether two segmentation results are equal.
  *
  * Returns a modified graph object with colours assigned in graph.data.colors
@@ -83,20 +75,25 @@ const category10Colours = ["#1f77b4",
  * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
  *
  */
-function assignColoursByGroup (graph, segmentor, colourList = category10Colours) {
+function assignColoursByGroup(
+  graph,
+  segmentor,
+  colourList = category10Colours,
+) {
   let categories = [];
   let colors = {};
 
-  for(let column of graph.data.columns) {
+  for (let column of graph.data.columns) {
     const seriesName = column[0];
-    if(seriesName !== "x") { //"x" series used to provide categories, not data.
+    if (seriesName !== "x") {
+      //"x" series used to provide categories, not data.
       let category = segmentor(column);
       let index = _.indexOf(categories, category);
-      if(index === -1) {
+      if (index === -1) {
         //first time we've encountered this category,
         //add it to the list.
         categories.push(category);
-        if(categories.length > colourList.length) {
+        if (categories.length > colourList.length) {
           throw new Error("Error: too many data categories for colour palette");
         }
         index = categories.length - 1;
@@ -106,7 +103,7 @@ function assignColoursByGroup (graph, segmentor, colourList = category10Colours)
   }
   graph.data.colors = colors;
   return graph;
-};
+}
 
 /*
  * Post-processing graph function that visually de-emphasizes certain
@@ -127,13 +124,12 @@ function assignColoursByGroup (graph, segmentor, colourList = category10Colours)
  *
  * ['Monthly Mean Tasmin', 30, 20, 50, 40, 60, 50, 10, 10, 20, 30, 40, 50]
  */
-function fadeSeriesByRank (graph, ranker) {
-
+function fadeSeriesByRank(graph, ranker) {
   let rankDictionary = {};
 
-  for(let column of graph.data.columns) {
+  for (let column of graph.data.columns) {
     const seriesName = column[0];
-    if(seriesName !== "x") {
+    if (seriesName !== "x") {
       rankDictionary[seriesName] = ranker(column);
     }
   }
@@ -141,15 +137,16 @@ function fadeSeriesByRank (graph, ranker) {
   //c3 will pass the function the assigned colour, and either:
   //     * a string with the name of the time series (drawing legend)
   //     * an object with attributes about the time series (drawing a point or line)
-  function fader (colour, d) {
-    const scale = chroma.scale(['white', colour]);
-    if(_.isObject(d)) { //d = data attributes
+  function fader(colour, d) {
+    const scale = chroma.scale(["white", colour]);
+    if (_.isObject(d)) {
+      //d = data attributes
       return scale(rankDictionary[d.id]).hex();
-    }
-    else { //d = series name only
+    } else {
+      //d = series name only
       return scale(rankDictionary[d]).hex();
     }
-  };
+  }
 
   graph.data.color = fader;
   return graph;
@@ -166,23 +163,23 @@ function fadeSeriesByRank (graph, ranker) {
  * By default, every data series appears in the legend; this postprocessor
  * is only needed if at least one series should be hidden.
  */
-function hideSeriesInLegend (graph, predicate) {
+function hideSeriesInLegend(graph, predicate) {
   let hiddenSeries = [];
 
-  _.each(graph.data.columns, column => {
+  _.each(graph.data.columns, (column) => {
     const seriesName = column[0];
-    if(seriesName !== "x" && predicate(column)) {
+    if (seriesName !== "x" && predicate(column)) {
       hiddenSeries.push(seriesName);
     }
   });
 
-  if(!graph.legend) {
+  if (!graph.legend) {
     graph.legend = {};
   }
 
   graph.legend.hide = hiddenSeries;
   return graph;
-};
+}
 
 /*
  * Post-processing graph function that sets the order of the data series.
@@ -194,36 +191,37 @@ function hideSeriesInLegend (graph, predicate) {
  * ranking function's results. The higher a series is ranked, the later it
  * will be drawn and the more prominent it will appear.
  */
-function sortSeriesByRank (graph, ranker) {
-  const sorter = function(a, b) {return ranker(a) - ranker(b);}
+function sortSeriesByRank(graph, ranker) {
+  const sorter = function (a, b) {
+    return ranker(a) - ranker(b);
+  };
   graph.data.columns = graph.data.columns.sort(sorter);
   return graph;
-};
+}
 
 /*
  * Post-processing graph function that hides specific series from the tooltip.
- * 
+ *
  * Takes a graph specification object and a predicate. Any series for which
  * the predicate returns true will be blocked from appearing in the tooltip.
- * 
- * By default, every series appears in the tooltip. This postprocessor is 
+ *
+ * By default, every series appears in the tooltip. This postprocessor is
  * only needed if you want one or more series NOT to be shown.
  */
-function hideSeriesInTooltip (graph, predicate) {
+function hideSeriesInTooltip(graph, predicate) {
   //determine which series do not appear in the tooltip
-  const hidden = _.map(_.filter(graph.data.columns, predicate),0);
+  const hidden = _.map(_.filter(graph.data.columns, predicate), 0);
 
   //in order to have a value not show up in the tooltip, it needs to
-  //render as undefined in the tooltip value formatting function. 
+  //render as undefined in the tooltip value formatting function.
   //Return undefined for values in the series list made earlier.
-  const oldTooltipValueFormatter = graph.tooltip.format.value;  
-  const newTooltipValueFormatter = function(value, ratio, id, index) {
-    if(hidden.indexOf(id) !== -1) {
-      return undefined; 
-    }
-    else {
+  const oldTooltipValueFormatter = graph.tooltip.format.value;
+  const newTooltipValueFormatter = function (value, ratio, id, index) {
+    if (hidden.indexOf(id) !== -1) {
+      return undefined;
+    } else {
       return oldTooltipValueFormatter(value, ratio, id, index);
-    }  
+    }
   };
   graph.tooltip.format.value = newTooltipValueFormatter;
   return graph;
@@ -233,13 +231,13 @@ function hideSeriesInTooltip (graph, predicate) {
  * 1. Axis formatters
  ****************************************************************************/
 /*
- * Helper function that returns an array of all data series associated with 
+ * Helper function that returns an array of all data series associated with
  * a specific y axis (y or y2). Ignores category or time series, if present.
  */
 function getDataSeriesByAxis(graph, axis) {
-  return _.filter(graph.data.columns, series => {
+  return _.filter(graph.data.columns, (series) => {
     const seriesName = series[0];
-    return seriesName !== 'x' && graph.data.axes[seriesName] === axis;
+    return seriesName !== "x" && graph.data.axes[seriesName] === axis;
   });
 }
 
@@ -248,73 +246,97 @@ function getDataSeriesByAxis(graph, axis) {
  * data on a graph by setting the y-axis maximums and minimums to multiples
  * of the data span. Especially useful if you have data on both the y1 and y2
  * axis, but don't want them to visually overlap.
- * 
+ *
  * Arguments:
  *   graph - the graph to be modified
  *   axis - either "y1" or "y2"
  *   direction - where to add padding, either "top" or "bottom"
- *   padding - the amount of extra y-axis space to add, expressed as a 
- *             multiple of the existing data span. 
+ *   padding - the amount of extra y-axis space to add, expressed as a
+ *             multiple of the existing data span.
  */
-function padYAxis (graph, axis = "y", direction = "top", padding = 1) {
-  if(padding <= 0) {
+function padYAxis(graph, axis = "y", direction = "top", padding = 1) {
+  if (padding <= 0) {
     throw new Error("Error: Graph axis padding value must be greater than 0");
   }
-  
-  if(direction != "top" && direction != "bottom") {
+
+  if (direction !== "top" && direction !== "bottom") {
     throw new Error("Error: Unknown graph axis padding direction");
   }
-  
-  if(axis !== "y" && axis !== "y2") {
+
+  if (axis !== "y" && axis !== "y2") {
     throw new Error("Error: invalid scaling axis");
   }
-  
+
   // if this graph does not yet have minimums and maximums defined, calculate
   // them from the data.
   let min = graph.axis[axis].min;
-  let max = graph.axis[axis].max
+  let max = graph.axis[axis].max;
   const axisSeries = getDataSeriesByAxis(graph, axis);
 
-  if(_.isUndefined(min)) {
-    min = _.min(_.map(axisSeries, series => _.min(seriesData(series))));
-  }    
-  
-  if(_.isUndefined(max)) {
-    max = _.max(_.map(axisSeries, series => _.max(seriesData(series))));
+  if (_.isUndefined(min)) {
+    min = _.min(_.map(axisSeries, (series) => _.min(seriesData(series))));
   }
-  
-  if(direction === "top") {
+
+  if (_.isUndefined(max)) {
+    max = _.max(_.map(axisSeries, (series) => _.max(seriesData(series))));
+  }
+
+  if (direction === "top") {
     graph.axis[axis].max = max + (max - min) * padding;
-  } else if(direction === "bottom") {
+  } else if (direction === "bottom") {
     graph.axis[axis].min = min - (max - min) * padding;
-  } 
+  }
   return graph;
 }
 
 /*
  * Post-processing graph function that accepts a graph with two y axes and
  * sets the axes to have the same range.
- * 
+ *
  * Most of the time, if two y-axes have the same range, a single shared y-axis
  * should obviously be used instead. However, for graphs that are *normally*
  * displayed with 2 y-axes, having two identical y-axes may be a better option
  * than either: 1) having an axis that appears and disappears depending on
  * the data range, or 2) having two misleadingly *almost* identical axes.
- * 
+ *
  * This graph transform function is for those limited circumstances.
  */
 function matchYAxisRange(graph) {
   const y = graph.axis.y;
   const y2 = graph.axis.y2;
-  
-  if(!(y && y2)) {
+
+  if (!(y && y2)) {
     throw new Error("Error: cannot match single axis range");
   }
 
-  const ymin = y.min ? y.min : _.min(_.map(getDataSeriesByAxis(graph, "y"), series => _.min(seriesData(series))));
-  const ymax = y.max ? y.max : _.max(_.map(getDataSeriesByAxis(graph, "y"), series => _.max(seriesData(series))));
-  const y2min = y2.min ? y2.min : _.min(_.map(getDataSeriesByAxis(graph, "y2"), series => _.min(seriesData(series))));
-  const y2max = y2.max ? y2.max : _.max(_.map(getDataSeriesByAxis(graph, "y2"), series => _.max(seriesData(series))));
+  const ymin = y.min
+    ? y.min
+    : _.min(
+        _.map(getDataSeriesByAxis(graph, "y"), (series) =>
+          _.min(seriesData(series)),
+        ),
+      );
+  const ymax = y.max
+    ? y.max
+    : _.max(
+        _.map(getDataSeriesByAxis(graph, "y"), (series) =>
+          _.max(seriesData(series)),
+        ),
+      );
+  const y2min = y2.min
+    ? y2.min
+    : _.min(
+        _.map(getDataSeriesByAxis(graph, "y2"), (series) =>
+          _.min(seriesData(series)),
+        ),
+      );
+  const y2max = y2.max
+    ? y2.max
+    : _.max(
+        _.map(getDataSeriesByAxis(graph, "y2"), (series) =>
+          _.max(seriesData(series)),
+        ),
+      );
 
   graph.axis.y.min = Math.min(ymin, y2min);
   graph.axis.y2.min = Math.min(ymin, y2min);
@@ -323,49 +345,57 @@ function matchYAxisRange(graph) {
   return graph;
 }
 
-
 /*
  * Post-processing graph function that alters the graph to only display
- * numerical values for axis ticks inside a certain range. This is 
+ * numerical values for axis ticks inside a certain range. This is
  * intended to help make it clearer which data series are
  * associated with which y axis in graphs with multiple axes.
- * 
+ *
  * If min and max are not specified, data range will be used.
- * 
- * By default, without this formatter, numerical values for all 
+ *
+ * By default, without this formatter, numerical values for all
  * ticks are visible.
  */
 
 function hideTicksByRange(graph, axis = "y", min, max) {
   const oldFormatFunction = graph.axis[axis].tick.format;
   const axisSeries = getDataSeriesByAxis(graph, axis);
-  
+
   //if a range is not supplied, generate one from the data
   const genMin = _.isUndefined(min);
   const genMax = _.isUndefined(max);
-  min = genMin ? _.min(_.map(axisSeries, series => _.min(seriesData(series)))) : min;
-  max = genMax ? _.max(_.map(axisSeries, series => _.max(seriesData(series)))) : max;
+  min = genMin
+    ? _.min(_.map(axisSeries, (series) => _.min(seriesData(series))))
+    : min;
+  max = genMax
+    ? _.max(_.map(axisSeries, (series) => _.max(seriesData(series))))
+    : max;
   //expand generated axis range to include a ceiling or floor tick
   //(may not matter in very short or very tall graphs)
   min = genMin ? min - (max - min) / 4 : min;
   max = genMax ? max + (max - min) / 4 : max;
-  
+
   function newFormatFunction(value) {
-    if(value <= max && value >= min) {
+    if (value <= max && value >= min) {
       return oldFormatFunction(value);
-    }
-    else {
+    } else {
       return "";
     }
-  };
-  
+  }
+
   graph.axis[axis].tick.format = newFormatFunction;
   return graph;
 }
 
-export { assignColoursByGroup, fadeSeriesByRank,
-    hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip,
-    padYAxis, matchYAxisRange, hideTicksByRange,
-    //helper functions exported only for testing:
-    getDataSeriesByAxis
+export {
+  assignColoursByGroup,
+  fadeSeriesByRank,
+  hideSeriesInLegend,
+  sortSeriesByRank,
+  hideSeriesInTooltip,
+  padYAxis,
+  matchYAxisRange,
+  hideTicksByRange,
+  //helper functions exported only for testing:
+  getDataSeriesByAxis,
 };

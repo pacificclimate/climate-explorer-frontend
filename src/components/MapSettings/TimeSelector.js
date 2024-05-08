@@ -2,15 +2,15 @@
 // mean files. Disabled if `timeLinked` prop is true; this means it is
 // controlled externally (by another selector) and is only used to display.
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { sameYear, timestampToTimeOfYear } from '../../core/util';
-import NullTimeSelector from './NullTimeSelector';
-import Selector from '../Selector';
-import { TimeSelectorLabel } from '../guidance-content/info/InformationItems';
+import { sameYear, timestampToTimeOfYear } from "../../core/util";
+import NullTimeSelector from "./NullTimeSelector";
+import Selector from "../Selector";
+import { TimeSelectorLabel } from "../guidance-content/info/InformationItems";
 
 export default class TimeSelector extends React.Component {
   static propTypes = {
@@ -27,18 +27,15 @@ export default class TimeSelector extends React.Component {
   }
 
   temporalLabelPart() {
-    return (
-      this.disambiguateYears() ?
-      'Year and Time of Year' :
-      'Time of Year'
-    );
+    return this.disambiguateYears() ? "Year and Time of Year" : "Time of Year";
   }
 
   timeOptions() {
     const dY = this.disambiguateYears();
-    return _.map(this.props.times, (v, k) =>
-      [k, timestampToTimeOfYear(v, JSON.parse(k).timescale, dY)]
-    );
+    return _.map(this.props.times, (v, k) => [
+      k,
+      timestampToTimeOfYear(v, JSON.parse(k).timescale, dY),
+    ]);
   }
 
   render() {
@@ -47,21 +44,20 @@ export default class TimeSelector extends React.Component {
       // metadata API call hasn't finished loading yet; return disabled selector.
       // (user shouldn't see this unless something is off with backend -
       // metadata query should be loaded by the time the user opens this menu.)
-      return <NullTimeSelector/>;
+      return <NullTimeSelector />;
     }
 
-    const label =
-      <TimeSelectorLabel temporalLabelPart={this.temporalLabelPart()}/>
-    ;
-
+    const label = (
+      <TimeSelectorLabel temporalLabelPart={this.temporalLabelPart()} />
+    );
     return (
-        <Selector
-          disabled={this.props.timeLinked}
-          label={label}
-          items={this.timeOptions()}
-          value={this.props.timeIdx}
-          onChange={this.props.onChange}
-        />
+      <Selector
+        disabled={this.props.timeLinked}
+        label={label}
+        items={this.timeOptions()}
+        value={this.props.timeIdx}
+        onChange={this.props.onChange}
+      />
     );
   }
 }

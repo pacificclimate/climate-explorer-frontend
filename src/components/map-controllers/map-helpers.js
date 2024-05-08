@@ -1,20 +1,20 @@
 /************************************************************************
  * map-helpers.js - helper functions for MapControllers
- * 
+ *
  * Functions in this file fall into three general categories:
- * 
+ *
  *   0. Data processing helper functions, which extract information from
  *      a MapController props object or piece of one.
- *   
- *   1. WMS parameter generation functions, which generate initial 
+ *
+ *   1. WMS parameter generation functions, which generate initial
  *      parameters for ncWMS layers of various types.
- *      
+ *
  *   2. State and handler functions shared by multiple MapControllers
  ************************************************************************/
-import _ from 'lodash';
+import _ from "lodash";
 
-import { getTimeMetadata } from '../../data-services/ce-backend';
-import { getVariableOptions } from '../../core/util';
+import { getTimeMetadata } from "../../data-services/ce-backend";
+import { getVariableOptions } from "../../core/util";
 
 /************************************************************************
  * 0. Data processing helpers
@@ -23,21 +23,23 @@ import { getVariableOptions } from '../../core/util';
 export function hasValidData(symbol, props) {
   // Returns true if props contains enough information to generate a map
   // for the primary (symbol is 'variable') or secondary ('comparand') variable.
-  var dataLocation = symbol === 'variable' ? 'meta' : 'comparandMeta';
+  var dataLocation = symbol === "variable" ? "meta" : "comparandMeta";
   var dataName = `${symbol}_id`;
 
-  return !_.isUndefined(props[dataName]) &&
+  return (
+    !_.isUndefined(props[dataName]) &&
     !_.isUndefined(props[dataLocation]) &&
-    props[dataLocation].length > 0;
+    props[dataLocation].length > 0
+  );
 }
 
 export function hasComparand(props) {
-  return this.hasValidData('comparand', props);
+  return this.hasValidData("comparand", props);
 }
 
 // predicate that detects whether a timestamp index is a 0th index:
-// either January, winter, or the first year in a file. 
-export const is0thIndex = timestamp =>
+// either January, winter, or the first year in a file.
+export const is0thIndex = (timestamp) =>
   Number(JSON.parse(timestamp).timeidx) === 0;
 
 // This function returns two values that are used to request climate layers from
@@ -54,7 +56,11 @@ export const is0thIndex = timestamp =>
 //  `{ run, start_date, end_date, ...}`, but this gets tangled up with how
 //  `hasValidData` works ... sigh.
 export function getDatasetIdentifiers(
-  props, state, varSymbol, relevantMeta, encodedVarTimeIdx
+  props,
+  state,
+  varSymbol,
+  relevantMeta,
+  encodedVarTimeIdx,
 ) {
   let metadata = undefined;
   if (encodedVarTimeIdx) {
@@ -69,13 +75,13 @@ export function getDatasetIdentifiers(
     }
   }
   // dataset may not exist if generating a map for a single-variable portal
-  return metadata && {
-    dataset: metadata.unique_id,
-    filepath: metadata.filepath,
-  };
+  return (
+    metadata && {
+      dataset: metadata.unique_id,
+      filepath: metadata.filepath,
+    }
+  );
 }
-
-
 
 /********************************************************************
  * 1. WMS parameter generating functions
@@ -92,12 +98,13 @@ export function getTimeParametersPromise(dataSpec, meta) {
   //   {timescale: annual, timeidx: 0} is 1950
   //   {timescale: annual, timeidx: 1} is 1951
   // The timestamps are timestamp strings suitable for ncWMS.
-  const { start_date, end_date, ensemble_member } = dataSpec;  
-  let datafiles = _.filter(meta,
-      { ensemble_member, start_date, end_date });
-  const timestampPromises = datafiles.map(df => getTimeMetadata(df.unique_id));
-  
-  return Promise.all(timestampPromises).then(responses => {
+  const { start_date, end_date, ensemble_member } = dataSpec;
+  let datafiles = _.filter(meta, { ensemble_member, start_date, end_date });
+  const timestampPromises = datafiles.map((df) =>
+    getTimeMetadata(df.unique_id),
+  );
+
+  return Promise.all(timestampPromises).then((responses) => {
     let times = {};
 
     for (let i = 0; i < responses.length; i++) {
@@ -133,19 +140,25 @@ export function scalarParams(variable, times) {
   const startingIndex = _.find(Object.keys(times), is0thIndex);
 
   return {
-    variableId, times, logscale,
+    variableId,
+    times,
+    logscale,
     timeIdx: startingIndex,
     wmsTime: times[startingIndex],
-    range: {}
+    range: {},
   };
 }
 
 export function selectRasterPalette(params) {
   // add a default raster palette to a ncWMS params object: either rainbow (x-Occam)
   // or a variable default palette if the config file has one.
-  let palette = 'x-Occam';
-  if (!_.isUndefined(getVariableOptions(params.variableId, 'defaultRasterPalette'))) {
-      palette = getVariableOptions(params.variableId, 'defaultRasterPalette');
+  let palette = "x-Occam";
+  if (
+    !_.isUndefined(
+      getVariableOptions(params.variableId, "defaultRasterPalette"),
+    )
+  ) {
+    palette = getVariableOptions(params.variableId, "defaultRasterPalette");
   }
   params.palette = palette;
   return params;
@@ -153,8 +166,8 @@ export function selectRasterPalette(params) {
 
 export function selectIsolinePalette(params) {
   // adds the default isoline palette (rainbow / x-Occam) to the params object.
-  // TODO: add isoline numContours here when we get it working 
-  params.palette = 'x-Occam';
+  // TODO: add isoline numContours here when we get it working
+  params.palette = "x-Occam";
   return params;
 }
 
@@ -169,7 +182,7 @@ export function currentDataSpec({ run, start_date, end_date }) {
 }
 
 export function updateLayerSimpleState(layerType, name, value) {
-  this.setState(prevState => ({
+  this.setState((prevState) => ({
     [layerType]: {
       ...prevState[layerType],
       [name]: value,
@@ -183,7 +196,7 @@ export function updateLayerTime(layerType, timeIdx) {
   // and an index denoting the timestamp's position with the file
   this.setState((prevState) => ({
     [layerType]: {
-      ...prevState[layerType],  // This should not be necessary
+      ...prevState[layerType], // This should not be necessary
       timeIdx,
       wmsTime: prevState[layerType].times[timeIdx],
     },

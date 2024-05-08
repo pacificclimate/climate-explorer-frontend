@@ -5,6 +5,6 @@ tasmin:
   decimalPrecision: 1
   shiftAnnualCycle:
     - tasmax
-  `
+  `,
   });
 }

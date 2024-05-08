@@ -6,6 +6,4 @@ var generateResolutions = function (maxRes, count) {
   return result;
 };
 
-export {
-  generateResolutions,
-};
+export { generateResolutions };
