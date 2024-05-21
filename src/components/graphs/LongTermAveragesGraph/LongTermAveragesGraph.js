@@ -36,22 +36,28 @@ import { timeOfYearSelectorLabel } from "../../guidance-content/info/Information
 import styles from "./LongTermAveragesGraph.module.css";
 
 export default class LongTermAveragesGraph extends React.Component {
+  static defaultProps = {
+    hideTimeOfYearSelector: false,
+  };
   static propTypes = {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
     meta: PropTypes.array,
     area: PropTypes.string,
-    getMetadata: PropTypes.func,
     // `getMetadata` returns the metadata describing the datasets to
     // be displayed in this component.
     // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
-    dataToGraphSpec: PropTypes.func,
+    getMetadata: PropTypes.func,
     // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
     // to a graph spec.
     // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
+    dataToGraphSpec: PropTypes.func,
+    // Not all screens require the time of year selector, specifically the extreme
+    // stream flow screen. This prop is used to hide the time of year selector.
+    hideTimeOfYearSelector: PropTypes.bool,
   };
 
   // Lifecycle hooks
@@ -63,6 +69,9 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    // Suggest swapping this out for a more human readable value possibly passed
+    // in as a prop when this component is refactored from class to function.
+    const defaultTimeOfYearValue = { value: 16 }; // this is the "annual" value
     // See ../README for an explanation of the content and usage
     // of state values. This is important for understanding how this
     // component works.
@@ -70,11 +79,17 @@ export default class LongTermAveragesGraph extends React.Component {
     this.state = {
       prevMeta: null,
       prevArea: null,
-      prevTimeOfYear: undefined,
-      timeOfYear: undefined,
+      prevTimeOfYear: props.hideTimeOfYearSelector
+        ? defaultTimeOfYearValue
+        : undefined,
+      timeOfYear: props.hideTimeOfYearSelector
+        ? defaultTimeOfYearValue
+        : undefined,
       data: null,
       dataError: null,
     };
+
+    console.log(this.state);
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -128,6 +143,8 @@ export default class LongTermAveragesGraph extends React.Component {
 
   fetchData() {
     this.setState({ fetchingData: true });
+
+    console.log(this.state);
     Promise.all(
       this.getMetadatas().map((metadata) => this.getAndValidateData(metadata)),
     )
@@ -137,6 +154,8 @@ export default class LongTermAveragesGraph extends React.Component {
           data,
           dataError: null,
         });
+
+        console.log(this.state);
       })
       .catch((dataError) => {
         this.setState({
@@ -197,21 +216,24 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
+    const controlsWidth = this.props.hideTimeOfYearSelector ? 12 : 6;
     return (
       <React.Fragment>
         <Row>
-          <Col lg={6} md={6} sm={6}>
-            <ControlLabel className={styles.selector_label}>
-              {timeOfYearSelectorLabel}
-            </ControlLabel>
-            <TimeOfYearSelector
-              value={this.state.timeOfYear}
-              onChange={this.handleChangeTimeOfYear}
-              {...timeResolutions(this.props.meta)}
-              className={styles.selector}
-            />
-          </Col>
-          <Col lg={6} md={6} sm={6}>
+          {!this.props.hideTimeOfYearSelector && (
+            <Col lg={6} md={6} sm={6}>
+              <ControlLabel className={styles.selector_label}>
+                {timeOfYearSelectorLabel}
+              </ControlLabel>
+              <TimeOfYearSelector
+                value={this.state.timeOfYear}
+                onChange={this.handleChangeTimeOfYear}
+                {...timeResolutions(this.props.meta)}
+                className={styles.selector}
+              />
+            </Col>
+          )}
+          <Col lg={controlsWidth} md={controlsWidth} sm={controlsWidth}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
