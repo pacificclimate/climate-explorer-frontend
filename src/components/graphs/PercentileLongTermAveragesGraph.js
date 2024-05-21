@@ -72,6 +72,7 @@ export default function PercentileLongTermAveragesGraph(props) {
     "experiment",
     "meta",
     "area",
+    "hideTimeOfYearSelector",
   );
 
   return (

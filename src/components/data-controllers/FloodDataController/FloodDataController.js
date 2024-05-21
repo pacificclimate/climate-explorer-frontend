@@ -98,6 +98,7 @@ export default class FloodDataController extends React.Component {
           <Panel.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
+              hideTimeOfYearSelector={true}
               specs={FloodDataController.graphTabsSpecs}
             />
           </Panel.Body>
