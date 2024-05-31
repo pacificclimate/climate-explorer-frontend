@@ -23,26 +23,28 @@
 //      This is how this component's subnav selection is controlled.
 //    - A Route for each item specified in `navSpec`.
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
-import { Route, Redirect, Switch } from 'react-router-dom';
-import { LinkContainer } from 'react-router-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Navbar, Nav, NavItem } from "react-bootstrap";
+import { Route, Redirect, Switch } from "react-router-dom";
+import { LinkContainer } from "react-router-bootstrap";
 
-import LabelWithInfo from '../../guidance-tools/LabelWithInfo';
+import LabelWithInfo from "../../guidance-tools/LabelWithInfo";
 
-import styles from './NavRoutes.module.css';
-import classnames from 'classnames';
+import styles from "./NavRoutes.module.css";
+import classnames from "classnames";
 
-export default function NavRoutes(
-  {
-    navSpec, navIndex, onNavigate, children,
-    navClassName, pullUp,
-  }
-) {
-  const withBasePath = subpath => `${navSpec.basePath}/${subpath}`;
+export default function NavRoutes({
+  navSpec,
+  navIndex,
+  onNavigate,
+  children,
+  navClassName,
+  pullUp,
+}) {
+  const withBasePath = (subpath) => `${navSpec.basePath}/${subpath}`;
 
-  const navItems = navSpec.items.map((item, index) =>
+  const navItems = navSpec.items.map((item, index) => (
     <LinkContainer
       key={index}
       to={withBasePath(item.navSubpath || item.subpath)}
@@ -51,22 +53,20 @@ export default function NavRoutes(
         <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
       </NavItem>
     </LinkContainer>
-  );
+  ));
 
-  const routes = navSpec.items.map((item, index) =>
+  const routes = navSpec.items.map((item, index) => (
     <Route
       key={index}
       path={withBasePath(item.subpath)}
       component={item.component}
       render={item.render}
     />
-  );
+  ));
 
-  const basePathRedirectTo =
-    withBasePath(
-      navSpec.items[navIndex].navSubpath ||
-      navSpec.items[navIndex].subpath
-    );
+  const basePathRedirectTo = withBasePath(
+    navSpec.items[navIndex].navSubpath || navSpec.items[navIndex].subpath,
+  );
 
   return (
     <div>
@@ -74,19 +74,15 @@ export default function NavRoutes(
         fluid
         className={classnames(navClassName, { [styles.pullUp]: pullUp })}
       >
-        { children }
-        <Nav
-          bsStyle='pills'
-          pullRight
-          onSelect={onNavigate}
-        >
-          { navItems }
+        {children}
+        <Nav bsStyle="pills" pullRight onSelect={onNavigate}>
+          {navItems}
         </Nav>
       </Navbar>
 
       <Switch>
-        { routes }
-        <Redirect to={basePathRedirectTo}/>
+        {routes}
+        <Redirect to={basePathRedirectTo} />
       </Switch>
     </div>
   );

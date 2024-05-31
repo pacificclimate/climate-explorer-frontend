@@ -2,5 +2,5 @@
 // See https://jestjs.io/docs/en/webpack#handling-static-assets
 // Reference: package.json, jest.moduleNameMapper
 
-const stub = 'test-file-stub';
+const stub = "test-file-stub";
 export default stub;

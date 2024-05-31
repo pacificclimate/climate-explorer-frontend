@@ -1,28 +1,31 @@
-import React from 'react';
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { timeseriesToAnnualCycleGraph } from '../../core/chart-generators';
+import { timeseriesToAnnualCycleGraph } from "../../core/chart-generators";
 import {
   assignColoursByGroup,
   fadeSeriesByRank,
   padYAxis,
   matchYAxisRange,
-} from '../../core/chart-formatters';
+} from "../../core/chart-formatters";
 import {
   hasTwoYAxes,
   yAxisUnits,
   yAxisRange,
-} from '../../core/chart-accessors';
-import AnnualCycleGraph from './AnnualCycleGraph';
-import {
-  getVariableOptions,
-  findMatchingMetadata,
-} from '../../core/util';
+} from "../../core/chart-accessors";
+import AnnualCycleGraph from "./AnnualCycleGraph";
+import { getVariableOptions, findMatchingMetadata } from "../../core/util";
 
-export default function DualAnnualCycleGraph(
-  { model_id, experiment, variable_id, meta, comparand_id, comparandMeta, area }
-) {
+export default function DualAnnualCycleGraph({
+  model_id,
+  experiment,
+  variable_id,
+  meta,
+  comparand_id,
+  comparandMeta,
+  area,
+}) {
   function getMetadata(dataSpec) {
     // Find and return metadata matching the data specification (`dataSpec`):
     // model_id, experiment, variable_id, start_date, end_date, ensemble_member
@@ -35,34 +38,40 @@ export default function DualAnnualCycleGraph(
     // `start_date` and `end_date`. (`dataSpec` specifies the values to match.)
     const dateTolerance = 1;
 
-    const timescales = ['monthly', 'seasonal', 'yearly'];
+    const timescales = ["monthly", "seasonal", "yearly"];
 
     // Find matching metadata sets for variable (`variable_id`).
-    const variableMetadataSets = timescales.map(timescale =>
+    const variableMetadataSets = timescales.map((timescale) =>
       findMatchingMetadata(meta, dateTolerance, {
-        model_id, experiment,
+        model_id,
+        experiment,
         variable_id: variable_id,
-        timescale, ...dataSpec,
-      })
+        timescale,
+        ...dataSpec,
+      }),
     );
 
     // Find matching metadata sets for comparand (comparand_id).
     // Only use comparand metadata sets for which there is a corresponding
     // variable metadata set with the same timescale.
     // This is a function because we don't always compute it.
-    const comparandMetadataSets = () => timescales.map((timescale, i) =>
-      variableMetadataSets[i] &&
-      findMatchingMetadata(comparandMeta, dateTolerance, {
-        model_id, experiment,
-        variable_id: comparand_id,
-        timescale, ...dataSpec,
-      })
-    );
+    const comparandMetadataSets = () =>
+      timescales.map(
+        (timescale, i) =>
+          variableMetadataSets[i] &&
+          findMatchingMetadata(comparandMeta, dateTolerance, {
+            model_id,
+            experiment,
+            variable_id: comparand_id,
+            timescale,
+            ...dataSpec,
+          }),
+      );
 
     // Extend variable metadata sets with comparand metdata sets
     // if the comparand is different from the variable.
     const allMetadataSets = variableMetadataSets.concat(
-      variable_id === comparand_id ? [] : comparandMetadataSets()
+      variable_id === comparand_id ? [] : comparandMetadataSets(),
     );
 
     return _.compact(allMetadataSets);
@@ -77,7 +86,7 @@ export default function DualAnnualCycleGraph(
     // function that assigns each data series to one of two groups based on
     // which variable it represents. Passed to assignColoursByGroup to assign
     // graph line colors.
-    const sortByVariable = dataSeries => {
+    const sortByVariable = (dataSeries) => {
       const seriesName = dataSeries[0].toLowerCase();
       if (seriesName.search(variable_id.toLowerCase()) !== -1) {
         return 0;
@@ -96,11 +105,11 @@ export default function DualAnnualCycleGraph(
     //data stand out more.
     const rankByTimeResolution = (dataSeries) => {
       var seriesName = dataSeries[0].toLowerCase();
-      if (seriesName.search('monthly') !== -1) {
+      if (seriesName.search("monthly") !== -1) {
         return 1;
-      } else if (seriesName.search('seasonal') !== -1) {
+      } else if (seriesName.search("seasonal") !== -1) {
         return 0.6;
-      } else if (seriesName.search('yearly') !== -1) {
+      } else if (seriesName.search("yearly") !== -1) {
         return 0.3;
       }
       //no time resolution indicated in timeseries. default to full rank.
@@ -124,38 +133,47 @@ export default function DualAnnualCycleGraph(
     // shift their respective graph lines apart vertically.
     if (hasTwoYAxes(graph) && comparand_id !== variable_id) {
       // see if either variable is listed as conflicting with the other
-      const variableOverlaps = getVariableOptions(variable_id, 'shiftAnnualCycle');
-      const comparandOverlaps = getVariableOptions(comparand_id, 'shiftAnnualCycle');
-      
+      const variableOverlaps = getVariableOptions(
+        variable_id,
+        "shiftAnnualCycle",
+      );
+      const comparandOverlaps = getVariableOptions(
+        comparand_id,
+        "shiftAnnualCycle",
+      );
+
       // see if both variables are annual-only, in which case they visually
       // overlap as well, because both will be graphed as horizontal lines.
-      const annualOnly = (_.reject(meta, m => m.timescale === 'yearly')).length === 0;
-      
-      const overlap = (comparandOverlaps && comparandOverlaps.includes(variable_id))
-        || (variableOverlaps && variableOverlaps.includes(comparand_id));
-      
+      const annualOnly =
+        _.reject(meta, (m) => m.timescale === "yearly").length === 0;
+
+      const overlap =
+        (comparandOverlaps && comparandOverlaps.includes(variable_id)) ||
+        (variableOverlaps && variableOverlaps.includes(comparand_id));
+
       if (overlap || annualOnly) {
         // if the two data series have overlapping ranges and the same units,
-        // set their y axes to the same range to avoid 
+        // set their y axes to the same range to avoid
         // the misleading visuals of *slightly* different y axes.
         //
         // otherwise, just pad each axis by a flat 20% to move the
         // data sets apart visually.
 
         // determine whether the data ranges overlap:
-        const yRange = yAxisRange(graph, 'y');
-        const y2Range = yAxisRange(graph, 'y2');
-        if (yAxisUnits(graph, 'y') === yAxisUnits(graph, 'y2') &&
-           !(yRange.max < y2Range.min || y2Range.max < yRange.min)) {
+        const yRange = yAxisRange(graph, "y");
+        const y2Range = yAxisRange(graph, "y2");
+        if (
+          yAxisUnits(graph, "y") === yAxisUnits(graph, "y2") &&
+          !(yRange.max < y2Range.min || y2Range.max < yRange.min)
+        ) {
           // y axes will have the same range
           graph = matchYAxisRange(graph);
-        }
-        else {
+        } else {
           // y axes padded by 20%
-          const shiftUpAxis = yRange.max > y2Range.max ? 'y' : 'y2';
-          const shiftDownAxis = yRange.max < y2Range.max ? 'y' : 'y2';
-          graph = padYAxis(graph, shiftUpAxis, 'bottom', 0.2);
-          graph = padYAxis(graph, shiftDownAxis, 'top', 0.2);
+          const shiftUpAxis = yRange.max > y2Range.max ? "y" : "y2";
+          const shiftDownAxis = yRange.max < y2Range.max ? "y" : "y2";
+          graph = padYAxis(graph, shiftUpAxis, "bottom", 0.2);
+          graph = padYAxis(graph, shiftDownAxis, "top", 0.2);
         }
       }
     }
@@ -165,8 +183,13 @@ export default function DualAnnualCycleGraph(
   return (
     <AnnualCycleGraph
       {...{
-        model_id, experiment, variable_id, meta,
-        comparand_id, comparandMeta, area,
+        model_id,
+        experiment,
+        variable_id,
+        meta,
+        comparand_id,
+        comparandMeta,
+        area,
         getMetadata,
         dataToGraphSpec,
       }}

@@ -67,37 +67,36 @@
 //    geometry layer group. See `onSetArea` for more details.
 //
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import L from 'leaflet';
-import 'proj4';
-import 'proj4leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import L from "leaflet";
+import "proj4";
+import "proj4leaflet";
+import { EditControl } from "react-leaflet-draw";
 
-import GeoLoader from '../GeoLoader';
-import GeoExporter from '../GeoExporter';
+import GeoLoader from "../GeoLoader";
+import GeoExporter from "../GeoExporter";
 
-import { getLayerMinMax } from '../../data-services/ncwms';
-import { makeHandleLeafletRef } from '../../core/react-leaflet-utils';
-import CanadaBaseMap from '../CanadaBaseMap';
-import DataLayer from './DataLayer';
-import NcWMSColorbarControl from '../NcWMSColorbarControl';
-import NcWMSAutosetColorscaleControl from '../NcWMSAutosetColorscaleControl';
-import { layerParamsPropTypes } from '../../types/types.js';
-import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
-import StaticControl from '../StaticControl';
+import { getLayerMinMax } from "../../data-services/ncwms";
+import { makeHandleLeafletRef } from "../../core/react-leaflet-utils";
+import CanadaBaseMap from "../CanadaBaseMap";
+import DataLayer from "./DataLayer";
+import NcWMSColorbarControl from "../NcWMSColorbarControl";
+import NcWMSAutosetColorscaleControl from "../NcWMSAutosetColorscaleControl";
+import { layerParamsPropTypes } from "../../types/types.js";
+import LayerControlledFeatureGroup from "../LayerControlledFeatureGroup";
+import StaticControl from "../StaticControl";
 
-import { geoJSONToLeafletLayers } from '../../core/geoJSON-leaflet';
-import LayerOpacityControl from '../LayerOpacityControl';
+import { geoJSONToLeafletLayers } from "../../core/geoJSON-leaflet";
+import LayerOpacityControl from "../LayerOpacityControl";
 
-import { getWatershed } from '../../data-services/ce-backend';
-import { validateWatershedData } from '../../core/util';
+import { getWatershed } from "../../data-services/ce-backend";
+import { validateWatershedData } from "../../core/util";
 
-import './DataMap.css';
-
+import "./DataMap.css";
 
 class DataMap extends React.Component {
   static propTypes = {
@@ -114,13 +113,13 @@ class DataMap extends React.Component {
   };
 
   static defaultProps = {
-    activeGeometryStyle: { color: '#3388ff' },
-    inactiveGeometryStyle: { color: '#777777' },
-    watershedGeometryStyle: {color: '#000000' },
+    activeGeometryStyle: { color: "#3388ff" },
+    inactiveGeometryStyle: { color: "#777777" },
+    watershedGeometryStyle: { color: "#000000" },
     pointSelect: false,
   };
 
-  static layerTypes = ['raster', 'isoline', 'annotated'];
+  static layerTypes = ["raster", "isoline", "annotated"];
 
   constructor(props) {
     super(props);
@@ -139,12 +138,13 @@ class DataMap extends React.Component {
       }
     }
   }
-  
-  displayWatershedBoundary = () => this.props.pointSelect && this.props.watershedEnsemble;
+
+  displayWatershedBoundary = () =>
+    this.props.pointSelect && this.props.watershedEnsemble;
 
   // Handler for base map ref.
 
-  handleMapRef = makeHandleLeafletRef('map').bind(this);
+  handleMapRef = makeHandleLeafletRef("map").bind(this);
 
   // Handlers for data layer refs.
 
@@ -173,7 +173,7 @@ class DataMap extends React.Component {
         const corner2 = L.latLng(40, -150);
         bounds = L.latLngBounds(corner1, corner2);
       }
-      getLayerMinMax(layerType, props, bounds).then(response => {
+      getLayerMinMax(layerType, props, bounds).then((response) => {
         onChangeRange(response.data);
       });
     } catch (err) {
@@ -188,7 +188,7 @@ class DataMap extends React.Component {
       // Any other error should be rethrown so it can be noticed and debugged.
       // NOTE: rethrowing errors loses stacktrace in Chrome, see
       // https://bugs.chromium.org/p/chromium/issues/detail?id=60240
-      if (err.message !== 'Set map center and zoom first.') {
+      if (err.message !== "Set map center and zoom first.") {
         throw err;
       }
     }
@@ -198,11 +198,11 @@ class DataMap extends React.Component {
     const leafletElement = layer && layer.leafletElement;
     if (leafletElement) {
       const onChangeRange = this.props[layerType].onChangeRange;
-      leafletElement.on('load', () => {
+      leafletElement.on("load", () => {
         this.updateLayerRange(layerType, this.props, onChangeRange);
       });
     }
-    this.setState({ [`${layerType}Layer`]: leafletElement });  // Ewww
+    this.setState({ [`${layerType}Layer`]: leafletElement }); // Ewww
   }
 
   // Handlers for area selection. Converts area to GeoJSON.
@@ -225,31 +225,29 @@ class DataMap extends React.Component {
   };
 
   layerStyle = (index) => {
-      if(index === 0) {
-          return this.props.activeGeometryStyle;
-      } 
-      else if (this.displayWatershedBoundary()) {
-          return this.props.watershedGeometryStyle;
-      }
-      else {
-          return this.props.inactiveGeometryStyle;
-      }
-  }
-  
-  addGeometryLayer = layer => {
-    this.setState(prevState => {
+    if (index === 0) {
+      return this.props.activeGeometryStyle;
+    } else if (this.displayWatershedBoundary()) {
+      return this.props.watershedGeometryStyle;
+    } else {
+      return this.props.inactiveGeometryStyle;
+    }
+  };
+
+  addGeometryLayer = (layer) => {
+    this.setState((prevState) => {
       layer.setStyle(this.layerStyle(prevState.geometryLayers.length));
       return { geometryLayers: prevState.geometryLayers.concat([layer]) };
     }, this.onSetArea);
   };
 
-  addGeometryLayers = layers => {
+  addGeometryLayers = (layers) => {
     for (const layer of layers) {
       this.addGeometryLayer(layer);
     }
   };
 
-  editGeometryLayers = layers => {
+  editGeometryLayers = (layers) => {
     // May not need to do anything to maintain `state.geometryLayers` here.
     // The contents of the layers are changed, but the layers themselves
     // (as identities) are not changed in number or identity.
@@ -259,15 +257,15 @@ class DataMap extends React.Component {
     this.onSetArea();
   };
 
-  deleteGeometryLayers = layers => {
-    this.setState(prevState => {
+  deleteGeometryLayers = (layers) => {
+    this.setState((prevState) => {
       const geometryLayers = _.without(prevState.geometryLayers, ...layers);
       geometryLayers.forEach((layer, i) => layer.setStyle(this.layerStyle(i)));
       return { geometryLayers };
     }, this.onSetArea);
   };
 
-  eventLayers = e => {
+  eventLayers = (e) => {
     // Extract the Leaflet layers from an editing event, returning them
     // as an array of layers.
     // Note: `e.layers` is a special class, not an array of layers, so we
@@ -275,32 +273,34 @@ class DataMap extends React.Component {
     // The alternative of accessing the private property `e.layers._layers`
     // (a) is naughty, and (b) fails.
     let layers = [];
-    e.layers.eachLayer(layer => layers.push(layer));
+    e.layers.eachLayer((layer) => layers.push(layer));
     return layers;
-  }
+  };
 
-  handleAreaCreated = e => {
+  handleAreaCreated = (e) => {
     //add the watershed boundary to the map if relevant
-    if(this.displayWatershedBoundary()) {
-        // get the latitude and longitude of the new point from its layer object
-        // we know the layer is a CircleMarker
-        // TODO: is there some leaflet built-in function for this, rather than 
-        // an _attribute?
-        const outletLat = e.layer._latlng.lat;
-        const outletLon = e.layer._latlng.lng;
-        getWatershed({
-            ensemble_name: this.props.watershedEnsemble, 
-            area: `POINT (${outletLon} ${outletLat})`})
+    if (this.displayWatershedBoundary()) {
+      // get the latitude and longitude of the new point from its layer object
+      // we know the layer is a CircleMarker
+      // TODO: is there some leaflet built-in function for this, rather than
+      // an _attribute?
+      const outletLat = e.layer._latlng.lat;
+      const outletLon = e.layer._latlng.lng;
+      getWatershed({
+        ensemble_name: this.props.watershedEnsemble,
+        area: `POINT (${outletLon} ${outletLat})`,
+      })
         .then(validateWatershedData)
-        .then(response => {
-            this.addGeometryLayers(geoJSONToLeafletLayers(response.data.boundary));
-        })        
+        .then((response) => {
+          this.addGeometryLayers(
+            geoJSONToLeafletLayers(response.data.boundary),
+          );
+        });
     }
     this.addGeometryLayer(e.layer);
   };
-  handleAreaEdited = e => this.editGeometryLayers(this.eventLayers(e));
-  handleAreaDeleted = e => this.deleteGeometryLayers(this.eventLayers(e));
-
+  handleAreaEdited = (e) => this.editGeometryLayers(this.eventLayers(e));
+  handleAreaDeleted = (e) => this.deleteGeometryLayers(this.eventLayers(e));
 
   handleUploadArea = (geoJSON) => {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
@@ -309,7 +309,7 @@ class DataMap extends React.Component {
   // Handlers for layer opacity
 
   handleChangeLayerOpacity = (layerType, opacity) =>
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       layerOpacity: {
         ...prevState.layerOpacity,
         [layerType]: opacity,
@@ -328,25 +328,24 @@ class DataMap extends React.Component {
   render() {
     // TODO: Add positioning for autoset
 
-    const dataLayers = DataMap.layerTypes.map(layerType => (
-      this.props[layerType] && (
-        <DataLayer
-          layerType={layerType}
-          layerParams={{
-            ...this.props[layerType],
-            opacity: this.state.layerOpacity[layerType],
-          }}
-          onLayerRef={this.handleLayerRef.bind(this, layerType)}
-        />
-      )
-    ));
+    const dataLayers = DataMap.layerTypes.map(
+      (layerType) =>
+        this.props[layerType] && (
+          <DataLayer
+            layerType={layerType}
+            layerParams={{
+              ...this.props[layerType],
+              opacity: this.state.layerOpacity[layerType],
+            }}
+            onLayerRef={this.handleLayerRef.bind(this, layerType)}
+          />
+        ),
+    );
 
     const allowGeometryDraw = this.state.geometryLayers.length === 0;
 
     return (
-      <CanadaBaseMap
-        mapRef={this.handleMapRef}
-      >
+      <CanadaBaseMap mapRef={this.handleMapRef}>
         {dataLayers}
 
         <LayerOpacityControl
@@ -356,7 +355,7 @@ class DataMap extends React.Component {
 
         <NcWMSColorbarControl
           layer={this.state.rasterLayer}
-          {...this.props.raster}  // update when any raster prop changes
+          {...this.props.raster} // update when any raster prop changes
         />
 
         <NcWMSAutosetColorscaleControl
@@ -365,43 +364,43 @@ class DataMap extends React.Component {
 
         <NcWMSColorbarControl
           layer={this.state.isolineLayer}
-          {...this.props.isoline}  // update when any isoline prop changes
+          {...this.props.isoline} // update when any isoline prop changes
         />
 
-        {
-          allowGeometryDraw && !this.props.pointSelect &&
-          <StaticControl position='topleft'>
-              <GeoLoader
-                onLoadArea={this.handleUploadArea}
-                title='Import polygon'
-              />
+        {allowGeometryDraw && !this.props.pointSelect && (
+          <StaticControl position="topleft">
+            <GeoLoader
+              onLoadArea={this.handleUploadArea}
+              title="Import polygon"
+            />
           </StaticControl>
-        }
+        )}
 
-        <LayerControlledFeatureGroup
-          layers={this.state.geometryLayers}
-        >
+        <LayerControlledFeatureGroup layers={this.state.geometryLayers}>
           <EditControl
-            position='topleft'
+            position="topleft"
             draw={{
               marker: false,
-              circlemarker: allowGeometryDraw && this.props.pointSelect && {
-                  title: 'Select an outlet point',
-                  text: 'Select an outlet point'
-              },
+              circlemarker: allowGeometryDraw &&
+                this.props.pointSelect && {
+                  title: "Select an outlet point",
+                  text: "Select an outlet point",
+                },
               circle: false,
               polyline: false,
-              polygon: allowGeometryDraw && !this.props.pointSelect && {
-                showArea: false,
-                showLength: false,
-              },
-              rectangle: allowGeometryDraw && !this.props.pointSelect && {
-                showArea: false,
-                showLength: false,
-              },
+              polygon: allowGeometryDraw &&
+                !this.props.pointSelect && {
+                  showArea: false,
+                  showLength: false,
+                },
+              rectangle: allowGeometryDraw &&
+                !this.props.pointSelect && {
+                  showArea: false,
+                  showLength: false,
+                },
             }}
             //don't allow editing watershed boundary polygon
-            edit={this.displayWatershedBoundary() ? {edit: false} : {}} 
+            edit={this.displayWatershedBoundary() ? { edit: false } : {}}
             onCreated={this.handleAreaCreated}
             onEdited={this.handleAreaEdited}
             onDeleted={this.handleAreaDeleted}
@@ -411,17 +410,17 @@ class DataMap extends React.Component {
         {
           // See comments at module head regarding current GeoExporter
           // arrangement.
-          !allowGeometryDraw &&
-          <StaticControl position='topleft'>
+          !allowGeometryDraw && (
+            <StaticControl position="topleft">
               <GeoExporter
                 area={this.layersToArea(this.state.geometryLayers)}
-                title='Export polygon'
+                title="Export polygon"
               />
-          </StaticControl>
+            </StaticControl>
+          )
         }
 
-        { this.props.children }
-
+        {this.props.children}
       </CanadaBaseMap>
     );
   }

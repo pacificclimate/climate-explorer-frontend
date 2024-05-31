@@ -1,15 +1,12 @@
-import React from 'react';
-import { ListGroup, ListGroupItem } from 'react-bootstrap';
-import T from 'pcic-react-external-text';
-import _ from 'lodash';
+import React from "react";
+import { ListGroup, ListGroupItem } from "react-bootstrap";
+import T from "pcic-react-external-text";
+import _ from "lodash";
 
 export function Item({ header, href, body }) {
   return (
-    <ListGroupItem
-      header={header}
-      href={href}
-    >
-      <T.Markdown source={body}/>
+    <ListGroupItem header={header} href={href}>
+      <T.Markdown source={body} />
     </ListGroupItem>
   );
 }
@@ -20,7 +17,9 @@ export default function List({ items }) {
   }
   return (
     <ListGroup>
-      { items.map(item => <Item {...item}/>) }
+      {items.map((item) => (
+        <Item {...item} />
+      ))}
     </ListGroup>
   );
 }

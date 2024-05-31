@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Glyphicon, Popover, OverlayTrigger } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Glyphicon, Popover, OverlayTrigger } from "react-bootstrap";
 
-import styles from './Information.module.css';
+import styles from "./Information.module.css";
 
 let idNum = 0;
 
@@ -10,19 +10,15 @@ function nextPopoverId() {
   return `info-popover-${idNum++}`;
 }
 
-export default function Information(
-  { glyph, placement, delayHide, children }
-) {
+export default function Information({ glyph, placement, delayHide, children }) {
   return (
     <OverlayTrigger
-      trigger='click'
+      trigger="click"
       rootClose
       placement={placement}
-      overlay={
-        <Popover id={nextPopoverId()}>{children}</Popover>
-      }
+      overlay={<Popover id={nextPopoverId()}>{children}</Popover>}
     >
-      <Glyphicon glyph={glyph} className={styles.icon}/>
+      <Glyphicon glyph={glyph} className={styles.icon} />
     </OverlayTrigger>
   );
 }
@@ -35,7 +31,7 @@ Information.propTypes = {
 };
 
 Information.defaultProps = {
-  glyph: 'info-sign',
-  placement: 'bottom',
+  glyph: "info-sign",
+  placement: "bottom",
   delayHide: 1000,
 };

@@ -10,49 +10,54 @@
 // and `dataToGraphSpec`, which respectively return metadata describing the
 // the datasets to display, and return a graph spec for the graph proper.
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col, ControlLabel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { TimeOfYearSelector } from 'pcic-react-components';
-import DataGraph from '../DataGraph/DataGraph';
-import ExportButtons from '../ExportButtons';
+import { TimeOfYearSelector } from "pcic-react-components";
+import DataGraph from "../DataGraph/DataGraph";
+import ExportButtons from "../ExportButtons";
 
 import {
   loadingDataGraphSpec,
   noDataMessageGraphSpec,
   errorMessage,
-} from '../graph-helpers';
+} from "../graph-helpers";
 import {
   timeKeyToResolutionIndex,
   validateLongTermAverageData,
   timeResolutions,
-} from '../../../core/util';
-import { getData } from '../../../data-services/ce-backend';
-import { exportDataToWorksheet } from '../../../core/export';
-import { timeOfYearSelectorLabel } from
-    '../../guidance-content/info/InformationItems';
-import styles from './LongTermAveragesGraph.module.css';
+} from "../../../core/util";
+import { getData } from "../../../data-services/ce-backend";
+import { exportDataToWorksheet } from "../../../core/export";
+import { timeOfYearSelectorLabel } from "../../guidance-content/info/InformationItems";
+import styles from "./LongTermAveragesGraph.module.css";
 
 export default class LongTermAveragesGraph extends React.Component {
+  static defaultProps = {
+    hideTimeOfYearSelector: false,
+  };
   static propTypes = {
     model_id: PropTypes.string,
     variable_id: PropTypes.string,
     experiment: PropTypes.string,
     meta: PropTypes.array,
     area: PropTypes.string,
-    getMetadata: PropTypes.func,
     // `getMetadata` returns the metadata describing the datasets to
     // be displayed in this component.
     // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
-    dataToGraphSpec: PropTypes.func,
+    getMetadata: PropTypes.func,
     // `dataToGraphSpec` converts data (monthly, seasonal, annual cycle data)
     // to a graph spec.
     // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
+    dataToGraphSpec: PropTypes.func,
+    // Not all screens require the time of year selector, specifically the extreme
+    // stream flow screen. This prop is used to hide the time of year selector.
+    hideTimeOfYearSelector: PropTypes.bool,
   };
 
   // Lifecycle hooks
@@ -64,6 +69,9 @@ export default class LongTermAveragesGraph extends React.Component {
   constructor(props) {
     super(props);
 
+    // Suggest swapping this out for a more human readable value possibly passed
+    // in as a prop when this component is refactored from class to function.
+    const defaultTimeOfYearValue = { value: 16 }; // this is the "annual" value
     // See ../README for an explanation of the content and usage
     // of state values. This is important for understanding how this
     // component works.
@@ -71,11 +79,17 @@ export default class LongTermAveragesGraph extends React.Component {
     this.state = {
       prevMeta: null,
       prevArea: null,
-      prevTimeOfYear: undefined,
-      timeOfYear: undefined,
+      prevTimeOfYear: props.hideTimeOfYearSelector
+        ? defaultTimeOfYearValue
+        : undefined,
+      timeOfYear: props.hideTimeOfYearSelector
+        ? defaultTimeOfYearValue
+        : undefined,
       data: null,
       dataError: null,
     };
+
+    console.log(this.state);
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -83,8 +97,8 @@ export default class LongTermAveragesGraph extends React.Component {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -93,8 +107,8 @@ export default class LongTermAveragesGraph extends React.Component {
     if (state.prevTimeOfYear !== state.timeOfYear) {
       return {
         prevTimeOfYear: state.timeOfYear,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
@@ -116,37 +130,40 @@ export default class LongTermAveragesGraph extends React.Component {
   // Data fetching
 
   getAndValidateData(metadata) {
-    return (
-      getData(metadata)
+    return getData(metadata)
       .then(validateLongTermAverageData)
-      .then(response => response.data)
-    );
+      .then((response) => response.data);
   }
 
   getMetadatas = () =>
     // This fn is called multiple times, so memoize it if inefficient
-    this.props.getMetadata(this.state.timeOfYear && this.state.timeOfYear.value)
-    .filter(metadata => !!metadata)
+    this.props
+      .getMetadata(this.state.timeOfYear && this.state.timeOfYear.value)
+      .filter((metadata) => !!metadata);
 
   fetchData() {
     this.setState({ fetchingData: true });
+
+    console.log(this.state);
     Promise.all(
-      this.getMetadatas()
-      .map(metadata => this.getAndValidateData(metadata))
+      this.getMetadatas().map((metadata) => this.getAndValidateData(metadata)),
     )
-    .then(data => {
-      this.setState({
-        fetchingData: false,
-        data,
-        dataError: null,
+      .then((data) => {
+        this.setState({
+          fetchingData: false,
+          data,
+          dataError: null,
+        });
+
+        console.log(this.state);
+      })
+      .catch((dataError) => {
+        this.setState({
+          // Do we have to set data non-null here to prevent infinite update loop?
+          fetchingData: false,
+          dataError,
+        });
       });
-    }).catch(dataError => {
-      this.setState({
-        // Do we have to set data non-null here to prevent infinite update loop?
-        fetchingData: false,
-        dataError,
-      });
-    });
   }
 
   // User event handlers
@@ -161,17 +178,17 @@ export default class LongTermAveragesGraph extends React.Component {
 
   exportData(format) {
     exportDataToWorksheet(
-      'climoseries',
-      _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
+      "climoseries",
+      _.pick(this.props, "model_id", "variable_id", "experiment", "meta"),
       this.graphSpec(),
       format,
-      timeKeyToResolutionIndex(this.state.timeOfYear.value)
+      timeKeyToResolutionIndex(this.state.timeOfYear.value),
     );
   }
 
-  handleExportXlsx = this.exportData.bind(this, 'xlsx');
-  handleExportCsv = this.exportData.bind(this, 'csv');
-  
+  handleExportXlsx = this.exportData.bind(this, "xlsx");
+  handleExportCsv = this.exportData.bind(this, "csv");
+
   // render helpers
 
   graphSpec() {
@@ -199,21 +216,24 @@ export default class LongTermAveragesGraph extends React.Component {
   }
 
   render() {
+    const controlsWidth = this.props.hideTimeOfYearSelector ? 12 : 6;
     return (
       <React.Fragment>
         <Row>
-          <Col lg={6} md={6} sm={6}>
-            <ControlLabel className={styles.selector_label}>
-              {timeOfYearSelectorLabel}
-            </ControlLabel>
-            <TimeOfYearSelector
-              value={this.state.timeOfYear}
-              onChange={this.handleChangeTimeOfYear}
-              {...timeResolutions(this.props.meta)}
-              className={styles.selector}
-            />
-          </Col>
-          <Col lg={6} md={6} sm={6}>
+          {!this.props.hideTimeOfYearSelector && (
+            <Col lg={6} md={6} sm={6}>
+              <ControlLabel className={styles.selector_label}>
+                {timeOfYearSelectorLabel}
+              </ControlLabel>
+              <TimeOfYearSelector
+                value={this.state.timeOfYear}
+                onChange={this.handleChangeTimeOfYear}
+                {...timeResolutions(this.props.meta)}
+                className={styles.selector}
+              />
+            </Col>
+          )}
+          <Col lg={controlsWidth} md={controlsWidth} sm={controlsWidth}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
@@ -222,7 +242,7 @@ export default class LongTermAveragesGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph {...this.graphSpec()}/>
+            <DataGraph {...this.graphSpec()} />
           </Col>
         </Row>
       </React.Fragment>

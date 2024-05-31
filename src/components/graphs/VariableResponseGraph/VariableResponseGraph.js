@@ -1,24 +1,25 @@
 /**************************************************************************
- * VariableResponseGraph.js - scatterplot showing relationship between two 
+ * VariableResponseGraph.js - scatterplot showing relationship between two
  *                            variables
  **************************************************************************/
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col } from "react-bootstrap";
 
-import DataGraph from '../DataGraph/DataGraph';
+import DataGraph from "../DataGraph/DataGraph";
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData,
-} from '../../../core/util';
-import { getTimeseries } from '../../../data-services/ce-backend';
+} from "../../../core/util";
+import { getTimeseries } from "../../../data-services/ce-backend";
 import {
   blankGraphSpec,
-  displayError, multiYearMeanSelected,
-  noDataMessageGraphSpec, shouldLoadData,
-} from '../graph-helpers';
-
+  displayError,
+  multiYearMeanSelected,
+  noDataMessageGraphSpec,
+  shouldLoadData,
+} from "../graph-helpers";
 
 // This component renders a graph of the spatially averaged values of a
 // non-temporally averaged dataset over time.
@@ -59,14 +60,12 @@ export default class VariableResponseGraph extends React.Component {
   };
 
   getAndValidateTimeseries(metadata, area) {
-    const validate = multiYearMeanSelected(this.props) ?
-      validateAnnualCycleData :
-      validateUnstructuredTimeseriesData;
-    return (
-      getTimeseries(metadata, area)
-        .then(validate)
-        .then(response => response.data)
-    );
+    const validate = multiYearMeanSelected(this.props)
+      ? validateAnnualCycleData
+      : validateUnstructuredTimeseriesData;
+    return getTimeseries(metadata, area)
+      .then(validate)
+      .then((response) => response.data);
   }
 
   loadGraph() {
@@ -77,22 +76,31 @@ export default class VariableResponseGraph extends React.Component {
       return;
     }
     if (this.props.comparand_id === this.props.variable_id) {
-      this.displayNoDataMessage("Variable response graph requires two selected variables");
+      this.displayNoDataMessage(
+        "Variable response graph requires two selected variables",
+      );
       return;
     }
 
-    const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
-    const timeseriesPromises = metadatas.map(metadata =>
-      this.getAndValidateTimeseries(metadata, this.props.area)
+    const metadatas = this.props.getMetadata().filter((metadata) => !!metadata);
+    const timeseriesPromises = metadatas.map((metadata) =>
+      this.getAndValidateTimeseries(metadata, this.props.area),
     );
 
-    Promise.all(timeseriesPromises).then(data => {
-      this.setState({
-        graphSpec: this.props.dataToGraphSpec(metadatas, data, this.props.variable_id, this.props.comparand_id),
+    Promise.all(timeseriesPromises)
+      .then((data) => {
+        this.setState({
+          graphSpec: this.props.dataToGraphSpec(
+            metadatas,
+            data,
+            this.props.variable_id,
+            this.props.comparand_id,
+          ),
+        });
+      })
+      .catch((error) => {
+        displayError(error, this.displayNoDataMessage);
       });
-    }).catch(error => {
-      displayError(error, this.displayNoDataMessage);
-    });
   }
 
   // Lifecycle hooks
@@ -115,7 +123,7 @@ export default class VariableResponseGraph extends React.Component {
     return (
       <Row>
         <Col>
-          <DataGraph {...this.state.graphSpec}/>
+          <DataGraph {...this.state.graphSpec} />
         </Col>
       </Row>
     );

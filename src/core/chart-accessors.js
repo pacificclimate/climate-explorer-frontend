@@ -6,13 +6,11 @@
  *
  * Reference on the C3 chart spec format can be found at https://c3js.org
  ***************************************************************************/
-import _ from 'lodash';
-
+import _ from "lodash";
 
 // C3 data series are an array containing a string axis label followed by the
 // (numeric) data values for the axis. This function returns the data.
-export const seriesData = series => _.drop(series, 1);
-
+export const seriesData = (series) => _.drop(series, 1);
 
 export function hasTwoYAxes(graph) {
   // returns a truthy object if this graph has a both a y and y2 axis defined
@@ -23,7 +21,7 @@ export function checkYAxisValidity(graph, axis) {
   // helper function that throws an error if the named (typically "y" or "y2")
   // y axis is not present in the graph spec.
   if (!graph.axis[axis]) {
-    throw new Error('Error: invalid axis ' + axis);
+    throw new Error("Error: invalid axis " + axis);
   }
 }
 
@@ -39,22 +37,22 @@ export function yAxisUnits(graph, axis) {
 
 export function yAxisRange(graph, axis) {
   // returns an object containing the maximum and minimum of all
-  // data series in this graph spec associated with a particular 
+  // data series in this graph spec associated with a particular
   // y-axis. The axis argument is typically either "y" or "y2".
   // Return value has the format {max: 10, min: 0}
   checkYAxisValidity(graph, axis);
 
   // Filter to just the data points associated with this y axis.
-  const axisData =
-    _.flattenDeep(  // deep flattening may not be required here
-      _.map(
-        graph.data.columns.filter(ser => axis === graph.data.axes[ser[0]]),
-        seriesData
-      )
-    );
+  const axisData = _.flattenDeep(
+    // deep flattening may not be required here
+    _.map(
+      graph.data.columns.filter((ser) => axis === graph.data.axes[ser[0]]),
+      seriesData,
+    ),
+  );
 
   return {
     min: _.min(axisData),
     max: _.max(axisData),
-  };  
+  };
 }

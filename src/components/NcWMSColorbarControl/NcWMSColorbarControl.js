@@ -1,9 +1,6 @@
-import React from 'react';  // Necessary?
+import { MapControl, withLeaflet } from "react-leaflet";
 
-import { MapControl, withLeaflet } from 'react-leaflet';
-
-import LeafletNcWMSColorbarControl from './LeafletNcWMSColorbarControl';
-
+import LeafletNcWMSColorbarControl from "./LeafletNcWMSColorbarControl";
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/123
 class NcWMSColorbarControl extends MapControl {

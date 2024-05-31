@@ -1,24 +1,25 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col, ControlLabel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import DataGraph from '../DataGraph/DataGraph';
-import ExportButtons from '../ExportButtons';
-import { exportDataToWorksheet } from '../../../core/export';
-import styles from './TimeSeriesGraph.module.css';
+import DataGraph from "../DataGraph/DataGraph";
+import ExportButtons from "../ExportButtons";
+import { exportDataToWorksheet } from "../../../core/export";
+import styles from "./TimeSeriesGraph.module.css";
 import {
   validateAnnualCycleData,
   validateUnstructuredTimeseriesData,
-} from '../../../core/util';
-import { getTimeseries } from '../../../data-services/ce-backend';
+} from "../../../core/util";
+import { getTimeseries } from "../../../data-services/ce-backend";
 import {
   blankGraphSpec,
-  displayError, multiYearMeanSelected,
-  noDataMessageGraphSpec, shouldLoadData,
-} from '../graph-helpers';
-
+  displayError,
+  multiYearMeanSelected,
+  noDataMessageGraphSpec,
+  shouldLoadData,
+} from "../graph-helpers";
 
 // This component renders a graph of the spatially averaged values of a
 // non-temporally averaged dataset over time.
@@ -59,14 +60,12 @@ export default class TimeSeriesGraph extends React.Component {
   };
 
   getAndValidateTimeseries(metadata, area) {
-    const validate = multiYearMeanSelected(this.props) ?
-      validateAnnualCycleData :
-      validateUnstructuredTimeseriesData;
-    return (
-      getTimeseries(metadata, area)
-        .then(validate)
-        .then(response => response.data)
-    );
+    const validate = multiYearMeanSelected(this.props)
+      ? validateAnnualCycleData
+      : validateUnstructuredTimeseriesData;
+    return getTimeseries(metadata, area)
+      .then(validate)
+      .then((response) => response.data);
   }
 
   loadGraph() {
@@ -77,18 +76,20 @@ export default class TimeSeriesGraph extends React.Component {
       return;
     }
 
-    const metadatas = this.props.getMetadata().filter(metadata => !!metadata);
-    const timeseriesPromises = metadatas.map(metadata =>
-      this.getAndValidateTimeseries(metadata, this.props.area)
+    const metadatas = this.props.getMetadata().filter((metadata) => !!metadata);
+    const timeseriesPromises = metadatas.map((metadata) =>
+      this.getAndValidateTimeseries(metadata, this.props.area),
     );
 
-    Promise.all(timeseriesPromises).then(data => {
-      this.setState({
-        graphSpec: this.props.dataToGraphSpec(metadatas, data),
+    Promise.all(timeseriesPromises)
+      .then((data) => {
+        this.setState({
+          graphSpec: this.props.dataToGraphSpec(metadatas, data),
+        });
+      })
+      .catch((error) => {
+        displayError(error, this.displayNoDataMessage);
       });
-    }).catch(error => {
-      displayError(error, this.displayNoDataMessage);
-    });
   }
 
   // Lifecycle hooks
@@ -110,16 +111,16 @@ export default class TimeSeriesGraph extends React.Component {
   // User event handlers
   exportData(format) {
     exportDataToWorksheet(
-      'raw_timeseries',
-      _.pick(this.props, 'model_id', 'variable_id', 'experiment', 'meta'),
+      "raw_timeseries",
+      _.pick(this.props, "model_id", "variable_id", "experiment", "meta"),
       this.state.graphSpec,
       format,
-      null
+      null,
     );
   }
 
-  handleExportXlsx = this.exportData.bind(this, 'xlsx');
-  handleExportCsv = this.exportData.bind(this, 'csv');
+  handleExportXlsx = this.exportData.bind(this, "xlsx");
+  handleExportCsv = this.exportData.bind(this, "csv");
 
   render() {
     return (
@@ -134,7 +135,7 @@ export default class TimeSeriesGraph extends React.Component {
         </Row>
         <Row>
           <Col>
-            <DataGraph {...this.state.graphSpec}/>
+            <DataGraph {...this.state.graphSpec} />
             <ControlLabel className={styles.graphlabel}>
               Highlight a time span on lower graph to see more detail
             </ControlLabel>

@@ -1,0 +1,45 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+  "name": "Climate explorer frontend",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      // Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
+      // Append -bullseye or -buster to pin to an OS version.
+      // Use -bullseye variants on local on arm64/Apple Silicon.
+      "VARIANT": "ubuntu-22.04"
+    }
+  },
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.8.10"
+    }
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bash ./.devcontainer/post-install.sh",
+  "postStartCommand": "bash ./.devcontainer/post-start.sh",
+  // Configure tool-specific properties.
+  // "customizations": {},
+  // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "vscode",
+  "runArgs": [
+    // allow container to be treated with no network isolation
+    "--network=host",
+    // give a nicer name to the container
+    "--name",
+    "ce_frontend_${localEnv:USER}"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": ["EditorConfig.EditorConfig", "ms-vscode.makefile-tools"]
+    }
+  }
+}

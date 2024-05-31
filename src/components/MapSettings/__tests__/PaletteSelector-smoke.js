@@ -1,16 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import PaletteSelector from '../PaletteSelector';
-import { noop } from 'lodash';
+import React from "react";
+import ReactDOM from "react-dom";
+import PaletteSelector from "../PaletteSelector";
+import { noop } from "lodash";
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
+it("renders without crashing", () => {
+  const div = document.createElement("div");
   ReactDOM.render(
-    <PaletteSelector
-      name='Raster'
-      value='seq-Blues'
-      onChange={noop}
-    />,
-    div
+    <PaletteSelector name="Raster" value="seq-Blues" onChange={noop} />,
+    div,
   );
 });

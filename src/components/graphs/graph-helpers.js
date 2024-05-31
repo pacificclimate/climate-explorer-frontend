@@ -1,20 +1,18 @@
-import _ from 'lodash';
+import _ from "lodash";
 import {
-  assignColoursByGroup, fadeSeriesByRank,
-  hideSeriesInLegend, sortSeriesByRank, hideSeriesInTooltip
-  } from '../../core/chart-formatters';
-import { caseInsensitiveStringSearch } from '../../core/util';
+  assignColoursByGroup,
+  fadeSeriesByRank,
+  hideSeriesInLegend,
+  sortSeriesByRank,
+  hideSeriesInTooltip,
+} from "../../core/chart-formatters";
+import { caseInsensitiveStringSearch } from "../../core/util";
 
-
-function areAllPropsValid(
-  { meta, model_id, variable_id, experiment }
-) {
-  console.log('areAllPropsValid', { meta, model_id, variable_id, experiment })
-  const propValues = _.values(
-    { meta, model_id, variable_id, experiment });
-  return (propValues.length > 0) && propValues.every(Boolean);
+function areAllPropsValid({ meta, model_id, variable_id, experiment }) {
+  console.log("areAllPropsValid", { meta, model_id, variable_id, experiment });
+  const propValues = _.values({ meta, model_id, variable_id, experiment });
+  return propValues.length > 0 && propValues.every(Boolean);
 }
-
 
 function multiYearMeanSelected({ model_id, variable_id, experiment, meta }) {
   // Indicates whether the currently selected dataset is a multi-year-mean
@@ -29,13 +27,11 @@ function hasComparand(props) {
   return !_.isUndefined(props.comparandMeta);
 }
 
-
 function isVariableMYM(props) {
   // Indicates whether the currently selected dataset for the (primary)
   // variable is a multi-year-mean
   return multiYearMeanSelected(props);
 }
-
 
 function isComparandMYM({ model_id, comparand_id, experiment, comparandMeta }) {
   // Indicates whether the currently selected dataset for the (secondary)
@@ -48,17 +44,18 @@ function isComparandMYM({ model_id, comparand_id, experiment, comparandMeta }) {
   });
 }
 
-
 function isEnsembleLoading(props) {
   // When switching ensembles, DualDataController is sometimes rendered when
   // the primary variable has been updated to reflect the new ensemble,
   // but the comparand hasn't yet.
   // This function evaluates that condition.
   // False when there is no comparand to load!
-  return hasComparand(props) &&
-    props.meta.length > 0 && props.comparandMeta.length < 1;
+  return (
+    hasComparand(props) &&
+    props.meta.length > 0 &&
+    props.comparandMeta.length < 1
+  );
 }
-
 
 function findMatchingMetadata(example, difference, meta) {
   // Given a dataset's metadata and a "difference" listing of attribute values pairs,
@@ -71,9 +68,9 @@ function findMatchingMetadata(example, difference, meta) {
   // would return the annual-resolution dataset that corresponds to a monthly one.
   // Returns only one dataset's metadata even if multiple qualify.
   var template = {};
-  for(var att in example) {
+  for (var att in example) {
     // TODO: !==
-    if(att != 'unique_id' && att != 'variable_name') {
+    if (att !== "unique_id" && att !== "variable_name") {
       template[att] = difference[att] ? difference[att] : example[att];
     }
   }
@@ -87,12 +84,12 @@ export function errorMessage(error) {
   // and parsers, which have different formats.
   if (error.response) {
     // axios error: data server sent a non-200 response
-    return 'Error: ' + error.response.status + ' received from data server.';
+    return "Error: " + error.response.status + " received from data server.";
   }
 
   if (error.request) {
     // axios error: data server didn't respond
-    return 'Error: no response received from data server.';
+    return "Error: no response received from data server.";
   }
 
   // either an error thrown by a data validation function,
@@ -106,12 +103,10 @@ export function errorMessage(error) {
   return error.message;
 }
 
-
 function displayError(error, displayMethod) {
   // Used to display any error (via `displayMethod`)
   displayMethod(errorMessage(error));
 }
-
 
 function noDataMessageGraphSpec(message) {
   return {
@@ -127,7 +122,6 @@ function noDataMessageGraphSpec(message) {
   };
 }
 
-
 const blankGraphSpec = {
   data: {
     columns: [],
@@ -135,8 +129,7 @@ const blankGraphSpec = {
   axis: {},
 };
 
-export const loadingDataGraphSpec = noDataMessageGraphSpec('Loading data...');
-
+export const loadingDataGraphSpec = noDataMessageGraphSpec("Loading data...");
 
 function shouldLoadData(props, displayMessage) {
   // Return true iff the current state, evaluated based on `props`, indicates
@@ -144,14 +137,17 @@ function shouldLoadData(props, displayMessage) {
   // As a side effect, display the appropriate data loading message via
   // `displayMessage`.
   const tests = [
-    { failCondition: p => !areAllPropsValid(p),
-      message: 'Preparing to load data...' },
-    { failCondition: isEnsembleLoading,
-      message: 'Loading ensemble...' },
-    { failCondition: p =>
-        hasComparand(p) && (isVariableMYM(p) !== isComparandMYM(p)),
+    {
+      failCondition: (p) => !areAllPropsValid(p),
+      message: "Preparing to load data...",
+    },
+    { failCondition: isEnsembleLoading, message: "Loading ensemble..." },
+    {
+      failCondition: (p) =>
+        hasComparand(p) && isVariableMYM(p) !== isComparandMYM(p),
       message:
-        'Error: Cannot compare climatologies to nominal time value datasets.' },
+        "Error: Cannot compare climatologies to nominal time value datasets.",
+    },
   ];
   for (const test of tests) {
     if (test.failCondition(props)) {
@@ -159,7 +155,7 @@ function shouldLoadData(props, displayMessage) {
       return false;
     }
   }
-  displayMessage('Loading data...');
+  displayMessage("Loading data...");
   return true;
 }
 
@@ -172,10 +168,10 @@ function emphasizeSeries(graph, seriesName) {
   // particular dataset: (SingleTimeSliceGraph, SingleContextGraph).
   // Classify data series by which model generated them
   const makeSegmentor = function (selectedOutput, otherOutput) {
-    return function(dataseries) {
-      return caseInsensitiveStringSearch(dataseries[0], seriesName) ?
-        selectedOutput :
-        otherOutput;
+    return function (dataseries) {
+      return caseInsensitiveStringSearch(dataseries[0], seriesName)
+        ? selectedOutput
+        : otherOutput;
     };
   };
 

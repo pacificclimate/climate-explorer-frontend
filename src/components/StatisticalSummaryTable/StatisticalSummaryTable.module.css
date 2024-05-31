@@ -1,12 +1,12 @@
 .mevSummary {
-    text-align: right;
+  text-align: right;
 }
 
 .selector_label {
-    margin-right: 1em;
+  margin-right: 1em;
 }
 
 .selector {
-    display: inline-block;
-    width: 50%;
+  display: inline-block;
+  width: 50%;
 }

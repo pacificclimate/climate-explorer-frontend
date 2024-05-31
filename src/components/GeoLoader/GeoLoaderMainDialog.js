@@ -1,9 +1,8 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { FormControl, Button, Modal } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { FormControl, Button, Modal } from "react-bootstrap";
 
-import g from '../../core/geo';
-
+import g from "../../core/geo";
 
 export default class GeoloaderMainDialog extends React.Component {
   // Note slightly tricky bit needed to chain A-controls-B components:
@@ -30,36 +29,33 @@ export default class GeoloaderMainDialog extends React.Component {
   render() {
     return (
       <Modal show={this.props.controls[1].show()}>
-  
         <Modal.Header closeButton>
           <Modal.Title>Import Polygon</Modal.Title>
         </Modal.Header>
-  
+
         <Modal.Body>
           <p>
             <FormControl
-              type='file'
-              label='Select file'
+              type="file"
+              label="Select file"
               onChange={(e) => this.importPolygon(e.currentTarget.files[0])}
             />
           </p>
           <p>
-            We recommend importing only a file containing a
-            single Feature (not a FeatureCollection).
+            We recommend importing only a file containing a single Feature (not
+            a FeatureCollection).
           </p>
           <p>
-            If you import a file containing multiple features,
-            only the first feature (in the internal order within the file)
-            will become active and be used to form spatial averages.
-            The active feature is coloured blue.
-            Inactive features are coloured grey.
+            If you import a file containing multiple features, only the first
+            feature (in the internal order within the file) will become active
+            and be used to form spatial averages. The active feature is coloured
+            blue. Inactive features are coloured grey.
           </p>
         </Modal.Body>
-  
+
         <Modal.Footer>
           <Button onClick={this.props.controls[1].close}>Close</Button>
         </Modal.Footer>
-  
       </Modal>
     );
   }

@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ScaleSelector from '../ColourMapTypeSelector';
-import { noop } from 'lodash';
+import React from "react";
+import ReactDOM from "react-dom";
+import ScaleSelector from "../ColourMapTypeSelector";
+import { noop } from "lodash";
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
+it("renders without crashing", () => {
+  const div = document.createElement("div");
   ReactDOM.render(
     <ScaleSelector
-      name='Raster'
-      variableId='tasmax'
+      name="Raster"
+      variableId="tasmax"
       layerMin={-23.34}
-      value={'false'}
+      value={"false"}
       onChange={noop}
     />,
-    div
+    div,
   );
 });

@@ -1,17 +1,17 @@
 /*************************************************************************
  * DualMapController - displays two variables on the map at once
- * 
+ *
  * This controller coordinates a map displaying two layers at once:
  *   * A raster layer with colour shading reflecting values
  *   * A coloured isoline layer
- * 
- * The layers may display separate timestamps at once. The user may 
+ *
+ * The layers may display separate timestamps at once. The user may
  * configure map layer settings including colour pallete, period and run,
  * whether colour to value mapping is logarithmic, and selected timestamp
  * on a map settings menu.
- * 
+ *
  * Props: one or two arrays of metadata describing available files
- * 
+ *
  * Children:
  *   * Datamap, which actually renders the map
  *   * MapSettings, which allows user configuration of map layers
@@ -21,18 +21,18 @@
 // Also contains some legacy code that should be further refactored, primarily
 // `loadMap` and the handling of datasets (see TODOs/FIXMEs).
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import Loader from 'react-loader';
-import { Panel, Row, Col } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import Loader from "react-loader";
+import { Panel, Row, Col } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import '../MapController.module.css';
-import DataMap from '../../DataMap';
-import MapLegend from '../../MapLegend';
-import MapSettings from '../../MapSettings';
-import StaticControl from '../../StaticControl';
+import "../MapController.module.css";
+import DataMap from "../../DataMap";
+import MapLegend from "../../MapLegend";
+import MapSettings from "../../MapSettings";
+import StaticControl from "../../StaticControl";
 
 import {
   hasValidData,
@@ -45,12 +45,10 @@ import {
   updateLayerTime,
   getDatasetIdentifiers,
   isMultiRun,
-} from '../map-helpers.js';
+} from "../map-helpers.js";
 
-import styles from '../MapController.module.css';
-import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { MEVSummary } from '../../data-presentation/MEVSummary';
-
+import styles from "../MapController.module.css";
+import { mapPanelLabel } from "../../guidance-content/info/InformationItems";
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class DualMapController extends React.Component {
@@ -79,50 +77,52 @@ export default class DualMapController extends React.Component {
         times: undefined,
         timeIdx: undefined,
         wmsTime: undefined,
-        palette: 'seq-Greys',
-        logscale: 'false',
+        palette: "seq-Greys",
+        logscale: "false",
         range: {},
       },
 
-      isoline: this.props.comparandMeta ? {
-        variableId: undefined, // formerly 'comparand'
-        times: undefined,
-        timeIdx: undefined,
-        wmsTime: undefined,
-        numberOfContours: 10,
-        palette: 'x-Occam',
-        logscale: 'false',
-        range: {},
-      } : {},
+      isoline: this.props.comparandMeta
+        ? {
+            variableId: undefined, // formerly 'comparand'
+            times: undefined,
+            timeIdx: undefined,
+            wmsTime: undefined,
+            numberOfContours: 10,
+            palette: "x-Occam",
+            logscale: "false",
+            range: {},
+          }
+        : {},
     };
   }
 
   // Support functions
 
-  timesMatch(vTimes = this.state.raster.times, cTimes = this.state.isoline.times) {
+  timesMatch(
+    vTimes = this.state.raster.times,
+    cTimes = this.state.isoline.times,
+  ) {
     // Returns true if the timestamps available for the variable
     // and the timestamps available for the comparand match
-    return !_.isUndefined(vTimes) &&
+    return (
+      !_.isUndefined(vTimes) &&
       !_.isUndefined(cTimes) &&
-      _.isEqual(vTimes, cTimes);
+      _.isEqual(vTimes, cTimes)
+    );
   }
 
   // Support functions for event/callback handlers
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  loadMap(
-    props,
-    dataSpec,
-    newVariable = false,
-    newComparand = false
-  ) {
+  loadMap(props, dataSpec, newVariable = false, newComparand = false) {
     // update state with all the information needed to display
     // maps for specific dataspecs.
-    // A 'dataspec' is a variable + emissions + model + period + run combination. 
-    // Timestamps for an dataspec may be spread across up to three files 
+    // A 'dataspec' is a variable + emissions + model + period + run combination.
+    // Timestamps for an dataspec may be spread across up to three files
     // (one annual, one seasonal, one monthly). DualMapController implicitly receives
     // the variable, emissions scenario, and model parameters via its metadata props,
-    // which have been filtered on those parameters. It selects a period and run and 
+    // which have been filtered on those parameters. It selects a period and run and
     // stores them in state, but doesn't select (or store in state) a specific file with a
     // specific unique_id until rendering, when it needs to pass an exact file
     // and timestamp to the viewer component DataMap.
@@ -131,52 +131,56 @@ export default class DualMapController extends React.Component {
 
     const { start_date, end_date, ensemble_member } = dataSpec;
     const multi_run = isMultiRun(props.meta);
-    
+
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
       .then(rasterScalarParams)
       .then(selectRasterPalette);
-    
+
     const isolineScalarParams = scalarParams.bind(null, props.comparand_id);
-    const isolineParamsPromise = getTimeParametersPromise(dataSpec, props.comparandMeta)
+    const isolineParamsPromise = getTimeParametersPromise(
+      dataSpec,
+      props.comparandMeta,
+    )
       .then(isolineScalarParams)
       .then(selectIsolinePalette);
-    
-    Promise.all([rasterParamsPromise, isolineParamsPromise]).then(params => {
-            
-      let rasterParams = _.find(params, {variableId: props.variable_id});
-      let isolineParams = _.find(params, {variableId: props.comparand_id});
-      
-      if(rasterParams === isolineParams) {
+
+    Promise.all([rasterParamsPromise, isolineParamsPromise]).then((params) => {
+      let rasterParams = _.find(params, { variableId: props.variable_id });
+      let isolineParams = _.find(params, { variableId: props.comparand_id });
+
+      if (rasterParams === isolineParams) {
         // needed when comparand and variable are the same
         isolineParams = _.clone(rasterParams);
       }
-      
+
       // if the variable or comparand has changed, use the default values, otherwise
       // the ones previously set by the user
-      if(!newVariable) {
+      if (!newVariable) {
         rasterParams.palette = this.state.raster.palette;
         rasterParams.logscale = this.state.raster.logscale;
       }
-      if(!newComparand) {
+      if (!newComparand) {
         isolineParams.palette = this.state.isoline.palette;
         isolineParams.logscale = this.state.isoline.logscale;
       }
-      
-      if(isolineParams.palette === 'x-Occam' && 
-          rasterParams.palette === 'x-Occam') {
-        rasterParams.palette = 'seq-Greys';
+
+      if (
+        isolineParams.palette === "x-Occam" &&
+        rasterParams.palette === "x-Occam"
+      ) {
+        rasterParams.palette = "seq-Greys";
       }
-      
-      this.setState(prevState => ({
+
+      this.setState((prevState) => ({
         run: ensemble_member,
         start_date,
         end_date,
         multi_run,
         raster: rasterParams,
-        isoline: isolineParams
+        isoline: isolineParams,
       }));
-    });  
+    });
   }
 
   // Handlers for dataSpec change
@@ -185,21 +189,37 @@ export default class DualMapController extends React.Component {
   updateDataSpec = (encodedDataSpec) => {
     this.loadMap(this.props, JSON.parse(encodedDataSpec));
   };
-  
+
   // Handlers for time selection change
 
-  handleChangeVariableTime = updateLayerTime.bind(this, 'raster');
-  handleChangeComparandTime = updateLayerTime.bind(this, 'isoline');
+  handleChangeVariableTime = updateLayerTime.bind(this, "raster");
+  handleChangeComparandTime = updateLayerTime.bind(this, "isoline");
 
   // Handlers for palette change
 
-  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
-  handleChangeIsolinePalette = updateLayerSimpleState.bind(this, 'isoline', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "palette",
+  );
+  handleChangeIsolinePalette = updateLayerSimpleState.bind(
+    this,
+    "isoline",
+    "palette",
+  );
 
   // Handlers for layer range change
 
-  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
-  handleChangeIsolineRange = updateLayerSimpleState.bind(this, 'isoline', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "range",
+  );
+  handleChangeIsolineRange = updateLayerSimpleState.bind(
+    this,
+    "isoline",
+    "range",
+  );
 
   // Handlers for scale change
 
@@ -208,8 +228,16 @@ export default class DualMapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
-  handleChangeIsolineScale = updateLayerSimpleState.bind(this, 'isoline', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "logscale",
+  );
+  handleChangeIsolineScale = updateLayerSimpleState.bind(
+    this,
+    "isoline",
+    "logscale",
+  );
 
   // React lifecycle event handlers
 
@@ -222,15 +250,25 @@ export default class DualMapController extends React.Component {
     // the first dataset representing a 0th time index (January, Winter, or Annual)
     // will be displayed.
 
-    if (hasValidData('variable', nextProps)) {
+    if (hasValidData("variable", nextProps)) {
       const defaultDataset = nextProps.meta[0];
-      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataSpec = _.pick(
+        defaultDataset,
+        "start_date",
+        "end_date",
+        "ensemble_member",
+      );
 
       // check to see whether the variables displayed have been switched.
       // if so, logarithmic display and palettes will be reset to defaults
-      const hasComparand = hasValidData('comparand', nextProps);
-      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
-      const switchComparand = hasComparand && !_.isEqual(this.props.comparand_id, nextProps.comparand_id);
+      const hasComparand = hasValidData("comparand", nextProps);
+      const switchVariable = !_.isEqual(
+        this.props.variable_id,
+        nextProps.variable_id,
+      );
+      const switchComparand =
+        hasComparand &&
+        !_.isEqual(this.props.comparand_id, nextProps.comparand_id);
 
       this.loadMap(nextProps, defaultDataSpec, switchVariable, switchComparand);
     } else {
@@ -242,7 +280,7 @@ export default class DualMapController extends React.Component {
         variableTimes: undefined,
         variableTimeIdx: undefined,
         comparandTimes: undefined,
-        comparandTimeIdx: undefined
+        comparandTimeIdx: undefined,
       });
     }
   }
@@ -261,92 +299,84 @@ export default class DualMapController extends React.Component {
   }
 
   render() {
-    const mapLegend = (<MapLegend
-      {...this.props}
-      {...this.state}
-      hasValidComparand={hasValidData('comparand', this.props)}
-    />);
+    const mapLegend = (
+      <MapLegend
+        {...this.props}
+        {...this.state}
+        hasValidComparand={hasValidData("comparand", this.props)}
+      />
+    );
 
     return (
       <Panel>
         <Panel.Heading>
           <Panel.Title>
             <Row>
-              <Col lg={2}>
-                {mapPanelLabel}
-              </Col>
-              <Col lg={10}>
-                {mapLegend}
-              </Col>
+              <Col lg={2}>{mapPanelLabel}</Col>
+              <Col lg={10}>{mapLegend}</Col>
             </Row>
-
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
-          {
-            this.state.raster.times || this.state.isoline.times ? (
-              <DataMap
-                raster={{
-                  ...getDatasetIdentifiers(
-                    this.props, this.state,
-                    'variable', this.props.meta, this.state.raster.timeIdx
-                  ),
-                  ...this.state.raster,
-                  defaultOpacity: 0.7,
-                  onChangeRange: this.handleChangeRasterRange,
-                }}
+          {this.state.raster.times || this.state.isoline.times ? (
+            <DataMap
+              raster={{
+                ...getDatasetIdentifiers(
+                  this.props,
+                  this.state,
+                  "variable",
+                  this.props.meta,
+                  this.state.raster.timeIdx,
+                ),
+                ...this.state.raster,
+                defaultOpacity: 0.7,
+                onChangeRange: this.handleChangeRasterRange,
+              }}
+              isoline={{
+                ...getDatasetIdentifiers(
+                  this.props,
+                  this.state,
+                  "comparand",
+                  this.props.comparandMeta,
+                  this.state.isoline.timeIdx,
+                ),
+                ...this.state.isoline,
+                defaultOpacity: 1.0,
+                onChangeRange: this.handleChangeIsolineRange,
+              }}
+              onSetArea={this.props.onSetArea}
+              area={this.props.area}
+              pointSelect={false}
+            >
+              <StaticControl position="topright">
+                <MapSettings
+                  title="Map Settings"
+                  meta={this.props.meta}
+                  comparandMeta={this.props.comparandMeta}
+                  dataSpec={currentDataSpec(this.state)}
+                  onDataSpecChange={this.updateDataSpec}
+                  raster={{
+                    ...this.state.raster,
+                    onChangeTime: this.handleChangeVariableTime,
+                    onChangePalette: this.handleChangeRasterPalette,
+                    onChangeScale: this.handleChangeRasterScale,
+                  }}
+                  hasComparand={hasValidData("comparand", this.props)}
+                  timesLinkable={this.timesMatch()}
+                  isoline={{
+                    ...this.state.isoline,
+                    onChangeTime: this.handleChangeComparandTime,
+                    onChangePalette: this.handleChangeIsolinePalette,
+                    onChangeScale: this.handleChangeIsolineScale,
+                  }}
+                />
+              </StaticControl>
 
-                isoline={{
-                  ...getDatasetIdentifiers(
-                    this.props, this.state,
-                    'comparand', this.props.comparandMeta, this.state.isoline.timeIdx
-                  ),
-                  ...this.state.isoline,
-                  defaultOpacity: 1.0,
-                  onChangeRange: this.handleChangeIsolineRange,
-                }}
-
-                onSetArea={this.props.onSetArea}
-                area={this.props.area}
-                pointSelect={false}
-              >
-
-                <StaticControl position='topright'>
-                  <MapSettings
-                    title='Map Settings'
-                    meta={this.props.meta}
-                    comparandMeta={this.props.comparandMeta}
-
-                    dataSpec={currentDataSpec(this.state)}
-                    onDataSpecChange={this.updateDataSpec}
-
-                    raster={{
-                      ...this.state.raster,
-                      onChangeTime: this.handleChangeVariableTime,
-                      onChangePalette: this.handleChangeRasterPalette,
-                      onChangeScale: this.handleChangeRasterScale,
-                    }}
-
-                    hasComparand={hasValidData('comparand', this.props)}
-                    timesLinkable={this.timesMatch()}
-                    isoline={{
-                      ...this.state.isoline,
-                      onChangeTime: this.handleChangeComparandTime,
-                      onChangePalette: this.handleChangeIsolinePalette,
-                      onChangeScale: this.handleChangeIsolineScale,
-                    }}
-                  />
-                </StaticControl>
-
-                <StaticControl position='bottomleft'>
-                  {mapLegend}
-                </StaticControl>
-
-              </DataMap>
-            ) : (
-              <Loader/>
-            )
-          }
+              <StaticControl position="bottomleft">{mapLegend}</StaticControl>
+            </DataMap>
+          ) : (
+            <Loader />
+          )}
         </Panel.Body>
       </Panel>
     );

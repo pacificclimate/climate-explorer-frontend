@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 function shallowDiff(a, b) {
   // Compute the shallow difference between two objects `a` and `b`.
@@ -12,7 +12,7 @@ function shallowDiff(a, b) {
   return diff;
 }
 
-function shallowDiffStr(a, b, space=4) {
+function shallowDiffStr(a, b, space = 4) {
   return JSON.stringify(shallowDiff(a, b), null, space);
 }
 

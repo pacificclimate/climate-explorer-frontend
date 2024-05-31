@@ -2,10 +2,10 @@
  * types/types.js - provides PropType declarations for props used by multiple
  * components.
  *****************************************************************************/
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
- //layerParams - parameters specifying an ncWMS map layer
- //used by DataMap and DataLayer
+//layerParams - parameters specifying an ncWMS map layer
+//used by DataMap and DataLayer
 const layerParamsPropTypes = PropTypes.shape({
   dataset: PropTypes.string,
   filepath: PropTypes.string,
@@ -18,4 +18,4 @@ const layerParamsPropTypes = PropTypes.shape({
   onChangeRange: PropTypes.func.isRequired,
 });
 
-export {layerParamsPropTypes};
+export { layerParamsPropTypes };

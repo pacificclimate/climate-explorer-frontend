@@ -1,14 +1,14 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Button, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Button, ControlLabel } from "react-bootstrap";
 
 import {
   csvButtonLabel,
-  downloadGraphDataLabel, xslxButtonLabel,
-} from '../../guidance-content/info/InformationItems';
+  downloadGraphDataLabel,
+  xslxButtonLabel,
+} from "../../guidance-content/info/InformationItems";
 
-import styles from './ExportButtons.module.css';
-
+import styles from "./ExportButtons.module.css";
 
 export default class ExportButtons extends React.Component {
   static propTypes = {

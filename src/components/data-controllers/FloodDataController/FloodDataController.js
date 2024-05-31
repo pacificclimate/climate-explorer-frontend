@@ -6,39 +6,40 @@
  * So it doesn't display a time slice graph or a context graph - these
  * are used to compare models. It also doesn't display a timeseries
  * graph or anomaly annual cycle graph - these show monthly and
- * seasonal changes. In fact, there is only one graph, a long term 
+ * seasonal changes. In fact, there is only one graph, a long term
  * average graph. This graph displays both ensemble means and any
  * available ensemble percentiles.
- * 
+ *
  * Receives a model, an experiment, and a variable from its parent,
  * FloodAppController. Manages viewer components that display data as
- * graphs or tables. 
+ * graphs or tables.
  *
  * Child component:
  *  - a SingleLongTermAverageGraph showing the mean of each climatology
  *    period as a seperate data point.
  *
  * A Data Table viewer component showing statistical information for each
- * climatology period or timeseries is also generated. 
+ * climatology period or timeseries is also generated.
  *******************************************************************/
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-import React from 'react';
-import { Row, Col, Panel } from 'react-bootstrap';
-import _ from 'lodash';
+import React from "react";
+import { Row, Col, Panel } from "react-bootstrap";
+import _ from "lodash";
 
-import SingleTimeSeriesGraph from '../../graphs/SingleTimeSeriesGraph';
-import PercentileLongTermAveragesGraph from '../../graphs/PercentileLongTermAveragesGraph';
+import SingleTimeSeriesGraph from "../../graphs/SingleTimeSeriesGraph";
+import PercentileLongTermAveragesGraph from "../../graphs/PercentileLongTermAveragesGraph";
 import {
-    percentileLtaTabLabel, watershedGraphsPanelLabel, timeSeriesTabLabel,
-    } from '../../guidance-content/info/InformationItems';
+  percentileLtaTabLabel,
+  watershedGraphsPanelLabel,
+  timeSeriesTabLabel,
+} from "../../guidance-content/info/InformationItems";
 
-import styles from '../DataController.module.css';
-import { MEVSummary } from '../../data-presentation/MEVSummary';
-import FlowArrow from '../../data-presentation/FlowArrow';
-import GraphTabs from '../GraphTabs';
-import WatershedSummaryTable from '../../WatershedSummaryTable'
+import styles from "../DataController.module.css";
+import { MEVSummary } from "../../data-presentation/MEVSummary";
+import GraphTabs from "../GraphTabs";
+import WatershedSummaryTable from "../../WatershedSummaryTable";
 
 export default class FloodDataController extends React.Component {
   static propTypes = {
@@ -48,7 +49,7 @@ export default class FloodDataController extends React.Component {
     area: PropTypes.string,
     meta: PropTypes.array,
     percentileMeta: PropTypes.array,
-    ensemble_name: PropTypes.string,  // TODO: Why is this declared? Remove?
+    ensemble_name: PropTypes.string, // TODO: Why is this declared? Remove?
   };
 
   // TODO: Is this necessary?
@@ -61,7 +62,7 @@ export default class FloodDataController extends React.Component {
     return !(
       _.isEqual(nextProps.meta, this.props.meta) &&
       _.isEqual(nextProps.area, this.props.area)
-     );
+    );
   }
 
   // Spec for generating tabs containing various graphs.
@@ -71,15 +72,13 @@ export default class FloodDataController extends React.Component {
     mym: [
       { title: percentileLtaTabLabel, graph: PercentileLongTermAveragesGraph },
     ],
-    notMym: [
-      { title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph },
-    ],
+    notMym: [{ title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph }],
   };
 
   render() {
     // TODO: Improve returned item
-    if (!_.allDefined(this.props, 'model_id', 'experiment', 'variable_id')) {
-      return 'Readying...';
+    if (!_.allDefined(this.props, "model_id", "experiment", "variable_id")) {
+      return "Readying...";
     }
 
     return (
@@ -89,13 +88,9 @@ export default class FloodDataController extends React.Component {
           <Panel.Heading>
             <Panel.Title>
               <Row>
-                <Col lg={4}>
-                  {watershedGraphsPanelLabel}
-                </Col>
+                <Col lg={4}>{watershedGraphsPanelLabel}</Col>
                 <Col lg={8}>
-                  <MEVSummary
-                    className={styles.mevSummary} {...this.props}
-                  />
+                  <MEVSummary className={styles.mevSummary} {...this.props} />
                 </Col>
               </Row>
             </Panel.Title>
@@ -103,13 +98,13 @@ export default class FloodDataController extends React.Component {
           <Panel.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
+              hideTimeOfYearSelector={true}
               specs={FloodDataController.graphTabsSpecs}
             />
           </Panel.Body>
         </Panel>
 
         <WatershedSummaryTable {...this.props} />
-
       </div>
     );
   }

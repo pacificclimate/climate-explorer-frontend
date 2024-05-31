@@ -1,29 +1,26 @@
-// Watershed Summary Table: Panel containing a Attribute Value table that 
+// Watershed Summary Table: Panel containing a Attribute Value table that
 // shows physical information (elevation, area, etc) about the watershed the user
 // has selected.
 
 // TODO: Use HOC `withAsyncData` to manage fetching data
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Row, Col, Panel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Row, Col, Panel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import AttributeValueTable from '../AttributeValueTable/AttributeValueTable';
-import { watershedTableLabel } from
-    '../guidance-content/info/InformationItems';
-import { MEVSummary } from '../data-presentation/MEVSummary';
+import AttributeValueTable from "../AttributeValueTable/AttributeValueTable";
+import { watershedTableLabel } from "../guidance-content/info/InformationItems";
 
-import { getWatershed } from '../../data-services/ce-backend';
+import { getWatershed } from "../../data-services/ce-backend";
 import {
   parseWatershedTableData,
   validateWatershedData,
-} from '../../core/util';
-import { errorMessage } from '../graphs/graph-helpers';
+} from "../../core/util";
+import { errorMessage } from "../graphs/graph-helpers";
 
-import styles from './WatershedSummaryTable.module.css';
-
+import styles from "./WatershedSummaryTable.module.css";
 
 // TODO: Use `withAsyncData` to factor out common data-fetching code here
 export default class WatershedSummaryTable extends React.Component {
@@ -57,12 +54,12 @@ export default class WatershedSummaryTable extends React.Component {
     if (props.area !== state.prevArea) {
       return {
         prevArea: props.area,
-        fetchingData: false,  // not quite yet
-        data: null,  // Signal that data fetch is required
+        fetchingData: false, // not quite yet
+        data: null, // Signal that data fetch is required
         dataError: null,
       };
     }
-    
+
     // No state update necessary.
     return null;
   }
@@ -78,13 +75,11 @@ export default class WatershedSummaryTable extends React.Component {
   }
 
   // Data fetching
-  
+
   getAndValidateWatershed(parameters) {
-      return (
-      getWatershed(parameters)
+    return getWatershed(parameters)
       .then(validateWatershedData)
-      .then(response => response.data)
-      );
+      .then((response) => response.data);
   }
 
   fetchData() {
@@ -94,26 +89,26 @@ export default class WatershedSummaryTable extends React.Component {
     }
     this.setState({ fetchingData: true });
     const metadata = {
-      ..._.pick(this.props, 'ensemble_name', 'area')
+      ..._.pick(this.props, "ensemble_name", "area"),
     };
     this.getAndValidateWatershed(metadata)
-    .then(data => {
-      this.setState({
-        fetchingData: false,
-        data: parseWatershedTableData(
-          data, this.props.area),
-        dataError: null,
+      .then((data) => {
+        this.setState({
+          fetchingData: false,
+          data: parseWatershedTableData(data, this.props.area),
+          dataError: null,
+        });
+      })
+      .catch((dataError) => {
+        this.setState({
+          // Set data non-null here to prevent infinite update loop.
+          data: undefined,
+          fetchingData: false,
+          dataError,
+        });
       });
-    }).catch(dataError => {
-      this.setState({
-        // Set data non-null here to prevent infinite update loop.
-        data: undefined,
-        fetchingData: false,
-        dataError,
-      });
-    });
   }
-  
+
   // render helpers
 
   watershedTableOptions() {
@@ -126,11 +121,14 @@ export default class WatershedSummaryTable extends React.Component {
 
     // Waiting for data
     if (this.state.fetchingData || this.state.data === null) {
-      return { noDataText: 'Select am outlet point on the map to see watershed information' };
+      return {
+        noDataText:
+          "Select an outlet point on the map with the circle marker tool to see watershed information",
+      };
     }
 
     // We can haz data
-    return { noDataText: 'We have data and this message should not show' };
+    return { noDataText: "We have data and this message should not show" };
   }
 
   render() {
@@ -139,9 +137,7 @@ export default class WatershedSummaryTable extends React.Component {
         <Panel.Heading>
           <Panel.Title>
             <Row>
-              <Col lg={4}>
-                {watershedTableLabel}
-              </Col>
+              <Col lg={4}>{watershedTableLabel}</Col>
             </Row>
           </Panel.Title>
         </Panel.Heading>

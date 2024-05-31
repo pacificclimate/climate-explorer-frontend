@@ -4,5 +4,5 @@
 //
 // Typical usage: In component definition:
 //  handleChangeFred = setNamedState(this, 'fred');
-export const setNamedState = (this_, name) =>
-  value => this_.setState({ [name]: value });
+export const setNamedState = (this_, name) => (value) =>
+  this_.setState({ [name]: value });

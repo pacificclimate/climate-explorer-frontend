@@ -1,56 +1,57 @@
 /************************************************************************
  * PrecipAppController.js - Extreme precipitation application controller
- * 
+ *
  * This controller represents a portal that serves information on extreme
- * precipitation. It is meant to be used with an ensemble containing 
- * GCM pr outputs as well as climdex indices relating to precipitation. 
+ * precipitation. It is meant to be used with an ensemble containing
+ * GCM pr outputs as well as climdex indices relating to precipitation.
  * The user selects a model, experiment, and climdex variable, which is
  * then compared to precipitation values.
- * 
+ *
  * Its children are DualDataController, which coordinates graphs comparing
  * the two selected variables, and PrecipMapController, which coordinates
- * a map displaying the selected climdex as a raster and precipitation as 
+ * a map displaying the selected climdex as a raster and precipitation as
  * annotated isolines.
- * 
+ *
  * It is very similar to the DualController, except the comparison variable
  * is always precipitation.
  ************************************************************************/
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Grid, Row, Col, Panel, ControlLabel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Grid, Row, Col, Panel, ControlLabel } from "react-bootstrap";
 
-import DualDataController from
-    '../../data-controllers/DualDataController/DualDataController';
+import DualDataController from "../../data-controllers/DualDataController/DualDataController";
 import {
-  modelSelectorLabel, emissionScenarioSelectorLabel, variableSelectorLabel,
-  datasetFilterPanelLabel, variable1SelectorLabel
-} from '../../guidance-content/info/InformationItems';
+  modelSelectorLabel,
+  emissionScenarioSelectorLabel,
+  variableSelectorLabel,
+  datasetFilterPanelLabel,
+} from "../../guidance-content/info/InformationItems";
 
-import g from '../../../core/geo';
-import PrecipMapController from '../../map-controllers/PrecipMapController';
-import { FullWidthCol, HalfWidthCol } from '../../layout/rb-derived-components';
-import FilteredDatasetsSummary from
-    '../../data-presentation/FilteredDatasetsSummary';
+import g from "../../../core/geo";
+import PrecipMapController from "../../map-controllers/PrecipMapController";
+import { FullWidthCol, HalfWidthCol } from "../../layout/rb-derived-components";
+import FilteredDatasetsSummary from "../../data-presentation/FilteredDatasetsSummary";
 
-import FlowArrow from '../../data-presentation/FlowArrow';
-import UnfilteredDatasetsSummary from
-    '../../data-presentation/UnfilteredDatasetsSummary';
+import FlowArrow from "../../data-presentation/FlowArrow";
+import UnfilteredDatasetsSummary from "../../data-presentation/UnfilteredDatasetsSummary";
 import {
   EmissionsScenarioSelector,
-  ModelSelector, VariableSelector
-} from 'pcic-react-components';
+  ModelSelector,
+  VariableSelector,
+} from "pcic-react-components";
 
+import { ensemble_name } from "../common";
+import { setNamedState } from "../../../core/react-component-utils";
+import withAsyncMetadata from "../../../HOCs/withAsyncMetadata";
 import {
-  ensemble_name,
-} from '../common';
-import { setNamedState } from '../../../core/react-component-utils';
-import withAsyncMetadata from '../../../HOCs/withAsyncMetadata'
-import {
-  findModelNamed, findScenarioIncluding, findVariableMatching,
-  representativeValue, constraintsFor, filterMetaBy,
-} from '../../../core/selectors';
-
+  findModelNamed,
+  findScenarioIncluding,
+  findVariableMatching,
+  representativeValue,
+  constraintsFor,
+  filterMetaBy,
+} from "../../../core/selectors";
 
 class PrecipAppControllerDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
@@ -72,8 +73,8 @@ class PrecipAppControllerDisplay extends React.Component {
     meta: PropTypes.array,
   };
 
-  replaceInvalidModel = findModelNamed('CanESM2');
-  replaceInvalidScenario = findScenarioIncluding(['rcp85']);
+  replaceInvalidModel = findModelNamed("CanESM2");
+  replaceInvalidScenario = findScenarioIncluding(["rcp85"]);
   replaceInvalidVariable = findVariableMatching(this.props.comparand);
 
   representativeValue = (...args) => representativeValue(...args)(this.props);
@@ -82,15 +83,21 @@ class PrecipAppControllerDisplay extends React.Component {
     filterMetaBy(...args)(this.props)(this.props.meta);
 
   render() {
-    const filteredMetaVariable =
-      this.filterMetaBy('model', 'scenario', 'variable');
-    const filteredMetaComparand =
-      this.filterMetaBy('model', 'scenario', 'comparand');
+    const filteredMetaVariable = this.filterMetaBy(
+      "model",
+      "scenario",
+      "variable",
+    );
+    const filteredMetaComparand = this.filterMetaBy(
+      "model",
+      "scenario",
+      "comparand",
+    );
 
-    const model_id = this.representativeValue('model', 'model_id');
-    const experiment = this.representativeValue('scenario', 'experiment');
-    const variable_id = this.representativeValue('variable', 'variable_id');
-    const comparand_id = this.representativeValue('comparand', 'variable_id');
+    const model_id = this.representativeValue("model", "model_id");
+    const experiment = this.representativeValue("scenario", "experiment");
+    const variable_id = this.representativeValue("variable", "variable_id");
+    const comparand_id = this.representativeValue("comparand", "variable_id");
 
     return (
       <Grid fluid>
@@ -127,7 +134,7 @@ class PrecipAppControllerDisplay extends React.Component {
                     <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
                     <EmissionsScenarioSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model')}
+                      constraint={this.constraintsFor("model")}
                       value={this.props.scenario}
                       onChange={this.props.onChangeScenario}
                       replaceInvalidValue={this.replaceInvalidScenario}
@@ -137,7 +144,7 @@ class PrecipAppControllerDisplay extends React.Component {
                     <ControlLabel>{variableSelectorLabel}</ControlLabel>
                     <VariableSelector
                       bases={this.props.meta}
-                      constraint={this.constraintsFor('model', 'scenario')}
+                      constraint={this.constraintsFor("model", "scenario")}
                       value={this.props.variable}
                       onChange={this.props.onChangeVariable}
                       replaceInvalidValue={this.replaceInvalidVariable}
@@ -186,7 +193,7 @@ class PrecipAppControllerDisplay extends React.Component {
               variable_id={variable_id}
               meta={filteredMetaVariable}
               comparand_id={comparand_id}
-              comparandMeta = {filteredMetaComparand}
+              comparandMeta={filteredMetaComparand}
               area={this.props.area}
               onSetArea={this.props.onChangeArea}
             />
@@ -199,7 +206,7 @@ class PrecipAppControllerDisplay extends React.Component {
               variable_id={variable_id}
               meta={filteredMetaVariable}
               comparand_id={comparand_id}
-              comparandMeta = {filteredMetaComparand}
+              comparandMeta={filteredMetaComparand}
               area={g.geojson(this.props.area).toWKT()}
             />
           </HalfWidthCol>
@@ -209,10 +216,10 @@ class PrecipAppControllerDisplay extends React.Component {
   }
 }
 
-
 // Inject asynchronously fetched metadata into controlled component.
-const WmdPrecipAppControllerDisplay = withAsyncMetadata(PrecipAppControllerDisplay);
-
+const WmdPrecipAppControllerDisplay = withAsyncMetadata(
+  PrecipAppControllerDisplay,
+);
 
 // In this controller, `comparand` is a fixed value. It is easiest to
 // let existing state-based methods, which expect variable selector option
@@ -221,11 +228,11 @@ const WmdPrecipAppControllerDisplay = withAsyncMetadata(PrecipAppControllerDispl
 const comparand = {
   value: {
     representative: {
-      variable_id: 'pr',
-      variable_name: 'Precipitation',
-      multi_year_mean: true
-    }
-  }
+      variable_id: "pr",
+      variable_name: "Precipitation",
+      multi_year_mean: true,
+    },
+  },
 };
 
 export default class PrecipAppController extends React.Component {
@@ -233,14 +240,14 @@ export default class PrecipAppController extends React.Component {
     model: undefined,
     scenario: undefined,
     variable: undefined,
-    area: undefined,  // geojson object
+    area: undefined, // geojson object
   };
 
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/122
-  handleChangeArea = setNamedState(this, 'area');
-  handleChangeModel = setNamedState(this, 'model');
-  handleChangeScenario = setNamedState(this, 'scenario');
-  handleChangeVariable = setNamedState(this, 'variable');
+  handleChangeArea = setNamedState(this, "area");
+  handleChangeModel = setNamedState(this, "model");
+  handleChangeScenario = setNamedState(this, "scenario");
+  handleChangeVariable = setNamedState(this, "variable");
 
   render() {
     return (

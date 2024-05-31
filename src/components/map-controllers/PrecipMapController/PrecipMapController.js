@@ -1,12 +1,12 @@
 /************************************************************************
  * PrecipMapController.js - Precipitation Map Controller
- * 
- * This controller coordinates a map with two layers, both of which are 
+ *
+ * This controller coordinates a map with two layers, both of which are
  * displayed with logarithmic scaling by default:
- * 
+ *
  *  - A climdex index rendered as a blue and white raster layer
  *  - A matching precipitation GCM output rendered as annotated isolines
- *  
+ *
  * Unlike the default MapController, both layers always display the same
  * timestamp; the precipitation is not intended for independant exploration,
  * just to provide context for the climdex layer. The user can configure
@@ -15,7 +15,7 @@
  *
  * It is also responsible for passing user-selected areas up to its parent.
  *
- * Children: 
+ * Children:
  *   * Datamap, which actually renders the map
  *   * MapSettings, which allows a user to configure the map
  ************************************************************************/
@@ -23,18 +23,18 @@
 // Also contains some legacy code that should be further refactored, primarily
 // `loadMap` and the handling of dataSpecs (see TODOs/FIXMEs).
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import Loader from 'react-loader';
-import { Row, Col, Panel } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import Loader from "react-loader";
+import { Row, Col, Panel } from "react-bootstrap";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import '../MapController.module.css';
-import DataMap from '../../DataMap';
-import MapLegend from '../../MapLegend';
-import MapSettings from '../../MapSettings';
-import StaticControl from '../../StaticControl';
+import "../MapController.module.css";
+import DataMap from "../../DataMap";
+import MapLegend from "../../MapLegend";
+import MapSettings from "../../MapSettings";
+import StaticControl from "../../StaticControl";
 
 import {
   hasValidData,
@@ -46,12 +46,10 @@ import {
   selectRasterPalette,
   getTimeParametersPromise,
   isMultiRun,
-} from '../map-helpers.js';
+} from "../map-helpers.js";
 
-import styles from '../MapController.module.css';
-import { mapPanelLabel } from '../../guidance-content/info/InformationItems';
-import { DualMEVSummary } from '../../data-presentation/MEVSummary';
-
+import styles from "../MapController.module.css";
+import { mapPanelLabel } from "../../guidance-content/info/InformationItems";
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class PrecipMapController extends React.Component {
@@ -80,20 +78,22 @@ export default class PrecipMapController extends React.Component {
         times: undefined,
         timeIdx: undefined,
         wmsTime: undefined,
-        palette: 'seq-Blues',
-        logscale: 'true',
+        palette: "seq-Blues",
+        logscale: "true",
         range: {},
       },
 
-      annotated: this.props.comparandMeta ? {
-        variableId: undefined, // formerly 'comparand'
-        times: undefined,
-        timeIdx: undefined,
-        wmsTime: undefined,
-        numberOfContours: 10,
-        logscale: 'true',
-        range: {},
-      } : {},
+      annotated: this.props.comparandMeta
+        ? {
+            variableId: undefined, // formerly 'comparand'
+            times: undefined,
+            timeIdx: undefined,
+            wmsTime: undefined,
+            numberOfContours: 10,
+            logscale: "true",
+            range: {},
+          }
+        : {},
     };
   }
 
@@ -101,19 +101,15 @@ export default class PrecipMapController extends React.Component {
 
   // TODO: split loadmap into helpers?
   // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
-  loadMap(
-    props,
-    dataSpec,
-    newVariable = false,
-  ) {
+  loadMap(props, dataSpec, newVariable = false) {
     // Update state with all the information needed to display
     // maps for the specified dataspec.
-    // A 'dataSpec' represents a combination of a specific variable, 
-    // emissions scenario, model, period, and run. The variable, emissions, 
+    // A 'dataSpec' represents a combination of a specific variable,
+    // emissions scenario, model, period, and run. The variable, emissions,
     // and model are selected by the user in a top level component, and implicitly
-    // encoded in meta and comparandMeta, which are filtered to only relevant 
+    // encoded in meta and comparandMeta, which are filtered to only relevant
     // datasets by this component's parent.
-    // The start date, end date, and run and selected by this component - either 
+    // The start date, end date, and run and selected by this component - either
     // defaults or user selection - and supplied as the "dataSpec" variable.
     // The data described by a dataspec may be spread across up to three data files
     // (yearly, seasonal, monthly); the specific file needed to map a particular
@@ -121,41 +117,45 @@ export default class PrecipMapController extends React.Component {
 
     const { start_date, end_date, ensemble_member } = dataSpec;
     const multi_run = isMultiRun(props.meta);
-    
+
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
       .then(rasterScalarParams)
       .then(selectRasterPalette);
-    
+
     const annotatedScalarParams = scalarParams.bind(null, props.comparand_id);
-    const annotatedParamsPromise = getTimeParametersPromise(dataSpec, props.comparandMeta)
-      .then(annotatedScalarParams);
-    
-    Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(params => {
-      
-      let rasterParams = _.find(params, {variableId: props.variable_id});
-      let annotatedParams = _.find(params, {variableId: props.comparand_id});
-      
-      // if the variable has changed, go back to the default palette and logscale,
-      // otherwise use the previous (user-selected) values in state.
-      if(newVariable) {
-        rasterParams.palette = 'seq-Blues';
-        rasterParams.logscale = "true";
-      }
-      else {
-        rasterParams.palette = this.state.raster.palette;
-        rasterParams.logscale = this.state.raster.logscale;
-      }
-      
-      this.setState(prevState => ({
-        run: ensemble_member,
-        start_date,
-        end_date,
-        multi_run,
-        raster: rasterParams,
-        annotated: annotatedParams
-      }));
-    });  
+    const annotatedParamsPromise = getTimeParametersPromise(
+      dataSpec,
+      props.comparandMeta,
+    ).then(annotatedScalarParams);
+
+    Promise.all([rasterParamsPromise, annotatedParamsPromise]).then(
+      (params) => {
+        let rasterParams = _.find(params, { variableId: props.variable_id });
+        let annotatedParams = _.find(params, {
+          variableId: props.comparand_id,
+        });
+
+        // if the variable has changed, go back to the default palette and logscale,
+        // otherwise use the previous (user-selected) values in state.
+        if (newVariable) {
+          rasterParams.palette = "seq-Blues";
+          rasterParams.logscale = "true";
+        } else {
+          rasterParams.palette = this.state.raster.palette;
+          rasterParams.logscale = this.state.raster.logscale;
+        }
+
+        this.setState((prevState) => ({
+          run: ensemble_member,
+          start_date,
+          end_date,
+          multi_run,
+          raster: rasterParams,
+          annotated: annotatedParams,
+        }));
+      },
+    );
   }
 
   // Handlers for dataSpec change
@@ -166,20 +166,34 @@ export default class PrecipMapController extends React.Component {
   };
 
   // Handlers for settings changes
-  handleChangeRasterPalette = updateLayerSimpleState.bind(this, 'raster', 'palette');
+  handleChangeRasterPalette = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "palette",
+  );
   handleChangeTime = (timeIdx) => {
-    //times are selected from the raster list. annotated map will not appear if not 
+    //times are selected from the raster list. annotated map will not appear if not
     //available for the selected time.
-    const annotatedIndex = _.indexOf(_.keys(this.state.annotated.times), timeIdx) != -1 ? 
-        timeIdx : undefined;     
-    updateLayerTime.bind(this, 'raster', timeIdx)();
-    updateLayerTime.bind(this, 'annotated', annotatedIndex)();
+    const annotatedIndex =
+      _.indexOf(_.keys(this.state.annotated.times), timeIdx) !== -1
+        ? timeIdx
+        : undefined;
+    updateLayerTime.bind(this, "raster", timeIdx)();
+    updateLayerTime.bind(this, "annotated", annotatedIndex)();
   };
-  
+
   // Handlers for layer range change
 
-  handleChangeRasterRange = updateLayerSimpleState.bind(this, 'raster', 'range');
-  handleChangeAnnotatedRange = updateLayerSimpleState.bind(this, 'annotated', 'range');
+  handleChangeRasterRange = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "range",
+  );
+  handleChangeAnnotatedRange = updateLayerSimpleState.bind(
+    this,
+    "annotated",
+    "range",
+  );
 
   // Handlers for scale change
 
@@ -188,7 +202,11 @@ export default class PrecipMapController extends React.Component {
   // (represented by a string, argh), but "scale" logically could refer to a
   // value selected from a list of values (which is currently limited to
   // "linear", "logscale", hence the boolean). Fix this.
-  handleChangeRasterScale = updateLayerSimpleState.bind(this, 'raster', 'logscale');
+  handleChangeRasterScale = updateLayerSimpleState.bind(
+    this,
+    "raster",
+    "logscale",
+  );
 
   // React lifecycle event handlers
 
@@ -200,14 +218,22 @@ export default class PrecipMapController extends React.Component {
     // the first dataset representing a 0th time index (January, Winter, or Annual)
     // will be displayed.
 
-    if (hasValidData('variable', nextProps)) {
+    if (hasValidData("variable", nextProps)) {
       const defaultDataset = nextProps.meta[0];
-      const defaultDataSpec = _.pick(defaultDataset, 'start_date', 'end_date', 'ensemble_member');
+      const defaultDataSpec = _.pick(
+        defaultDataset,
+        "start_date",
+        "end_date",
+        "ensemble_member",
+      );
 
       // check to see whether the variables displayed have been switched.
       // (if so, palette and logscale will be reset)
-      const switchVariable = !_.isEqual(this.props.variable_id, nextProps.variable_id);
-      
+      const switchVariable = !_.isEqual(
+        this.props.variable_id,
+        nextProps.variable_id,
+      );
+
       this.loadMap(nextProps, defaultDataSpec, switchVariable);
     } else {
       // haven't received any displayable data. Probably means user has selected
@@ -218,7 +244,7 @@ export default class PrecipMapController extends React.Component {
         variableTimes: undefined,
         variableTimeIdx: undefined,
         comparandTimes: undefined,
-        comparandTimeIdx: undefined
+        comparandTimeIdx: undefined,
       });
     }
   }
@@ -237,85 +263,79 @@ export default class PrecipMapController extends React.Component {
   }
 
   render() {
-    const mapLegend = (<MapLegend
-      {...this.props}
-      {...this.state}
-      hasValidComparand={hasValidData('comparand', this.props)}
-    />);
+    const mapLegend = (
+      <MapLegend
+        {...this.props}
+        {...this.state}
+        hasValidComparand={hasValidData("comparand", this.props)}
+      />
+    );
 
     return (
       <Panel>
         <Panel.Heading>
           <Panel.Title>
             <Row>
-              <Col lg={2}>
-                {mapPanelLabel}
-              </Col>
-              <Col lg={10}>
-                {mapLegend}
-              </Col>
+              <Col lg={2}>{mapPanelLabel}</Col>
+              <Col lg={10}>{mapLegend}</Col>
             </Row>
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body className={styles.mapcontroller}>
-          {
-            this.state.raster.times ? (
-              <DataMap
-                raster={{
-                  ...getDatasetIdentifiers(
-                    this.props, this.state,
-                    'variable', this.props.meta, this.state.raster.timeIdx
-                  ),
-                  ...this.state.raster,
-                  defaultOpacity: 0.7,
-                  onChangeRange: this.handleChangeRasterRange,
-                }}
+          {this.state.raster.times ? (
+            <DataMap
+              raster={{
+                ...getDatasetIdentifiers(
+                  this.props,
+                  this.state,
+                  "variable",
+                  this.props.meta,
+                  this.state.raster.timeIdx,
+                ),
+                ...this.state.raster,
+                defaultOpacity: 0.7,
+                onChangeRange: this.handleChangeRasterRange,
+              }}
+              annotated={{
+                ...getDatasetIdentifiers(
+                  this.props,
+                  this.state,
+                  "comparand",
+                  this.props.comparandMeta,
+                  this.state.annotated.timeIdx,
+                ),
+                ...this.state.annotated,
+                defaultOpacity: 1.0,
+                onChangeRange: this.handleChangeAnnotatedRange,
+              }}
+              onSetArea={this.props.onSetArea}
+              area={this.props.area}
+              pointSelect={false}
+            >
+              <StaticControl position="topright">
+                <MapSettings
+                  title="Map Settings"
+                  meta={this.props.meta}
+                  comparandMeta={this.props.comparandMeta}
+                  dataSpec={currentDataSpec(this.state)}
+                  onDataSpecChange={this.updateDataSpec}
+                  raster={{
+                    ...this.state.raster,
+                    onChangeTime: this.handleChangeTime,
+                    onChangePalette: this.handleChangeRasterPalette,
+                    onChangeScale: this.handleChangeRasterScale,
+                  }}
+                  //does have a comparand, but comparand has no user-configurable params.
+                  hasComparand={false}
+                  timesLinkable={false}
+                />
+              </StaticControl>
 
-                annotated={{
-                  ...getDatasetIdentifiers(
-                    this.props, this.state,
-                    'comparand', this.props.comparandMeta, this.state.annotated.timeIdx
-                  ),
-                  ...this.state.annotated,
-                  defaultOpacity: 1.0,
-                  onChangeRange: this.handleChangeAnnotatedRange,
-                }}
-
-                onSetArea={this.props.onSetArea}
-                area={this.props.area}
-                pointSelect={false}
-              >
-
-                <StaticControl position='topright'>
-                  <MapSettings
-                    title='Map Settings'
-                    meta={this.props.meta}
-                    comparandMeta={this.props.comparandMeta}
-
-                    dataSpec={currentDataSpec(this.state)}
-                    onDataSpecChange={this.updateDataSpec}
-
-                    raster={{
-                      ...this.state.raster,
-                      onChangeTime: this.handleChangeTime,
-                      onChangePalette: this.handleChangeRasterPalette,
-                      onChangeScale: this.handleChangeRasterScale,
-                    }}
-                    //does have a comparand, but comparand has no user-configurable params.
-                    hasComparand={false}
-                    timesLinkable={false}
-                  />
-                </StaticControl>
-
-                <StaticControl position='bottomleft'>
-                  {mapLegend}
-                </StaticControl>
-
-              </DataMap>
-            ) : (
-              <Loader/>
-            )
-          }
+              <StaticControl position="bottomleft">{mapLegend}</StaticControl>
+            </DataMap>
+          ) : (
+            <Loader />
+          )}
         </Panel.Body>
       </Panel>
     );

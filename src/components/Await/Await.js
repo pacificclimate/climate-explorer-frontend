@@ -6,11 +6,10 @@
 // If any promise rejects, `Await` renders `props.error(error)` where error
 // is the reason for rejection (IOW, `catch(error => ...)`).
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-import _ from 'lodash';
-
+import _ from "lodash";
 
 const promiseType = PropTypes.instanceOf(Promise);
 
@@ -26,7 +25,11 @@ export default class Await extends React.Component {
 
   static defaultProps = {
     awaiting: <div>Waiting...</div>,
-    error:  error => <div>{error.name}: {error.message}</div>,
+    error: (error) => (
+      <div>
+        {error.name}: {error.message}
+      </div>
+    ),
   };
 
   state = {
@@ -34,17 +37,19 @@ export default class Await extends React.Component {
   };
 
   componentWillMount() {
-    const promise = _.isArray(this.props.promises) ?
-      Promise.all(this.props.promises) :
-      this.props.promises;
-    promise.then(() => {
-      this.setState({ isWaiting: false });
-    }).catch(error => {
-      this.setState({
-        isWaiting: false,
-        error
+    const promise = _.isArray(this.props.promises)
+      ? Promise.all(this.props.promises)
+      : this.props.promises;
+    promise
+      .then(() => {
+        this.setState({ isWaiting: false });
+      })
+      .catch((error) => {
+        this.setState({
+          isWaiting: false,
+          error,
+        });
       });
-    });
   }
 
   render() {
@@ -54,8 +59,6 @@ export default class Await extends React.Component {
     if (this.state.error) {
       return this.props.error(this.state.error);
     }
-    return (
-      <div>{this.props.children}</div>
-    );
+    return <div>{this.props.children}</div>;
   }
 }

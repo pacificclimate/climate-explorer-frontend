@@ -1,21 +1,20 @@
-import React from 'react';
-import NavRoutes from '../../navigation/NavRoutes/NavRoutes';
-import FAQ from './FAQ';
-import General from './General';
-import Glossary from './Glossary';
+import React from "react";
+import NavRoutes from "../../navigation/NavRoutes/NavRoutes";
+import FAQ from "./FAQ";
+import General from "./General";
 
 const navSpec = {
-  basePath: '/help',
+  basePath: "/help",
   items: [
     {
-      label: 'FAQ',
-      subpath: 'faq',
+      label: "FAQ",
+      subpath: "faq",
       component: FAQ,
     },
     // TODO: Break Help > General up into several pages
     {
-      label: 'General',
-      subpath: 'general',
+      label: "General",
+      subpath: "general",
       component: General,
     },
     // {
@@ -27,5 +26,5 @@ const navSpec = {
 };
 
 export default function Help(props) {
-  return <NavRoutes pullUp { ...{ navSpec, ...props } }/>;
+  return <NavRoutes pullUp {...{ navSpec, ...props }} />;
 }
