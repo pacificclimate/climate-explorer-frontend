@@ -58,9 +58,8 @@ export default function SingleContextGraph(props) {
     let graph = dataToLongTermAverageGraph(data, meta);
     graph = emphasizeSeries(graph, selectedModelId);
 
-    //simplify graph by turning off tooltip and missing data gaps
+    // Simplify graph by connecting missing data gaps
     graph.line.connectNull = true;
-    //graph.tooltip = { show: false };
     return graph;
   }
 
