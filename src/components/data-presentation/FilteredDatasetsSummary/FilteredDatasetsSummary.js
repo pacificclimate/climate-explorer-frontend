@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, Glyphicon } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import Accordion from "../../guidance-tools/Accordion";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import { MEVSummary } from "../MEVSummary/MEVSummary";
