@@ -16,7 +16,10 @@ import {
   loadingDataGraphSpec,
 } from "../graph-helpers";
 import { datasetSelectorLabel } from "../../guidance-content/info/InformationItems";
-import { representativeValue } from "../../../core/selectors";
+import {
+  representativeValue,
+  findStartEndDates,
+} from "../../../core/selectors";
 import { setNamedState } from "../../../core/react-component-utils";
 import styles from "./AnnualCycleGraph.module.css";
 
@@ -51,6 +54,10 @@ export default class AnnualCycleGraph extends React.Component {
     // to a graph spec.
     // A different function is passed by different clients to specialize
     // this general component to particular cases (single vs. dual controller).
+    isAnomalyAnnualCycle: PropTypes.bool,
+    // `isAnomalyAnnualCycle` states if a particular AnnualCycleGraph is an
+    // AnomalyAnnualCycleGraph. If so, the default selected dataspec is the one
+    // for 1981-2010 (request from RCI).
   };
 
   // Lifecycle hooks
@@ -164,6 +171,9 @@ export default class AnnualCycleGraph extends React.Component {
   // User event handlers
 
   handleChangeDataSpec = setNamedState(this, "dataSpec");
+  replaceInvalidDataSpec = this.props.isAnomalyAnnualCycle
+    ? findStartEndDates("1981", "2010")
+    : undefined;
 
   exportData(format) {
     exportDataToWorksheet(
@@ -217,6 +227,7 @@ export default class AnnualCycleGraph extends React.Component {
               value={this.state.dataSpec}
               onChange={this.handleChangeDataSpec}
               className={styles.selector}
+              replaceInvalidValue={this.replaceInvalidDataSpec}
             />
           </Col>
           <Col lg={6} md={6} sm={6}>

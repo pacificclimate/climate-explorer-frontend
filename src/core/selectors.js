@@ -46,6 +46,10 @@ export const findVariableMatching = (match) => (options) => {
   );
 };
 
+export const findStartEndDates = (start_date, end_date) => (options) =>
+  find({ value: { representative: { start_date, end_date } } })(options) ||
+  fallback(options);
+
 // Extract a value from the representative for a named option in source.
 export const representativeValue = (optionName, valueName) =>
   get(compact([optionName, "value", "representative", valueName]));
