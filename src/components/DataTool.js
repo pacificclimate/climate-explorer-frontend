@@ -29,15 +29,15 @@ const navSpec = {
     {
       label: "Single Variable CMIP6",
       info: "View a single climate variable from a selected GCM and emission scenario in the CMIP6 experiments.",
-      subpath: "climo/:ensemble_name(ce_cmip6)",
-      navSubpath: "climo/ce_cmip6",
+      subpath: "climo/:ensemble_name(ce_cmip6_mbcn)",
+      navSubpath: "climo/ce_cmip6_mbcn",
       render: (props) => <SingleAppController {...props} />,
     },
     {
       label: "Compare Variables CMIP6",
       info: "Simulataneously view and compare two climate variables from a selected GCM and emission scenario in the CMIP6 experiments.",
-      subpath: "compare/:ensemble_name(ce_cmip6)",
-      navSubpath: "compare/ce_cmip6",
+      subpath: "compare/:ensemble_name(ce_cmip6_mbcn)",
+      navSubpath: "compare/ce_cmip6_mbcn",
       render: (props) => <DualAppController {...props} />,
     },
     {
