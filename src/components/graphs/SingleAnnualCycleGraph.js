@@ -45,7 +45,7 @@ export default function SingleAnnualCycleGraph(props) {
 
     // arrange the graph so that the highest-resolution data is most visible.
     function rankByTimeResolution(series) {
-      var resolutions = ["Yearly", "Seasonal", "Monthly"];
+      var resolutions = ["Annual", "Seasonal", "Monthly"];
       for (let i = 0; i < 3; i++) {
         if (series[0].search(resolutions[i]) !== -1) {
           return i;
