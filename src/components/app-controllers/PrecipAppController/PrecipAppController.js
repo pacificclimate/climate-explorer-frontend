@@ -74,7 +74,7 @@ class PrecipAppControllerDisplay extends React.Component {
   };
 
   replaceInvalidModel = findModelNamed("CanESM2");
-  replaceInvalidScenario = findScenarioIncluding("rcp85");
+  replaceInvalidScenario = findScenarioIncluding(["rcp85"]);
   replaceInvalidVariable = findVariableMatching(this.props.comparand);
 
   representativeValue = (...args) => representativeValue(...args)(this.props);
