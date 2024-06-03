@@ -5,6 +5,7 @@ import Accordion from "../../guidance-tools/Accordion";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import { MEVSummary } from "../MEVSummary/MEVSummary";
 import { filteredDatasetSummaryPanelLabel } from "../../guidance-content/info/InformationItems";
+import { hasMultiRuns } from "../../map-controllers/map-helpers";
 
 import _ from "lodash";
 import { HalfWidthCol } from "../../layout/rb-derived-components";
@@ -45,8 +46,20 @@ export default class FilteredDatasetsSummary extends React.Component {
     };
 
     const keyedData = this.props.meta.map(metaToKeyedData);
+    if (this.props.meta.length && !hasMultiRuns(this.props.meta)) {
+      // Remove run in cases where there is only one run
+      keyedData.forEach((el) => (el.key = el.key.split(" ")[1]));
+    }
+
     const keyedComparandData =
       this.props.comparandMeta && this.props.comparandMeta.map(metaToKeyedData);
+    if (
+      keyedComparandData &&
+      this.props.comparandMeta.length &&
+      !hasMultiRuns(this.props.comparandMeta)
+    ) {
+      keyedComparandData.forEach((el) => (el.key = el.key.split(" ")[1]));
+    }
 
     const dataGroupedByKey = _.groupBy(keyedData, "key");
     const comparandDataGroupedByKey =
@@ -72,7 +85,7 @@ export default class FilteredDatasetsSummary extends React.Component {
           End Date
         </TableHeaderColumn>
         <TableHeaderColumn dataField="yearly" width={"10%"}>
-          Yearly?
+          Annual?
         </TableHeaderColumn>
         <TableHeaderColumn dataField="seasonal" width={"10%"}>
           Seasonal?
