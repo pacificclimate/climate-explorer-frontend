@@ -45,7 +45,7 @@ import {
   getTimeParametersPromise,
   scalarParams,
   getDatasetIdentifiers,
-  isMultiRun,
+  hasMultiRuns,
 } from "../map-helpers.js";
 
 import styles from "../MapController.module.css";
@@ -74,7 +74,7 @@ export default class SingleMapController extends React.Component {
       run: undefined,
       start_date: undefined,
       end_date: undefined,
-      multi_run: false,
+      has_multi_runs: false,
 
       raster: {
         variableId: undefined, // formerly 'variable'
@@ -104,7 +104,7 @@ export default class SingleMapController extends React.Component {
     // is passed to the viewer component.
 
     const { start_date, end_date, ensemble_member } = dataSpec;
-    const multi_run = isMultiRun(props.meta);
+    const has_multi_runs = hasMultiRuns(props.meta);
 
     const rasterScalarParams = scalarParams.bind(null, props.variable_id);
     const rasterParamsPromise = getTimeParametersPromise(dataSpec, props.meta)
@@ -123,7 +123,7 @@ export default class SingleMapController extends React.Component {
         run: ensemble_member,
         start_date,
         end_date,
-        multi_run,
+        has_multi_runs,
         raster: params,
       }));
     });

@@ -176,16 +176,16 @@ export function selectIsolinePalette(params) {
  **************************************************************************/
 
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/118
-export function currentDataSpec({ run, start_date, end_date, multi_run }) {
+export function currentDataSpec({ run, start_date, end_date, has_multi_runs }) {
   // Return encoding of currently selected dataspec.
   // If the model that this dataspec comes from only has one run, then only the start_date-end_date
   // portion is displayed in labels
-  return multi_run
+  return has_multi_runs
     ? `${run} ${start_date}-${end_date}`
     : `${start_date}-${end_date}`;
 }
 
-export function isMultiRun(meta) {
+export function hasMultiRuns(meta) {
   // Check if there are multiple runs making up the datasets for the given model (e.g. CMIP5 MIROC5 has r1i1p1 and r3i1p1).
   let ids = meta.map(
     (el) => `${el.ensemble_member} ${el.start_date}-${el.end_date}`,
@@ -194,6 +194,7 @@ export function isMultiRun(meta) {
     _.sortBy(ids, (item) => item),
     (item) => item,
   );
+  // Check if first run is the same as last run
   return ids[0].split(" ")[0] != ids[ids.length - 1].split(" ")[0];
 }
 
