@@ -658,7 +658,7 @@ help:
 
         ### Return period/level variables
 
-        A return period/level variable (for CMIP5/CMIP6 respectively) describes extreme temperature or
+        A return period/level variable (**`rp`** for CMIP5 and **`rl`** for CMIP6 respectively) describes extreme temperature or
         precipitation events that would be expected to occur once
         during a specified "return period," for example once every
         20 years.
