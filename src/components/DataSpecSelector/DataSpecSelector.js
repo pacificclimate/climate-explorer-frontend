@@ -49,10 +49,6 @@ export default class DataSpecSelector extends React.Component {
       _.sortBy(ids, (item) => item[1]),
       (item) => item[1],
     );
-    ids = _.sortedUniqBy(
-      _.sortBy(ids, (item) => item[1]),
-      (item) => item[1],
-    );
     if (ids[0][1].split(" ")[0] == ids[ids.length - 1][1].split(" ")[0]) {
       // Only one run id for this model. Remove from labels.
       ids.forEach((item) => {
