@@ -195,7 +195,9 @@ export function hasMultiRuns(meta) {
     (item) => item,
   );
   // Check if first run is the same as last run
-  return ids[0].split(" ")[0] != ids[ids.length - 1].split(" ")[0];
+  const first_run_id = ids[0].split(" ")[0];
+  const last_run_id = ids[ids.length - 1].split(" ")[0];
+  return first_run_id !== last_run_id;
 }
 
 export function updateLayerSimpleState(layerType, name, value) {
