@@ -25,6 +25,13 @@ export default class FilteredDatasetsSummary extends React.Component {
     dual: false,
   };
 
+  removeSingleRun = (keyedData, meta) => {
+    // Remove ensemble member from keyedData if there is only one run in the metadata
+    if (keyedData && meta.length && !hasMultiRuns(meta)) {
+      keyedData.forEach((el) => (el.key = el.key.split(" ")[1]));
+    }
+  };
+
   render() {
     const metaToKeyedData = (m) => ({
       key: `${m.ensemble_member} ${m.start_date}-${m.end_date}`,
@@ -46,20 +53,11 @@ export default class FilteredDatasetsSummary extends React.Component {
     };
 
     const keyedData = this.props.meta.map(metaToKeyedData);
-    if (this.props.meta.length && !hasMultiRuns(this.props.meta)) {
-      // Remove run in cases where there is only one run
-      keyedData.forEach((el) => (el.key = el.key.split(" ")[1]));
-    }
+    this.removeSingleRun(keyedData, this.props.meta);
 
     const keyedComparandData =
       this.props.comparandMeta && this.props.comparandMeta.map(metaToKeyedData);
-    if (
-      keyedComparandData &&
-      this.props.comparandMeta.length &&
-      !hasMultiRuns(this.props.comparandMeta)
-    ) {
-      keyedComparandData.forEach((el) => (el.key = el.key.split(" ")[1]));
-    }
+    this.removeSingleRun(keyedComparandData, this.props.comparandMeta);
 
     const dataGroupedByKey = _.groupBy(keyedData, "key");
     const comparandDataGroupedByKey =
