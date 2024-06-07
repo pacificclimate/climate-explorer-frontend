@@ -788,7 +788,7 @@ help:
 
           200-year annual maximum one day streamflow
 
-        ### Change factors for annual maximum atreamflow quantiles
+        ### Change factors for annual maximum streamflow quantiles
 
         Change factors for the streamflow quantiles describe the change
         in daily extreme streamflow events for a specified return period
