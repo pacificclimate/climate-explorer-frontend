@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import Selector from "../Selector/Selector";
 import _ from "lodash";
 import { datasetSelectorLabel } from "../guidance-content/info/InformationItems";
+import { hasMultiRuns } from "../map-controllers/map-helpers";
+
 /******************************************************************
  * DataSpecSelector.js - Data Specification selecting widget
  *
@@ -49,7 +51,7 @@ export default class DataSpecSelector extends React.Component {
       _.sortBy(ids, (item) => item[1]),
       (item) => item[1],
     );
-    if (ids[0][1].split(" ")[0] == ids[ids.length - 1][1].split(" ")[0]) {
+    if (!hasMultiRuns(this.props.meta)) {
       // Only one run id for this model. Remove from labels.
       ids.forEach((item) => {
         item[1] = item[1].split(" ")[1];
