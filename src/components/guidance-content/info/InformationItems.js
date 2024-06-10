@@ -492,6 +492,25 @@ export const datasetSelectorLabel = (
   </LabelWithInfo>
 );
 
+export const baselineSelectorLabel = (
+  <LabelWithInfo label="Baseline">
+    <p>
+      Select a single baseline dataset to display from all of those that match
+      the Model, Emissions Scenario, Variable, and historical averaging period
+      selected.
+    </p>
+    <p>
+      On the graph, the datasets with the same Model, Emissions Scenario, and
+      Variable for all available future periods will be compared with this
+      selected baseline.
+    </p>
+    <p>
+      Datasets are identified by a combination of model run id (e.g.,{" "}
+      <code>r1i1p1</code>) and averaging period (e.g., <code>1961-1990</code>).
+    </p>
+  </LabelWithInfo>
+);
+
 export const timeOfYearSelectorLabel = (
   <LabelWithInfo label="Time of Year">
     <p>

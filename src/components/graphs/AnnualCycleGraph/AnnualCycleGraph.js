@@ -15,7 +15,10 @@ import {
   errorMessage,
   loadingDataGraphSpec,
 } from "../graph-helpers";
-import { datasetSelectorLabel } from "../../guidance-content/info/InformationItems";
+import {
+  datasetSelectorLabel,
+  baselineSelectorLabel,
+} from "../../guidance-content/info/InformationItems";
 import {
   representativeValue,
   findStartEndDates,
@@ -174,6 +177,9 @@ export default class AnnualCycleGraph extends React.Component {
   replaceInvalidDataSpec = this.props.isAnomalyAnnualCycle
     ? findStartEndDates("1981", "2010")
     : undefined;
+  selectorLabel = this.props.isAnomalyAnnualCycle
+    ? baselineSelectorLabel
+    : datasetSelectorLabel;
 
   exportData(format) {
     exportDataToWorksheet(
@@ -220,7 +226,7 @@ export default class AnnualCycleGraph extends React.Component {
         <Row>
           <Col lg={6} md={6} sm={6}>
             <ControlLabel className={styles.selector_label}>
-              {datasetSelectorLabel}
+              {this.selectorLabel}
             </ControlLabel>
             <DataspecSelector
               bases={this.props.meta}
