@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 2.4.0
+
+_11-Jun-2024_
+
+- [Fixes eslint warnings and updates node version to 22](https://github.com/pacificclimate/climate-explorer-frontend/pull/460)
+- [Makes time of year dropdown optional and removes from extreme streamflow view](https://github.com/pacificclimate/climate-explorer-frontend/pull/463)
+- [Replaces CMIP6 BCCAQv2 climatologies with MBCn](https://github.com/pacificclimate/climate-explorer-frontend/pull/464)
+- [Implements various UI changes/fixes requested by RCI](https://github.com/pacificclimate/climate-explorer-frontend/pull/465)
+
 ## 2.3.4
 
 _23-Feb-2024_
