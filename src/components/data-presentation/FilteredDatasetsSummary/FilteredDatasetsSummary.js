@@ -5,6 +5,7 @@ import Accordion from "../../guidance-tools/Accordion";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import { MEVSummary } from "../MEVSummary/MEVSummary";
 import { filteredDatasetSummaryPanelLabel } from "../../guidance-content/info/InformationItems";
+import { hasMultiRuns } from "../../map-controllers/map-helpers";
 
 import _ from "lodash";
 import { HalfWidthCol } from "../../layout/rb-derived-components";
@@ -22,6 +23,13 @@ export default class FilteredDatasetsSummary extends React.Component {
 
   static defaultProps = {
     dual: false,
+  };
+
+  removeSingleRun = (keyedData, meta) => {
+    // Remove ensemble member from keyedData if there is only one run in the metadata
+    if (keyedData && meta.length && !hasMultiRuns(meta)) {
+      keyedData.forEach((el) => (el.key = el.key.split(" ")[1]));
+    }
   };
 
   render() {
@@ -45,8 +53,11 @@ export default class FilteredDatasetsSummary extends React.Component {
     };
 
     const keyedData = this.props.meta.map(metaToKeyedData);
+    this.removeSingleRun(keyedData, this.props.meta);
+
     const keyedComparandData =
       this.props.comparandMeta && this.props.comparandMeta.map(metaToKeyedData);
+    this.removeSingleRun(keyedComparandData, this.props.comparandMeta);
 
     const dataGroupedByKey = _.groupBy(keyedData, "key");
     const comparandDataGroupedByKey =
@@ -72,7 +83,7 @@ export default class FilteredDatasetsSummary extends React.Component {
           End Date
         </TableHeaderColumn>
         <TableHeaderColumn dataField="yearly" width={"10%"}>
-          Yearly?
+          Annual?
         </TableHeaderColumn>
         <TableHeaderColumn dataField="seasonal" width={"10%"}>
           Seasonal?

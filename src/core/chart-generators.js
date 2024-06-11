@@ -24,7 +24,7 @@ import _ from "lodash";
 import {
   capitalizeWords,
   caseInsensitiveStringSearch,
-  extendedDateToBasicDate,
+  dateToPeriod,
   getDataUnits,
   getVariableOptions,
   nestedAttributeIsDefined,
@@ -436,7 +436,9 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
   // only one timeseries being graphed, simple label.
   if (data.length === 1) {
     return function (m) {
-      return capitalizeWords(`${m.timescale} mean`);
+      return m.timescale === "yearly"
+        ? "Annual Mean"
+        : capitalizeWords(`${m.timescale} mean`);
     };
   }
 
@@ -493,7 +495,7 @@ function shortestUniqueTimeseriesNamingFunction(metadata, data) {
       name = name.concat(`${m[v]} `);
     }
     name = name.concat(basenameByVariable[m.variable_id]);
-    return capitalizeWords(name);
+    return capitalizeWords(name.replace("yearly", "annual"));
   };
 }
 
@@ -606,12 +608,12 @@ const missingVariableName = "defaultVariable";
 
 /*
  * Helper constant for dataToLongTermAverageGraph: Format object
- * for a timeseries X axis.
+ * for a timeseries X axis labelled by the decadal period.
  */
-const timeseriesXAxis = {
+const periodXAxis = {
   type: "timeseries",
   tick: {
-    format: "%Y-%m-%d",
+    format: "%Ys",
   },
 };
 
@@ -775,7 +777,7 @@ function dataToLongTermAverageGraph(data, contexts = []) {
   // get the list of all timestamps and add them to the chart
   // (C3 requires x-axis timestamps be added as a data column)
   const timestamps = getAllTimestamps(data);
-  c3Data.columns.push(["x"].concat(_.map(timestamps, extendedDateToBasicDate)));
+  c3Data.columns.push(["x"].concat(_.map(timestamps, dateToPeriod)));
   c3Data.x = "x";
 
   // add each API call to the chart
@@ -812,7 +814,7 @@ function dataToLongTermAverageGraph(data, contexts = []) {
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
-  c3Axis.x = timeseriesXAxis;
+  c3Axis.x = periodXAxis;
 
   // The long term average graph doesn't require every series to have the exact
   // same timestamps, since it's comparing long term trends anyway. Allow C3
@@ -901,7 +903,7 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
 
   // get list of all timestamps
   const timestamps = getAllTimestamps(data);
-  c3Data.columns.push(["x"].concat(_.map(timestamps, extendedDateToBasicDate)));
+  c3Data.columns.push(["x"].concat(_.map(timestamps, dateToPeriod)));
   c3Data.x = "x";
 
   // Add each timeseries to the graph
@@ -935,7 +937,7 @@ function timeseriesToTimeseriesGraph(metadata, ...data) {
 
   // whole-graph display options: axis formatting and tooltip behaviour
   let c3Axis = {};
-  c3Axis.x = timeseriesXAxis;
+  c3Axis.x = periodXAxis;
   const c3Subchart = { show: true, size: { height: 20 } };
 
   // instructs c3 to connect series across gaps where a timeseries is missing

@@ -4,6 +4,7 @@ import {
   fadeSeriesByRank,
   hideSeriesInLegend,
   sortSeriesByRank,
+  hideSeriesInTooltip,
 } from "../../core/chart-formatters";
 import { caseInsensitiveStringSearch } from "../../core/util";
 
@@ -177,6 +178,7 @@ function emphasizeSeries(graph, seriesName) {
   graph = assignColoursByGroup(graph, makeSegmentor(1, 0));
   graph = fadeSeriesByRank(graph, makeSegmentor(1, 0.35));
   graph = hideSeriesInLegend(graph, makeSegmentor(false, true));
+  graph = hideSeriesInTooltip(graph, makeSegmentor(false, true));
   graph = sortSeriesByRank(graph, makeSegmentor(1, 0));
 
   return graph;

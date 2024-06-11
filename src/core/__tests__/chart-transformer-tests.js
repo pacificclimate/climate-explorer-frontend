@@ -177,7 +177,7 @@ describe("makeTimeSliceGraph", function () {
   });
   it("generates a yearly timeslice", function () {
     let graph = cg.dataToLongTermAverageGraph([mockAPI.tasmaxData]);
-    const timeSliceGraph = ct.makeTimeSliceGraph("1997-01-15", graph);
+    const timeSliceGraph = ct.makeTimeSliceGraph("1990-01-01", graph);
     for (let c of timeSliceGraph.data.columns) {
       expect(c.length).toBe(2);
     }
