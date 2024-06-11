@@ -41,13 +41,11 @@ import SingleLongTermAveragesGraph from "../../graphs/SingleLongTermAveragesGrap
 import SingleContextGraph from "../../graphs/SingleContextGraph";
 import SingleTimeSeriesGraph from "../../graphs/SingleTimeSeriesGraph";
 import AnomalyAnnualCycleGraph from "../../graphs/AnomalyAnnualCycleGraph";
-import SingleTimeSliceGraph from "../../graphs/SingleTimeSliceGraph";
 import {
   singleAnnualCycleTabLabel,
   changeFromBaselineTabLabel,
   singleLtaTabLabel,
   modelContextTabLabel,
-  snapshotTabLabel,
   timeSeriesTabLabel,
   graphsPanelLabel,
 } from "../../guidance-content/info/InformationItems";
@@ -91,7 +89,6 @@ export default class SingleDataController extends React.Component {
       { title: singleLtaTabLabel, graph: SingleLongTermAveragesGraph },
       { title: modelContextTabLabel, graph: SingleContextGraph },
       { title: changeFromBaselineTabLabel, graph: AnomalyAnnualCycleGraph },
-      { title: snapshotTabLabel, graph: SingleTimeSliceGraph },
     ],
     notMym: [{ title: timeSeriesTabLabel, graph: SingleTimeSeriesGraph }],
   };

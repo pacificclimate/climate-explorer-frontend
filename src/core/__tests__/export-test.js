@@ -134,7 +134,7 @@ describe("generateDataCellsFromC3Graph", function () {
     expect(validate.isRectangularArray(cells, 4, 14)).toBe(true);
     expect(cells[1][0]).toBe("Monthly Mean");
     expect(cells[2][0]).toBe("Seasonal Mean");
-    expect(cells[3][0]).toBe("Yearly Mean");
+    expect(cells[3][0]).toBe("Annual Mean");
     //spot check a couple representative values
     expect(cells[3][6]).toBe("-2.67");
     expect(cells[2][10]).toBe("-1.36");

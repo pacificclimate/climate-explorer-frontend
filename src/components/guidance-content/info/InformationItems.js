@@ -457,7 +457,7 @@ export const filteredDatasetSummaryPanelLabel = (
       comprising multiple runs are denoted rX.
     </p>
     <p>
-      The "Yearly", "Seasonal", and "Monthly" columns indicate whether a dataset
+      The "Annual", "Seasonal", and "Monthly" columns indicate whether a dataset
       with that timescale (averaging period) is available in the group.
     </p>
   </LabelWithInfo>
@@ -484,6 +484,25 @@ export const datasetSelectorLabel = (
     </p>
     <p>
       On the graph(s), the Dataset selector appears directly above the graph.
+    </p>
+    <p>
+      Datasets are identified by a combination of model run id (e.g.,{" "}
+      <code>r1i1p1</code>) and averaging period (e.g., <code>1961-1990</code>).
+    </p>
+  </LabelWithInfo>
+);
+
+export const baselineSelectorLabel = (
+  <LabelWithInfo label="Baseline">
+    <p>
+      Select a single baseline dataset to display from all of those that match
+      the Model, Emissions Scenario, Variable, and historical averaging period
+      selected.
+    </p>
+    <p>
+      On the graph, the datasets with the same Model, Emissions Scenario, and
+      Variable for all available future periods will be compared with this
+      selected baseline.
     </p>
     <p>
       Datasets are identified by a combination of model run id (e.g.,{" "}
@@ -590,7 +609,7 @@ export const watershedGraphsPanelLabel = (
 export const singleAnnualCycleTabLabel = (
   <LabelWithInfo label="Annual Cycle">
     <p>
-      Annual cycle graph showing the yearly, seasonal, and monthly mean values
+      Annual cycle graph showing the annual, seasonal, and monthly mean values
       of the selected variable.
     </p>
     <p>{annualCycleGraphDefn}</p>
@@ -601,7 +620,7 @@ export const singleAnnualCycleTabLabel = (
 
 export const dualAnnualCycleTabLabel = (
   <LabelWithInfo label="Annual Cycle">
-    Annual cycle graphs showing the yearly, seasonal, and monthly mean values of
+    Annual cycle graphs showing the annual, seasonal, and monthly mean values of
     the two selected variables (if different).
     <p>{annualCycleGraphDefn}</p>
     <p>{spatialAveragingDefn}</p>
