@@ -230,7 +230,7 @@ function getWatershedGeographyName(ensemble) {
     upper_fraser: "upper_fraser_watershed",
     fraser: "fraser_watershed",
       frapce: "frapce_watershed",
-      fraser_peace_columbia: "frapce_watershed",
+      fraser_peace_columbia: "fraser_peace_columbia_watershed",
   }[ensemble];
 }
 
