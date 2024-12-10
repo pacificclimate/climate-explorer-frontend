@@ -159,9 +159,9 @@ export default class LongTermAveragesGraph extends React.Component {
       })
       .catch((dataError) => {
         this.setState({
-          // Do we have to set data non-null here to prevent infinite update loop?
           fetchingData: false,
           dataError,
+          data: undefined,
         });
       });
   }
