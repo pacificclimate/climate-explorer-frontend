@@ -219,7 +219,7 @@ export default class LongTermAveragesGraph extends React.Component {
 
     if (!this.props.area) {
       return noDataMessageGraphSpec(
-        "Select an outlet point on the map with the circle marker tool",
+        "Use the map to select an area to display data for.",
       );
     }
 
