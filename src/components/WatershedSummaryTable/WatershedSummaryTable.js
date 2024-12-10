@@ -44,9 +44,12 @@ export default class WatershedSummaryTable extends React.Component {
 
     this.state = {
       prevArea: null,
-      fetchingData: false,
       data: null,
       dataError: null,
+      // Signal that data fetch is required
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
     };
   }
 
@@ -54,9 +57,12 @@ export default class WatershedSummaryTable extends React.Component {
     if (props.area !== state.prevArea) {
       return {
         prevArea: props.area,
-        fetchingData: false, // not quite yet
-        data: null, // Signal that data fetch is required
+        data: null,
         dataError: null,
+        // Signal that data fetch is required
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
       };
     }
 
@@ -69,7 +75,7 @@ export default class WatershedSummaryTable extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.fetchingData && this.state.data === null) {
+    if (!this.state.isLoading && !this.state.isSuccess && !this.state.isError) {
       this.fetchData();
     }
   }
@@ -87,23 +93,27 @@ export default class WatershedSummaryTable extends React.Component {
       // Don't fetch data when user hasn't selected a watershed
       return;
     }
-    this.setState({ fetchingData: true });
+    this.setState({ isLoading: true });
     const metadata = {
       ..._.pick(this.props, "ensemble_name", "area"),
     };
     this.getAndValidateWatershed(metadata)
       .then((data) => {
         this.setState({
-          fetchingData: false,
+          isLoading: false,
+          isSuccess: true,
+          isError: false,
           data: parseWatershedTableData(data, this.props.area),
           dataError: null,
         });
       })
       .catch((dataError) => {
         this.setState({
+          isLoading: false,
+          isSuccess: false,
+          isError: true,
           // Set data non-null here to prevent infinite update loop.
-          data: undefined,
-          fetchingData: false,
+          data: null,
           dataError,
         });
       });
@@ -120,7 +130,7 @@ export default class WatershedSummaryTable extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.fetchingData || this.state.data === null) {
+    if (!this.state.data) {
       return {
         noDataText:
           "Select an outlet point on the map with the circle marker tool to see watershed information",
