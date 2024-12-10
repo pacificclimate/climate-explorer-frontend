@@ -151,6 +151,11 @@ export default class LongTermAveragesGraph extends React.Component {
       .filter((metadata) => !!metadata);
 
   fetchData() {
+    if (!this.props.area) {
+      // Don't fetch data when user hasn't selected a watershed
+      return;
+    }
+
     this.setState({ isLoading: true });
 
     console.log(this.state);
@@ -210,6 +215,12 @@ export default class LongTermAveragesGraph extends React.Component {
     // An error occurred
     if (this.state.dataError) {
       return noDataMessageGraphSpec(errorMessage(this.state.dataError));
+    }
+
+    if (!this.props.area) {
+      return noDataMessageGraphSpec(
+        "Select an outlet point on the map with the circle marker tool",
+      );
     }
 
     // Waiting for data

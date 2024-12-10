@@ -112,7 +112,6 @@ export default class WatershedSummaryTable extends React.Component {
           isLoading: false,
           isSuccess: false,
           isError: true,
-          // Set data non-null here to prevent infinite update loop.
           data: null,
           dataError,
         });
