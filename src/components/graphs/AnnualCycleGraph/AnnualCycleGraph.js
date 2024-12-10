@@ -89,9 +89,11 @@ export default class AnnualCycleGraph extends React.Component {
       prevArea: null,
       prevDataSpec: null,
       dataSpec: undefined,
-      fetchingData: false,
       data: null,
       dataError: null,
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
     };
   }
 
@@ -105,9 +107,11 @@ export default class AnnualCycleGraph extends React.Component {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        fetchingData: false, // not quite yet
-        data: null, // Signal that data fetch is required
+        data: null,
         dataError: null,
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
       };
     }
 
@@ -115,9 +119,11 @@ export default class AnnualCycleGraph extends React.Component {
     if (state.prevDataSpec !== state.dataSpec) {
       return {
         prevDataSpec: state.dataSpec,
-        fetchingData: false, // not quite yet
-        data: null, // Signal that data fetch is required
+        data: null,
         dataError: null,
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
       };
     }
 
@@ -130,7 +136,7 @@ export default class AnnualCycleGraph extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.fetchingData && this.state.data === null) {
+    if (!this.state.isLoading && !this.state.isSuccess && !this.state.isError) {
       this.fetchData();
     }
   }
@@ -151,13 +157,15 @@ export default class AnnualCycleGraph extends React.Component {
       .filter((metadata) => !!metadata);
 
   fetchData() {
-    this.setState({ fetchingData: true });
+    this.setState({ isLoading: true });
     Promise.all(
       this.getMetadatas().map((metadata) => this.getAndValidateData(metadata)),
     )
       .then((data) => {
         this.setState({
-          fetchingData: false,
+          isLoading: false,
+          isSuccess: true,
+          isError: false,
           data,
           dataError: null,
         });
@@ -165,8 +173,11 @@ export default class AnnualCycleGraph extends React.Component {
       .catch((dataError) => {
         this.setState({
           // Do we have to set data non-null here to prevent infinite update loop?
-          fetchingData: false,
+          isLoading: false,
+          isSuccess: false,
+          isError: true,
           dataError,
+          data: undefined,
         });
       });
   }
@@ -205,7 +216,7 @@ export default class AnnualCycleGraph extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.fetchingData || this.state.data === null) {
+    if (!this.state.data) {
       return loadingDataGraphSpec;
     }
 
