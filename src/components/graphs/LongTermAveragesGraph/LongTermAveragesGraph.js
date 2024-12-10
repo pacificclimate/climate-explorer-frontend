@@ -259,6 +259,7 @@ export default class LongTermAveragesGraph extends React.Component {
           )}
           <Col lg={controlsWidth} md={controlsWidth} sm={controlsWidth}>
             <ExportButtons
+              disabled={!this.state.data}
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
             />

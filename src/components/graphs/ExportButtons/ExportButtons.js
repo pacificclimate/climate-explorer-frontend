@@ -14,6 +14,7 @@ export default class ExportButtons extends React.Component {
   static propTypes = {
     onExportXlsx: PropTypes.func.isRequired,
     onExportCsv: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
   };
 
   render() {
@@ -22,8 +23,15 @@ export default class ExportButtons extends React.Component {
         <ControlLabel className={styles.exportlabel}>
           {downloadGraphDataLabel}
         </ControlLabel>
-        <Button onClick={this.props.onExportXlsx}>{xslxButtonLabel}</Button>
-        <Button onClick={this.props.onExportCsv}>{csvButtonLabel}</Button>
+        <Button
+          disabled={this.props.disabled}
+          onClick={this.props.onExportXlsx}
+        >
+          {xslxButtonLabel}
+        </Button>
+        <Button disabled={this.props.disabled} onClick={this.props.onExportCsv}>
+          {csvButtonLabel}
+        </Button>
       </div>
     );
   }
