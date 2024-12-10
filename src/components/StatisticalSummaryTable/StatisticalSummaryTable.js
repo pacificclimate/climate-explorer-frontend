@@ -162,9 +162,10 @@ export default class StatisticalSummaryTable extends React.Component {
       })
       .catch((dataError) => {
         this.setState({
-          // Set data non-null here to prevent infinite update loop.
-          data: undefined,
           isLoading: false,
+          isSuccess: false,
+          isError: true,
+          data: null,
           dataError,
         });
       });
