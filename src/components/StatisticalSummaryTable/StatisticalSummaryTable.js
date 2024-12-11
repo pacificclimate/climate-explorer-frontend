@@ -59,9 +59,12 @@ export default class StatisticalSummaryTable extends React.Component {
       prevArea: null,
       prevTimeOfYear: undefined,
       timeOfYear: undefined,
-      fetchingData: false,
       data: null,
       dataError: null,
+      // Signal that data fetch is required
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
     };
   }
 
@@ -70,9 +73,12 @@ export default class StatisticalSummaryTable extends React.Component {
       return {
         prevMeta: props.meta,
         prevArea: props.area,
-        fetchingData: false, // not quite yet
-        data: null, // Signal that data fetch is required
+        data: null,
         dataError: null,
+        // Signal that data fetch is required
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
       };
     }
 
@@ -80,9 +86,12 @@ export default class StatisticalSummaryTable extends React.Component {
     if (state.prevTimeOfYear !== state.timeOfYear) {
       return {
         prevTimeOfYear: state.timeOfYear,
-        fetchingData: false, // not quite yet
-        data: null, // Signal that data fetch is required
+        data: null,
         dataError: null,
+        // Signal that data fetch is required
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
       };
     }
 
@@ -95,7 +104,7 @@ export default class StatisticalSummaryTable extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.fetchingData && this.state.data === null) {
+    if (!this.state.isLoading && !this.state.isSuccess && !this.state.isError) {
       this.fetchData();
     }
   }
@@ -126,7 +135,7 @@ export default class StatisticalSummaryTable extends React.Component {
       // Don't fetch data when ToY hasn't settled yet.
       return;
     }
-    this.setState({ fetchingData: true });
+    this.setState({ isLoading: true });
     const metadata = {
       ..._.pick(
         this.props,
@@ -141,7 +150,9 @@ export default class StatisticalSummaryTable extends React.Component {
     this.getAndValidateData(metadata)
       .then((data) => {
         this.setState({
-          fetchingData: false,
+          isLoading: false,
+          isSuccess: true,
+          isError: false,
           data: parseBootstrapTableData(
             this.injectRunIntoStats(data),
             this.props.meta,
@@ -151,9 +162,10 @@ export default class StatisticalSummaryTable extends React.Component {
       })
       .catch((dataError) => {
         this.setState({
-          // Set data non-null here to prevent infinite update loop.
-          data: undefined,
-          fetchingData: false,
+          isLoading: false,
+          isSuccess: false,
+          isError: true,
+          data: null,
           dataError,
         });
       });
@@ -189,7 +201,7 @@ export default class StatisticalSummaryTable extends React.Component {
     }
 
     // Waiting for data
-    if (this.state.fetchingData || this.state.data === null) {
+    if (this.state.isLoading || this.state.data === null) {
       return { noDataText: "Loading data..." };
     }
 
