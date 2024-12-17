@@ -17,8 +17,8 @@ export function getBaseWMSParams({
   // involves the full filepath, or a simple dataset identifier, which uses
   // just the dataset unique_id. Default behaviour is "simple".
   const datasetId =
-    process.env.REACT_APP_MAP_LAYER_ID_TYPE === "dynamic"
-      ? `${process.env.REACT_APP_MAP_LAYER_ID_PREFIX}${filepath}`
+    window.env.REACT_APP_MAP_LAYER_ID_TYPE === "dynamic"
+      ? `${window.env.REACT_APP_MAP_LAYER_ID_PREFIX}${filepath}`
       : dataset;
   const fixedParams = {
     layers: `${datasetId}/${variableId}`,
@@ -82,7 +82,7 @@ export function getLayerMinMax(layer, props, bounds) {
 
   const { layers, version, srs, time } = getWMSParams(layer, props[layer]);
 
-  return axios(process.env.REACT_APP_NCWMS_URL, {
+  return axios(window.env.REACT_APP_NCWMS_URL, {
     params: {
       styles: "default-scalar",
       request: "GetMetadata",

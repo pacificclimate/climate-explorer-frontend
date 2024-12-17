@@ -16,7 +16,7 @@ import * as serviceWorker from "./serviceWorker";
 import "./core/lodash.mixins";
 
 const loadTexts = makeYamlLoader(
-  `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`,
+  `${window.env.PUBLIC_URL}/${window.env.REACT_APP_EXTERNAL_TEXT}`,
 );
 
 ReactDOM.render(

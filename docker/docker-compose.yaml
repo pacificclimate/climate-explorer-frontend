@@ -1,0 +1,24 @@
+# This docker-compose uses the following shell environment variables:
+#
+# `PCEX_TAG`: Image tag
+# `PCEX_PORT`: External port to map to
+# Note: These values are set as part of the makefile, initialize the container
+# Using it.
+#
+# Their values are set appropriately in the Makefile for use on a workstation.
+# For use in a production setting, either set the shell
+# variables appropriately when invoking docker-compose, or modify (a copy of)
+# this file with the desired values.
+
+version: "3.2"
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    #image: pcic/station-data-portal-frontend:${PCEX_TAG}
+    container_name: station-data-portal-frontend
+    volumes:
+      - ./config.js:/app/config.js
+    ports:
+      - "${PCEX_PORT}:8080"

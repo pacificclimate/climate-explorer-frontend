@@ -66,7 +66,7 @@ class CanadaBaseMap extends React.Component {
       >
         <WMSTileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url={process.env.REACT_APP_TILECACHE_URL}
+          url={window.env.REACT_APP_TILECACHE_URL}
           layers={"osm"}
           format={"image/png"}
           transparent={true}

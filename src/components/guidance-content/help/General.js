@@ -21,7 +21,7 @@ export default class HelpGeneral extends React.Component {
           <HalfWidthCol>
             <T
               path="help.general.sections"
-              data={{ IMAGES: `${process.env.PUBLIC_URL}/images` }}
+              data={{ IMAGES: `${window.env.PUBLIC_URL}/images` }}
             />
           </HalfWidthCol>
         </Row>
