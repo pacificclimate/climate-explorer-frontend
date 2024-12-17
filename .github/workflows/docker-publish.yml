@@ -26,6 +26,7 @@ jobs:
         with:
           username: ${{ secrets.pcicdevops_at_dockerhub_username }}
           password: ${{ secrets.pcicdevops_at_dockerhub_password }}
+          dockerfile: docker/Dockerfile
           repository: pcic/climate-explorer-frontend
           tag_with_ref: true
           build_args: REACT_APP_APP_VERSION=${{ env.REACT_APP_APP_VERSION }}
