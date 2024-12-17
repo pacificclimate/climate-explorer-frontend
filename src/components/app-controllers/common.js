@@ -5,4 +5,4 @@
 export const ensemble_name = (props) =>
   (props.match && props.match.params && props.match.params.ensemble_name) ||
   props.ensemble_name ||
-  process.env.REACT_APP_CE_ENSEMBLE_NAME;
+  window.env.REACT_APP_CE_ENSEMBLE_NAME;

@@ -55,7 +55,7 @@ Environment variables for configuring the app are:
 - For production, set this to the path component of the URL for CE configured in our proxy server.
 - **WARNING**: This **MUST** match the path component of `PUBLIC_URL` (see above).
 
-`REACT_APP_CE_CURRENT_VERSION`
+`REACT_APP_APP_VERSION`
 
 - Current version of the app.
 - This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
@@ -270,10 +270,10 @@ Build a docker image:
 
 ```bash
 docker build -t climate-explorer-frontend \
-    --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" .
+    --build-arg REACT_APP_APP_VERSION="$(./generate-commitish.sh)" .
 ```
 
-Setting build arg `REACT_APP_CE_CURRENT_VERSION` as above is the most reliable
+Setting build arg `REACT_APP_APP_VERSION` as above is the most reliable
 way to inject an accurate version into the final app. This value can be overridden
 when the image is run, but it is not recommended, as it introduces the possibility
 of error.

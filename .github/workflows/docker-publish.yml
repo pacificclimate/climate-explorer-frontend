@@ -13,10 +13,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Export REACT_APP_CE_CURRENT_VERSION env var
+      - name: Export REACT_APP_APP_VERSION env var
         run: |
           git fetch --prune --unshallow
-          echo "REACT_APP_CE_CURRENT_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
+          echo "REACT_APP_APP_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
+      - name: Build npm package
+        run: |
+          npm ci
+          npm run build
       - name: Publish to Registry
         uses: docker/build-push-action@v1
         with:
@@ -24,4 +28,4 @@ jobs:
           password: ${{ secrets.pcicdevops_at_dockerhub_password }}
           repository: pcic/climate-explorer-frontend
           tag_with_ref: true
-          build_args: REACT_APP_CE_CURRENT_VERSION=${{ env.REACT_APP_CE_CURRENT_VERSION }}
+          build_args: REACT_APP_APP_VERSION=${{ env.REACT_APP_APP_VERSION }}
