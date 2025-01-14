@@ -1,5 +1,9 @@
 # News / Release Notes
 
+## 2.5.0
+
+- [Update build process for quicker container startups](https://github.com/pacificclimate/climate-explorer-frontend/pull/471)
+
 ## 2.4.0
 
 _11-Jun-2024_
