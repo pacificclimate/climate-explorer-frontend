@@ -1,5 +1,8 @@
 import "./core/lodash.mixins";
 
+// include our default config properties
+require("../public/config.js");
+
 // configure({ adapter: new Adapter() });
 
 // global.SVGPathElement = function () {};

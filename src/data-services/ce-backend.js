@@ -47,7 +47,7 @@ const transformMetadata = (metadata) =>
 export function getMetadata(ensemble_name) {
   // Get all the metadata for `ensemble_name` and transform it to CE form.
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "multimeta"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multimeta"),
     params: {
       ensemble_name,
       extras: "filepath",
@@ -61,7 +61,7 @@ export function getPercentileMetadata(ensemble_name) {
   // Get all metadata for all percentile datasets in `ensemble_name`
   // and transform it to CE form.
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "multimeta"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multimeta"),
     params: {
       ensemble_name,
       climatological_statistic: "percentile",
@@ -74,7 +74,7 @@ export function getPercentileMetadata(ensemble_name) {
 
 function getTimeMetadata(uniqueId) {
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "metadata"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "metadata"),
     params: {
       // Note misleading naming: Param model_id is actually unique_id. FFS.
       model_id: uniqueId,
@@ -89,7 +89,7 @@ function getTimeseries({ variable_id, unique_id }, area) {
   // `area`. (`variable_id` and `unique_id` are typically components of a
   // metadata object, hence their grouping like this.)
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "timeseries"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "timeseries"),
     params: {
       id_: unique_id || null,
       variable: variable_id,
@@ -147,7 +147,7 @@ function getData({
   }
 
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "data"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "data"),
     params: query_params,
   });
 }
@@ -180,7 +180,7 @@ function getStats({
   //  }
   const emission = guessExperimentFormatFromVariable(variable_id, experiment);
   return axios({
-    baseURL: urljoin(process.env.REACT_APP_CE_BACKEND_URL, "multistats"),
+    baseURL: urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multistats"),
     params: {
       ensemble_name: ensemble_name,
       model: model_id,
@@ -198,7 +198,7 @@ export function getWatershed({ ensemble_name, area }) {
   // physical geology of the watershed.
   return axios({
     baseURL: urljoin(
-      process.env.REACT_APP_CE_BACKEND_URL,
+      window.env.REACT_APP_CE_BACKEND_URL,
       "streamflow/watershed",
     ),
     params: {
