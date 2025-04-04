@@ -1,5 +1,9 @@
 # News / Release Notes
 
+## 2.6.0
+
+- [Add colombia river streamflow](https://github.com/pacificclimate/climate-explorer-frontend/pull/472)
+
 ## 2.5.0
 
 - [Update build process for quicker container startups](https://github.com/pacificclimate/climate-explorer-frontend/pull/471)
