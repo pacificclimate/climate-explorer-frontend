@@ -375,6 +375,21 @@ export const emissionScenarioSelectorLabel = (
           </td>
         </tr>
         <tr>
+          <td>ssp370</td>
+          <td>
+            <a
+              href="https://climate-scenarios.canada.ca/?page=cmip6-overview-notes"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              SSP
+            </a>{" "}
+            3-7.0 (limited global cooperation &amp; protectionist policies; high
+            emissions &amp; high aerosols). No direct RCP analog; roughly
+            between RCP6.0 and RCP8.5 in forcing by 2100.
+          </td>
+        </tr>
+        <tr>
           <td>rcp85/ssp585</td>
           <td>
             <a
