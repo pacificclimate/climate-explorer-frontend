@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.7.0
+
+_17-Sep-2025_
+
+- [Add CMIP6-MBCn SSP 3-7.0 scenarios] (https://github.com/pacificclimate/climate-explorer-frontend/pull/475)
+
 ## 2.6.0
 
 - [Add colombia river streamflow](https://github.com/pacificclimate/climate-explorer-frontend/pull/472)
