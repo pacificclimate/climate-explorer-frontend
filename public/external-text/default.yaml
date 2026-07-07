@@ -191,11 +191,11 @@ help:
 
           For CMIP5, the downscaled scenarios in Climate Explorer are constructed from 27 GCMs and 3 Representative Concentration
           Pathways (RCPs). The climatologies for these scenarios can be accessed using the `Single Variable` and `Compare Variables`
-          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_gcms/map/).
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://services.pacificclimate.org/portal/downscaled_gcms/map/).
 
           For CMIP6, the downscaled scenarios in Climate Explorer are constructed from 26 GCMs and 3 Shared Socioeconomic
           Pathways (SSPs). The climatologies for these scenarios can be accessed using the `Single Variable CMIP6` and `Compare Variables CMIP6`
-          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://data.pacificclimate.org/portal/downscaled_cmip6_multi/map/).
+          tabs, and the daily model output can be accessed [here on the PCIC data portal](https://services.pacificclimate.org/portal/downscaled_cmip6_multi/map/).
 
   general:
     # This chunk is partway to being ready for presenting the sections as
@@ -1845,7 +1845,7 @@ science:
     Climatic Change, 109 (1-2), 5-31, doi:10.1007/s10584-011-0148-z.
 
     **Werner, A.T.**, 2011:
-    [_BCSD downscaled transient climate projections for eight select GCMs over British Columbia, Canada_](http://www.pacificclimate.org/sites/default/files/publications/Werner.HydroModelling.FinalReport1.Apr2011.pdf).
+    [_BCSD downscaled transient climate projections for eight select GCMs over British Columbia, Canada_](https://www.uvic.ca/pcic/_assets/docs/werner-hydromodelling-april2011.pdf).
     Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 63 pp.
 
     **Werner, A.T.** and **A.J. Cannon**, 2015: Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods.
@@ -1868,15 +1868,15 @@ about:
       - header: Version
         body: ${version}
       - header: Author
-        body: "[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)"
+        body: "[Pacific Climate Impacts Consortium (PCIC)](https://www.uvic.ca/pcic/)"
       - header: Terms of Use
         body: |
-          In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
+          In addition to PCIC's [terms of use](https://www.uvic.ca/pcic/about/terms-of-use/index.php), the data for each individual
           data set is subject to the terms of use of each source organization.
           For further details please refer to:
 
-          * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
-          * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
+          * [The Coupled Model Intercomparison Project](https://www.uvic.ca/pcic/_assets/docs/tou-cmip5-pcmdi_llnl_gov_february-2014.pdf)
+          * [National Center for Atmospheric Research Earth System Grid](https://www.uvic.ca/pcic/_assets/docs/tou_earthsystemgrid_february-19th-2014.pdf)
           * [CMIP6 Terms of Use](https://pcmdi.llnl.gov/CMIP6/TermsOfUse/TermsOfUse6-1.html)
 
           #### No Warranty
@@ -1893,8 +1893,8 @@ about:
     sponsors:
       title: "## Sponsors"
       items:
-        - header: Ministry of Transportation and Infrastructure (MoTI)
-          href: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation-and-infrastructure
+        - header: Ministry of Transportation and Transit
+          href: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/transportation
           body: Primary sponsor of the PCIC Climate Explorer (PCEX) project.
     others:
       title: "## Others"
@@ -1947,26 +1947,25 @@ about:
           Please address questions about science and interpretation of the
           data presented in this tool to ${$$.components.contacts.science.link}.
       - header: Pacific Climate Impacts Consortium
-        body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+        body: See [PCIC Contact page](https://www.uvic.ca/pcic/about/contact-us/index.php).
 
   team:
     title: "# Team"
     items:
       - header: James Hiebert
-        href: https://pacificclimate.org/about-pcic/people/james-hiebert
+        href: https://www.uvic.ca/pcic/about/our-people/profiles/hiebert-james.php
         body: |
           Fearless leader.
           Ur-Architect of PCIC information systems.
           Keeper of the clan's lore and history.
       - header: Lee Zeman
-        href: https://pacificclimate.org/about-pcic/people/lee-zeman
+        href: https://www.uvic.ca/pcic/about/our-people/profiles/zeman-lee.php
         body: |
           Front-end engineer.
           Valiant contender with GIS legacy backend rebellions.
           Implementor of wondrous data graphs.
           Champion of the practical and effective.
       - header: Rod Glover
-        href: https://pacificclimate.org/about-pcic/people/rod-glover
         body: |
           Full-stack engineer.
           Implementor of fearsome data preparation tools.
@@ -1974,7 +1973,6 @@ about:
           React refactorer and perfectionist.
           Migrator of databases and devotee of the alchemical arts.
       - header: Matthew Benstead
-        href: https://pacificclimate.org/about-pcic/people/matthew-benstead
         body: |
           System administrator and master of all things IT.
           Docker guru.
