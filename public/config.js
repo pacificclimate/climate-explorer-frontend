@@ -1,5 +1,6 @@
 window.env = {
-  PUBLIC_URL: "http://localhost:3001",
+  // Keep local public assets on the same origin as the CRA dev server.
+  PUBLIC_URL: "",
   REACT_APP_TILECACHE_URL:
     "https://beehive.pacificclimate.org/mapproxy/service",
   REACT_APP_NCWMS_URL: "https://beehive.pacificclimate.org/ncwms",
