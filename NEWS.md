@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.8.0
+
+_27-Aug-2026_
+
+- [Add npm policy, node 24, pin CI](https://github.com/pacificclimate/climate-explorer-frontend/pull/479)
+
 ## 2.7.0
 
 _17-Sep-2025_
