@@ -8,15 +8,26 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Standardize npm
+        run: npm install --global npm@12
+      - name: Verify Node/npm toolchain
+        shell: bash
+        run: |
+          echo "Node: $(node --version)"
+          echo "npm:  $(npm --version)"
+          test "$(node --version | cut -d. -f1 | tr -d v)" = "24"
+          test "$(npm --version | cut -d. -f1)" = "12"
       - name: Node.js Test Suite
         run: |
-          npm install
+          npm ci
           npm test

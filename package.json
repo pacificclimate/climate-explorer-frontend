@@ -35,8 +35,8 @@
     "leaflet-image": "^0.4.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.3.0",
-    "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
+    "pcic-react-components": "git+https://github.com/pacificclimate/pcic-react-components.git#3.4.0",
+    "pcic-react-external-text": "git+https://github.com/pacificclimate/pcic-react-external-text.git#1.1.0",
     "proj4": "^2.4.4",
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.0",
@@ -64,7 +64,7 @@
     "xlsx": "^0.18.2"
   },
   "scripts": {
-    "reinstall": "rm -rf ./node_modules; npm install",
+    "reinstall": "npm ci",
     "start": "react-scripts --openssl-legacy-provider start",
     "start:rg": "CE_BACKEND_URL=https://services.pacificclimate.org/marmot/api NCWMS_URL=https://services.pacificclimate.org/marmot/ncwms TILECACHE_URL=https://tiles.pacificclimate.org/tilecache/tilecache.py CE_ENSEMBLE_NAME=all_downscale_files APP_VERSION=$(./generate-commitish.sh) react-scripts start",
     "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) react-scripts --openssl-legacy-provider build",
@@ -94,5 +94,12 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "engines": {
+    "node": "24.x",
+    "npm": "12.x"
+  },
+  "allowScripts": {
+    "core-js@2.6.12 || 3.45.1": true
   }
 }
