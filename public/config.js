@@ -1,5 +1,5 @@
 window.env = {
-  // Keep local public assets on the same origin as the CRA dev server.
+  // Keep local public assets on the same origin as the Vite dev server.
   PUBLIC_URL: "",
   REACT_APP_TILECACHE_URL:
     "https://beehive.pacificclimate.org/mapproxy/service",

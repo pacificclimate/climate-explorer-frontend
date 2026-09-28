@@ -1,11 +1,12 @@
 import "./core/lodash.mixins";
 
 // include our default config properties
-require("../public/config.js");
+import "../public/config.js";
 
-// configure({ adapter: new Adapter() });
+// core/util preloads runtime options as a module side effect. Keep unit tests
+// offline and leave its cache empty unless a test supplies options explicitly.
+vi.mock("./data-services/public.js", () => ({
+  getVariableOptions: () => new Promise(() => {}),
+}));
 
-// global.SVGPathElement = function () {};
-var JSDOM = require("jsdom").JSDOM;
-global.window = new JSDOM().window;
 window.SVGPathElement = function () {};

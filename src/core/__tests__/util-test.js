@@ -14,11 +14,10 @@ import xlsx from "xlsx";
 import * as util from "../util";
 import * as mockAPI from "../__test_data__/sample-API-results";
 
-jest.dontMock("../util");
-jest.dontMock("../export");
-jest.dontMock("lodash");
-jest.dontMock("xlsx");
-jest.mock("../../data-services/public.js");
+vi.mock(
+  "../../data-services/public.js",
+  async () => import("../../data-services/__mocks__/public.js"),
+);
 
 //expected results for the parseBootstrapTableData test - the
 // ./sample-API-Results.tasmaxStats data rendered into a table.

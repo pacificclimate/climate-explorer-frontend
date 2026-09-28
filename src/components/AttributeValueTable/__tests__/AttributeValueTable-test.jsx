@@ -3,9 +3,6 @@ import React from "react";
 import TestUtils from "react-dom/test-utils";
 import AttributeValueTable from "../AttributeValueTable.jsx";
 
-jest.dontMock("../AttributeValueTable");
-jest.dontMock("../../../core/util");
-
 describe("AttributeValueTable", function () {
   it("renders", function () {
     var table = TestUtils.renderIntoDocument(<AttributeValueTable data={[]} />);

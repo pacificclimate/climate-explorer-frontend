@@ -1,6 +1,3 @@
-jest.dontMock("../DataGraph");
-jest.dontMock("../../../core/util");
-
 import React from "react";
 import TestUtils from "react-dom/test-utils";
 

@@ -17,12 +17,6 @@ import * as mockAPI from "../__test_data__/sample-API-results";
 import * as util from "../util";
 import * as chart from "../chart-generators";
 
-jest.dontMock("../util");
-jest.dontMock("../chart-generators");
-jest.dontMock("../export");
-jest.dontMock("lodash");
-jest.dontMock("xlsx");
-
 /*
  * It's not clear how to test exportDataToWorksheet, which would require
  * capturing and testing a file saved to the user. However, most of the
@@ -31,9 +25,9 @@ jest.dontMock("xlsx");
  * export functionality.
  */
 describe("exportDataToWorksheet", function () {
-  xit("exports an annual cycle graph to file", function () {});
-  xit("exports a stats table to file", function () {});
-  xit("exports a long term average graph to file", function () {});
+  it.skip("exports an annual cycle graph to file", function () {});
+  it.skip("exports a stats table to file", function () {});
+  it.skip("exports a long term average graph to file", function () {});
 });
 
 describe("createWorksheetSummaryCells", function () {

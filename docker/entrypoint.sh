@@ -11,7 +11,16 @@ rpl -iR \
     -x **/*.html \
     -x **/*.css \
     -x **/*.json \
-    "%REPLACE_PUBLIC_URL%" $PUBLIC_URL .
+    "%REPLACE_PUBLIC_URL%" "$PUBLIC_URL" .
+
+# Vite validates its base as a URL, so production assets use this valid URL
+# placeholder until the same runtime PUBLIC_URL replacement is applied.
+rpl -iR \
+    -x **/*.js \
+    -x **/*.html \
+    -x **/*.css \
+    -x **/*.json \
+    "https://REPLACE_PUBLIC_URL" "$PUBLIC_URL" .
 
 # It is possible that the above could be replaced by a node.js based
 # script which may prove more resillient long term 
