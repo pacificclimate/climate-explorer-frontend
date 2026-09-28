@@ -1,6 +1,0 @@
-{
-  "name": "GeoExporter",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./GeoExporter.js"
-}
