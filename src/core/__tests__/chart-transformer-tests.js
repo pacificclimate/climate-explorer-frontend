@@ -16,11 +16,6 @@ import * as ct from "../chart-transformers";
 import * as validate from "../__test_data__/test-validators";
 import * as mockAPI from "../__test_data__/sample-API-results";
 
-jest.dontMock("../chart-generators");
-jest.dontMock("../chart-transformers");
-jest.dontMock("../util");
-jest.dontMock("lodash");
-
 describe("makeVariableResponseGraph", function () {
   it("transforms two timeseries into a scatterplot", function () {
     let c = cg.timeseriesToAnnualCycleGraph(
@@ -149,7 +144,7 @@ describe("addAnomalyTooltipFormatter", function () {
       "-18 degC (+0.81)",
     );
   });
-  xit("displays anomaly as a percentage for precipitation", function () {
+  it.skip("displays anomaly as a percentage for precipitation", function () {
     //this functionality relies on reading the variable config yaml, not yet
     //available for testing.
   });

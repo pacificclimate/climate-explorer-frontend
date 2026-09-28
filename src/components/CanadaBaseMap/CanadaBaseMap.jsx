@@ -7,7 +7,11 @@ import L from "leaflet";
 
 import { Map, WMSTileLayer } from "react-leaflet";
 import "proj4";
-import "proj4leaflet";
+import Proj from "proj4leaflet";
+
+// proj4leaflet is CommonJS and mutates its own Leaflet import. Assigning its
+// export keeps that extension attached to Vite's Leaflet module instance.
+L.Proj = Proj;
 
 import "./CanadaBaseMap.css";
 import { generateResolutions } from "../../core/map-utils";

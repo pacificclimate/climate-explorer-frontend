@@ -24,9 +24,6 @@ import {
 } from "../__test_data__/sample-API-results";
 import _ from "lodash";
 
-jest.dontMock("../chart-accessors");
-jest.dontMock("lodash");
-
 describe("hasTwoYAxes", function () {
   const metadata = metadataToArray();
   it("detects graphs that have only 1 y-axis", function () {

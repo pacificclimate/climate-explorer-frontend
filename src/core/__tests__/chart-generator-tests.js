@@ -39,10 +39,6 @@ import {
   metadataToArray,
 } from "../__test_data__/sample-API-results";
 
-jest.dontMock("../chart-generators");
-jest.dontMock("../util");
-jest.dontMock("lodash");
-
 describe("formatYAxis", function () {
   it("formats a c3 y axis with units label", function () {
     const axis = formatYAxis("meters");
@@ -72,7 +68,7 @@ describe("makePrecisionBySeries", function () {
   // this test fails and is skipped because it relies on an external
   // .yaml config file that isn't easily available during jest testing.
   // In non-test usage the file is transformed and made available by webpack.
-  xit("reads the config file and applies its settings", function () {
+  it.skip("reads the config file and applies its settings", function () {
     const precision = makePrecisionBySeries({ testseries: "tasmin" });
     expect(precision(4.777, "testseries")).toEqual(4.8);
   });
