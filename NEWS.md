@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 2.8.1
+
+_23-Oct-2026_
+- Rebuild image with latest Node.js 24.x patch release.
+
 ## 2.8.0
 
 _27-Aug-2026_
