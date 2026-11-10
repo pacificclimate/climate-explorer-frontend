@@ -146,6 +146,12 @@ npm test
 Use `npm run test:ci` for a single non-interactive run (as CI does), and
 `npm run coverage` to write coverage reports.
 
+Coverage includes untested application files. The retired `MotiApp`,
+`MotiAppController`, and `MotiDataController` components are explicitly excluded:
+they are retained for historical reference (see #218), import deleted modules,
+and are not used by the application. Their unresolved imports otherwise cause
+Vitest to omit them with misleading JSX parsing errors.
+
 ### Linting / code style
 
 Linting is handled by [Prettier](https://prettier.io/). Prettier can be run directly from the command

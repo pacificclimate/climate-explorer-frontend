@@ -77,7 +77,15 @@ export default defineConfig(({ command }) => ({
       provider: "v8",
       reporter: ["text", "json", "html"],
       include: ["src/**/*.{js,jsx}"],
-      exclude: ["src/**/__tests__*/**", "src/setupTests.{js,jsx}"],
+      exclude: [
+        "src/**/__tests__*/**",
+        "src/setupTests.{js,jsx}",
+        // Retired MOTI components retained for reference (#218). They import
+        // deleted modules and cannot be transformed for coverage.
+        "src/components/MotiApp/MotiApp.jsx",
+        "src/components/app-controllers/MotiAppController/MotiAppController.jsx",
+        "src/components/data-controllers/MotiDataController/MotiDataController.jsx",
+      ],
     },
   },
 }));
