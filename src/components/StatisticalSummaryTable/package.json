@@ -1,6 +1,0 @@
-{
-  "name": "StatisticalSummaryTable",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./StatisticalSummaryTable.js"
-}

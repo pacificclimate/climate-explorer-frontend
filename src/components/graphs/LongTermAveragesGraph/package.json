@@ -1,6 +1,0 @@
-{
-  "name": "LongTermAveragesGraph",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./LongTermAveragesGraph.js"
-}
