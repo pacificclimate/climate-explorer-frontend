@@ -25,7 +25,6 @@ export default defineConfig(({ command }) => ({
       // react-bootstrap-table imports Node's EventEmitter; use its browser polyfill.
       events: "events/",
       "pcic-react-external-text": "pcic-react-external-text/lib/index.js",
-      "react-leaflet-draw": "react-leaflet-draw/dist/react-leaflet-draw.js",
     },
   },
   oxc: {
@@ -52,6 +51,8 @@ export default defineConfig(({ command }) => ({
     outDir: "build",
   },
   test: {
+    // Match Vite's browser entry so map plugins share one Leaflet instance.
+    alias: { "react-leaflet": "react-leaflet/es/index.js" },
     include: [
       "src/**/__tests__/**/*.{js,jsx}",
       "src/**/*.{test,spec}.{js,jsx}",
@@ -64,9 +65,7 @@ export default defineConfig(({ command }) => ({
       deps: {
         inline: [
           "leaflet",
-          "leaflet-draw",
           "react-leaflet",
-          "react-leaflet-draw",
           "pcic-react-components",
           "proj4",
           "proj4leaflet",

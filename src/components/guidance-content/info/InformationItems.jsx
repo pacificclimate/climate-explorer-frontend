@@ -51,86 +51,43 @@ const mapZoomControls = (
   </span>
 );
 
+const GeomanToolIcon = ({ icon, title }) => (
+  <span className={`leaflet-pm-toolbar ${css.toolIcon}`}>
+    <span className="leaflet-buttons-control-button">
+      <span
+        className={`control-icon leaflet-pm-icon-${icon}`}
+        role="img"
+        aria-label={title}
+      />
+    </span>
+  </span>
+);
+
 const mapPolygonDrawControls = (
   <span>
-    <LeafletControlContainer>
-      <div className="leaflet-draw leaflet-control">
-        <div className="leaflet-draw-section">
-          <div className="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-            <button
-              className="leaflet-draw-draw-polygon"
-              title="Draw a polygon"
-            >
-              <span className="sr-only">Draw a polygon</span>
-            </button>
-            <button
-              className="leaflet-draw-draw-rectangle"
-              title="Draw a rectangle"
-            >
-              <span className="sr-only">Draw a rectangle</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </LeafletControlContainer>{" "}
-    (Draw Polygon/Rectangle)
+    <GeomanToolIcon icon="polygon" title="Draw Polygons" />
+    <GeomanToolIcon icon="rectangle" title="Draw Rectangle" /> (Draw
+    Polygon/Rectangle)
   </span>
 );
 
 const mapCircleMarkerControl = (
   <span>
-    <LeafletControlContainer>
-      <div className="leaflet-draw leaflet-control">
-        <div className="leaflet-draw-section">
-          <div className="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-            <button
-              className="leaflet-draw-draw-circlemarker"
-              title="Draw a circlemarker"
-            >
-              <span className="sr-only">Draw a circlemarker</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </LeafletControlContainer>{" "}
-    (Add Outlet)
+    <GeomanToolIcon icon="circle-marker" title="Draw Circle Marker" /> (Add
+    Outlet)
   </span>
 );
 
 const mapDeleteControl = (
   <span>
-    <LeafletControlContainer>
-      <div className="leaflet-draw leaflet-control">
-        <div className="leaflet-draw-section">
-          <div className="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-            <button className="leaflet-draw-edit-remove" title="Delete layers">
-              <span className="sr-only">Delete layers</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </LeafletControlContainer>{" "}
-    (Delete Outlet)
+    <GeomanToolIcon icon="delete" title="Remove Layers" /> (Delete Outlet)
   </span>
 );
 
 const mapPolygonEditControls = (
   <span>
-    <LeafletControlContainer>
-      <div className="leaflet-draw leaflet-control">
-        <div className="leaflet-draw-section">
-          <div className="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-            <button className="leaflet-draw-edit-edit" title="Edit layers">
-              <span className="sr-only">Edit layers</span>
-            </button>
-            <button className="leaflet-draw-edit-remove" title="Delete layers">
-              <span className="sr-only">Delete layers</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </LeafletControlContainer>{" "}
-    (Edit/Delete Polygon)
+    <GeomanToolIcon icon="edit" title="Edit Layers" />
+    <GeomanToolIcon icon="delete" title="Remove Layers" /> (Edit/Delete Polygon)
   </span>
 );
 

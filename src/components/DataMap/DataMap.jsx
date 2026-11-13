@@ -52,15 +52,9 @@
 //
 //  Geometry upload and download
 //
-//  - In order to integrate upload and download of geometry with the
-//    geometry editing tool, a new React Leaflet component,
-//    `LayerControlledFeatureGroup`, has been created. As its name implies,
-//    its contents are controlled by a prop `layers`.
-//
-//    - The `LayerControlledFeatureGroup` prop `layers`  is controlled
-//    by `DataMap` state `geometryLayers`, which is maintained according to
-//    what is communicated by callbacks from the geometry layer group
-//    draw/edit and upload tools.
+//  - GeomanControl synchronizes the native Leaflet selection group with
+//    state `geometryLayers`, including uploaded geometry. Its callbacks
+//    report creation, editing and removal without exposing Geoman events.
 //
 //  - The geometry export (download) feature (`GeoExporter` component), like
 //    `onSetArea`, exports only the first geometry item present in the
@@ -72,10 +66,8 @@ import React from "react";
 
 import _ from "lodash";
 
-import L from "leaflet";
-import "proj4";
-import "proj4leaflet";
-import { EditControl } from "react-leaflet-draw";
+import L from "../../core/leaflet";
+import GeomanControl from "../GeomanControl/GeomanControl";
 
 import GeoLoader from "../GeoLoader/GeoLoader.js";
 import GeoExporter from "../GeoExporter/GeoExporter.js";
@@ -87,7 +79,6 @@ import DataLayer from "./DataLayer";
 import NcWMSColorbarControl from "../NcWMSColorbarControl/NcWMSColorbarControl.js";
 import NcWMSAutosetColorscaleControl from "../NcWMSAutosetColorscaleControl/NcWMSAutosetColorscaleControl.js";
 import { layerParamsPropTypes } from "../../types/types.js";
-import LayerControlledFeatureGroup from "../LayerControlledFeatureGroup/LayerControlledFeatureGroup.js";
 import StaticControl from "../StaticControl/StaticControl.js";
 
 import { geoJSONToLeafletLayers } from "../../core/geoJSON-leaflet";
@@ -125,6 +116,7 @@ class DataMap extends React.Component {
     super(props);
 
     this.state = {
+      map: null,
       rasterLayer: null,
       isolineLayer: null,
       annotatedLayer: null,
@@ -144,7 +136,9 @@ class DataMap extends React.Component {
 
   // Handler for base map ref.
 
-  handleMapRef = makeHandleLeafletRef("map").bind(this);
+  handleMapRef = makeHandleLeafletRef("map", (map) =>
+    this.setState({ map }),
+  ).bind(this);
 
   // Handlers for data layer refs.
 
@@ -247,16 +241,6 @@ class DataMap extends React.Component {
     }
   };
 
-  editGeometryLayers = (layers) => {
-    // May not need to do anything to maintain `state.geometryLayers` here.
-    // The contents of the layers are changed, but the layers themselves
-    // (as identities) are not changed in number or identity.
-    // `geometryLayers` is a list of such identities, so doesn't need to change.
-    // Only need to communicate change via onSetArea.
-    // Maybe not; maybe better to create a new copy of geometryLayers. Hmmm.
-    this.onSetArea();
-  };
-
   deleteGeometryLayers = (layers) => {
     this.setState((prevState) => {
       const geometryLayers = _.without(prevState.geometryLayers, ...layers);
@@ -265,42 +249,32 @@ class DataMap extends React.Component {
     }, this.onSetArea);
   };
 
-  eventLayers = (e) => {
-    // Extract the Leaflet layers from an editing event, returning them
-    // as an array of layers.
-    // Note: `e.layers` is a special class, not an array of layers, so we
-    // have to go through this rigmarole to get the layers.
-    // The alternative of accessing the private property `e.layers._layers`
-    // (a) is naughty, and (b) fails.
-    let layers = [];
-    e.layers.eachLayer((layer) => layers.push(layer));
-    return layers;
-  };
-
-  handleAreaCreated = (e) => {
+  handleAreaCreated = (layer) => {
     //add the watershed boundary to the map if relevant
     if (this.displayWatershedBoundary()) {
       // get the latitude and longitude of the new point from its layer object
       // we know the layer is a CircleMarker
-      // TODO: is there some leaflet built-in function for this, rather than
-      // an _attribute?
-      const outletLat = e.layer._latlng.lat;
-      const outletLon = e.layer._latlng.lng;
+      const outletLat = layer.getLatLng().lat;
+      const outletLon = layer.getLatLng().lng;
       getWatershed({
         ensemble_name: this.props.watershedEnsemble,
         area: `POINT (${outletLon} ${outletLat})`,
       })
         .then(validateWatershedData)
         .then((response) => {
-          this.addGeometryLayers(
-            geoJSONToLeafletLayers(response.data.boundary),
-          );
+          if (this.state.geometryLayers.includes(layer)) {
+            this.addGeometryLayers(
+              geoJSONToLeafletLayers(response.data.boundary),
+            );
+          }
         });
     }
-    this.addGeometryLayer(e.layer);
+    this.addGeometryLayer(layer);
   };
-  handleAreaEdited = (e) => this.editGeometryLayers(this.eventLayers(e));
-  handleAreaDeleted = (e) => this.deleteGeometryLayers(this.eventLayers(e));
+  handleAreaDeleted = (layers) =>
+    this.deleteGeometryLayers(
+      this.displayWatershedBoundary() ? this.state.geometryLayers : layers,
+    );
 
   handleUploadArea = (geoJSON) => {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
@@ -376,36 +350,16 @@ class DataMap extends React.Component {
           </StaticControl>
         )}
 
-        <LayerControlledFeatureGroup layers={this.state.geometryLayers}>
-          <EditControl
-            position="topleft"
-            draw={{
-              marker: false,
-              circlemarker: allowGeometryDraw &&
-                this.props.pointSelect && {
-                  title: "Select an outlet point",
-                  text: "Select an outlet point",
-                },
-              circle: false,
-              polyline: false,
-              polygon: allowGeometryDraw &&
-                !this.props.pointSelect && {
-                  showArea: false,
-                  showLength: false,
-                },
-              rectangle: allowGeometryDraw &&
-                !this.props.pointSelect && {
-                  showArea: false,
-                  showLength: false,
-                },
-            }}
-            //don't allow editing watershed boundary polygon
-            edit={this.displayWatershedBoundary() ? { edit: false } : {}}
-            onCreated={this.handleAreaCreated}
-            onEdited={this.handleAreaEdited}
-            onDeleted={this.handleAreaDeleted}
-          />
-        </LayerControlledFeatureGroup>
+        <GeomanControl
+          map={this.state.map}
+          layers={this.state.geometryLayers}
+          pointSelect={this.props.pointSelect}
+          protectBoundary={Boolean(this.displayWatershedBoundary())}
+          shapeStyle={this.props.activeGeometryStyle}
+          onCreate={this.handleAreaCreated}
+          onEdit={this.onSetArea}
+          onRemove={this.handleAreaDeleted}
+        />
 
         {
           // See comments at module head regarding current GeoExporter

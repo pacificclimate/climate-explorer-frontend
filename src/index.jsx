@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
 import "bootstrap-slider/dist/css/bootstrap-slider.min.css";
 // import 'perfect-scrollbar/dist/css/perfect-scrollbar.min.css';
 import "c3/c3.min.css";
