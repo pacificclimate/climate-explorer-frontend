@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import MapSettingsDialog from "../MapSettingsDialog.jsx";
 import { noop } from "lodash";
 import { meta, times } from "../../../test_support/data";
@@ -7,7 +7,7 @@ import { meta, times } from "../../../test_support/data";
 describe("with one variable", () => {
   it("renders without crashing", () => {
     const div = document.createElement("div");
-    ReactDOM.render(
+    render(
       <MapSettingsDialog
         show={true}
         open={noop}

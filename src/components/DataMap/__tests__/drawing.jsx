@@ -1,9 +1,8 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { act } from "react-dom/test-utils";
-import { Map as ReactLeafletMap } from "react-leaflet";
+import React, { act } from "react";
+import { render } from "../../../test_support/render";
 import DataMap from "../DataMap";
 import L from "../../../core/leaflet";
+import { getWatershed } from "../../../data-services/ce-backend";
 
 vi.mock("../../../data-services/ce-backend", async (importOriginal) => {
   const { watershed } = await import(
@@ -11,17 +10,9 @@ vi.mock("../../../data-services/ce-backend", async (importOriginal) => {
   );
   return {
     ...(await importOriginal()),
-    getWatershed: () => Promise.resolve({ data: watershed }),
+    getWatershed: vi.fn(() => Promise.resolve({ data: watershed })),
   };
 });
-
-// Existing React-Leaflet 2/jsdom workaround; Will be removed during next React upgrade.
-const shouldUpdateBounds = ReactLeafletMap.prototype.shouldUpdateBounds;
-ReactLeafletMap.prototype.shouldUpdateBounds = function (next, previous) {
-  return next.bounds && previous.bounds
-    ? shouldUpdateBounds.call(this, next, previous)
-    : false;
-};
 
 let container;
 let instance;
@@ -31,15 +22,18 @@ beforeEach(() => {
   container = document.createElement("div");
   onSetArea = vi.fn();
 });
-afterEach(() => act(() => ReactDOM.unmountComponentAtNode(container)));
 
 function mount(props = {}) {
-  act(() => {
-    instance = ReactDOM.render(
-      <DataMap onSetArea={onSetArea} {...props} />,
-      container,
-    );
-  });
+  render(
+    <DataMap
+      ref={(value) => {
+        instance = value;
+      }}
+      onSetArea={onSetArea}
+      {...props}
+    />,
+    container,
+  );
   map = instance.map;
   map.setView([52, -123], 7, { animate: false });
 }
@@ -136,5 +130,30 @@ it("selects an outlet and removes its protected watershed together", async () =>
   });
   expect(instance.state.geometryLayers).toHaveLength(0);
   expect(map.hasLayer(boundary)).toBe(false);
+  expect(toolbar("circle-marker")).not.toBeNull();
+});
+
+it("ignores a watershed response after its outlet has been deleted", async () => {
+  let respond;
+  vi.mocked(getWatershed).mockReturnValueOnce(
+    new Promise((resolve) => {
+      respond = resolve;
+    }),
+  );
+  mount({ pointSelect: true, watershedEnsemble: "watersheds" });
+  act(() => {
+    toolbar("circle-marker").click();
+    clickAt([52, -123]);
+  });
+  act(() => {
+    toolbar("delete").click();
+    instance.state.geometryLayers[0].fire("click");
+  });
+  const { watershed } = await import(
+    "../../../core/__test_data__/sample-API-results"
+  );
+  await act(async () => respond({ data: watershed }));
+  expect(instance.state.geometryLayers).toHaveLength(0);
+  expect(onSetArea).toHaveBeenLastCalledWith(undefined);
   expect(toolbar("circle-marker")).not.toBeNull();
 });

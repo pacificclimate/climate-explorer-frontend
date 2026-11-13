@@ -8,7 +8,7 @@ import _ from "lodash";
 
 import InputRange from "react-input-range";
 
-import StaticControl from "../StaticControl/StaticControl.js";
+import StaticControl from "../StaticControl/StaticControl.jsx";
 
 import "./LayerOpacityControl.css";
 

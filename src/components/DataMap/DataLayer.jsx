@@ -29,23 +29,22 @@ export default class DataLayer extends React.Component {
     const { onLayerRef, layerType, layerParams } = this.props;
 
     // TODO: This dispatcher belongs in data-services/ncwms
-    const wmsParams = {
+    if (!layerParams?.dataset) return null;
+
+    const { opacity, noWrap, ...wmsParams } = {
       raster: getRasterWMSParams,
       isoline: getIsolineWMSParams,
       annotated: getAnnotatedWMSParams,
     }[layerType](layerParams);
 
-    if (layerParams && layerParams.dataset) {
-      return (
-        <WMSTileLayer
-          url={window.env.REACT_APP_NCWMS_URL}
-          {...wmsParams}
-          ref={onLayerRef}
-        />
-      );
-    }
-
-    onLayerRef(null);
-    return null;
+    return (
+      <WMSTileLayer
+        url={window.env.REACT_APP_NCWMS_URL}
+        params={wmsParams}
+        opacity={opacity}
+        noWrap={noWrap}
+        ref={onLayerRef}
+      />
+    );
   }
 }

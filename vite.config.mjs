@@ -51,8 +51,6 @@ export default defineConfig(({ command }) => ({
     outDir: "build",
   },
   test: {
-    // Match Vite's browser entry so map plugins share one Leaflet instance.
-    alias: { "react-leaflet": "react-leaflet/es/index.js" },
     include: [
       "src/**/__tests__/**/*.{js,jsx}",
       "src/**/*.{test,spec}.{js,jsx}",
@@ -79,6 +77,7 @@ export default defineConfig(({ command }) => ({
       exclude: [
         "src/**/__tests__*/**",
         "src/setupTests.{js,jsx}",
+        "src/test_support/**",
         // Retired MOTI components retained for reference (#218). They import
         // deleted modules and cannot be transformed for coverage.
         "src/components/MotiApp/MotiApp.jsx",

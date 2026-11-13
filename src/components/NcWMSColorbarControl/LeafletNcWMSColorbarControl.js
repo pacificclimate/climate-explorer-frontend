@@ -29,18 +29,30 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
 
   onAdd: function () {
     this.container = L.DomUtil.create("div", "leaflet-control");
+    this.handleLoading = () => this.refreshValues();
+    L.DomEvent.on(this.container, "click", L.DomEvent.stopPropagation)
+      .on(this.container, "click", L.DomEvent.preventDefault)
+      .on(this.container, "click", this.handleLoading);
     if (this.layer) {
+      this.layer.on("loading", this.handleLoading);
       this.fillContainer();
     }
     return this.container;
   },
 
   update: function (newProps) {
+    this.layer?.off("loading", this.handleLoading);
     this.initialize(newProps);
     L.DomUtil.empty(this.container);
     if (this.layer) {
+      this.layer.on("loading", this.handleLoading);
       this.fillContainer();
     }
+  },
+
+  onRemove: function () {
+    this.layer?.off("loading", this.handleLoading);
+    L.DomEvent.off(this.container);
   },
 
   fillContainer: function () {
@@ -57,24 +69,6 @@ const LeafletNcWMSColorbarControl = L.Control.extend({
       textShadow: "0 0 0.2em white, 0 0 0.2em white, 0 0 0.2em white",
       whiteSpace: "nowrap",
     });
-
-    // Set up event handling
-    L.DomEvent.addListener(this.container, "click", L.DomEvent.stopPropagation)
-      .addListener(this.container, "click", L.DomEvent.preventDefault)
-      .addListener(
-        this.container,
-        "click",
-        () => {
-          this.refreshValues();
-        },
-        this,
-      );
-    this.layer.on(
-      "loading",
-      function () {
-        this.refreshValues();
-      }.bind(this),
-    );
 
     // Create and style labels
     var applyLabelStyle = function (el) {

@@ -10,3 +10,6 @@ vi.mock("./data-services/public.js", () => ({
 }));
 
 window.SVGPathElement = function () {};
+
+// React act() should flush updates in jsdom tests.
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;

@@ -79,7 +79,7 @@ import DataLayer from "./DataLayer";
 import NcWMSColorbarControl from "../NcWMSColorbarControl/NcWMSColorbarControl.js";
 import NcWMSAutosetColorscaleControl from "../NcWMSAutosetColorscaleControl/NcWMSAutosetColorscaleControl.js";
 import { layerParamsPropTypes } from "../../types/types.js";
-import StaticControl from "../StaticControl/StaticControl.js";
+import StaticControl from "../StaticControl/StaticControl.jsx";
 
 import { geoJSONToLeafletLayers } from "../../core/geoJSON-leaflet";
 import LayerOpacityControl from "../LayerOpacityControl/LayerOpacityControl.jsx";
@@ -129,6 +129,14 @@ class DataMap extends React.Component {
         this.state.layerOpacity[layerType] = props[layerType].defaultOpacity;
       }
     }
+    this.layerRefs = {};
+    this.layerLoadHandlers = {};
+    this.handleLayerRefs = Object.fromEntries(
+      DataMap.layerTypes.map((layerType) => [
+        layerType,
+        (layer) => this.handleLayerRef(layerType, layer),
+      ]),
+    );
   }
 
   displayWatershedBoundary = () =>
@@ -189,14 +197,23 @@ class DataMap extends React.Component {
   };
 
   handleLayerRef(layerType, layer) {
-    const leafletElement = layer && layer.leafletElement;
-    if (leafletElement) {
-      const onChangeRange = this.props[layerType].onChangeRange;
-      leafletElement.on("load", () => {
-        this.updateLayerRange(layerType, this.props, onChangeRange);
-      });
+    const previousLayer = this.layerRefs[layerType];
+    if (previousLayer === layer) return;
+    if (previousLayer) {
+      previousLayer.off("load", this.layerLoadHandlers[layerType]);
     }
-    this.setState({ [`${layerType}Layer`]: leafletElement }); // Ewww
+    this.layerRefs[layerType] = layer;
+    if (layer) {
+      const handleLoad = () => {
+        const onChangeRange = this.props[layerType]?.onChangeRange;
+        if (onChangeRange) {
+          this.updateLayerRange(layerType, this.props, onChangeRange);
+        }
+      };
+      this.layerLoadHandlers[layerType] = handleLoad;
+      layer.on("load", handleLoad);
+    }
+    this.setState({ [`${layerType}Layer`]: layer }); // Ewww
   }
 
   // Handlers for area selection. Converts area to GeoJSON.
@@ -235,10 +252,18 @@ class DataMap extends React.Component {
     }, this.onSetArea);
   };
 
-  addGeometryLayers = (layers) => {
-    for (const layer of layers) {
-      this.addGeometryLayer(layer);
-    }
+  addGeometryLayers = (layers, outlet) => {
+    this.setState((prevState) => {
+      // React 18 may batch outlet creation with a fast watershed response.
+      // Check pending state, while still ignoring responses for deleted outlets.
+      if (outlet && !prevState.geometryLayers.includes(outlet)) return null;
+      layers.forEach((layer, index) => {
+        layer.setStyle(
+          this.layerStyle(prevState.geometryLayers.length + index),
+        );
+      });
+      return { geometryLayers: prevState.geometryLayers.concat(layers) };
+    }, this.onSetArea);
   };
 
   deleteGeometryLayers = (layers) => {
@@ -262,11 +287,10 @@ class DataMap extends React.Component {
       })
         .then(validateWatershedData)
         .then((response) => {
-          if (this.state.geometryLayers.includes(layer)) {
-            this.addGeometryLayers(
-              geoJSONToLeafletLayers(response.data.boundary),
-            );
-          }
+          this.addGeometryLayers(
+            geoJSONToLeafletLayers(response.data.boundary),
+            layer,
+          );
         });
     }
     this.addGeometryLayer(layer);
@@ -306,12 +330,13 @@ class DataMap extends React.Component {
       (layerType) =>
         this.props[layerType] && (
           <DataLayer
+            key={layerType}
             layerType={layerType}
             layerParams={{
               ...this.props[layerType],
               opacity: this.state.layerOpacity[layerType],
             }}
-            onLayerRef={this.handleLayerRef.bind(this, layerType)}
+            onLayerRef={this.handleLayerRefs[layerType]}
           />
         ),
     );

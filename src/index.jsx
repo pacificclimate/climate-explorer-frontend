@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "./index.css";
 import "leaflet/dist/leaflet.css";
 import "bootstrap-slider/dist/css/bootstrap-slider.min.css";
@@ -20,11 +20,10 @@ const loadTexts = makeYamlLoader(
 );
 
 const renderApp = () => {
-  ReactDOM.render(
+  createRoot(document.getElementById("wrapper")).render(
     <ExternalText.Provider loadTexts={loadTexts}>
       <App />
     </ExternalText.Provider>,
-    document.getElementById("wrapper"),
   );
 };
 

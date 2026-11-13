@@ -34,7 +34,7 @@ import "../MapController.module.css";
 import DataMap from "../../DataMap/DataMap.jsx";
 import MapLegend from "../../MapLegend/MapLegend.jsx";
 import MapSettings from "../../MapSettings/MapSettings.js";
-import StaticControl from "../../StaticControl/StaticControl.js";
+import StaticControl from "../../StaticControl/StaticControl.jsx";
 
 import {
   hasValidData,
