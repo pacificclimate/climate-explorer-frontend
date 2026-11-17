@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import DualMapController from "../DualMapController/DualMapController.jsx";
 import SingleMapController from "../SingleMapController/SingleMapController.jsx";
 import PrecipMapController from "../PrecipMapController/PrecipMapController.jsx";
@@ -13,7 +13,7 @@ describe("DualMapController", () => {
     describe("with empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <DualMapController variable_id="" meta={[]} onSetArea={noop} />,
           div,
         );
@@ -22,7 +22,7 @@ describe("DualMapController", () => {
     describe("with non-empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <DualMapController
             variable_id="tasmax"
             meta={[
@@ -54,7 +54,7 @@ describe("DualMapController", () => {
     describe("with empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <DualMapController
             variable_id=""
             meta={[]}
@@ -69,7 +69,7 @@ describe("DualMapController", () => {
     describe("with non-empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <DualMapController
             variable_id="tasmax"
             meta={[
@@ -124,7 +124,7 @@ describe("SingleMapController", () => {
     describe("with empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <SingleMapController variable_id="" meta={[]} onSetArea={noop} />,
           div,
         );
@@ -133,7 +133,7 @@ describe("SingleMapController", () => {
     describe("with non-empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <SingleMapController
             variable_id="tasmax"
             meta={[
@@ -170,7 +170,7 @@ describe("PrecipMapController", () => {
     describe("with empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <PrecipMapController variable_id="" meta={[]} onSetArea={noop} />,
           div,
         );
@@ -179,7 +179,7 @@ describe("PrecipMapController", () => {
     describe("with non-empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <PrecipMapController
             variable_id="tasmax"
             meta={[
@@ -211,7 +211,7 @@ describe("PrecipMapController", () => {
     describe("with empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <PrecipMapController
             variable_id=""
             meta={[]}
@@ -226,7 +226,7 @@ describe("PrecipMapController", () => {
     describe("with non-empty metadata", () => {
       it("renders without crashing", () => {
         const div = document.createElement("div");
-        ReactDOM.render(
+        render(
           <PrecipMapController
             variable_id="tasmax"
             meta={[

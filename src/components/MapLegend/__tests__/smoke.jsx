@@ -1,11 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import MapFooter from "../MapLegend.jsx";
 import { times } from "../../../test_support/data";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(
+  render(
     <MapFooter
       start_date={"start"}
       end_date={"end"}

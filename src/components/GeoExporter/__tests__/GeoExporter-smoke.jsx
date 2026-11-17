@@ -1,9 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import GeoExporter from "../GeoExporter";
 import { noop } from "lodash";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(<GeoExporter onLoadArea={noop} />, div);
+  render(<GeoExporter onLoadArea={noop} />, div);
 });

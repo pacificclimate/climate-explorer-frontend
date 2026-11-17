@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import MapSettings from "../MapSettings";
 import { noop } from "lodash";
 import { meta, times } from "../../../test_support/data";
@@ -7,7 +7,7 @@ import { meta, times } from "../../../test_support/data";
 describe("with one variable", () => {
   it("renders without crashing", () => {
     const div = document.createElement("div");
-    ReactDOM.render(
+    render(
       <MapSettings
         title="Map Settings"
         meta={meta}
