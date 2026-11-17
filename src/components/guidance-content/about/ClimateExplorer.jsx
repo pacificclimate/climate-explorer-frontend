@@ -23,7 +23,7 @@ export default class ClimateExplorer extends React.Component {
           <HalfWidthCol>
             <List
               items={T.get(this.context, "about.pcex.items", {
-                version: process.env.REACT_APP_APP_VERSION ?? "Not specified",
+                version: __APP_VERSION__,
               })}
             />
           </HalfWidthCol>

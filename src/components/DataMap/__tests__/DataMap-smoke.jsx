@@ -1,7 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Map as ReactLeafletMap } from "react-leaflet";
 import DataMap from "../DataMap.jsx";
 import { noop } from "lodash";
+
+// Temporary React-Leaflet 2 compatibility shim. Its draw UMD build creates a
+// second Leaflet instance in jsdom; remove this when upgrading React-Leaflet.
+vi.mock("react-leaflet-draw", () => ({ EditControl: () => null }));
+
+// Temporary React-Leaflet 2/jsdom workaround. The legacy bounds update path
+// assumes both renders provide bounds. Revisit/remove with the React 18 and
+// React-Leaflet upgrade.
+const shouldUpdateBounds = ReactLeafletMap.prototype.shouldUpdateBounds;
+ReactLeafletMap.prototype.shouldUpdateBounds = function (nextProps, props) {
+  if (!nextProps.bounds || !props.bounds) return false;
+  return shouldUpdateBounds.call(this, nextProps, props);
+};
 
 describe("with single dataset (raster)", () => {
   it("renders without crashing", () => {

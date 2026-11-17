@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="%REPLACE_PUBLIC_URL%/manifest.json" />
+    <link rel="shortcut icon" href="%REPLACE_PUBLIC_URL%/favicon.ico" />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzWg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
+      crossorigin="anonymous"
+    />
+    <title>PCIC Climate Explorer</title>
+    <script src="%REPLACE_PUBLIC_URL%/config.js"></script>
+    <script>
+      // VFile (used by the legacy Markdown renderer) calls process.cwd().
+      window.process = { browser: true, cwd: () => "/", env: {} };
+    </script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="wrapper"></div>
+    <script>
+      L_PREFER_CANVAS = true;
+    </script>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>

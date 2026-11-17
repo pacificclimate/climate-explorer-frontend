@@ -2,9 +2,6 @@ import React from "react";
 import TestUtils from "react-dom/test-utils";
 import Selector from "../Selector.jsx";
 
-jest.dontMock("../Selector");
-jest.dontMock("react-bootstrap");
-
 describe("Selector", function () {
   it("sets the label", function () {
     var selector = TestUtils.renderIntoDocument(
@@ -68,7 +65,7 @@ describe("Selector", function () {
   });
 
   it("calls the callback", function () {
-    var callback = jest.fn();
+    var callback = vi.fn();
     var selector = TestUtils.renderIntoDocument(
       <Selector
         onChange={callback}

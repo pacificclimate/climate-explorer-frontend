@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import StatisticalSummaryTable from "../StatisticalSummaryTable.jsx";
 import { meta } from "../../../test_support/data";
 
-jest.mock("../../../data-services/ce-backend");
+vi.mock("../../../data-services/ce-backend");
 
 it("renders without crashing", () => {
   const div = document.createElement("div");

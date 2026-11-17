@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import WatershedSummaryTable from "../WatershedSummaryTable.jsx";
 import { watershed_wkt } from "../../../test_support/data";
 
-jest.mock("../../../data-services/ce-backend");
+vi.mock("../../../data-services/ce-backend");
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
