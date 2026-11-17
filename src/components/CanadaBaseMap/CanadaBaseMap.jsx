@@ -5,7 +5,7 @@ import React from "react";
 import _ from "lodash";
 import L from "../../core/leaflet";
 
-import { Map, WMSTileLayer } from "react-leaflet";
+import { MapContainer, WMSTileLayer } from "react-leaflet";
 import "./CanadaBaseMap.css";
 import { generateResolutions } from "../../core/map-utils";
 
@@ -49,7 +49,7 @@ class CanadaBaseMap extends React.Component {
   render() {
     const center = _.pick(this.props.origin, "lat", "lng");
     return (
-      <Map
+      <MapContainer
         pmIgnore={false}
         crs={this.props.crs}
         center={center}
@@ -72,7 +72,7 @@ class CanadaBaseMap extends React.Component {
           crs={L.CRS.EPSG4326}
         />
         {this.props.children}
-      </Map>
+      </MapContainer>
     );
   }
 }
