@@ -8,3 +8,15 @@
   padding: 0.5em 0;
   clear: both;
 }
+
+.toolIcon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.25em;
+}
+
+.toolIcon :global(.leaflet-buttons-control-button) {
+  display: block;
+  width: 30px;
+  height: 30px;
+}

@@ -1331,75 +1331,43 @@ help:
 
         #### Draw Polygon
 
-        To draw a general polygon on the map:
+        1. Click **Draw Polygons** on the map toolbar.
 
-        1. Click the **Draw Polygon** button on the map toolbar.
+        1. Click to place each corner of the polygon.
 
-        1. Click to place a corner of the polygon.
+        1. Click on the first point again, or click **Finish**, to complete it.
 
-        1. Click on the first point placed to complete the polygon.
+        Only one selection can be drawn at a time. Delete it before drawing another.
 
         #### Draw Rectangle
 
-        To draw a rectangular area on the map. (It is a rectangle in pixel
-          coordinates, not in projection coordinates.)
+        1. Click **Draw Rectangle** on the map toolbar.
 
-        1. Click the **Draw Rectangle** button on the map toolbar.
-
-        1. On the map, click on one corner of the desired rectangle,
-        drag to the opposite corner and release.
+        1. Click on one corner of the desired rectangle, then click on the
+        opposite corner.
 
         #### Edit Polygon
 
-        To edit an existing polygon on the map:
+        1. Click **Edit Layers** on the map toolbar.
 
-        1. Click the **Edit Polygon** button on the map toolbar.
+        1. Drag a vertex handle to move a corner. Drag a midpoint handle to add
+        a corner, or right-click a vertex handle to remove it.
+        Rectangles retain their rectangular shape.
 
-        1. The mouse cursor becomes a pointer.
-        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
-
-        1. Editing handles (square boxes) appear at each polygon vertex and
-        at the midpoint of each polygon side. Vertex handles are opaque white;
-        midpoint handles are semitransparent white.
-
-        1. To move a vertex, click on its handle and drag.
-        Release at the desired new position.
-
-        1. To create a new vertex, click on a midpoint handle and drag.
-        Release at the desired new position.
-
-        1. When you have made all desired changes to the polygon, click
-        the **Save** button next to the **Edit Polygon** button.
-        To discard all changes, click the **Cancel** button.
-
-        1. The modified polygon is saved and the editing handles disappear.
+        1. Changes take effect immediately. Click **Finish** when done editing.
 
         #### Delete Polygons (Layers)
 
-        To delete a single polygon:
+        1. Click **Remove Layers** on the map toolbar, then click a polygon to
+        delete it. Deletion takes effect immediately.
 
-        1. Click the **Delete Polygons** button on the map toolbar.
+        1. To remove every imported polygon, click **Clear all**.
 
-        1. The mouse cursor becomes a pointer.
-        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
+        1. Click **Finish** when done. After all selections are removed, the
+        drawing tools become available again.
 
-        1. Click on the polygon to delete.
-
-        1. The selected polygon disappears.
-
-        1. Click the **Save** button beside the **Delete Polygons** button.
-
-        1. To cancel (individual) deletions and close the tool, click **Cancel**.
-
-        To delete all polygons:
-
-        1. Click the **Delete Polygons** button on the map toolbar.
-
-        1. The mouse cursor becomes a pointer.
-        **Save** and **Cancel** buttons appear next to the **Edit Polygon** button.
-
-        1. Click the **Clear All** button.
-        All polygons are immediately deleted without confirmation.
+        For streamflow maps, removing an outlet also removes its computed
+        watershed boundary. The computed boundary cannot be edited separately.
 
         #### Import Polygon
 
