@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import StatisticalSummaryTable from "../StatisticalSummaryTable.jsx";
 import { meta } from "../../../test_support/data";
 
@@ -7,7 +7,7 @@ vi.mock("../../../data-services/ce-backend");
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(
+  render(
     <StatisticalSummaryTable
       model_id={"GFDL-ESM2G"}
       variable_id={"tasmax"}

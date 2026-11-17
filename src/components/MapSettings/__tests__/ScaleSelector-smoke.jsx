@@ -1,11 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../test_support/render";
 import ScaleSelector from "../ColourMapTypeSelector";
 import { noop } from "lodash";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(
+  render(
     <ScaleSelector
       name="Raster"
       variableId="tasmax"

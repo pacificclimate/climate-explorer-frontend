@@ -1,12 +1,11 @@
+import { renderComponent } from "../../../test_support/render";
 import React from "react";
 import TestUtils from "react-dom/test-utils";
 import Selector from "../Selector.jsx";
 
 describe("Selector", function () {
   it("sets the label", function () {
-    var selector = TestUtils.renderIntoDocument(
-      <Selector label={"New Label"} />,
-    );
+    var selector = renderComponent(<Selector label={"New Label"} />);
 
     var labelNode = TestUtils.findRenderedDOMComponentWithTag(
       selector,
@@ -16,7 +15,7 @@ describe("Selector", function () {
   });
 
   it("can handle passed items", function () {
-    var selector = TestUtils.renderIntoDocument(
+    var selector = renderComponent(
       <Selector items={["apple", "banana", "carrot"]} />,
     );
 
@@ -28,7 +27,7 @@ describe("Selector", function () {
   });
 
   it("can handle [key, label] pairs", function () {
-    var selector = TestUtils.renderIntoDocument(
+    var selector = renderComponent(
       <Selector
         items={[
           ["apple_value", "Apple label"],
@@ -45,7 +44,7 @@ describe("Selector", function () {
   });
 
   it("can handle [key, label, disabled] triples", function () {
-    var selector = TestUtils.renderIntoDocument(
+    var selector = renderComponent(
       <Selector
         items={[
           ["apple_value", "Apple label", true],
@@ -66,7 +65,7 @@ describe("Selector", function () {
 
   it("calls the callback", function () {
     var callback = vi.fn();
-    var selector = TestUtils.renderIntoDocument(
+    var selector = renderComponent(
       <Selector
         onChange={callback}
         items={[

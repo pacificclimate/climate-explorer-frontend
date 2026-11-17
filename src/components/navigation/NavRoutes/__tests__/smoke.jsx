@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "../../../../test_support/render";
 import { MemoryRouter } from "react-router-dom";
 import NavRoutes from "../NavRoutes.jsx";
 import { noop } from "lodash";
@@ -18,7 +18,7 @@ const navSpec = {
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(
+  render(
     <MemoryRouter>
       <NavRoutes navSpec={navSpec} navIndex={0} onNavigate={noop} />
     </MemoryRouter>,
