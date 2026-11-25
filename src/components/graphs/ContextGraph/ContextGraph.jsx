@@ -91,20 +91,14 @@ export default class ContextGraph extends React.Component {
     this.loadGraph();
   }
 
-  componentWillReceiveProps(nextProps) {
-    // If we are already displaying data, and if only the model_id has
-    // changed, then we don't need to get data again; we only need to
-    // regenerate the graph from it (to emphasize the current model).
-    // This code coordinates with `this.props.getMetadata`, and so may be
-    // better defined externally and passed as a prop (`updatedGraphSpec`,
-    // returning new graph spec?).
-    // Leave it here for now.
+  componentDidUpdate(prevProps) {
     if (
       this.state.graphSpec &&
       this.state.graphSpec.data.columns.length > 0 &&
-      nextProps.variable_id === this.props.variable_id &&
-      nextProps.experiment === this.props.experiment &&
-      nextProps.area === this.props.area
+      prevProps.model_id !== this.props.model_id &&
+      prevProps.variable_id === this.props.variable_id &&
+      prevProps.experiment === this.props.experiment &&
+      prevProps.area === this.props.area
     ) {
       this.setState({
         graphSpec: this.props.dataToGraphSpec(
@@ -114,12 +108,9 @@ export default class ContextGraph extends React.Component {
         ),
       });
     }
-  }
 
-  componentDidUpdate(prevProps, prevState) {
     if (
-      // Note omission of model_id: This graph doesn't need to reload if model
-      // doesn't change. See `componentWillReceiveProps`.
+      // Model-only changes reuse the fetched data above.
       prevProps.variable_id !== this.props.variable_id ||
       prevProps.experiment !== this.props.experiment ||
       prevProps.contextMeta !== this.props.contextMeta || // TODO: Necessary?

@@ -24,7 +24,10 @@ import { ControlLabel, MenuItem, Dropdown } from "react-bootstrap";
 import _ from "lodash";
 import styles from "./Selector.module.css";
 
+let nextSelectorId = 0;
+
 class Selector extends React.Component {
+  dropdownId = `selector-${nextSelectorId++}`;
   static propTypes = {
     onChange: PropTypes.any, // Using 'function' logs warnings
     label: PropTypes.node,
@@ -42,22 +45,18 @@ class Selector extends React.Component {
     inlineLabel: false,
   };
 
-  componentWillReceiveProps(newProps) {
-    this.updateDisplayValue(newProps.value, newProps.items);
-  }
-
-  //store the display string for the already-selected value
-  updateDisplayValue = (value, items = this.props.items) => {
+  // Derive the selected label from the current props.
+  displayValue = (value, items) => {
     if (_.indexOf(items, value) !== -1) {
       //display string is the same as value string.
-      this.displayString = value;
+      return value;
     } else {
       //display the associated user string,
       //if associated user string cannot be found,
       //just display the original string, on the assumption
       //it's something like "Select a Choice"
       var item = _.find(items, { 0: value });
-      this.displayString = item ? item[1] : value;
+      return item ? item[1] : value;
     }
   };
 
@@ -102,10 +101,10 @@ class Selector extends React.Component {
           vertical
           disabled={this.props.disabled}
           onSelect={this.handleChange}
-          id={this.props.label}
+          id={this.dropdownId}
         >
           <Dropdown.Toggle className={styles.selectortitle}>
-            {this.displayString}
+            {this.displayValue(this.props.value, this.props.items)}
           </Dropdown.Toggle>
           <Dropdown.Menu className={styles.selectormenu}>
             {this.props.items.map(this.createMenuItem)}

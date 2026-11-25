@@ -1,5 +1,5 @@
-import { renderComponent } from "../../../test_support/render";
-import React from "react";
+import { render, renderComponent } from "../../../test_support/render";
+import React, { act } from "react";
 import TestUtils from "react-dom/test-utils";
 import Selector from "../Selector.jsx";
 
@@ -79,10 +79,28 @@ describe("Selector", function () {
       selector,
       "button",
     );
-    TestUtils.Simulate.click(dropdownButton);
+    act(() => TestUtils.Simulate.click(dropdownButton));
     var option = TestUtils.scryRenderedDOMComponentsWithTag(selector, "a")[1];
-    TestUtils.Simulate.click(option);
+    act(() => TestUtils.Simulate.click(option));
 
     expect(callback).toBeCalledWith("two");
   });
+});
+
+it("updates the selected label and keeps a valid dropdown ID for rich labels", () => {
+  const view = (label) => (
+    <Selector
+      label={<span>Variable</span>}
+      value="tasmax"
+      items={[["tasmax", label]]}
+    />
+  );
+  const container = render(view("Temperature"));
+  const button = () => container.querySelector("button");
+  const id = button().id;
+  expect(id).toMatch(/^selector-/);
+  expect(button().textContent).toContain("Temperature");
+  render(view("Maximum temperature"), container);
+  expect(button().id).toBe(id);
+  expect(button().textContent).toContain("Maximum temperature");
 });

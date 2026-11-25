@@ -37,10 +37,15 @@ export default class DataLayer extends React.Component {
       annotated: getAnnotatedWMSParams,
     }[layerType](layerParams);
 
+    // React-Leaflet reloads tiles when the params object changes identity.
+    if (!_.isEqual(this.wmsParams, wmsParams)) {
+      this.wmsParams = wmsParams;
+    }
+
     return (
       <WMSTileLayer
         url={window.env.REACT_APP_NCWMS_URL}
-        params={wmsParams}
+        params={this.wmsParams}
         opacity={opacity}
         noWrap={noWrap}
         ref={onLayerRef}

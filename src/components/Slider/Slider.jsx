@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import ReactDOM from "react-dom";
 import BootstrapSlider from "bootstrap-slider";
 
 export default class Slider extends React.Component {
@@ -35,27 +34,28 @@ export default class Slider extends React.Component {
     },
   };
 
-  componentWillUpdate(nextProps, nextState) {
-    this.slider.setValue(nextProps.value);
+  sliderNode = React.createRef();
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.value !== this.props.value) {
+      this.slider.setValue(this.props.value);
+    }
   }
 
   componentDidMount() {
     var toolTip = this.props.toolTip ? "show" : "hide";
-    var slider = (this.slider = new BootstrapSlider(
-      ReactDOM.findDOMNode(this),
-      {
-        id: this.props.id,
-        min: this.props.min,
-        max: this.props.max,
-        step: this.props.step,
-        value: this.props.value,
-        ticks: this.props.ticks,
-        ticks_labels: this.props.ticksLabels,
-        ticks_positions: this.props.ticksPositions,
-        tooltip: toolTip,
-        selection: this.props.selection,
-      },
-    ));
+    var slider = (this.slider = new BootstrapSlider(this.sliderNode.current, {
+      id: this.props.id,
+      min: this.props.min,
+      max: this.props.max,
+      step: this.props.step,
+      value: this.props.value,
+      ticks: this.props.ticks,
+      ticks_labels: this.props.ticksLabels,
+      ticks_positions: this.props.ticksPositions,
+      tooltip: toolTip,
+      selection: this.props.selection,
+    }));
 
     slider.on(
       "slideStop",
@@ -66,7 +66,11 @@ export default class Slider extends React.Component {
     );
   }
 
+  componentWillUnmount() {
+    this.slider.destroy();
+  }
+
   render() {
-    return <div style={{ width: "100%" }} />;
+    return <div ref={this.sliderNode} style={{ width: "100%" }} />;
   }
 }

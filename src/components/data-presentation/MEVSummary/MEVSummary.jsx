@@ -6,7 +6,7 @@ export function MEVSummary({
   experiment,
   variable_id,
   comparand_id,
-  dual,
+  dual = false,
 }) {
   // When the props for this component don't have useful values,
   // we want to display a less obnoxious result.
@@ -27,14 +27,10 @@ export function MEVSummary({
 }
 
 MEVSummary.propTypes = {
-  model_id: PropTypes.string.isRequired,
-  experiment: PropTypes.string.isRequired,
+  model_id: PropTypes.string,
+  experiment: PropTypes.string,
   variable_id: PropTypes.string,
-  dual: PropTypes.bool.isRequired,
-};
-
-MEVSummary.defaultProps = {
-  dual: false,
+  dual: PropTypes.bool,
 };
 
 export const DualMEVSummary = (props) => <MEVSummary {...props} dual />;
