@@ -46,6 +46,7 @@ class DataGraph extends React.Component {
   };
 
   _renderChart = (data) => {
+    this.chart?.destroy();
     var options = { bindto: this._node };
     _.extend(options, data);
     this.chart = window.c3.generate(options);
@@ -55,9 +56,14 @@ class DataGraph extends React.Component {
     this._renderChart(this.props);
   }
 
-  componentWillReceiveProps(newProps) {
-    // Should be able to `this.chart.load(newProps)`, but this doesn't work
-    this._renderChart(newProps);
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(prevProps, this.props)) {
+      this._renderChart(this.props);
+    }
+  }
+
+  componentWillUnmount() {
+    this.chart?.destroy();
   }
 
   render() {

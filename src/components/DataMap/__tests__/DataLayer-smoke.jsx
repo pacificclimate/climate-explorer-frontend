@@ -23,6 +23,7 @@ it.each([
       logscale: "true",
       range: { min: 1, max: 10 },
       opacity: 0.7,
+      onChangeRange: () => {},
     };
     const view = (layerParams) => (
       <MapContainer center={[60, -100]} zoom={1}>
@@ -37,6 +38,12 @@ it.each([
     const originalLayer = layer;
     expect(layer.wmsParams.time).toBe(params.wmsTime);
     expect(layer.options.opacity).toBe(0.7);
+
+    const redraw = vi.spyOn(layer, "redraw");
+    render(view({ ...params, opacity: 0.3 }), container);
+    expect(layer).toBe(originalLayer);
+    expect(layer.options.opacity).toBe(0.3);
+    expect(redraw).not.toHaveBeenCalled();
 
     render(
       view({
@@ -59,5 +66,6 @@ it.each([
       colorscalerange: "2,20",
     });
     expect(layer.options.opacity).toBe(0.3);
+    expect(redraw).toHaveBeenCalledOnce();
   },
 );

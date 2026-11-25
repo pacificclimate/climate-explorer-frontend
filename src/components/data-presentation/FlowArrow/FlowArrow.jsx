@@ -4,7 +4,7 @@ import classnames from "classnames";
 
 import css from "./FlowArrow.module.css";
 
-const FlowArrow = ({ pullUp, children }) => (
+const FlowArrow = ({ pullUp = false, children }) => (
   <div
     className={classnames(
       css.flowArrow,
@@ -18,12 +18,8 @@ const FlowArrow = ({ pullUp, children }) => (
 );
 
 FlowArrow.propTypes = {
-  pullUp: PropTypes.bool.isRequired,
+  pullUp: PropTypes.bool,
   children: PropTypes.node,
-};
-
-FlowArrow.defaultProps = {
-  pullUp: false,
 };
 
 export default FlowArrow;

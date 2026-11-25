@@ -36,11 +36,11 @@ import classnames from "classnames";
 
 export default function NavRoutes({
   navSpec,
-  navIndex,
+  navIndex = 0,
   onNavigate,
   children,
   navClassName,
-  pullUp,
+  pullUp = false,
 }) {
   const withBasePath = (subpath) => `${navSpec.basePath}/${subpath}`;
 
@@ -129,12 +129,7 @@ NavRoutes.propTypes = {
   }).isRequired,
   navIndex: PropTypes.number,
   onNavigate: PropTypes.func,
-  pullUp: PropTypes.bool.isRequired,
+  pullUp: PropTypes.bool,
   navClassName: PropTypes.string,
   children: PropTypes.any,
-};
-
-NavRoutes.defaultProps = {
-  navIndex: 0,
-  pullUp: false,
 };

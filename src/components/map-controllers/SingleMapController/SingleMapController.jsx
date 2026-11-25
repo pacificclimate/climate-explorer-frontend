@@ -57,13 +57,13 @@ import {
 // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/125
 export default class SingleMapController extends React.Component {
   static propTypes = {
-    model_id: PropTypes.string.isRequired,
-    experiment: PropTypes.string.isRequired,
-    variable_id: PropTypes.string.isRequired,
+    model_id: PropTypes.string,
+    experiment: PropTypes.string,
+    variable_id: PropTypes.string,
     meta: PropTypes.array.isRequired,
     area: PropTypes.object,
     onSetArea: PropTypes.func.isRequired,
-    pointSelect: PropTypes.bool.isRequired,
+    pointSelect: PropTypes.bool,
     watershedEnsemble: PropTypes.string,
   };
 
@@ -171,10 +171,7 @@ export default class SingleMapController extends React.Component {
 
   // React lifecycle event handlers
 
-  componentWillReceiveProps(nextProps) {
-    // TODO: This stuff, particularly loadMap, may be better placed in
-    // componentWillUpdate.
-
+  updateForProps(nextProps, previousProps) {
     // Load initial map, based on a list of available data files passed
     // as props from its parent
     // the first dataset representing a 0th time index (January, Winter, or Annual)
@@ -192,7 +189,7 @@ export default class SingleMapController extends React.Component {
       // check to see whether the variables displayed have been switched.
       // if so, loadMap will reset palette and logarithmic dispay.
       const switchVariable = !_.isEqual(
-        this.props.variable_id,
+        previousProps.variable_id,
         nextProps.variable_id,
       );
 
@@ -206,6 +203,12 @@ export default class SingleMapController extends React.Component {
         variableTimes: undefined,
         variableTimeIdx: undefined,
       });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(prevProps, this.props)) {
+      this.updateForProps(this.props, prevProps);
     }
   }
 

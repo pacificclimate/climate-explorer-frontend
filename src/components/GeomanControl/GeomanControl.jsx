@@ -68,8 +68,8 @@ export default function GeomanControl({
       map.off("pm:create", created);
       map.off("pm:remove", removed);
       map.pm.disableDraw();
-      map.pm.disableGlobalEditMode();
-      map.pm.disableGlobalRemovalMode();
+      if (map.pm.globalEditModeEnabled()) map.pm.disableGlobalEditMode();
+      if (map.pm.globalRemovalModeEnabled()) map.pm.disableGlobalRemovalMode();
       map.pm.removeControls();
       managed.forEach((layer) => layer.off("pm:edit", edited));
       group.remove();
@@ -110,8 +110,8 @@ export default function GeomanControl({
     if (!map) return;
     if (hasSelection) map.pm.disableDraw();
     else {
-      map.pm.disableGlobalEditMode();
-      map.pm.disableGlobalRemovalMode();
+      if (map.pm.globalEditModeEnabled()) map.pm.disableGlobalEditMode();
+      if (map.pm.globalRemovalModeEnabled()) map.pm.disableGlobalRemovalMode();
     }
     map.pm.addControls({
       position: "topleft",

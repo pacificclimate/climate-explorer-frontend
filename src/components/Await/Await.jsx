@@ -20,7 +20,7 @@ export default class Await extends React.Component {
       PropTypes.arrayOf(promiseType),
     ]),
     awaiting: PropTypes.node,
-    error: PropTypes.element,
+    error: PropTypes.func,
   };
 
   static defaultProps = {
@@ -36,7 +36,7 @@ export default class Await extends React.Component {
     isWaiting: true,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const promise = _.isArray(this.props.promises)
       ? Promise.all(this.props.promises)
       : this.props.promises;

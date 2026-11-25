@@ -12,9 +12,9 @@ import { HalfWidthCol } from "../../layout/rb-derived-components.jsx";
 
 export default class FilteredDatasetsSummary extends React.Component {
   static propTypes = {
-    model_id: PropTypes.string.isRequired,
-    experiment: PropTypes.string.isRequired,
-    variable_id: PropTypes.string.isRequired,
+    model_id: PropTypes.string,
+    experiment: PropTypes.string,
+    variable_id: PropTypes.string,
     comparand_id: PropTypes.string,
     meta: PropTypes.array.isRequired,
     comparandMeta: PropTypes.array,

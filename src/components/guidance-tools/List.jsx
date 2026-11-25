@@ -17,8 +17,8 @@ export default function List({ items }) {
   }
   return (
     <ListGroup>
-      {items.map((item) => (
-        <Item {...item} />
+      {items.map((item, index) => (
+        <Item key={item.href || index} {...item} />
       ))}
     </ListGroup>
   );

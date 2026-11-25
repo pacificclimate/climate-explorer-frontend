@@ -10,7 +10,12 @@ function nextPopoverId() {
   return `info-popover-${idNum++}`;
 }
 
-export default function Information({ glyph, placement, delayHide, children }) {
+export default function Information({
+  glyph = "info-sign",
+  placement = "bottom",
+  delayHide = 1000,
+  children,
+}) {
   return (
     <OverlayTrigger
       trigger="click"
@@ -28,10 +33,4 @@ Information.propTypes = {
   placement: PropTypes.string,
   delayHide: PropTypes.number,
   children: PropTypes.any,
-};
-
-Information.defaultProps = {
-  glyph: "info-sign",
-  placement: "bottom",
-  delayHide: 1000,
 };

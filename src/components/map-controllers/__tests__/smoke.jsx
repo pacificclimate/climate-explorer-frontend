@@ -1,3 +1,4 @@
+import { meta } from "../../../test_support/data";
 import React from "react";
 import { render } from "../../../test_support/render";
 import DualMapController from "../DualMapController/DualMapController.jsx";
@@ -272,3 +273,37 @@ describe("PrecipMapController", () => {
     });
   });
 });
+
+it.each([
+  ["single", SingleMapController],
+  ["dual", DualMapController],
+  ["precipitation", PrecipMapController],
+])(
+  "%s requests an appearance reset for variable changes but not model changes",
+  (_name, Controller) => {
+    // Keep metadata requests outside this lifecycle regression.
+    const loadMap = vi
+      .spyOn(Controller.prototype, "loadMap")
+      .mockImplementation(() => {});
+    try {
+      const view = (model_id, variable_id, metadata = meta) => (
+        <Controller
+          {...{ model_id, variable_id }}
+          meta={metadata}
+          pointSelect={false}
+          onSetArea={noop}
+        />
+      );
+      const container = render(view("model-a", undefined, []));
+      render(view("model-a", "tasmax"), container);
+      expect(loadMap.mock.lastCall[2]).toBe(true);
+      render(view("model-b", "tasmax"), container);
+      expect(loadMap.mock.lastCall[2]).toBe(false);
+      render(view("model-b", "pr"), container);
+      expect(loadMap.mock.lastCall[2]).toBe(true);
+      expect(loadMap).toHaveBeenCalledTimes(3);
+    } finally {
+      loadMap.mockRestore();
+    }
+  },
+);

@@ -7,7 +7,7 @@ import styles from "../DataController.module.css";
 
 const graphTabSpecPropType = PropTypes.shape({
   title: PropTypes.node,
-  graph: PropTypes.element,
+  graph: PropTypes.elementType,
 });
 
 export default class GraphTabs extends React.Component {
@@ -17,8 +17,8 @@ export default class GraphTabs extends React.Component {
     experiment: PropTypes.string.isRequired,
     meta: PropTypes.array.isRequired,
     specs: PropTypes.shape({
-      mym: graphTabSpecPropType.isRequired,
-      notMym: graphTabSpecPropType.isRequired,
+      mym: PropTypes.arrayOf(graphTabSpecPropType).isRequired,
+      notMym: PropTypes.arrayOf(graphTabSpecPropType).isRequired,
     }).isRequired,
   };
 
@@ -35,7 +35,12 @@ export default class GraphTabs extends React.Component {
     ].map((spec, i) => {
       const Graph = spec.graph;
       return (
-        <Tab eventKey={i} title={spec.title} className={styles.data_panel}>
+        <Tab
+          key={i}
+          eventKey={i}
+          title={spec.title}
+          className={styles.data_panel}
+        >
           <Graph {...this.props} />
         </Tab>
       );

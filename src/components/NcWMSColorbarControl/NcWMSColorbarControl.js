@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 
 import LeafletNcWMSColorbarControl from "./LeafletNcWMSColorbarControl";
@@ -26,4 +26,4 @@ function NcWMSColorbarControl(props) {
   return null;
 }
 
-export default NcWMSColorbarControl;
+export default memo(NcWMSColorbarControl);
