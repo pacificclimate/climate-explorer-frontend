@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -8,7 +8,7 @@ import T from "pcic-react-external-text";
 
 export default function Science() {
   return (
-    <Grid fluid>
+    <Container fluid>
       <Row>
         <FullWidthCol>
           <T path="science.title" />
@@ -20,6 +20,6 @@ export default function Science() {
           <T path="science.content" />
         </HalfWidthCol>
       </Row>
-    </Grid>
+    </Container>
   );
 }

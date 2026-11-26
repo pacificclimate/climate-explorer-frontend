@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
+import TableView, { Column } from "../TableView/TableView";
 
 class DataTable extends React.Component {
   static propTypes = {
@@ -11,21 +11,16 @@ class DataTable extends React.Component {
   render() {
     return (
       <div id={"table"}>
-        <BootstrapTable
+        <TableView
           data={this.props.data}
           options={this.props.options}
           striped
           hover
         >
-          <TableHeaderColumn
-            dataField="run"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          <Column dataField="run" dataAlign="center" dataSort width="12%">
             Run
-          </TableHeaderColumn>
-          <TableHeaderColumn
+          </Column>
+          <Column
             dataField="model_period"
             isKey
             dataAlign="center"
@@ -33,51 +28,26 @@ class DataTable extends React.Component {
             width="15%"
           >
             Averaging Period
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="min"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          </Column>
+          <Column dataField="min" dataAlign="center" dataSort width="12%">
             Min
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="max"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          </Column>
+          <Column dataField="max" dataAlign="center" dataSort width="12%">
             Max
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="mean"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          </Column>
+          <Column dataField="mean" dataAlign="center" dataSort width="12%">
             Mean
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="median"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          </Column>
+          <Column dataField="median" dataAlign="center" dataSort width="12%">
             Median
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="stdev"
-            dataAlign="center"
-            dataSort
-            width="12%"
-          >
+          </Column>
+          <Column dataField="stdev" dataAlign="center" dataSort width="12%">
             Std.Dev
-          </TableHeaderColumn>
-          <TableHeaderColumn dataField="units" dataAlign="center" width="15%">
+          </Column>
+          <Column dataField="units" dataAlign="center" width="15%">
             Units
-          </TableHeaderColumn>
-        </BootstrapTable>
+          </Column>
+        </TableView>
       </div>
     );
   }

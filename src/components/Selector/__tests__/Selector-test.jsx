@@ -1,93 +1,78 @@
-import { render, renderComponent } from "../../../test_support/render";
 import React, { act } from "react";
-import TestUtils from "react-dom/test-utils";
+import { render } from "../../../test_support/render";
 import Selector from "../Selector.jsx";
 
-describe("Selector", function () {
-  it("sets the label", function () {
-    var selector = renderComponent(<Selector label={"New Label"} />);
-
-    var labelNode = TestUtils.findRenderedDOMComponentWithTag(
-      selector,
-      "label",
-    );
-    expect(labelNode.textContent).toEqual("New Label");
+async function mount(props = {}, open = false) {
+  let container;
+  await act(async () => {
+    container = render(<Selector {...props} />);
   });
+  if (open) await act(async () => container.querySelector("button").click());
+  return container;
+}
 
-  it("can handle passed items", function () {
-    var selector = renderComponent(
-      <Selector items={["apple", "banana", "carrot"]} />,
-    );
-
-    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, "li");
-    var content = itemNodes.map(function (obj) {
-      return obj.textContent;
-    });
-    expect(content).toEqual(["apple", "banana", "carrot"]);
-  });
-
-  it("can handle [key, label] pairs", function () {
-    var selector = renderComponent(
-      <Selector
-        items={[
-          ["apple_value", "Apple label"],
-          ["banana_value", "Banana label"],
-        ]}
-      />,
-    );
-    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, "li");
-
-    var content = itemNodes.map(function (obj) {
-      return obj.textContent;
-    });
-    expect(content).toEqual(["Apple label", "Banana label"]);
-  });
-
-  it("can handle [key, label, disabled] triples", function () {
-    var selector = renderComponent(
-      <Selector
-        items={[
-          ["apple_value", "Apple label", true],
-          ["banana_value", "Banana label", false],
-        ]}
-      />,
-    );
-    var itemNodes = TestUtils.scryRenderedDOMComponentsWithTag(selector, "a");
-    //This is a very low-level way to test this, and very dependant on
-    //exact implementation in a way we normally don't have to care about.
-    //This test would likely be broken by a react or react-bootstrap upgrade. There is
-    //probably a more semantic and less fragile way to test whether an element is
-    //disabled, but I have been unable to determine it.
-    // expect(itemNodes[0].style[0]).toBe("pointer-events");
-    // expect(itemNodes[1].style[0]).toBe(undefined);
-    // FIXME: Find a way to test this
-  });
-
-  it("calls the callback", function () {
-    var callback = vi.fn();
-    var selector = renderComponent(
-      <Selector
-        onChange={callback}
-        items={[
-          ["one", "first"],
-          ["two", "second"],
-        ]}
-      />,
-    );
-
-    var dropdownButton = TestUtils.findRenderedDOMComponentWithTag(
-      selector,
-      "button",
-    );
-    act(() => TestUtils.Simulate.click(dropdownButton));
-    var option = TestUtils.scryRenderedDOMComponentsWithTag(selector, "a")[1];
-    act(() => TestUtils.Simulate.click(option));
-
-    expect(callback).toBeCalledWith("two");
-  });
+it("sets the label", async () => {
+  const container = await mount({ label: "New Label" });
+  expect(container.querySelector("label").textContent).toBe("New Label");
 });
 
-it("updates the selected label and keeps a valid dropdown ID for rich labels", () => {
+it.each([
+  [
+    ["apple", "banana", "carrot"],
+    ["apple", "banana", "carrot"],
+  ],
+  [
+    [
+      ["apple_value", "Apple label"],
+      ["banana_value", "Banana label"],
+    ],
+    ["Apple label", "Banana label"],
+  ],
+])("displays dropdown choices", async (items, labels) => {
+  const container = await mount({ items }, true);
+  expect(
+    [...container.querySelectorAll(".dropdown-item")].map(
+      (node) => node.textContent,
+    ),
+  ).toEqual(labels);
+});
+
+it("does not select choices marked as unavailable", async () => {
+  const onChange = vi.fn();
+  const container = await mount(
+    {
+      onChange,
+      items: [
+        ["apple", "Apple", true],
+        ["banana", "Banana", false],
+      ],
+    },
+    true,
+  );
+  const items = container.querySelectorAll(".dropdown-item");
+  await act(async () => items[0].click());
+  expect(onChange).not.toHaveBeenCalled();
+  await act(async () => items[1].click());
+  expect(onChange).toHaveBeenCalledWith("banana");
+});
+
+it("calls the callback with the selected value", async () => {
+  const onChange = vi.fn();
+  const container = await mount({
+    onChange,
+    items: [
+      ["one", "first"],
+      ["two", "second"],
+    ],
+  });
+  await act(async () => container.querySelector("button").click());
+  await act(async () =>
+    container.querySelectorAll(".dropdown-item")[1].click(),
+  );
+  expect(onChange).toHaveBeenCalledWith("two");
+});
+
+it("updates the selected label and keeps a valid dropdown ID for rich labels", async () => {
   const view = (label) => (
     <Selector
       label={<span>Variable</span>}
@@ -95,12 +80,17 @@ it("updates the selected label and keeps a valid dropdown ID for rich labels", (
       items={[["tasmax", label]]}
     />
   );
-  const container = render(view("Temperature"));
+  let container;
+  await act(async () => {
+    container = render(view("Temperature"));
+  });
   const button = () => container.querySelector("button");
   const id = button().id;
   expect(id).toMatch(/^selector-/);
   expect(button().textContent).toContain("Temperature");
-  render(view("Maximum temperature"), container);
+  await act(async () => {
+    render(view("Maximum temperature"), container);
+  });
   expect(button().id).toBe(id);
   expect(button().textContent).toContain("Maximum temperature");
 });

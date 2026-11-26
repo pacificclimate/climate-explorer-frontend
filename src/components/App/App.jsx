@@ -88,8 +88,8 @@ export default class App extends React.Component {
       <Router basename={getBaseName()}>
         <div>
           <NavRoutes navSpec={this.navSpec} navClassName={styles.mainNav}>
-            <Navbar.Header>
-              <Navbar.Brand className={styles.pcic_logo}>
+            <div className={styles.branding}>
+              <Navbar.Brand as="span" className={styles.pcic_logo}>
                 <a href="https://pacificclimate.org/">
                   <img
                     src={logo}
@@ -99,18 +99,18 @@ export default class App extends React.Component {
                   />
                 </a>
               </Navbar.Brand>
-              <Navbar.Brand className={styles.marmot_logo}>
+              <Navbar.Brand as="span" className={styles.marmot_logo}>
                 <img
                   src={marmot}
-                  height={68}
+                  height={50}
                   alt="Vancouver Island Marmot"
                   title='"The Marmot": Graphic by permission, V.I. Marmot Recovery Foundation'
                 />
               </Navbar.Brand>
-              <Navbar.Brand>
+              <Navbar.Brand as="span">
                 <T path="app.title" as="string" />{" "}
               </Navbar.Brand>
-            </Navbar.Header>
+            </div>
           </NavRoutes>
         </div>
       </Router>

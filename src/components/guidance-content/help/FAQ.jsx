@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -29,7 +29,7 @@ export default class FAQ extends React.Component {
     const secondItems = items.slice(half);
 
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <T path="help.faq.title" />
@@ -51,7 +51,7 @@ export default class FAQ extends React.Component {
             <Accordion>{secondItems}</Accordion>
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

@@ -24,7 +24,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import Loader from "react-loader";
-import { Panel, Row, Col } from "react-bootstrap";
+import { Card, Row, Col } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -311,16 +311,16 @@ export default class DualMapController extends React.Component {
     );
 
     return (
-      <Panel>
-        <Panel.Heading>
-          <Panel.Title>
+      <Card>
+        <Card.Header>
+          <Card.Title>
             <Row>
-              <Col lg={2}>{mapPanelLabel}</Col>
-              <Col lg={10}>{mapLegend}</Col>
+              <Col xl={2}>{mapPanelLabel}</Col>
+              <Col xl={10}>{mapLegend}</Col>
             </Row>
-          </Panel.Title>
-        </Panel.Heading>
-        <Panel.Body className={styles.mapcontroller}>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body className={styles.mapcontroller}>
           {this.state.raster.times || this.state.isoline.times ? (
             <DataMap
               raster={{
@@ -380,8 +380,8 @@ export default class DualMapController extends React.Component {
           ) : (
             <Loader />
           )}
-        </Panel.Body>
-      </Panel>
+        </Card.Body>
+      </Card>
     );
   }
 }

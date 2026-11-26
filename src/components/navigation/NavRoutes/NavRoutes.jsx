@@ -25,14 +25,19 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Navbar, Nav, NavItem } from "react-bootstrap";
-import { Route, Redirect, Switch } from "react-router-dom";
-import { LinkContainer } from "react-router-bootstrap";
+import { Container, Navbar, Nav } from "react-bootstrap";
+import { Route, Navigate, Routes, NavLink, useParams } from "react-router-dom";
 
 import LabelWithInfo from "../../guidance-tools/LabelWithInfo.jsx";
 
 import styles from "./NavRoutes.module.css";
 import classnames from "classnames";
+
+function RouteContent({ item }) {
+  const params = useParams();
+  const Page = item.component;
+  return item.render ? item.render(params) : Page ? <Page {...params} /> : null;
+}
 
 export default function NavRoutes({
   navSpec,
@@ -45,22 +50,20 @@ export default function NavRoutes({
   const withBasePath = (subpath) => `${navSpec.basePath}/${subpath}`;
 
   const navItems = navSpec.items.map((item, index) => (
-    <LinkContainer
+    <Nav.Link
       key={index}
+      as={NavLink}
       to={withBasePath(item.navSubpath || item.subpath)}
+      eventKey={index}
     >
-      <NavItem eventKey={index}>
-        <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
-      </NavItem>
-    </LinkContainer>
+      <LabelWithInfo label={item.label}>{item.info}</LabelWithInfo>
+    </Nav.Link>
   ));
-
   const routes = navSpec.items.map((item, index) => (
     <Route
       key={index}
-      path={withBasePath(item.subpath)}
-      component={item.component}
-      render={item.render}
+      path={`${item.subpath}/*`}
+      element={<RouteContent item={item} />}
     />
   ));
 
@@ -70,20 +73,28 @@ export default function NavRoutes({
 
   return (
     <div>
-      <Navbar
-        fluid
-        className={classnames(navClassName, { [styles.pullUp]: pullUp })}
-      >
-        {children}
-        <Nav bsStyle="pills" pullRight onSelect={onNavigate}>
-          {navItems}
-        </Nav>
+      <Navbar className={classnames(navClassName, { [styles.pullUp]: pullUp })}>
+        <Container fluid>
+          {children}
+          {/* Let the URL control highlighting instead of remembering the last clicked tab. */}
+          <Nav
+            variant="pills"
+            className="ms-auto"
+            activeKey={null}
+            onSelect={(key) => onNavigate?.(Number(key))}
+          >
+            {navItems}
+          </Nav>
+        </Container>
       </Navbar>
 
-      <Switch>
+      <Routes>
         {routes}
-        <Redirect to={basePathRedirectTo} />
-      </Switch>
+        <Route
+          path="*"
+          element={<Navigate to={basePathRedirectTo} replace />}
+        />
+      </Routes>
     </div>
   );
 }

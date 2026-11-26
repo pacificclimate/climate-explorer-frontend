@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row, ListGroup, ListGroupItem } from "react-bootstrap";
+import { Container, Row, ListGroup, ListGroupItem } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -11,17 +11,27 @@ import _ from "lodash";
 
 const items = _.sortBy(
   [
-    <ListGroupItem header="foo">foo</ListGroupItem>,
+    <ListGroupItem key="foo">
+      <h4>foo</h4>foo
+    </ListGroupItem>,
 
-    <ListGroupItem header="qux">qux</ListGroupItem>,
+    <ListGroupItem key="qux">
+      <h4>qux</h4>qux
+    </ListGroupItem>,
 
-    <ListGroupItem header="bar">bar</ListGroupItem>,
+    <ListGroupItem key="bar">
+      <h4>bar</h4>bar
+    </ListGroupItem>,
 
-    <ListGroupItem header="baz">baz</ListGroupItem>,
+    <ListGroupItem key="baz">
+      <h4>baz</h4>baz
+    </ListGroupItem>,
 
-    <ListGroupItem header="penguin">penguin</ListGroupItem>,
+    <ListGroupItem key="penguin">
+      <h4>penguin</h4>penguin
+    </ListGroupItem>,
   ],
-  (item) => item.props.header,
+  (item) => item.key,
 );
 
 const half = Math.ceil(items.length / 2);
@@ -30,7 +40,7 @@ const secondItems = items.slice(half);
 
 export default function HelpGeneral() {
   return (
-    <Grid fluid>
+    <Container fluid>
       <Row>
         <FullWidthCol>
           <h1>Glossary</h1>
@@ -45,6 +55,6 @@ export default function HelpGeneral() {
           <ListGroup>{secondItems}</ListGroup>
         </HalfWidthCol>
       </Row>
-    </Grid>
+    </Container>
   );
 }

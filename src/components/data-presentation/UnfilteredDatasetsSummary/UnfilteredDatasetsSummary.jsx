@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import Accordion from "../../guidance-tools/Accordion.jsx";
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
+import TableView, { Column } from "../../TableView/TableView";
 import { unfilteredDatasetSummaryPanelLabel } from "../../guidance-content/info/InformationItems.jsx";
 
 import _ from "lodash";
@@ -28,14 +28,14 @@ export default class UnfilteredDatasetsSummary extends React.Component {
     }
 
     const CountsTable = ({ title, grouper }) => (
-      <BootstrapTable data={countsByGroup(this.props.meta, grouper)}>
-        <TableHeaderColumn dataField="key" isKey width={"50%"}>
+      <TableView data={countsByGroup(this.props.meta, grouper)}>
+        <Column dataField="key" isKey width={"50%"}>
           {title}
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="count" width={"50%"} dataAlign="right">
+        </Column>
+        <Column dataField="count" width={"50%"} dataAlign="right">
           Number of datasets
-        </TableHeaderColumn>
-      </BootstrapTable>
+        </Column>
+      </TableView>
     );
 
     return (
@@ -44,8 +44,8 @@ export default class UnfilteredDatasetsSummary extends React.Component {
           eventKey={2}
           title={
             <Row>
-              <Col lg={2}>{unfilteredDatasetSummaryPanelLabel}</Col>
-              <Col lg={10}>{this.props.meta.length} datasets total</Col>
+              <Col xl={2}>{unfilteredDatasetSummaryPanelLabel}</Col>
+              <Col xl={10}>{this.props.meta.length} datasets total</Col>
             </Row>
           }
         >

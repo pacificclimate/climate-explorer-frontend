@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Grid, Row, Col, Button, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import _ from "lodash";
 
 import DataSpecSelector from "../DataSpecSelector/DataSpecSelector";
@@ -79,9 +79,9 @@ export default class MapSettingsDialog extends React.Component {
         </Modal.Header>
 
         <Modal.Body>
-          <Grid fluid>
+          <Container fluid>
             <Row>
-              <Col lg={12}>
+              <Col xl={12}>
                 <DataSpecSelector
                   meta={this.props.meta}
                   value={this.props.dataSpec}
@@ -91,7 +91,7 @@ export default class MapSettingsDialog extends React.Component {
             </Row>
 
             <Row>
-              <Col lg={rasterColLg}>
+              <Col xl={rasterColLg}>
                 <h4>Raster</h4>
                 <DataDisplayControls
                   name="Raster"
@@ -100,7 +100,7 @@ export default class MapSettingsDialog extends React.Component {
                 />
               </Col>
               {this.props.hasComparand && (
-                <Col lg={1}>
+                <Col xl={1}>
                   <TimeLinkButton
                     timesLinkable={this.props.timesLinkable}
                     linkTimes={this.state.linkTimes}
@@ -109,7 +109,7 @@ export default class MapSettingsDialog extends React.Component {
                 </Col>
               )}
               {this.props.hasComparand && (
-                <Col lg={5}>
+                <Col xl={5}>
                   <h4>Isolines</h4>
                   <DataDisplayControls
                     name="Isoline"
@@ -120,11 +120,13 @@ export default class MapSettingsDialog extends React.Component {
                 </Col>
               )}
             </Row>
-          </Grid>
+          </Container>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={this.props.close}>Close</Button>
+          <Button variant="light" onClick={this.props.close}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     );

@@ -25,7 +25,7 @@
 import PropTypes from "prop-types";
 
 import React from "react";
-import { Row, Col, Panel } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 import _ from "lodash";
 
 import SingleTimeSeriesGraph from "../../graphs/SingleTimeSeriesGraph";
@@ -84,25 +84,25 @@ export default class FloodDataController extends React.Component {
     return (
       // TODO: https://github.com/pacificclimate/climate-explorer-frontend/issues/246
       <div>
-        <Panel>
-          <Panel.Heading>
-            <Panel.Title>
+        <Card>
+          <Card.Header>
+            <Card.Title>
               <Row>
-                <Col lg={4}>{watershedGraphsPanelLabel}</Col>
-                <Col lg={8}>
+                <Col xl={4}>{watershedGraphsPanelLabel}</Col>
+                <Col xl={8}>
                   <MEVSummary className={styles.mevSummary} {...this.props} />
                 </Col>
               </Row>
-            </Panel.Title>
-          </Panel.Heading>
-          <Panel.Body className={styles.data_panel}>
+            </Card.Title>
+          </Card.Header>
+          <Card.Body className={styles.data_panel}>
             <GraphTabs
               {...this.props}
               hideTimeOfYearSelector={true}
               specs={FloodDataController.graphTabsSpecs}
             />
-          </Panel.Body>
-        </Panel>
+          </Card.Body>
+        </Card>
 
         <WatershedSummaryTable {...this.props} />
       </div>

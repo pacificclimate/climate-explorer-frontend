@@ -1,6 +1,7 @@
+import Icon from "../../Icon/Icon";
 import PropTypes from "prop-types";
 import React from "react";
-import { Glyphicon, Popover, OverlayTrigger } from "react-bootstrap";
+import { Popover, OverlayTrigger } from "react-bootstrap";
 
 import styles from "./Information.module.css";
 
@@ -21,9 +22,13 @@ export default function Information({
       trigger="click"
       rootClose
       placement={placement}
-      overlay={<Popover id={nextPopoverId()}>{children}</Popover>}
+      overlay={
+        <Popover id={nextPopoverId()}>
+          <Popover.Body>{children}</Popover.Body>
+        </Popover>
+      }
     >
-      <Glyphicon glyph={glyph} className={styles.icon} />
+      <Icon glyph={glyph} className={styles.icon} />
     </OverlayTrigger>
   );
 }

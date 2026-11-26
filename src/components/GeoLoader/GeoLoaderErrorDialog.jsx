@@ -22,7 +22,9 @@ export default class GeoloaderErrorDialog extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={this.props.close}>Close</Button>
+          <Button variant="light" onClick={this.props.close}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     );

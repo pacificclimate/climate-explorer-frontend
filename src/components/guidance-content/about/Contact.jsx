@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -12,7 +12,7 @@ export default class HelpGeneral extends React.Component {
 
   render() {
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <T path="about.contact.title" />
@@ -24,7 +24,7 @@ export default class HelpGeneral extends React.Component {
             <List items={T.get(this.context, "about.contact.items")} />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

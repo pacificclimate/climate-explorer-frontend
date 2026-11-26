@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, ControlLabel } from "react-bootstrap";
+import { Row, Col, FormLabel } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -235,10 +235,10 @@ export default class AnnualCycleGraph extends React.Component {
     return (
       <React.Fragment>
         <Row>
-          <Col lg={6} md={6} sm={6}>
-            <ControlLabel className={styles.selector_label}>
+          <Col xl={6} lg={6} md={6}>
+            <FormLabel className={styles.selector_label}>
               {this.selectorLabel}
-            </ControlLabel>
+            </FormLabel>
             <DataspecSelector
               bases={this.props.meta}
               value={this.state.dataSpec}
@@ -247,7 +247,7 @@ export default class AnnualCycleGraph extends React.Component {
               replaceInvalidValue={this.replaceInvalidDataSpec}
             />
           </Col>
-          <Col lg={6} md={6} sm={6}>
+          <Col xl={6} lg={6} md={6}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, ControlLabel } from "react-bootstrap";
+import { Row, Col, FormLabel } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -126,7 +126,7 @@ export default class TimeSeriesGraph extends React.Component {
     return (
       <React.Fragment>
         <Row>
-          <Col lg={6} md={6} sm={6}>
+          <Col xl={6} lg={6} md={6}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}
@@ -136,9 +136,9 @@ export default class TimeSeriesGraph extends React.Component {
         <Row>
           <Col>
             <DataGraph {...this.state.graphSpec} />
-            <ControlLabel className={styles.graphlabel}>
+            <FormLabel className={styles.graphlabel}>
               Highlight a time span on lower graph to see more detail
-            </ControlLabel>
+            </FormLabel>
           </Col>
         </Row>
       </React.Fragment>

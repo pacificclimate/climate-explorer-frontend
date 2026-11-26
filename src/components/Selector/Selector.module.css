@@ -17,7 +17,7 @@
 }
 
 .selectoritem {
-  color: WhiteSmoke;
+  color: var(--bs-dropdown-link-color);
 }
 
 .selectorframe {

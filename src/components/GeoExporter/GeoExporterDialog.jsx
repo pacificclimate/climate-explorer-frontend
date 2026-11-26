@@ -36,16 +36,28 @@ export default class GeoExporterDialog extends React.Component {
 
         <Modal.Body>
           <ButtonGroup>
-            <Button onClick={this.exportShapefile}>Shapefile</Button>
-            <Button onClick={this.exportGeoJSON}>GeoJSON</Button>
-            <Button onClick={this.exportWKT}>WKT</Button>
-            <Button onClick={this.exportKML}>KML</Button>
-            <Button onClick={this.exportGPX}>GPX</Button>
+            <Button variant="light" onClick={this.exportShapefile}>
+              Shapefile
+            </Button>
+            <Button variant="light" onClick={this.exportGeoJSON}>
+              GeoJSON
+            </Button>
+            <Button variant="light" onClick={this.exportWKT}>
+              WKT
+            </Button>
+            <Button variant="light" onClick={this.exportKML}>
+              KML
+            </Button>
+            <Button variant="light" onClick={this.exportGPX}>
+              GPX
+            </Button>
           </ButtonGroup>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={this.props.close}>Close</Button>
+          <Button variant="light" onClick={this.props.close}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     );

@@ -28,7 +28,10 @@ export default class GeoloaderMainDialog extends React.Component {
 
   render() {
     return (
-      <Modal show={this.props.controls[1].show()}>
+      <Modal
+        show={this.props.controls[1].show()}
+        onHide={this.props.controls[1].close}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Import Polygon</Modal.Title>
         </Modal.Header>
@@ -37,7 +40,7 @@ export default class GeoloaderMainDialog extends React.Component {
           <p>
             <FormControl
               type="file"
-              label="Select file"
+              aria-label="Select file"
               onChange={(e) => this.importPolygon(e.currentTarget.files[0])}
             />
           </p>
@@ -54,7 +57,9 @@ export default class GeoloaderMainDialog extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={this.props.controls[1].close}>Close</Button>
+          <Button variant="light" onClick={this.props.controls[1].close}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     );

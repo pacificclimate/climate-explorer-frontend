@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -13,7 +13,7 @@ export default class HelpGeneral extends React.Component {
 
   render() {
     return (
-      <Grid fluid className="markdown">
+      <Container fluid className="markdown">
         <Row>
           <FullWidthCol>
             <T path="help.general.title" />
@@ -28,7 +28,7 @@ export default class HelpGeneral extends React.Component {
             />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

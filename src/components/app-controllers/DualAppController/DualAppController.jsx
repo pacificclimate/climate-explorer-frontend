@@ -18,7 +18,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Grid, Row, Col, Panel, ControlLabel } from "react-bootstrap";
+import { Container, Row, Col, Card, FormLabel } from "react-bootstrap";
 
 import DualDataController from "../../data-controllers/DualDataController/DualDataController.jsx";
 import {
@@ -104,7 +104,7 @@ class DualAppControllerDisplay extends React.Component {
     const comparand_id = this.representativeValue("comparand", "variable_id");
 
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <UnfilteredDatasetsSummary meta={this.props.meta} />
@@ -119,14 +119,14 @@ class DualAppControllerDisplay extends React.Component {
 
         <Row>
           <FullWidthCol>
-            <Panel>
-              <Panel.Heading>
-                <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>
+            <Card>
+              <Card.Header>
+                <Card.Title>{datasetFilterPanelLabel}</Card.Title>
+              </Card.Header>
+              <Card.Body>
                 <Row>
-                  <Col lg={2} md={2}>
-                    <ControlLabel>{modelSelectorLabel}</ControlLabel>
+                  <Col xl={2} lg={2}>
+                    <FormLabel>{modelSelectorLabel}</FormLabel>
                     <ModelSelector
                       bases={this.props.meta}
                       value={this.props.model}
@@ -134,8 +134,8 @@ class DualAppControllerDisplay extends React.Component {
                       replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
-                  <Col lg={2} md={2}>
-                    <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
+                  <Col xl={2} lg={2}>
+                    <FormLabel>{emissionScenarioSelectorLabel}</FormLabel>
                     <EmissionsScenarioSelector
                       bases={this.props.meta}
                       constraint={this.constraintsFor("model")}
@@ -144,8 +144,8 @@ class DualAppControllerDisplay extends React.Component {
                       replaceInvalidValue={this.replaceInvalidScenario}
                     />
                   </Col>
-                  <Col lg={3} md={3}>
-                    <ControlLabel>{variable1SelectorLabel}</ControlLabel>
+                  <Col xl={3} lg={3}>
+                    <FormLabel>{variable1SelectorLabel}</FormLabel>
                     <VariableSelector
                       bases={this.props.meta}
                       constraint={this.constraintsFor("model", "scenario")}
@@ -154,8 +154,8 @@ class DualAppControllerDisplay extends React.Component {
                       replaceInvalidValue={this.replaceInvalidVariable}
                     />
                   </Col>
-                  <Col lg={3} md={3}>
-                    <ControlLabel>{variable2SelectorLabel}</ControlLabel>
+                  <Col xl={3} lg={3}>
+                    <FormLabel>{variable2SelectorLabel}</FormLabel>
                     <VariableSelector
                       bases={this.props.meta}
                       constraint={this.constraintsFor("model", "scenario")}
@@ -165,8 +165,8 @@ class DualAppControllerDisplay extends React.Component {
                     />
                   </Col>
                 </Row>
-              </Panel.Body>
-            </Panel>
+              </Card.Body>
+            </Card>
           </FullWidthCol>
         </Row>
 
@@ -230,7 +230,7 @@ class DualAppControllerDisplay extends React.Component {
             />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

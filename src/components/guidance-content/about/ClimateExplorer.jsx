@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -12,7 +12,7 @@ export default class ClimateExplorer extends React.Component {
 
   render() {
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <T path="about.pcex.title" />
@@ -28,7 +28,7 @@ export default class ClimateExplorer extends React.Component {
             />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

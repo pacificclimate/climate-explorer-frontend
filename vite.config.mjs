@@ -22,8 +22,6 @@ export default defineConfig(({ command }) => ({
     // v1.1.0 advertises an ESM entry that is absent from its published git
     // package; its CommonJS library entry is present and is Vite-compatible.
     alias: {
-      // react-bootstrap-table imports Node's EventEmitter; use its browser polyfill.
-      events: "events/",
       "pcic-react-external-text": "pcic-react-external-text/lib/index.js",
     },
   },

@@ -5,7 +5,8 @@ import _ from "lodash";
 
 export function Item({ header, href, body }) {
   return (
-    <ListGroupItem header={header} href={href}>
+    <ListGroupItem href={href}>
+      {header && <h4>{header}</h4>}
       <T.Markdown source={body} />
     </ListGroupItem>
   );

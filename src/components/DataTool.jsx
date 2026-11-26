@@ -15,44 +15,56 @@ const navSpec = {
     {
       label: "Single Variable CMIP5",
       info: "View a single climate variable from a selected GCM and emission scenario in the CMIP5 experiments.",
-      subpath: "climo/:ensemble_name(ce_files)",
+      subpath: "climo/ce_files",
       navSubpath: "climo/ce_files",
-      render: (props) => <SingleAppController {...props} />,
+      render: (props) => (
+        <SingleAppController {...props} ensemble_name="ce_files" />
+      ),
     },
     {
       label: "Compare Variables CMIP5",
       info: "Simulataneously view and compare two climate variables from a selected GCM and emission scenario in the CMIP5 experiments.",
-      subpath: "compare/:ensemble_name(ce_files)",
+      subpath: "compare/ce_files",
       navSubpath: "compare/ce_files",
-      render: (props) => <DualAppController {...props} />,
+      render: (props) => (
+        <DualAppController {...props} ensemble_name="ce_files" />
+      ),
     },
     {
       label: "Single Variable CMIP6",
       info: "View a single climate variable from a selected GCM and emission scenario in the CMIP6 experiments.",
-      subpath: "climo/:ensemble_name(ce_cmip6_mbcn)",
+      subpath: "climo/ce_cmip6_mbcn",
       navSubpath: "climo/ce_cmip6_mbcn",
-      render: (props) => <SingleAppController {...props} />,
+      render: (props) => (
+        <SingleAppController {...props} ensemble_name="ce_cmip6_mbcn" />
+      ),
     },
     {
       label: "Compare Variables CMIP6",
       info: "Simulataneously view and compare two climate variables from a selected GCM and emission scenario in the CMIP6 experiments.",
-      subpath: "compare/:ensemble_name(ce_cmip6_mbcn)",
+      subpath: "compare/ce_cmip6_mbcn",
       navSubpath: "compare/ce_cmip6_mbcn",
-      render: (props) => <DualAppController {...props} />,
+      render: (props) => (
+        <DualAppController {...props} ensemble_name="ce_cmip6_mbcn" />
+      ),
     },
     {
       label: "Extreme Precipitation",
       info: "View data representing extreme precipitation based on a selected GCM and emission scenario.",
-      subpath: "precipitation/:ensemble_name(extreme_precipitation)",
+      subpath: "precipitation/extreme_precipitation",
       navSubpath: "precipitation/extreme_precipitation",
-      render: (props) => <PrecipAppController {...props} />,
+      render: (props) => (
+        <PrecipAppController {...props} ensemble_name="extreme_precipitation" />
+      ),
     },
     {
       label: "Extreme Streamflow",
       info: "View streamflow design values for the Fraser and Peace River basins based on the CanESM2 large ensemble.",
-      subpath: "flood/:ensemble_name(fraser_peace_columbia)",
+      subpath: "flood/fraser_peace_columbia",
       navSubpath: "flood/fraser_peace_columbia",
-      render: (props) => <FloodAppController {...props} />,
+      render: (props) => (
+        <FloodAppController {...props} ensemble_name="fraser_peace_columbia" />
+      ),
     },
   ],
 };

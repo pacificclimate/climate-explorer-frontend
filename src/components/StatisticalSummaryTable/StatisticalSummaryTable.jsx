@@ -1,11 +1,11 @@
-// Statistical Summary Table: Panel containing a Data Table viewer component
+// Statistical Summary Table: Card containing a Data Table viewer component
 // showing statistical information for each climatology period or timeseries.
 
 // TODO: Use HOC `withAsyncData` to manage fetching data
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, Panel, ControlLabel } from "react-bootstrap";
+import { Row, Col, Card, FormLabel } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -211,23 +211,23 @@ export default class StatisticalSummaryTable extends React.Component {
 
   render() {
     return (
-      <Panel>
-        <Panel.Heading>
-          <Panel.Title>
+      <Card>
+        <Card.Header>
+          <Card.Title>
             <Row>
-              <Col lg={4}>{statsTableLabel}</Col>
-              <Col lg={8}>
+              <Col xl={4}>{statsTableLabel}</Col>
+              <Col xl={8}>
                 <MEVSummary className={styles.mevSummary} {...this.props} />
               </Col>
             </Row>
-          </Panel.Title>
-        </Panel.Heading>
-        <Panel.Body className={styles.data_panel}>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body className={styles.data_panel}>
           <Row>
-            <Col lg={6} md={6} sm={6}>
-              <ControlLabel className={styles.selector_label}>
+            <Col xl={6} lg={6} md={6}>
+              <FormLabel className={styles.selector_label}>
                 {timeOfYearSelectorLabel}
-              </ControlLabel>
+              </FormLabel>
               <TimeOfYearSelector
                 value={this.state.timeOfYear}
                 onChange={this.handleChangeTimeOfYear}
@@ -235,7 +235,7 @@ export default class StatisticalSummaryTable extends React.Component {
                 className={styles.selector}
               />
             </Col>
-            <Col lg={6} md={6} sm={6}>
+            <Col xl={6} lg={6} md={6}>
               <ExportButtons
                 onExportXlsx={this.exportDataTable.bind(this, "xlsx")}
                 onExportCsv={this.exportDataTable.bind(this, "csv")}
@@ -246,8 +246,8 @@ export default class StatisticalSummaryTable extends React.Component {
             data={this.state.data || []}
             options={this.dataTableOptions()}
           />
-        </Panel.Body>
-      </Panel>
+        </Card.Body>
+      </Card>
     );
   }
 }

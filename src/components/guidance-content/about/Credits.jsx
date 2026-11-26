@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Row } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import {
   FullWidthCol,
   HalfWidthCol,
@@ -16,7 +16,7 @@ export default class Credits extends React.Component {
     const data = T.get(this.context, "about.credits.data.items");
 
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <T path="about.credits.title" />
@@ -37,7 +37,7 @@ export default class Credits extends React.Component {
             <List items={data} />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

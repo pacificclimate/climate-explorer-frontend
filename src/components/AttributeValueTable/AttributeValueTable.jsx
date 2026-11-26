@@ -5,7 +5,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
+import TableView, { Column } from "../TableView/TableView";
 
 class AttributeValueTable extends React.Component {
   static propTypes = {
@@ -16,31 +16,22 @@ class AttributeValueTable extends React.Component {
   render() {
     return (
       <div id={"table"}>
-        <BootstrapTable
+        <TableView
           data={this.props.data}
           options={this.props.options}
           striped
           hover
         >
-          <TableHeaderColumn
-            dataField="attribute"
-            dataAlign="center"
-            width="20%"
-          >
+          <Column dataField="attribute" dataAlign="center" width="20%">
             Attribute
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            dataField="value"
-            isKey
-            dataAlign="center"
-            width="20%"
-          >
+          </Column>
+          <Column dataField="value" isKey dataAlign="center" width="20%">
             Value
-          </TableHeaderColumn>
-          <TableHeaderColumn dataField="units" dataAlign="center" width="20%">
+          </Column>
+          <Column dataField="units" dataAlign="center" width="20%">
             Units
-          </TableHeaderColumn>
-        </BootstrapTable>
+          </Column>
+        </TableView>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Button, ControlLabel } from "react-bootstrap";
+import { Button, FormLabel } from "react-bootstrap";
 
 import {
   csvButtonLabel,
@@ -19,11 +19,15 @@ export default class ExportButtons extends React.Component {
   render() {
     return (
       <div>
-        <ControlLabel className={styles.exportlabel}>
+        <FormLabel className={styles.exportlabel}>
           {downloadGraphDataLabel}
-        </ControlLabel>
-        <Button onClick={this.props.onExportXlsx}>{xslxButtonLabel}</Button>
-        <Button onClick={this.props.onExportCsv}>{csvButtonLabel}</Button>
+        </FormLabel>
+        <Button variant="light" onClick={this.props.onExportXlsx}>
+          {xslxButtonLabel}
+        </Button>
+        <Button variant="light" onClick={this.props.onExportCsv}>
+          {csvButtonLabel}
+        </Button>
       </div>
     );
   }

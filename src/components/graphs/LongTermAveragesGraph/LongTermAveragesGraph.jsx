@@ -12,7 +12,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, ControlLabel } from "react-bootstrap";
+import { Row, Col, FormLabel } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -234,10 +234,10 @@ export default class LongTermAveragesGraph extends React.Component {
       <React.Fragment>
         <Row>
           {!this.props.hideTimeOfYearSelector && (
-            <Col lg={6} md={6} sm={6}>
-              <ControlLabel className={styles.selector_label}>
+            <Col xl={6} lg={6} md={6}>
+              <FormLabel className={styles.selector_label}>
                 {timeOfYearSelectorLabel}
-              </ControlLabel>
+              </FormLabel>
               <TimeOfYearSelector
                 value={this.state.timeOfYear}
                 onChange={this.handleChangeTimeOfYear}
@@ -246,7 +246,7 @@ export default class LongTermAveragesGraph extends React.Component {
               />
             </Col>
           )}
-          <Col lg={controlsWidth} md={controlsWidth} sm={controlsWidth}>
+          <Col xl={controlsWidth} lg={controlsWidth} md={controlsWidth}>
             <ExportButtons
               onExportXlsx={this.handleExportXlsx}
               onExportCsv={this.handleExportCsv}

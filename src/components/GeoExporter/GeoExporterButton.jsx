@@ -1,10 +1,11 @@
+import Icon from "../Icon/Icon";
 import React from "react";
-import { Button, Glyphicon } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 export default function (props) {
   return (
-    <Button bsSize="small" onClick={props.open} title={props.title}>
-      <Glyphicon glyph="save-file" />
+    <Button variant="light" size="sm" onClick={props.open} title={props.title}>
+      <Icon glyph="save-file" />
     </Button>
   );
 }

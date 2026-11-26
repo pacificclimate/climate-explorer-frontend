@@ -1,6 +1,7 @@
+import Icon from "../Icon/Icon";
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { Grid, Row, Col, Button, Glyphicon } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 import layersIcon from "leaflet/dist/images/layers.png";
 
@@ -105,8 +106,8 @@ export default class LayerOpacityControl extends PureComponent {
   render() {
     // TODO: Extract this to a separate component
     const LayerVisibilityButton = ({ layerVisibility, onClick }) => (
-      <Button bsSize={"xsmall"} onClick={onClick}>
-        <Glyphicon glyph={layerVisibility ? "eye-open" : "eye-close"} />
+      <Button variant="light" size="sm" onClick={onClick}>
+        <Icon glyph={layerVisibility ? "eye-open" : "eye-close"} />
       </Button>
     );
 
@@ -117,7 +118,7 @@ export default class LayerOpacityControl extends PureComponent {
         return (
           <Row key={layerType} className="layer-controls">
             <Row>
-              <Col lg={1} className="visibility-toggle">
+              <Col xl={1} className="visibility-toggle">
                 <LayerVisibilityButton
                   layerVisibility={!visible}
                   onClick={this.changeLayerVisibility.bind(
@@ -127,16 +128,16 @@ export default class LayerOpacityControl extends PureComponent {
                   )}
                 />
               </Col>
-              <Col lg={10} className="layer-identifier">
+              <Col xl={10} className="layer-identifier">
                 {`Climate ${layerType} layer`}
               </Col>
             </Row>
             {visible && (
               <Row className="opacity">
-                <Col lg={1} className="opacity-icon">
-                  <Glyphicon glyph={"adjust"} />
+                <Col xl={1} className="opacity-icon">
+                  <Icon glyph={"adjust"} />
                 </Col>
-                <Col lg={10} className="opacity-control">
+                <Col xl={10} className="opacity-control">
                   <InputRange
                     // step=0.0499 ensures can go up to 100%
                     // presumed rounding error means 0.05 won't work
@@ -163,24 +164,24 @@ export default class LayerOpacityControl extends PureComponent {
           onMouseLeave={this.handleMouseLeave}
         >
           {this.state.showControls ? (
-            <Grid fluid className="layer-controls-container">
+            <Container fluid className="layer-controls-container">
               {_.keys(this.props.layerOpacity).length > 1 && (
                 <Row className="layer-controls">
-                  <Col lg={1} className="visibility-toggle">
+                  <Col xl={1} className="visibility-toggle">
                     <LayerVisibilityButton
                       layerVisibility={!this.state.allLayersVisible}
                       onClick={this.toggleAllLayersVisiblility}
                     />
                   </Col>
-                  <Col lg={10} className="layer-identifier">
+                  <Col xl={10} className="layer-identifier">
                     All climate layers
                   </Col>
                 </Row>
               )}
               {layerVisibilityControls}
-            </Grid>
+            </Container>
           ) : (
-            <Button>
+            <Button variant="light">
               <img alt="" src={layersIcon} />
             </Button>
           )}

@@ -1,24 +1,14 @@
 import React from "react";
-import { Panel, PanelGroup } from "react-bootstrap";
-
-let idNum = 0;
-const nextId = () => `accordion-${idNum++}`;
+import { Accordion as BootstrapAccordion } from "react-bootstrap";
 
 const AccordionItem = ({ eventKey, title, children }) => (
-  <Panel eventKey={eventKey}>
-    <Panel.Heading>
-      <Panel.Title toggle>{title}</Panel.Title>
-    </Panel.Heading>
-    <Panel.Body collapsible>{children}</Panel.Body>
-  </Panel>
+  <BootstrapAccordion.Item eventKey={String(eventKey)}>
+    <BootstrapAccordion.Header>{title}</BootstrapAccordion.Header>
+    <BootstrapAccordion.Body>{children}</BootstrapAccordion.Body>
+  </BootstrapAccordion.Item>
 );
-
 const Accordion = ({ children }) => (
-  <PanelGroup accordion id={nextId()}>
-    {children}
-  </PanelGroup>
+  <BootstrapAccordion>{children}</BootstrapAccordion>
 );
-
 Accordion.Item = AccordionItem;
-
 export default Accordion;

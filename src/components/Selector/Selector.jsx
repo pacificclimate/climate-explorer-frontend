@@ -20,7 +20,7 @@
 import PropTypes from "prop-types";
 
 import React from "react";
-import { ControlLabel, MenuItem, Dropdown } from "react-bootstrap";
+import { FormLabel, Dropdown } from "react-bootstrap";
 import _ from "lodash";
 import styles from "./Selector.module.css";
 
@@ -64,7 +64,7 @@ class Selector extends React.Component {
     this.props.onChange(event);
   };
 
-  //renders an item into a react.bootstrap MenuItem
+  // Render an item as a Bootstrap dropdown choice.
   //if item is an atom, it is used for both user text and event key
   //otherwise, the 0th item is event key, the 1st user text, and the 2rd,
   //if present, whether the item is disabled.
@@ -74,21 +74,22 @@ class Selector extends React.Component {
     var disabled = _.isArray(item) && item.length > 2 ? item[2] : false;
 
     return (
-      <MenuItem
+      <Dropdown.Item
         key={choice}
         eventKey={eventKey}
         disabled={disabled}
         className={styles.selectoritem}
       >
         {choice}
-      </MenuItem>
+      </Dropdown.Item>
     );
   };
 
   render() {
     return (
       <div className={styles.selectorframe}>
-        <ControlLabel
+        <FormLabel
+          htmlFor={this.dropdownId}
           className={
             this.props.inlineLabel
               ? styles.selectorlabel_inline
@@ -96,14 +97,14 @@ class Selector extends React.Component {
           }
         >
           {this.props.label}
-        </ControlLabel>
-        <Dropdown
-          vertical
-          disabled={this.props.disabled}
-          onSelect={this.handleChange}
-          id={this.dropdownId}
-        >
-          <Dropdown.Toggle className={styles.selectortitle}>
+        </FormLabel>
+        <Dropdown onSelect={this.handleChange}>
+          <Dropdown.Toggle
+            variant="light"
+            id={this.dropdownId}
+            disabled={this.props.disabled}
+            className={styles.selectortitle}
+          >
             {this.displayValue(this.props.value, this.props.items)}
           </Dropdown.Toggle>
           <Dropdown.Menu className={styles.selectormenu}>

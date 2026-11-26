@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import Accordion from "../../guidance-tools/Accordion.jsx";
-import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
+import TableView, { Column } from "../../TableView/TableView";
 import { MEVSummary } from "../MEVSummary/MEVSummary.jsx";
 import { filteredDatasetSummaryPanelLabel } from "../../guidance-content/info/InformationItems.jsx";
 import { hasMultiRuns } from "../../map-controllers/map-helpers";
@@ -69,29 +69,29 @@ export default class FilteredDatasetsSummary extends React.Component {
       _.map(comparandDataGroupedByKey, keyedDataToTableRowData);
 
     const DataTable = ({ data }) => (
-      <BootstrapTable data={data}>
-        <TableHeaderColumn dataField="id" isKey width={"15%"}>
+      <TableView data={data}>
+        <Column dataField="id" isKey width={"15%"}>
           Label in selectors
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="ensemble_member" width={"10%"}>
+        </Column>
+        <Column dataField="ensemble_member" width={"10%"}>
           Model Run
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="start_date" width={"10%"}>
+        </Column>
+        <Column dataField="start_date" width={"10%"}>
           Start Date
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="end_date" width={"10%"}>
+        </Column>
+        <Column dataField="end_date" width={"10%"}>
           End Date
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="yearly" width={"10%"}>
+        </Column>
+        <Column dataField="yearly" width={"10%"}>
           Annual?
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="seasonal" width={"10%"}>
+        </Column>
+        <Column dataField="seasonal" width={"10%"}>
           Seasonal?
-        </TableHeaderColumn>
-        <TableHeaderColumn dataField="monthly" width={"10%"}>
+        </Column>
+        <Column dataField="monthly" width={"10%"}>
           Monthly?
-        </TableHeaderColumn>
-      </BootstrapTable>
+        </Column>
+      </TableView>
     );
 
     return (
@@ -100,8 +100,8 @@ export default class FilteredDatasetsSummary extends React.Component {
           eventKey={2}
           title={
             <Row>
-              <Col lg={2}>{filteredDatasetSummaryPanelLabel}</Col>
-              <Col lg={10}>
+              <Col xl={2}>{filteredDatasetSummaryPanelLabel}</Col>
+              <Col xl={10}>
                 <MEVSummary
                   model_id={this.props.model_id}
                   experiment={this.props.experiment}

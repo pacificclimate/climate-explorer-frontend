@@ -1,9 +1,10 @@
+import Icon from "../../Icon/Icon";
 // Central resource for LabelWithInfo and Information items used throughout
 // the app.
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Glyphicon, Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 import LabelWithInfo from "../../guidance-tools/LabelWithInfo.jsx";
 import css from "./InformationItems.module.css";
 
@@ -32,8 +33,8 @@ const LeafletControlContainer = ({ children }) => (
 
 const mapSettingsControl = (
   <span>
-    <Button bsSize="small">
-      <Glyphicon glyph="menu-hamburger" />
+    <Button variant="light" size="sm">
+      <Icon glyph="menu-hamburger" />
     </Button>{" "}
     (Map Settings)
   </span>
@@ -93,11 +94,11 @@ const mapPolygonEditControls = (
 
 const mapPolygonImportExportControls = (
   <span>
-    <Button bsSize="small">
-      <Glyphicon glyph="open-file" />
+    <Button variant="light" size="sm">
+      <Icon glyph="open-file" />
     </Button>{" "}
-    <Button bsSize="small">
-      <Glyphicon glyph="save-file" />
+    <Button variant="light" size="sm">
+      <Icon glyph="save-file" />
     </Button>{" "}
     (Polygon Import/Export)
   </span>
@@ -107,7 +108,7 @@ const mapColourScaleControls = <span>(Colour Scale Bar)</span>;
 
 const mapAutoScaleControl = (
   <span>
-    <Button bsSize="small">
+    <Button variant="light" size="sm">
       <span style={{ fontWeight: "bold" }}>AS</span>
     </Button>{" "}
     (Auto-Scale)

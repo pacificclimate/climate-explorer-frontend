@@ -18,7 +18,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Grid, Row, Col, Panel, ControlLabel } from "react-bootstrap";
+import { Container, Row, Col, Card, FormLabel } from "react-bootstrap";
 
 import DualDataController from "../../data-controllers/DualDataController/DualDataController.jsx";
 import {
@@ -103,7 +103,7 @@ class PrecipAppControllerDisplay extends React.Component {
     const comparand_id = this.representativeValue("comparand", "variable_id");
 
     return (
-      <Grid fluid>
+      <Container fluid>
         <Row>
           <FullWidthCol>
             <UnfilteredDatasetsSummary meta={this.props.meta} />
@@ -118,14 +118,14 @@ class PrecipAppControllerDisplay extends React.Component {
 
         <Row>
           <FullWidthCol>
-            <Panel>
-              <Panel.Heading>
-                <Panel.Title>{datasetFilterPanelLabel}</Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>
+            <Card>
+              <Card.Header>
+                <Card.Title>{datasetFilterPanelLabel}</Card.Title>
+              </Card.Header>
+              <Card.Body>
                 <Row>
-                  <Col lg={2} md={2}>
-                    <ControlLabel>{modelSelectorLabel}</ControlLabel>
+                  <Col xl={2} lg={2}>
+                    <FormLabel>{modelSelectorLabel}</FormLabel>
                     <ModelSelector
                       bases={this.props.meta}
                       value={this.props.model}
@@ -133,8 +133,8 @@ class PrecipAppControllerDisplay extends React.Component {
                       replaceInvalidValue={this.replaceInvalidModel}
                     />
                   </Col>
-                  <Col lg={2} md={2}>
-                    <ControlLabel>{emissionScenarioSelectorLabel}</ControlLabel>
+                  <Col xl={2} lg={2}>
+                    <FormLabel>{emissionScenarioSelectorLabel}</FormLabel>
                     <EmissionsScenarioSelector
                       bases={this.props.meta}
                       constraint={this.constraintsFor("model")}
@@ -143,8 +143,8 @@ class PrecipAppControllerDisplay extends React.Component {
                       replaceInvalidValue={this.replaceInvalidScenario}
                     />
                   </Col>
-                  <Col lg={4} md={4}>
-                    <ControlLabel>{variableSelectorLabel}</ControlLabel>
+                  <Col xl={4} lg={4}>
+                    <FormLabel>{variableSelectorLabel}</FormLabel>
                     <VariableSelector
                       bases={this.props.meta}
                       constraint={this.constraintsFor("model", "scenario")}
@@ -154,8 +154,8 @@ class PrecipAppControllerDisplay extends React.Component {
                     />
                   </Col>
                 </Row>
-              </Panel.Body>
-            </Panel>
+              </Card.Body>
+            </Card>
           </FullWidthCol>
         </Row>
 
@@ -214,7 +214,7 @@ class PrecipAppControllerDisplay extends React.Component {
             />
           </HalfWidthCol>
         </Row>
-      </Grid>
+      </Container>
     );
   }
 }

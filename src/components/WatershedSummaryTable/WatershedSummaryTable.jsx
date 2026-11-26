@@ -1,4 +1,4 @@
-// Watershed Summary Table: Panel containing a Attribute Value table that
+// Watershed Summary Table: Card containing a Attribute Value table that
 // shows physical information (elevation, area, etc) about the watershed the user
 // has selected.
 
@@ -6,7 +6,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, Panel } from "react-bootstrap";
+import { Row, Col, Card } from "react-bootstrap";
 
 import _ from "lodash";
 
@@ -143,21 +143,21 @@ export default class WatershedSummaryTable extends React.Component {
 
   render() {
     return (
-      <Panel>
-        <Panel.Heading>
-          <Panel.Title>
+      <Card>
+        <Card.Header>
+          <Card.Title>
             <Row>
-              <Col lg={4}>{watershedTableLabel}</Col>
+              <Col xl={4}>{watershedTableLabel}</Col>
             </Row>
-          </Panel.Title>
-        </Panel.Heading>
-        <Panel.Body className={styles.data_panel}>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body className={styles.data_panel}>
           <AttributeValueTable
             data={this.state.data || []}
             options={this.watershedTableOptions()}
           />
-        </Panel.Body>
-      </Panel>
+        </Card.Body>
+      </Card>
     );
   }
 }

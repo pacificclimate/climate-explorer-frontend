@@ -1,11 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
 import "leaflet/dist/leaflet.css";
 import "bootstrap-slider/dist/css/bootstrap-slider.min.css";
 // import 'perfect-scrollbar/dist/css/perfect-scrollbar.min.css';
 import "c3/c3.min.css";
-import "react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./bootstrap.css";
+import "./index.css";
 
 import ExternalText from "pcic-react-external-text";
 import { makeYamlLoader } from "./utils/external-text";
